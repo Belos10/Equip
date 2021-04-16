@@ -14,10 +14,12 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Widget_Manage_Widgets(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1441, 832)
+        MainWindow.resize(884, 832)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
+        self.gridLayout.setContentsMargins(0, 0, 0, 0)
+        self.gridLayout.setSpacing(0)
         self.gridLayout.setObjectName("gridLayout")
         self.tb_ManageWidget = QtWidgets.QTabWidget(self.centralwidget)
         self.tb_ManageWidget.setObjectName("tb_ManageWidget")

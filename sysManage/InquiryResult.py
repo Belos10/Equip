@@ -54,21 +54,23 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         sql = "select Dept_Name from dept where Dept_ID = '" + UnitID + "'"
         # print(sql)
         UnitName = Clicked(sql)
-        inquiry_result = []
-        result_num = 0
         if isRoot:
             self.findEquipId(EquipID, EquipIDList)
         else:
             EquipIDList.append(EquipID)
+        self.showInquiryResult(UnitID,EquipIDList)
 
+    def showInquiryResult(self,UnitID,EquipIDList):
+        inquiry_result = []
+        self.result_num = 0
         for id in EquipIDList:
             sql = "select * from equipandunit where Equip_ID = '" + id + "' and Unit_ID = '" + UnitID + "'"
             result = Clicked(sql)
             for row in result:
                 inquiry_result.append(row)
-            result_num += len(result)
+            self.result_num += len(result)
 
-        self.tw_inquiryResult.setRowCount(result_num)
+        self.tw_inquiryResult.setRowCount(self.result_num)
         self.tw_inquiryResult.setColumnCount(13)
         headerlist = ['单位名称', '装备名称', '实力数', '编制数', '现有数', '偏差', '准备退役数', '未到位数', '提前退役', '待核查无实物', '待核查无实力', '单独建账',
                       '正常到位']
@@ -112,8 +114,13 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         i = self.tw_inquiryResult.currentRow()
         UnitID = self.currentInquiryResult[i][1]
         EquipID = self.currentInquiryResult[i][0]
+        print("UnitID=",UnitID,"EquipId=",EquipID)
         delete_Inquiry_Clicked(UnitID, EquipID)
-        self.InquiryResult(UnitID, EquipID, 1)
+        EquipIDList1=[]
+        a=[e for e in range(self.result_num) if e != i]
+        for j in a:
+            EquipIDList1.append(self.currentInquiryResult[j][0])
+        self.showInquiryResult(UnitID, EquipIDList1)
 
     # 删除所有装备
     def deleteAllInquiryResult(self):
