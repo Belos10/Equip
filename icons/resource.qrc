@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="pic">
+    <file>set.png</file>
     <file>retire.png</file>
     <file>equip.png</file>
     <file>wave.png</file>

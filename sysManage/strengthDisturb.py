@@ -9,7 +9,7 @@ from sysManage.InquiryResult import Inquiry_Result
 from sysManage.addStrenthInfo import AddStrenthInfo
 from database.ConnectAndSql import Clicked, insert_Clicked
 from sysManage.Stren_Inquiry import Stren_Inquiry
-from widgets.StrengthDisturb import Strength_Disturb_Widget
+from sysManage.strengthDisturbSet import strengthDisturbSet
 
 class strengthDisturb(QMainWindow, Strength_Disturb_Widget):
     def __init__(self, parent=None):
@@ -20,17 +20,21 @@ class strengthDisturb(QMainWindow, Strength_Disturb_Widget):
         self.maintenMange = QWidget(self)
         self.equipBalance = QWidget(self)
         self.applyRetire = QWidget(self)
+        self.strengthDisturbSet = strengthDisturbSet(self)
 
         self.stackedWidget.addWidget(self.login)
         self.stackedWidget.addWidget(self.strenSelect)
         self.stackedWidget.addWidget(self.maintenMange)
         self.stackedWidget.addWidget(self.equipBalance)
         self.stackedWidget.addWidget(self.applyRetire)
+        self.stackedWidget.addWidget(self.strengthDisturbSet)
+
         self.stackedWidget.setCurrentIndex(0)
         self.actionstrengthSelect.setDisabled(False)
         self.actionapplyRetire.setDisabled(False)
         self.actionequipBalance.setDisabled(False)
         self.actionmaintenMange.setDisabled(False)
+        self.actionstrengthDisturbSet.setDisabled(False)
         self.connectSignal()
 
 
@@ -39,12 +43,14 @@ class strengthDisturb(QMainWindow, Strength_Disturb_Widget):
         self.actionmaintenMange.triggered.connect(self.slotMaintenMange)
         self.actionequipBalance.triggered.connect(self.slotEquipBalance)
         self.actionapplyRetire.triggered.connect(self.slotApplyRetire)
+        self.actionstrengthDisturbSet.triggered.connect(self.slotStrengthDisturbSet)
 
     def slotDisconnect(self):
         self.actionstrengthSelect.triggered.disconnect(self.slotSelectStrength)
         self.actionmaintenMange.triggered.disconnect(self.slotMaintenMange)
         self.actionequipBalance.triggered.disconnect(self.slotEquipBalance)
         self.actionapplyRetire.triggered.disconnect(self.slotApplyRetire)
+        self.actionstrengthDisturbSet.triggered.disconnect(self.slotStrengthDisturbSet)
 
     def slotSelectStrength(self):
 
@@ -52,6 +58,7 @@ class strengthDisturb(QMainWindow, Strength_Disturb_Widget):
         self.actionapplyRetire.setDisabled(False)
         self.actionequipBalance.setDisabled(False)
         self.actionmaintenMange.setDisabled(False)
+        self.actionstrengthDisturbSet.setDisabled(False)
         self.slotDisconnect()
         self.stackedWidget.setCurrentIndex(1)
         self.connectSignal()
@@ -61,6 +68,7 @@ class strengthDisturb(QMainWindow, Strength_Disturb_Widget):
         self.actionapplyRetire.setDisabled(False)
         self.actionequipBalance.setDisabled(False)
         self.actionmaintenMange.setDisabled(True)
+        self.actionstrengthDisturbSet.setDisabled(False)
 
         self.slotDisconnect()
         self.stackedWidget.setCurrentIndex(2)
@@ -72,6 +80,7 @@ class strengthDisturb(QMainWindow, Strength_Disturb_Widget):
         self.actionapplyRetire.setDisabled(False)
         self.actionequipBalance.setDisabled(True)
         self.actionmaintenMange.setDisabled(False)
+        self.actionstrengthDisturbSet.setDisabled(False)
 
         self.slotDisconnect()
         self.stackedWidget.setCurrentIndex(3)
@@ -83,9 +92,19 @@ class strengthDisturb(QMainWindow, Strength_Disturb_Widget):
         self.actionapplyRetire.setDisabled(True)
         self.actionequipBalance.setDisabled(False)
         self.actionmaintenMange.setDisabled(False)
+        self.actionstrengthDisturbSet.setDisabled(False)
 
         self.slotDisconnect()
         self.stackedWidget.setCurrentIndex(4)
         self.connectSignal()
 
+    def slotStrengthDisturbSet(self):
+        self.actionstrengthSelect.setDisabled(False)
+        self.actionapplyRetire.setDisabled(False)
+        self.actionequipBalance.setDisabled(False)
+        self.actionmaintenMange.setDisabled(False)
+        self.actionstrengthDisturbSet.setDisabled(True)
 
+        self.slotDisconnect()
+        self.stackedWidget.setCurrentIndex(5)
+        self.connectSignal()
