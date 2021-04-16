@@ -1,0 +1,8 @@
+<RCC>
+  <qresource prefix="pic">
+    <file>retire.png</file>
+    <file>equip.png</file>
+    <file>wave.png</file>
+    <file>select.png</file>
+  </qresource>
+</RCC>
