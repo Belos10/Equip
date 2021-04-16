@@ -52,7 +52,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         sql = "select Dept_Name from dept where Dept_ID = '" + UnitID + "'"
         #print(sql)
         UnitName = Clicked(sql)
-        inqury_result = []
+        inquiry_result = []
         result_num = 0
         if isRoot:
             self.findEquipId(EquipID, EquipIDList)
@@ -63,14 +63,14 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
             sql = "select * from equipandunit where Equip_ID = '" + id + "' and Unit_ID = '" + UnitID + "'"
             result = Clicked(sql)
             for row in result:
-                inqury_result.append(row)
+                inquiry_result.append(row)
             result_num += len(result)
 
         self.tw_inquiryResult.setRowCount(result_num)
         self.tw_inquiryResult.setColumnCount(13)
         headerlist = ['单位名称', '装备名称', '实力数', '编制数', '现有数', '偏差', '准备退役数', '未到位数', '提前退役', '待核查无实物', '待核查无实力', '单独建账', '正常到位']
         self.tw_inquiryResult.setHorizontalHeaderLabels(headerlist)
-        for i, data in enumerate(inqury_result):
+        for i, data in enumerate(inquiry_result):
             item = QTableWidgetItem(data[3])
             self.tw_inquiryResult.setItem(i, 0, item)
             item = QTableWidgetItem(data[2])
