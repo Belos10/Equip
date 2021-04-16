@@ -265,3 +265,4 @@ class Add_Strenth_Info(object):
         self.label_4.setText(_translate("Form", "现有数："))
         self.label_6.setText(_translate("Form", "实力数："))
         self.label_5.setText(_translate("Form", "计量单位："))
+#1
