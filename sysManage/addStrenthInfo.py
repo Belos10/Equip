@@ -63,6 +63,7 @@ class AddStrenthInfo(QWidget, Add_Strenth_Info):
         self.data = data
         self._initWidget()
 
+    # 信息录入界面新增按钮
     def slotAddSingle(self):
         row_num = self.tableWidget.rowCount()
         # print("row num",row_num)
@@ -70,6 +71,7 @@ class AddStrenthInfo(QWidget, Add_Strenth_Info):
         self.tableWidget.insertRow(row_num)
         self.row_num = row_num + 1
 
+    # 信息录入界面删除按钮
     def deleteNote(self):
         item = self.tableWidget.selectedItems()
         if len(item) == 0:

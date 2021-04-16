@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QMainWindow
 from widgets.stren_inquiry import Widget_Stren_Inquiry
 import sys
-from PyQt5.QtWidgets import QMainWindow,QApplication,QWidget, QTreeWidgetItemIterator, QTreeWidgetItem
+from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QTreeWidgetItemIterator, QTreeWidgetItem
 from PyQt5.QtGui import QIcon
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import pyqtSignal
@@ -17,21 +17,22 @@ from database.ConnectAndSql import Clicked, insert_Clicked
 first_treeWidget_dict = {}
 second_treeWidget_dict = {}
 
+
 class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
-    #signalInquiry = pyqtSignal(str, str, name="signalInquiry")
+    # signalInquiry = pyqtSignal(str, str, name="signalInquiry")
     def __init__(self, parent=None):
         super(Stren_Inquiry, self).__init__(parent)
         self.setupUi(self)
         self.inquiry_result = Inquiry_Result()
         self.add_strenth_info = AddStrenthInfo()
-        #初始显示实力查询界面
+        # 初始显示实力查询界面
         self.sw_strenSelectMan.addWidget(self.inquiry_result)
         self.sw_strenSelectMan.setCurrentIndex(0)
 
         self.sw_strenSelectMan.addWidget(self.add_strenth_info)
 
         self.signalConnectSlot()
-        #初始化TreeWidget
+        # 初始化TreeWidget
         self.tw_first.clear()
         self.tw_second.clear()
         self.tw_first.header().setVisible(False)
@@ -39,7 +40,7 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         self._initTreeWidget("", self.tw_first)
         print(first_treeWidget_dict)
 
-    #信号与槽的连接
+    # 信号与槽的连接
     def signalConnectSlot(self):
         # 按查询按钮时第一个目录的查询
         self.pb_firstSelect.clicked.connect(self.slotFilterFirstTreeWidget)
@@ -61,7 +62,7 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         self.inquiry_result.pb_clearCheck.clicked.connect(self.inquiry_result.deleteInquiryResult)
         self.inquiry_result.pb_clearAll.clicked.connect(self.inquiry_result.deleteAllInquiryResult)
 
-    #信号与槽连接的断开
+    # 信号与槽连接的断开
     def signalDisconnectSlot(self):
         self.pb_firstSelect.clicked.disconnect(self.slotFilterFirstTreeWidget)
         # 按查询按钮时第二个目录的查询
@@ -82,16 +83,19 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         self.inquiry_result.pb_clearCheck.clicked.disconnect(self.inquiry_result.deleteInquiryResult)
         self.inquiry_result.pb_clearAll.clicked.disconnect(self.inquiry_result.deleteAllInquiryResult)
 
-    def slotBack(self,event):
+    def slotBack(self, event):
         reply = QtWidgets.QMessageBox.question(self, '提示', '是否退出信息录入?',
                                                QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
         if reply == QtWidgets.QMessageBox.Yes:
             self.sw_strenSelectMan.setCurrentIndex(0)
-
+            self.tw_first.setEnabled(1)
+            self.tw_second.setEnabled(1)
 
     def slotSaveAddInfo(self):
         OrignNum = self.add_strenth_info.OrignNum
         print(self.add_strenth_info.OrignNum, self.add_strenth_info.tableWidget.rowCount())
+        self.tw_first.setEnabled(1)
+        self.tw_second.setEnabled(1)
         if self.add_strenth_info.OrignNum == self.add_strenth_info.tableWidget.rowCount():
             self.sw_strenSelectMan.setCurrentIndex(0)
             return
@@ -108,27 +112,28 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
             other = self.add_strenth_info.tableWidget.item(i + OrignNum, 7).text()
             print(ID, num, year, shop, state, arrive, confirm, other)
             insert_Clicked(Unit_ID, Equip_ID, ID, num, year, shop, state, arrive, confirm, other)
-
-
         self.sw_strenSelectMan.setCurrentIndex(0)
 
     def slotDoubleClickedTableItem(self):
         currentRow = self.inquiry_result.tw_inquiryResult.currentRow()
-        #self._initWeight()
+        # self._initWeight()
         for key, data in self.inquiry_result.currentInquiryResult.items():
             if key == currentRow:
                 self.add_strenth_info._initWeight(data)
+                self.tw_first.setEnabled(0)
+                self.tw_second.setEnabled(0)
                 break
 
         self.sw_strenSelectMan.setCurrentIndex(1)
 
     def slotFirstChange(self):
-        #self.tw_second.clear()
+        # self.tw_second.clear()
         self.inquiry_result.tw_inquiryResult.clear()
 
     '''
         初始化TreeWidget
     '''
+
     def _initTreeWidget(self, root, mother):
 
         if root == '':
@@ -148,6 +153,7 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         功能：
             让第一个目录进行过滤筛选出想选择的项目
     '''
+
     def slotFilterFirstTreeWidget(self):
         """以text开头作为过滤条件示例"""
         find = False
@@ -174,6 +180,7 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         功能：
             让第二个目录进行过滤筛选出想选择的项目
     '''
+
     def slotFilterSecondTreeWidget(self):
         """以text开头作为过滤条件示例"""
         text = self.le_second.text()
@@ -202,11 +209,11 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
 
         if UnitID:
             sql = "select Equip_Name,Equip_ID from equip where Unit_ID ='" + UnitID + "'" + "AND Equip_Uper is NUll"
-            #print(sql)
+            # print(sql)
         else:
 
             sql = "select Equip_Name,Equip_ID from equip where Equip_Uper ='" + root + "'"
-            #print(sql)
+            # print(sql)
         result = Clicked(sql)
         for data in result:
             item = QTreeWidgetItem(mother)
@@ -215,26 +222,24 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
             if data[0] != '':
                 self._initSecondTreeWidget(data[1], item, 0)
 
-
     def slotSelectIndex(self):
         self.signalDisconnectSlot()
-        #在clear前要现将该控件上的信号和槽的连接进行disconnect，不然会发生段错误
+        # 在clear前要现将该控件上的信号和槽的连接进行disconnect，不然会发生段错误
         self.inquiry_result.tw_inquiryResult.clear()
         self.tw_second.clear()
 
         for UnitID, item in first_treeWidget_dict.items():
             if item == self.tw_first.currentItem():
-
-                #print(sql)
+                # print(sql)
                 self._initSecondTreeWidget("", self.tw_second, UnitID)
-                #break
+                # break
         self.signalConnectSlot()
-
 
     '''
         功能：
             查询想要查询的结果并显示
     '''
+
     def slotInquiry(self):
         UnitID = 0
         EquitID = 0

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'inqury_result.ui'
+# Form implementation generated from reading ui file 'inquiry_result.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.2
 #
@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Widget_Inquiry_Result(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(1348, 781)
+        Form.resize(850, 777)
         self.verticalLayout = QtWidgets.QVBoxLayout(Form)
         self.verticalLayout.setObjectName("verticalLayout")
         self.widget = QtWidgets.QWidget(Form)
@@ -48,7 +48,12 @@ class Widget_Inquiry_Result(object):
         self.horizontalLayout_2.addWidget(self.pb_clearAll)
         self.verticalLayout_2.addLayout(self.horizontalLayout_2)
         self.tw_inquiryResult = QtWidgets.QTableWidget(self.widget)
-        self.tw_inquiryResult.setObjectName("tw_inquryResult")
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.tw_inquiryResult.sizePolicy().hasHeightForWidth())
+        self.tw_inquiryResult.setSizePolicy(sizePolicy)
+        self.tw_inquiryResult.setObjectName("tw_inquiryResult")
         self.tw_inquiryResult.setColumnCount(0)
         self.tw_inquiryResult.setRowCount(0)
         self.verticalLayout_2.addWidget(self.tw_inquiryResult)

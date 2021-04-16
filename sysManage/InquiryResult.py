@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QMainWindow
 from widgets.manage_widget import Widget_Manage_Widgets
 import sys
-from PyQt5.QtWidgets import QMainWindow,QApplication,QWidget, QTableWidgetItem, QAbstractItemView
+from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QTableWidgetItem, QAbstractItemView
 from PyQt5.QtGui import QIcon
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import pyqtSignal
@@ -12,6 +12,7 @@ from database.ConnectAndSql import Clicked, delete_Inquiry_Clicked
     类功能：
         管理实力分布下实力查询结果界面，包含查询结果相关逻辑代码
 '''
+
 
 class Inquiry_Result(QWidget, Widget_Inquiry_Result):
     def __init__(self, parent=None):
@@ -36,7 +37,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         EquipIDList.append(EquipID)
         for id in FindEquipID:
             sql = "select Equip_ID from equip where Equip_Uper = '" + id[0] + "'"
-            #print(sql)
+            # print(sql)
             haveChild = Clicked(sql)
             for child in haveChild:
                 self.findEquipId(child[0], EquipIDList)
@@ -45,12 +46,13 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
     '''
         QTableWidget显示查询结果
     '''
+
     def InquiryResult(self, UnitID, EquipID, isRoot):
         self.tw_inquiryResult.clear()
         EquipIDList = []
-        #EquipIDList.append(EquipID)
+        # EquipIDList.append(EquipID)
         sql = "select Dept_Name from dept where Dept_ID = '" + UnitID + "'"
-        #print(sql)
+        # print(sql)
         UnitName = Clicked(sql)
         inquiry_result = []
         result_num = 0
@@ -68,7 +70,8 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
 
         self.tw_inquiryResult.setRowCount(result_num)
         self.tw_inquiryResult.setColumnCount(13)
-        headerlist = ['单位名称', '装备名称', '实力数', '编制数', '现有数', '偏差', '准备退役数', '未到位数', '提前退役', '待核查无实物', '待核查无实力', '单独建账', '正常到位']
+        headerlist = ['单位名称', '装备名称', '实力数', '编制数', '现有数', '偏差', '准备退役数', '未到位数', '提前退役', '待核查无实物', '待核查无实力', '单独建账',
+                      '正常到位']
         self.tw_inquiryResult.setHorizontalHeaderLabels(headerlist)
         for i, data in enumerate(inquiry_result):
             item = QTableWidgetItem(data[3])
@@ -99,9 +102,9 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
             self.tw_inquiryResult.setItem(i, 12, item)
 
             self.currentInquiryResult[i] = data
-            #print(self.currentInquryResult)
+            # print(self.currentInquryResult)
 
- # 删除选中装备
+    # 删除选中装备
     def deleteInquiryResult(self):
         item = self.tw_inquiryResult.selectedItems()
         if len(item) == 0:
@@ -119,6 +122,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
             EquipID = self.currentInquiryResult[i][0]
             delete_Inquiry_Clicked(UnitID, EquipID)
         self.InquiryResult(UnitID, EquipID, 1)
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

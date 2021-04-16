@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1348</width>
-    <height>781</height>
+    <width>850</width>
+    <height>777</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -84,7 +84,14 @@
        </layout>
       </item>
       <item>
-       <widget class="QTableWidget" name="tw_inquryResult"/>
+       <widget class="QTableWidget" name="tw_inquiryResult">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
