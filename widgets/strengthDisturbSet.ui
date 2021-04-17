@@ -49,17 +49,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionselectSet"/>
   </widget>
-  <action name="actionselectSet">
-   <property name="icon">
-    <iconset resource="../icons/resource.qrc">
-     <normaloff>:/pic/selectSet.png</normaloff>:/pic/selectSet.png</iconset>
-   </property>
-   <property name="text">
-    <string>selectSet</string>
-   </property>
-  </action>
  </widget>
  <resources>
   <include location="../icons/resource.qrc"/>

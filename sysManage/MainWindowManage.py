@@ -17,6 +17,8 @@ class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
         self.purChasPlan = QWidget()
         self.mantanSupport = QWidget()
 
+        self.setWindowTitle("核化装备管理系统")
+
         self.tb_ManageWidget.addTab(self.strengthDisturb, "实力查询")
         self.tb_ManageWidget.setCurrentIndex(0)
         self.tb_ManageWidget.addTab(self.alocatMange, "调配管理")

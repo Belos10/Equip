@@ -55,57 +55,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionstrengthSelect"/>
-   <addaction name="actionmaintenMange"/>
-   <addaction name="actionequipBalance"/>
-   <addaction name="actionapplyRetire"/>
-   <addaction name="actionstrengthDisturbSet"/>
   </widget>
-  <action name="actionstrengthSelect">
-   <property name="icon">
-    <iconset resource="../icons/resource.qrc">
-     <normaloff>:/pic/select.png</normaloff>:/pic/select.png</iconset>
-   </property>
-   <property name="text">
-    <string>strengthSelect</string>
-   </property>
-  </action>
-  <action name="actionmaintenMange">
-   <property name="icon">
-    <iconset resource="../icons/resource.qrc">
-     <normaloff>:/pic/wave.png</normaloff>:/pic/wave.png</iconset>
-   </property>
-   <property name="text">
-    <string>maintenMange</string>
-   </property>
-  </action>
-  <action name="actionequipBalance">
-   <property name="icon">
-    <iconset resource="../icons/resource.qrc">
-     <normaloff>:/pic/equip.png</normaloff>:/pic/equip.png</iconset>
-   </property>
-   <property name="text">
-    <string>equipBalance</string>
-   </property>
-  </action>
-  <action name="actionapplyRetire">
-   <property name="icon">
-    <iconset resource="../icons/resource.qrc">
-     <normaloff>:/pic/retire.png</normaloff>:/pic/retire.png</iconset>
-   </property>
-   <property name="text">
-    <string>applyRetire</string>
-   </property>
-  </action>
-  <action name="actionstrengthDisturbSet">
-   <property name="icon">
-    <iconset resource="../icons/resource.qrc">
-     <normaloff>:/pic/set.png</normaloff>:/pic/set.png</iconset>
-   </property>
-   <property name="text">
-    <string>strengthDisturbSet</string>
-   </property>
-  </action>
  </widget>
  <resources>
   <include location="../icons/resource.qrc"/>
