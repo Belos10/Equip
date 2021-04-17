@@ -14,8 +14,10 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Widget_Inquiry_Result(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(850, 777)
+        Form.resize(869, 777)
         self.verticalLayout = QtWidgets.QVBoxLayout(Form)
+        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout.setSpacing(0)
         self.verticalLayout.setObjectName("verticalLayout")
         self.widget = QtWidgets.QWidget(Form)
         self.widget.setObjectName("widget")

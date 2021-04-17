@@ -59,6 +59,7 @@
    <addaction name="actionmaintenMange"/>
    <addaction name="actionequipBalance"/>
    <addaction name="actionapplyRetire"/>
+   <addaction name="actionstrengthDisturbSet"/>
   </widget>
   <action name="actionstrengthSelect">
    <property name="icon">
@@ -94,6 +95,15 @@
    </property>
    <property name="text">
     <string>applyRetire</string>
+   </property>
+  </action>
+  <action name="actionstrengthDisturbSet">
+   <property name="icon">
+    <iconset resource="../icons/resource.qrc">
+     <normaloff>:/pic/set.png</normaloff>:/pic/set.png</iconset>
+   </property>
+   <property name="text">
+    <string>strengthDisturbSet</string>
    </property>
   </action>
  </widget>

@@ -80,7 +80,7 @@ class strengthDisturb(QMainWindow, Strength_Disturb_Widget):
         self.actionapplyRetire.setDisabled(False)
         self.actionequipBalance.setDisabled(True)
         self.actionmaintenMange.setDisabled(False)
-        self.actionstrengthDisturbSet.setDisabled(False)
+        #self.actionstrengthDisturbSet.setDisabled(False)
 
         self.slotDisconnect()
         self.stackedWidget.setCurrentIndex(3)

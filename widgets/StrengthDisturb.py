@@ -54,10 +54,16 @@ class Strength_Disturb_Widget(object):
         icon3.addPixmap(QtGui.QPixmap(":/pic/retire.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionapplyRetire.setIcon(icon3)
         self.actionapplyRetire.setObjectName("actionapplyRetire")
+        self.actionstrengthDisturbSet = QtWidgets.QAction(MainWindow)
+        icon4 = QtGui.QIcon()
+        icon4.addPixmap(QtGui.QPixmap(":/pic/set.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionstrengthDisturbSet.setIcon(icon4)
+        self.actionstrengthDisturbSet.setObjectName("actionstrengthDisturbSet")
         self.toolBar.addAction(self.actionstrengthSelect)
         self.toolBar.addAction(self.actionmaintenMange)
         self.toolBar.addAction(self.actionequipBalance)
         self.toolBar.addAction(self.actionapplyRetire)
+        self.toolBar.addAction(self.actionstrengthDisturbSet)
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -70,4 +76,5 @@ class Strength_Disturb_Widget(object):
         self.actionmaintenMange.setText(_translate("MainWindow", "maintenMange"))
         self.actionequipBalance.setText(_translate("MainWindow", "equipBalance"))
         self.actionapplyRetire.setText(_translate("MainWindow", "applyRetire"))
+        self.actionstrengthDisturbSet.setText(_translate("MainWindow", "strengthDisturbSet"))
 import icons.resource_rc
