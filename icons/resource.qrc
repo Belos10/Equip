@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="pic">
+    <file>selectSet.png</file>
     <file>set.png</file>
     <file>retire.png</file>
     <file>equip.png</file>

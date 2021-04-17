@@ -15,6 +15,7 @@ class strengthDisturb(QMainWindow, Strength_Disturb_Widget):
     def __init__(self, parent=None):
         super(strengthDisturb, self).__init__(parent)
         self.setupUi(self)
+
         self.login = QWidget(self)
         self.strenSelect = Stren_Inquiry(self)
         self.maintenMange = QWidget(self)
@@ -30,81 +31,85 @@ class strengthDisturb(QMainWindow, Strength_Disturb_Widget):
         self.stackedWidget.addWidget(self.strengthDisturbSet)
 
         self.stackedWidget.setCurrentIndex(0)
-        self.actionstrengthSelect.setDisabled(False)
-        self.actionapplyRetire.setDisabled(False)
-        self.actionequipBalance.setDisabled(False)
-        self.actionmaintenMange.setDisabled(False)
-        self.actionstrengthDisturbSet.setDisabled(False)
+        self.tb_strengthSelect.setDisabled(False)
+        self.tb_applyRetire.setDisabled(False)
+        self.tb_equipBalance.setDisabled(False)
+        self.tb_maintenMange.setDisabled(False)
+        self.tb_strengthDisturbSet.setDisabled(False)
         self.connectSignal()
 
 
     def connectSignal(self):
-        self.actionstrengthSelect.triggered.connect(self.slotSelectStrength)
-        self.actionmaintenMange.triggered.connect(self.slotMaintenMange)
-        self.actionequipBalance.triggered.connect(self.slotEquipBalance)
-        self.actionapplyRetire.triggered.connect(self.slotApplyRetire)
-        self.actionstrengthDisturbSet.triggered.connect(self.slotStrengthDisturbSet)
+        self.tb_strengthSelect.clicked.connect(self.slotSelectStrength)
+        self.tb_maintenMange.clicked.connect(self.slotMaintenMange)
+        self.tb_equipBalance.clicked.connect(self.slotEquipBalance)
+        self.tb_applyRetire.clicked.connect(self.slotApplyRetire)
+        self.tb_strengthDisturbSet.clicked.connect(self.slotStrengthDisturbSet)
 
     def slotDisconnect(self):
-        self.actionstrengthSelect.triggered.disconnect(self.slotSelectStrength)
-        self.actionmaintenMange.triggered.disconnect(self.slotMaintenMange)
-        self.actionequipBalance.triggered.disconnect(self.slotEquipBalance)
-        self.actionapplyRetire.triggered.disconnect(self.slotApplyRetire)
-        self.actionstrengthDisturbSet.triggered.disconnect(self.slotStrengthDisturbSet)
+        self.tb_strengthSelect.clicked.disconnect(self.slotSelectStrength)
+        self.tb_maintenMange.clicked.disconnect(self.slotMaintenMange)
+        self.tb_equipBalance.clicked.disconnect(self.slotEquipBalance)
+        self.tb_applyRetire.clicked.disconnect(self.slotApplyRetire)
+        self.tb_strengthDisturbSet.clicked.disconnect(self.slotStrengthDisturbSet)
 
     def slotSelectStrength(self):
 
-        self.actionstrengthSelect.setDisabled(True)
-        self.actionapplyRetire.setDisabled(False)
-        self.actionequipBalance.setDisabled(False)
-        self.actionmaintenMange.setDisabled(False)
-        self.actionstrengthDisturbSet.setDisabled(False)
+        self.tb_strengthSelect.setDisabled(True)
+        self.tb_applyRetire.setDisabled(False)
+        self.tb_equipBalance.setDisabled(False)
+        self.tb_maintenMange.setDisabled(False)
+        self.tb_strengthDisturbSet.setDisabled(False)
         self.slotDisconnect()
         self.stackedWidget.setCurrentIndex(1)
         self.connectSignal()
 
     def slotMaintenMange(self):
-        self.actionstrengthSelect.setDisabled(False)
-        self.actionapplyRetire.setDisabled(False)
-        self.actionequipBalance.setDisabled(False)
-        self.actionmaintenMange.setDisabled(True)
-        self.actionstrengthDisturbSet.setDisabled(False)
+        self.tb_strengthSelect.setDisabled(False)
+        self.tb_applyRetire.setDisabled(False)
+        self.tb_equipBalance.setDisabled(False)
+        self.tb_maintenMange.setDisabled(True)
+        self.tb_strengthDisturbSet.setDisabled(False)
 
         self.slotDisconnect()
         self.stackedWidget.setCurrentIndex(2)
         self.connectSignal()
 
     def slotEquipBalance(self):
-
-        self.actionstrengthSelect.setDisabled(False)
-        self.actionapplyRetire.setDisabled(False)
-        self.actionequipBalance.setDisabled(True)
-        self.actionmaintenMange.setDisabled(False)
-        #self.actionstrengthDisturbSet.setDisabled(False)
+        self.tb_strengthSelect.setDisabled(False)
+        self.tb_applyRetire.setDisabled(False)
+        self.tb_equipBalance.setDisabled(True)
+        self.tb_maintenMange.setDisabled(False)
+        self.tb_strengthDisturbSet.setDisabled(False)
 
         self.slotDisconnect()
         self.stackedWidget.setCurrentIndex(3)
         self.connectSignal()
 
     def slotApplyRetire(self):
-
-        self.actionstrengthSelect.setDisabled(False)
-        self.actionapplyRetire.setDisabled(True)
-        self.actionequipBalance.setDisabled(False)
-        self.actionmaintenMange.setDisabled(False)
-        self.actionstrengthDisturbSet.setDisabled(False)
+        self.tb_strengthSelect.setDisabled(False)
+        self.tb_applyRetire.setDisabled(True)
+        self.tb_equipBalance.setDisabled(False)
+        self.tb_maintenMange.setDisabled(False)
+        self.tb_strengthDisturbSet.setDisabled(False)
 
         self.slotDisconnect()
         self.stackedWidget.setCurrentIndex(4)
         self.connectSignal()
 
     def slotStrengthDisturbSet(self):
-        self.actionstrengthSelect.setDisabled(False)
-        self.actionapplyRetire.setDisabled(False)
-        self.actionequipBalance.setDisabled(False)
-        self.actionmaintenMange.setDisabled(False)
-        self.actionstrengthDisturbSet.setDisabled(True)
+        self.tb_strengthSelect.setDisabled(False)
+        self.tb_applyRetire.setDisabled(False)
+        self.tb_equipBalance.setDisabled(False)
+        self.tb_maintenMange.setDisabled(False)
+        self.tb_strengthDisturbSet.setDisabled(True)
 
         self.slotDisconnect()
         self.stackedWidget.setCurrentIndex(5)
         self.connectSignal()
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    widget = strengthDisturb()
+    widget.show()
+    sys.exit(app.exec_())
