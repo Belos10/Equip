@@ -45,6 +45,7 @@ class Widget_Manage_Widgets(object):
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        self.setWindowIcon(QtGui.QIcon(":/pic/system.png"))
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate

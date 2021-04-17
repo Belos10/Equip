@@ -6,5 +6,6 @@
     <file>equip.png</file>
     <file>wave.png</file>
     <file>select.png</file>
+    <file>system.png</file>
   </qresource>
 </RCC>
