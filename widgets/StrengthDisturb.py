@@ -83,9 +83,9 @@ class Strength_Disturb_Widget(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.toolBar.setWindowTitle(_translate("MainWindow", "toolBar"))
-        self.tb_strengthSelect.setText(_translate("MainWindow", "strengthSelect"))
-        self.tb_maintenMange.setText(_translate("MainWindow", "maintenMange"))
-        self.tb_equipBalance.setText(_translate("MainWindow", "equipBalance"))
-        self.tb_applyRetire.setText(_translate("MainWindow", "applyRetire"))
-        self.tb_strengthDisturbSet.setText(_translate("MainWindow", "strengthDisturbSet"))
+        self.tb_strengthSelect.setText(_translate("MainWindow", "实力查询"))
+        self.tb_maintenMange.setText(_translate("MainWindow", "编制数维护"))
+        self.tb_equipBalance.setText(_translate("MainWindow", "装备平衡表"))
+        self.tb_applyRetire.setText(_translate("MainWindow", "申请退役"))
+        self.tb_strengthDisturbSet.setText(_translate("MainWindow", "实力分布设置"))
 import icons.resource_rc
