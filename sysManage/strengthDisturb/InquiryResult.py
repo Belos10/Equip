@@ -1,11 +1,6 @@
-from PyQt5.QtWidgets import QMainWindow
-from widgets.manage_widget import Widget_Manage_Widgets
 import sys
-from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QTableWidgetItem, QAbstractItemView,QAbstractItemView
-from PyQt5.QtGui import QIcon
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import pyqtSignal
-from widgets.inquiry_result import Widget_Inquiry_Result
+from PyQt5.QtWidgets import QApplication, QWidget, QTableWidgetItem, QAbstractItemView
+from widgets.strengthDisturb.inquiry_result import Widget_Inquiry_Result
 from database.ConnectAndSql import Clicked, delete_Inquiry_Clicked
 
 '''

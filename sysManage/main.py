@@ -1,11 +1,5 @@
 import sys
-from PyQt5.QtWidgets import QMainWindow
-import sys
-from PyQt5.QtWidgets import QMainWindow,QApplication,QWidget
-from PyQt5.QtGui import QIcon
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import pyqtSignal
-from sysManage.Stren_Inquiry import Stren_Inquiry
+from PyQt5.QtWidgets import QApplication
 from sysManage.MainWindowManage import Manage_Widgets
 
 '''

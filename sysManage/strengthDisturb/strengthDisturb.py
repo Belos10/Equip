@@ -1,15 +1,8 @@
-from PyQt5.QtWidgets import QMainWindow
-from widgets.StrengthDisturb import Strength_Disturb_Widget
+from widgets.strengthDisturb.StrengthDisturb import Strength_Disturb_Widget
 import sys
-from PyQt5.QtWidgets import QMainWindow,QApplication,QWidget, QTreeWidgetItemIterator, QTreeWidgetItem
-from PyQt5.QtGui import QIcon
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import pyqtSignal
-from sysManage.InquiryResult import Inquiry_Result
-from sysManage.addStrenthInfo import AddStrenthInfo
-from database.ConnectAndSql import Clicked, insert_Clicked
-from sysManage.Stren_Inquiry import Stren_Inquiry
-from sysManage.strengthDisturbSet import strengthDisturbSet
+from PyQt5.QtWidgets import QMainWindow,QApplication,QWidget
+from sysManage.strengthDisturb.Stren_Inquiry import Stren_Inquiry
+from sysManage.strengthDisturb.strengthDisturbSet import strengthDisturbSet
 
 class strengthDisturb(QMainWindow, Strength_Disturb_Widget):
     def __init__(self, parent=None):

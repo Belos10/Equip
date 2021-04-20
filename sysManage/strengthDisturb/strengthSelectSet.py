@@ -1,12 +1,6 @@
-from PyQt5.QtWidgets import QMainWindow,QApplication,QWidget, QTreeWidgetItemIterator, QTreeWidgetItem,QTableWidgetItem,QAbstractItemView, QMessageBox
-from PyQt5.QtGui import QIcon
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import pyqtSignal
-from sysManage.InquiryResult import Inquiry_Result
-from sysManage.addStrenthInfo import AddStrenthInfo
+from PyQt5.QtWidgets import QWidget, QTreeWidgetItem,QTableWidgetItem,QAbstractItemView, QMessageBox
 from database.ConnectAndSql import Clicked, add_UnitDict, update_Unit_Dict, selectUnitDictByUper, del_Unit_Dict, del_Unit_And_Child
-from sysManage.Stren_Inquiry import Stren_Inquiry
-from widgets.select_set import Widget_Select_Set
+from widgets.strengthDisturb.select_set import Widget_Select_Set
 
 
 

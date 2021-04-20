@@ -1,15 +1,7 @@
-import sys
-from PyQt5.QtWidgets import QMainWindow
-import sys
-from PyQt5.QtWidgets import QMainWindow,QApplication,QWidget
-from PyQt5.QtGui import QIcon
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import pyqtSignal
-from sysManage.Stren_Inquiry import Stren_Inquiry
+from PyQt5.QtWidgets import QWidget
 from untitled import Ui_Form
 from testUnit import testUnit
-import treelib
-from treelib import Tree, Node
+from treelib import Tree
 
 '''
     显示主界面

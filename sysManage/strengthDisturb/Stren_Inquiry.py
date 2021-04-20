@@ -1,12 +1,8 @@
-from PyQt5.QtWidgets import QMainWindow
-from widgets.stren_inquiry import Widget_Stren_Inquiry
-import sys
-from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QTreeWidgetItemIterator, QTreeWidgetItem
-from PyQt5.QtGui import QIcon
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import pyqtSignal
-from sysManage.InquiryResult import Inquiry_Result
-from sysManage.addStrenthInfo import AddStrenthInfo
+from widgets.strengthDisturb.stren_inquiry import Widget_Stren_Inquiry
+from PyQt5.QtWidgets import QWidget, QTreeWidgetItemIterator, QTreeWidgetItem
+from PyQt5 import QtWidgets
+from sysManage.strengthDisturb.InquiryResult import Inquiry_Result
+from sysManage.strengthDisturb.addStrenthInfo import AddStrenthInfo
 from database.ConnectAndSql import Clicked, insert_Clicked
 
 '''

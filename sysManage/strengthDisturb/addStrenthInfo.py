@@ -1,11 +1,5 @@
-from PyQt5.QtWidgets import QMainWindow
-from widgets.manage_widget import Widget_Manage_Widgets
-import sys
-from PyQt5.QtWidgets import QMainWindow,QApplication,QWidget, QTableWidgetItem
-from PyQt5.QtGui import QIcon
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import pyqtSignal
-from widgets.add_strenth_info import Add_Strenth_Info
+from PyQt5.QtWidgets import QWidget, QTableWidgetItem
+from widgets.strengthDisturb.add_strenth_info import Add_Strenth_Info
 from database.ConnectAndSql import Clicked, delete_Clicked
 
 '''

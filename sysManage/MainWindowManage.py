@@ -1,12 +1,6 @@
-from PyQt5.QtWidgets import QMainWindow
 from widgets.manage_widget import Widget_Manage_Widgets
-import sys
-from PyQt5.QtWidgets import QMainWindow,QApplication,QWidget
-from PyQt5.QtGui import QIcon
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import pyqtSignal
-from sysManage.Stren_Inquiry import Stren_Inquiry
-from sysManage.strengthDisturb import strengthDisturb
+from PyQt5.QtWidgets import QMainWindow, QWidget
+from sysManage.strengthDisturb.strengthDisturb import strengthDisturb
 
 class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
     def __init__(self, parent=None):
