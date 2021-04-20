@@ -69,6 +69,10 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
     def slotSecondInit(self):
         self.pushButton.setDisabled(False)
         self.pushButton_2.setDisabled(True)
+        self.tw_first.clear()
+        self.tw_second.clear()
+        self._initTreeWidget("", self.tw_first)
+        self._initUnitTableWidget()
         self.changeFirst = False
         self.tb_result.clear()
         self.tb_result.setRowCount(0)
