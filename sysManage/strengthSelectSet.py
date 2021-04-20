@@ -4,7 +4,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import pyqtSignal
 from sysManage.InquiryResult import Inquiry_Result
 from sysManage.addStrenthInfo import AddStrenthInfo
-from database.ConnectAndSql import Clicked, add_UnitDict, update_Unit_Dict
+from database.ConnectAndSql import Clicked, add_UnitDict, update_Unit_Dict, selectUnitDictByUper, del_Unit_Dict, del_Unit_And_Child
 from sysManage.Stren_Inquiry import Stren_Inquiry
 from widgets.select_set import Widget_Select_Set
 
@@ -35,10 +35,12 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
         self.tb_result.itemClicked.connect(self.slotClickedRow)
         self.pb_update.clicked.connect(self.slotUpdate)
         self.pushButton.clicked.connect(self.slotFirstInit)
+        self.pb_del.clicked.connect(self.slotDelDict)
 
     def slotDisconnect(self):
         self.pb_add.clicked.disconnect(self.slotAddDict)
         self.tb_result.itemClicked.disconnect(self.slotClickedRow)
+        self.pushButton.clicked.disconnect(self.slotFirstInit)
         self.pushButton.clicked.disconnect(self.slotFirstInit)
 
     def slotFirstInit(self):
@@ -100,8 +102,8 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
                 Unit_Uper = self.le_unitUper.text()
                 add_UnitDict(Unit_ID, Unit_Name, Unit_Uper)
                 self.slotDisconnect()
-                self.tb_result.clear()
-                self.tw_first.clear()
+                self.tb_result.setRowCount(0)
+                self.tw_first.setRowCount(0)
                 self.signalConnect()
                 self._initUnitTableWidget()
                 self._initTreeWidget("", self.tw_first)
@@ -122,3 +124,37 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
                 self.signalConnect()
                 self._initUnitTableWidget()
                 self._initTreeWidget("", self.tw_first)
+
+    def slotDelDict(self):
+        if self.changeFirst:
+            haveChild = selectUnitDictByUper(self.le_unitID.text())
+            if haveChild:
+                print("have")
+                reply = QMessageBox.question(self, '删除', '该单位有下级单位，是否将下级单位一起删除？', QMessageBox.Yes,
+                                                 QMessageBox.Cancel)
+                if reply == QMessageBox.Yes:
+                    del_Unit_And_Child(self.le_unitID.text())
+                    reply = QMessageBox.question(self, '删除', '删除成功', QMessageBox.Yes)
+                    self.slotDisconnect()
+                    self.tb_result.clear()
+                    self.tw_first.clear()
+                    self.signalConnect()
+                    self._initUnitTableWidget()
+                    self._initTreeWidget("", self.tw_first)
+                else:
+                    reply = QMessageBox.question(self, '删除', '删除失败', QMessageBox.Yes)
+            else:
+                reply = QMessageBox.question(self, '删除', '确定删除吗？', QMessageBox.Yes,
+                                             QMessageBox.Cancel)
+                if reply == QMessageBox.Yes:
+                    del_Unit_Dict(self.le_unitID.text())
+                    reply = QMessageBox.question(self, '删除', '删除成功', QMessageBox.Yes)
+                    self.slotDisconnect()
+                    self.tb_result.setRowCount(0)
+                    self.tw_first.setRowCount(0)
+                    self.signalConnect()
+                    self._initUnitTableWidget()
+                    self._initTreeWidget("", self.tw_first)
+                else:
+                    reply = QMessageBox.question(self, '删除', '删除失败', QMessageBox.Yes)
+

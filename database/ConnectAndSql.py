@@ -86,5 +86,43 @@ def update_Unit_Dict(Unit_ID, Unit_Name, Unit_Uper):
     cur.close()
     conn.close()
 
+def selectUnitDictByUper(Unit_Uper):
+    conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="test")
+    cur = conn.cursor()
+    sql = "select * from dept where Dept_Uper = '" + Unit_Uper + "'"
+    print(sql)
+    cur.execute(sql)
+    # 获取查询到的数据，是以字典的形式存储的，所以读取需要使用data[i][j]下标定位
+    data = cur.fetchall()
+    # 打印测试
+    # print(data)
+    cur.close()
+    conn.close()
+    return data
+
+def del_Unit_Dict(Unit_ID):
+    conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="test")
+    cur = conn.cursor()
+    # 插入的sql语句
+    sql = "delete from dept where Dept_ID = '" + Unit_ID + "'"
+    print(sql)
+    # 执行sql语句，并发送给数据库
+    cur.execute(sql)
+    conn.commit()
+    cur.close()
+    conn.close()
+
+def del_Unit_And_Child(Unit_ID):
+    conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="test")
+    cur = conn.cursor()
+    # 插入的sql语句
+    sql = "delete from dept where Dept_ID = '" + Unit_ID + "'" + "and Dept_Uper = '" + Unit_ID + "'"
+    print(sql)
+    # 执行sql语句，并发送给数据库
+    cur.execute(sql)
+    conn.commit()
+    cur.close()
+    conn.close()
+
 if __name__ == '__main__':
     update_Unit_Dict('019', 'd', '')
