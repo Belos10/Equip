@@ -137,7 +137,7 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
     def _initTreeWidget(self, root, mother):
 
         if root == '':
-            sql = 'select Dept_Name,Dept_ID from dept where Dept_Uper is null'
+            sql = 'select Dept_Name,Dept_ID from dept where Dept_Uper = ""'
         else:
             sql = " select Dept_Name,Dept_ID from dept where Dept_Uper='" + root + "'"
 
@@ -208,7 +208,7 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
     def _initSecondTreeWidget(self, root, mother, UnitID):
 
         if UnitID:
-            sql = "select Equip_Name,Equip_ID from equip where Unit_ID ='" + UnitID + "'" + "AND Equip_Uper is NUll"
+            sql = "select Equip_Name,Equip_ID from equip where Unit_ID ='" + UnitID + "'" + "AND Equip_Uper = ''"
             # print(sql)
         else:
 

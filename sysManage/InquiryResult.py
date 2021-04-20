@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QMainWindow
 from widgets.manage_widget import Widget_Manage_Widgets
 import sys
-from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QTableWidgetItem, QAbstractItemView
+from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QTableWidgetItem, QAbstractItemView,QAbstractItemView
 from PyQt5.QtGui import QIcon
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import pyqtSignal
@@ -22,6 +22,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         self.tw_inquiryResult.setEditTriggers(QAbstractItemView.CurrentChanged)
         self.pb_insert.setText("信息展示及修改")
         self.pb_insert.clicked.connect(self.slotStateChange)
+
 
     def slotStateChange(self):
         if self.tw_inquiryResult.editTriggers() == QAbstractItemView.CurrentChanged:

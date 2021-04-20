@@ -17,11 +17,17 @@ class AddStrenthInfo(QWidget, Add_Strenth_Info):
     def __init__(self, parent=None):
         super(AddStrenthInfo, self).__init__(parent)
         self.setupUi(self)
-        self.pb_Increase.clicked.connect(self.slotAddSingle)
+
         self.data = None
         self.UnitID = None
         self.EquipID = None
         self.OrignNum = 0
+
+    def signalConnect(self):
+        self.pb_Increase.clicked.connect(self.slotAddSingle)
+
+    def slotDisconnect(self):
+        self.pb_Increase.clicked.disconnect(self.slotAddSingle)
 
     def _initWidget(self):
         sql = "select * from inputinfo where Unit_ID = '" + self.UnitID + \
