@@ -1,6 +1,7 @@
 from widgets.manage_widget import Widget_Manage_Widgets
 from PyQt5.QtWidgets import QMainWindow, QWidget
 from sysManage.strengthDisturb.strengthDisturb import strengthDisturb
+from sysManage.alocatMange.alocatMange import alocatMange
 
 class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
     def __init__(self, parent=None):
@@ -8,7 +9,7 @@ class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
         self.setupUi(self)
         self.login = QWidget()
         self.strengthDisturb = strengthDisturb()
-        self.alocatMange = QWidget()
+        self.alocatMange = alocatMange()
         self.purChasPlan = QWidget()
         self.mantanSupport = QWidget()
         self.warStorage = QWidget()

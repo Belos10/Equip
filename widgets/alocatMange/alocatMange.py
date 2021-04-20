@@ -11,7 +11,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets,Qt
 
 
-class Ui_MainWindow(object):
+class Widget_Alocat_Mange(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(800, 614)
@@ -21,12 +21,6 @@ class Ui_MainWindow(object):
         self.gridLayout.setObjectName("gridLayout")
         self.stackedWidget = QtWidgets.QStackedWidget(self.centralwidget)
         self.stackedWidget.setObjectName("stackedWidget")
-        self.page = QtWidgets.QWidget()
-        self.page.setObjectName("page")
-        self.stackedWidget.addWidget(self.page)
-        self.page_2 = QtWidgets.QWidget()
-        self.page_2.setObjectName("page_2")
-        self.stackedWidget.addWidget(self.page_2)
         self.gridLayout.addWidget(self.stackedWidget, 0, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
@@ -40,20 +34,43 @@ class Ui_MainWindow(object):
         self.toolBar.setObjectName("toolBar")
         MainWindow.addToolBar(QtCore.Qt.TopToolBarArea, self.toolBar)
 
+        self.tb_disturbPlan = QtWidgets.QToolButton(MainWindow)
+        icon1 = QtGui.QIcon()
+        icon1.addPixmap(QtGui.QPixmap(":/pic/plan.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.tb_disturbPlan.setIcon(icon1)
+        self.tb_disturbPlan.setObjectName("tb_disturbPlan")
+        self.tb_disturbPlan.setToolButtonStyle(Qt.Qt.ToolButtonTextUnderIcon)
+
+        self.tb_disturbSchedule = QtWidgets.QToolButton(MainWindow)
+        icon2 = QtGui.QIcon()
+        icon2.addPixmap(QtGui.QPixmap(":/pic/schedule.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.tb_disturbSchedule.setIcon(icon2)
+        self.tb_disturbSchedule.setObjectName("tb_disturbSchedule")
+        self.tb_disturbSchedule.setToolButtonStyle(Qt.Qt.ToolButtonTextUnderIcon)
+
+        self.tb_disturbManage = QtWidgets.QToolButton(MainWindow)
+        icon3 = QtGui.QIcon()
+        icon3.addPixmap(QtGui.QPixmap(":/pic/manage.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.tb_disturbManage.setIcon(icon3)
+        self.tb_disturbManage.setObjectName("tb_disturbManage")
+        self.tb_disturbManage.setToolButtonStyle(Qt.Qt.ToolButtonTextUnderIcon)
+
+        self.toolBar.addWidget(self.tb_disturbPlan)
+        self.toolBar.addWidget(self.tb_disturbSchedule)
+        self.toolBar.addWidget(self.tb_disturbManage)
+
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-        self.tb_disturbPlan = QtWidgets.QToolButton(MainWindow)
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(":/pic/plan.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.tb_disturbPlan.setIcon(icon)
-        self.tb_disturbPlan.setObjectName("tb_disturbPlan")
-        self.tb_disturbPlan.setToolButtonStyle(Qt.Qt.ToolButtonTextUnderIcon)
+
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.toolBar.setWindowTitle(_translate("MainWindow", "toolBar"))
+        self.tb_disturbPlan.setText(_translate("MainWindow", "分配调整计划"))
+        self.tb_disturbSchedule.setText(_translate("MainWindow", "调拨进度"))
+        self.tb_disturbManage.setText(_translate("MainWindow", "调拨单管理"))
 
 import icons.resource_rc
 
