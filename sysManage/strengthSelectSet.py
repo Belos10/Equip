@@ -17,25 +17,28 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
 
         self.tw_first.clear()
         self.tw_second.clear()
-        self.tw_first.header().setVisible(False)
-        self.tw_second.header().setVisible(False)
-        self.changeFirst = True
+        self.tw_first.header().setVisible(False)        #不显示树窗口的title
+        self.tw_second.header().setVisible(False)       #不显示树窗口的title
+        self.changeFirst = True                         #是否是修改单元的目录
 
 
         # QTableWidget设置整行选中
         self.tb_result.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tb_result.setSelectionMode(QAbstractItemView.SingleSelection)
 
-        self.first_treeWidget_dict = {}
+        self.first_treeWidget_dict = {}             #当前单位目录列表对象，结构为：{'行号':对应的item}
+        self.second_treeWidget_dict = {}            #当前装备目录列表对象，结构为：{'行号':对应的item}
         self.signalConnect()
 
 
     def signalConnect(self):
-        self.pb_add.clicked.connect(self.slotAddDict)
-        self.tb_result.itemClicked.connect(self.slotClickedRow)
-        self.pb_update.clicked.connect(self.slotUpdate)
-        self.pushButton.clicked.connect(self.slotFirstInit)
-        self.pb_del.clicked.connect(self.slotDelDict)
+        self.pb_add.clicked.connect(self.slotAddDict)           #添加数据
+        self.tb_result.itemClicked.connect(self.slotClickedRow)     #点击当前tablewidget
+        self.pb_update.clicked.connect(self.slotUpdate)         #修改数据
+        self.pushButton.clicked.connect(self.slotFirstInit)     #设置单元目录
+        self.pb_del.clicked.connect(self.slotDelDict)           #删除数据
+        self.pushButton_2.clicked.connect(self.slotSecondInit)  #设置装备目录
+        self.tw_first.currentItemChanged.connect(self.slotSelectIndex)          #将单位目录与装备目录相关联
 
     def slotDisconnect(self):
         self.pb_add.clicked.disconnect(self.slotAddDict)
@@ -43,11 +46,29 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
         self.pushButton.clicked.disconnect(self.slotFirstInit)
         self.pushButton.clicked.disconnect(self.slotFirstInit)
 
+    '''
+        功能：
+            更改当前状态为设置单元目录，并初始化单元目录以及tablewidget
+    '''
     def slotFirstInit(self):
+        self.tw_first.clear()
+        self.tw_second.clear()
         self._initTreeWidget("", self.tw_first)
         self._initUnitTableWidget()
         self.pushButton.setDisabled(True)
         self.pushButton_2.setDisabled(False)
+        self.changeFirst = True
+
+    '''
+            功能：
+                更改当前状态为设置装备目录，并初始化装备目录以及tablewidget
+    '''
+    def slotSecondInit(self):
+        self.pushButton.setDisabled(False)
+        self.pushButton_2.setDisabled(True)
+        self.changeFirst = False
+        self.tb_result.clear()
+        self.tb_result.setRowCount(0)
 
     def _initUnitTableWidget(self):
         sql = " select * from dept"
@@ -67,6 +88,39 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
             self.tb_result.setItem(i, 2, item)
 
         print(result)
+
+    def slotSelectIndex(self):
+        if self.changeFirst:
+            pass
+        else:
+            # self.slotDisconnect()
+            # 在clear前要现将该控件上的信号和槽的连接进行disconnect，不然会发生段错误
+            self.tw_second.clear()
+
+            for UnitID, item in self.first_treeWidget_dict.items():
+                if item == self.tw_first.currentItem():
+                    print(item)
+                    self._initSecondTreeWidget("", self.tw_second, UnitID)
+                    # break
+            # self.signalConnect()
+
+
+    def _initSecondTreeWidget(self, root, mother, UnitID):
+
+        if UnitID:
+            sql = "select Equip_Name,Equip_ID from equip where Unit_ID ='" + UnitID + "'" + "AND Equip_Uper = ''"
+            # print(sql)
+        else:
+
+            sql = "select Equip_Name,Equip_ID from equip where Equip_Uper ='" + root + "'"
+            # print(sql)
+        result = Clicked(sql)
+        for data in result:
+            item = QTreeWidgetItem(mother)
+            item.setText(0, data[0])
+            self.second_treeWidget_dict[data[1]] = item
+            if data[0] != '':
+                self._initSecondTreeWidget(data[1], item, 0)
 
     def _initTreeWidget(self, root, mother):
 
@@ -149,10 +203,10 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
                 if reply == QMessageBox.Yes:
                     del_Unit_Dict(self.le_unitID.text())
                     reply = QMessageBox.question(self, '删除', '删除成功', QMessageBox.Yes)
-                    self.slotDisconnect()
-                    self.tb_result.setRowCount(0)
-                    self.tw_first.setRowCount(0)
-                    self.signalConnect()
+                    #self.slotDisconnect()
+                    self.tb_result.clear()
+                    self.tw_first.clear()
+                    #self.signalConnect()
                     self._initUnitTableWidget()
                     self._initTreeWidget("", self.tw_first)
                 else:
