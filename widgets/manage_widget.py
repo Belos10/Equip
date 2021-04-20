@@ -50,7 +50,7 @@ class Widget_Manage_Widgets(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.action_strenInquiry.setText(_translate("MainWindow", "实力查询"))
+        self.action_strenInquiry.setText(_translate("MainWindow", "实力分布"))
         self.action_weaveMainten.setText(_translate("MainWindow", "编制数维护"))
         self.action_equipBalance.setText(_translate("MainWindow", "装备平衡表"))
         self.action_applyRetire.setText(_translate("MainWindow", "申请退役"))

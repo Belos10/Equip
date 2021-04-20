@@ -7,5 +7,8 @@
     <file>wave.png</file>
     <file>select.png</file>
     <file>system.png</file>
+    <file>manage.png</file>
+    <file>schedule.png</file>
+    <file>plan.png</file>
   </qresource>
 </RCC>
