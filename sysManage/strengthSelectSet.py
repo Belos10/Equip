@@ -211,12 +211,11 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
                 self.tw_first.clear()
                 self.tw_second.clear()
                 self.tb_result.setRowCount(0)
-                self.tw_first.setRowCount(0)
-                self.first_treeWidget_dict = {}
-                self.second_treeWidget_dict = {}
-                self.signalConnect()
+                self.first_treeWidget_dict.clear()
+                self.second_treeWidget_dict.clear()
                 self._initUnitTableWidget()
                 self._initTreeWidget("", self.tw_first)
+                self.signalConnect()
 
     '''
         功能：
@@ -237,7 +236,6 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
                 self.tw_first.clear()
                 self.tw_second.clear()
                 self.tb_result.setRowCount(0)
-                self.tw_first.setRowCount(0)
                 self.first_treeWidget_dict = {}
                 self.second_treeWidget_dict = {}
                 self.signalConnect()
@@ -263,7 +261,6 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
                     self.tw_first.clear()
                     self.tw_second.clear()
                     self.tb_result.setRowCount(0)
-                    self.tw_first.setRowCount(0)
                     self.first_treeWidget_dict = {}
                     self.second_treeWidget_dict = {}
                     self.signalConnect()
@@ -282,7 +279,6 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
                     self.tw_first.clear()
                     self.tw_second.clear()
                     self.tb_result.setRowCount(0)
-                    self.tw_first.setRowCount(0)
                     self.first_treeWidget_dict = {}
                     self.second_treeWidget_dict = {}
                     self.signalConnect()
