@@ -46,7 +46,7 @@ def add_UnitDict(Unit_ID, Unit_Name, Unit_Uper):
 
 
 def delete_Clicked(Unit_ID, Equip_ID, ID, num, year, shop, state, arrive, confirm, other):
-    conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="equ2")
+    conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="test")
     cur = conn.cursor()
     sql = "delete from inputinfo where (Unit_ID=  '" + (Unit_ID or None) + "' AND Equip_ID='" + (Equip_ID or None) \
           + "' AND ID='" + (ID or None) + "' AND num='" + (num or None) + "')"
@@ -59,7 +59,7 @@ def delete_Clicked(Unit_ID, Equip_ID, ID, num, year, shop, state, arrive, confir
 
 
 def delete_Inquiry_Clicked(Unit_ID, Equip_ID):
-    conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="equ2")
+    conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="test")
     cur = conn.cursor()
     sql = "delete from equipandunit where (Unit_ID=  '" + Unit_ID + "' AND Equip_ID='" + Equip_ID + "')"
     #print(sql)

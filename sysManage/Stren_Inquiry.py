@@ -38,7 +38,7 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         self.tw_first.header().setVisible(False)
         self.tw_second.header().setVisible(False)
         self._initTreeWidget("", self.tw_first)
-        print(first_treeWidget_dict)
+        #print(first_treeWidget_dict)
 
     # 信号与槽的连接
     def signalConnectSlot(self):

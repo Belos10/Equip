@@ -100,8 +100,10 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
         功能：
             当设置装备目录时，初始化tableWidget
     '''
-    def _initEquipTableWidget(self):
-        sql = " select * from equip"
+    def _initEquipTableWidget(self, Unit_ID):
+        self.tb_result.clear()
+        self.tb_result.setRowCount(0)
+        sql = " select * from equip where Unit_ID = '" + Unit_ID + "'"
         result = Clicked(sql)
 
         header = ['装备编号', '单位编号', '装备名称', '上级装备编号']
@@ -137,8 +139,10 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
                 if item == self.tw_first.currentItem():
                     print(item)
                     self._initSecondTreeWidget("", self.tw_second, UnitID)
+                    self._initEquipTableWidget(UnitID)
                     # break
             # self.signalConnect()
+
 
     '''
         功能：
