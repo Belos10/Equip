@@ -156,8 +156,9 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
             other = self.add_strenth_info.tableWidget.item(i + OrignNum, 7).text()
             #print(ID, num, year, shop, state, arrive, confirm, other)
             addNum += int(num)
+            print(Unit_ID, Equip_ID, ID, num, year, shop, state, arrive, confirm, other)
             insert_Clicked(Unit_ID, Equip_ID, ID, num, year, shop, state, arrive, confirm, other)
-        insert_Strength(Unit_ID, Equip_ID, addNum)
+        #insert_Strength(Unit_ID, Equip_ID, addNum)
         self.sw_strenSelectMan.setCurrentIndex(0)
 
     def slotShowByEquip(self):
@@ -318,7 +319,8 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         currentUnitID = ""
         currentEquipID = ""
         if unitRow == -1 or euqipRow == -1:
-            reply = QMessageBox.question(self, '查询', '请同时选中单位和装备', QMessageBox.Yes)
+            #reply = QMessageBox.question(self, '查询', '请同时选中单位和装备', QMessageBox.Yes)
+            pass
         else:
             #按装备展开
             if self.inquiry_result.rb_equipShow.isChecked():

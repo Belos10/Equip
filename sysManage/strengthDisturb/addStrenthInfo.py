@@ -34,11 +34,10 @@ class AddStrenthInfo(QWidget, Add_Strenth_Info):
         self.pb_Increase.clicked.disconnect(self.slotAddSingle)
 
     def _initTableWidget(self, data):
-        self.equipID = data[0]
-        self.unitID = data[1]
-
-        result = select_Add_Info(self.unitID, self.equipID)
+        result = select_Add_Info(self.UnitID, self.EquipID)
+        print(result)
         self.currentLen = len(result)
+        self.tableWidget.setRowCount(self.currentLen)
         for i, data in enumerate(result):
             item = QTableWidgetItem(data[2])
             self.tableWidget.setItem(i, 0, item)
@@ -61,11 +60,15 @@ class AddStrenthInfo(QWidget, Add_Strenth_Info):
         self.tableWidget.clear()
         self.tableWidget.setRowCount(0)
 
+        self.UnitID = data[1]
+        self.EquipID = data[0]
+        self.data = data
         self.label_UnitName.setText(data[3])
         self.label_EquipName.setText(data[2])
         self.label_PowerNumber.setText(data[4])
         self.label_ExistNumber.setText(data[6])
 
+        self._initHeader()
         self._initTableWidget(data)
 
     # 信息录入界面新增按钮
@@ -95,4 +98,4 @@ class AddStrenthInfo(QWidget, Add_Strenth_Info):
         other = self.tableWidget.item(i, 7).text()
         # print(ID, num, year, shop, state, arrive, confirm, other)
         delete_Clicked(Unit_ID, Equip_ID, ID, num, year, shop, state, arrive, confirm, other)
-        self._initWidget()
+        self._initTableWidget(self.data)

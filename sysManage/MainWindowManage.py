@@ -2,6 +2,7 @@ from widgets.manage_widget import Widget_Manage_Widgets
 from PyQt5.QtWidgets import QMainWindow, QWidget
 from sysManage.strengthDisturb.strengthDisturb import strengthDisturb
 from sysManage.alocatMange.alocatMange import alocatMange
+from sysManage.dictSelect.dictSelect import dictSelect
 
 class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
     def __init__(self, parent=None):
@@ -16,7 +17,7 @@ class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
         self.contractMange = QWidget()
         self.dangerGoods = QWidget()
         self.PosEngin = QWidget()
-        self.dictSelect = QWidget()
+        self.dictSelect = dictSelect()
         self.sysConfig = QWidget()
 
         self.setWindowTitle("核化装备管理系统")
