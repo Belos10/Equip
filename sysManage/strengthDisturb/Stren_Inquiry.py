@@ -364,7 +364,8 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         currentUnitID = ""
         currentEquipID = ""
         if unitRow == -1 or euqipRow == -1:
-            reply = QMessageBox.question(self, '查询', '请同时选中单位和装备', QMessageBox.Yes)
+            #reply = QMessageBox.question(self, '查询', '请同时选中单位和装备', QMessageBox.Yes)
+            pass
         else:
             if self.inquiry_result.rb_equipShow.isChecked():
                 for unitID, unitItem in self.first_treeWidget_dict.items():

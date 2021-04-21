@@ -151,7 +151,7 @@ def select_Equip_And_Unit_ByUnit(UnitID, EquipID):
     UnitList = []
     childEquipList = []
     findUnitList(UnitID, UnitList, cur)
-    findChildEquip(UnitID, childEquipList, cur)
+    findChildEquip(EquipID, childEquipList, cur)
     equipName = selectEquipNameByEquipID(EquipID)
     #对于每一个单位统计他们在该装备下有多少
     for childUnit in UnitList:
@@ -178,7 +178,7 @@ def select_Equip_And_Unit_ByUnit(UnitID, EquipID):
         for value in addResult:
             result.append(value)
         final_result.append(result)
-
+    print(final_result)
     cur.close()
     conn.close()
     return final_result
