@@ -79,8 +79,6 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
         self._initSecondTreeWidget("", self.tw_second)
         self._initEquipTableWidget()
         self.changeFirst = False
-        #self.tb_result.clear()
-        #self.tb_result.setRowCount(0)
         self.le_equipID.setEnabled(1)
         self.le_equipName.setEnabled(1)
         self.le_equipUper.setEnabled(1)
@@ -121,8 +119,6 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
     '''
 
     def _initEquipTableWidget(self):
-        # self.tb_result.clear()
-        # self.tb_result.setRowCount(0)
         sql = " select * from equip "
         result = Clicked(sql)
 
