@@ -34,4 +34,11 @@ class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
         self.tb_ManageWidget.addTab(self.dictSelect, "目录查询")
         self.tb_ManageWidget.addTab(self.sysConfig, "系统配置")
 
+    def signalConnect(self):
+        self.tb_ManageWidget.currentChanged.connect(self.slotCurrentChange)
+
+    def slotCurrentChange(self):
+        if self.tb_ManageWidget.currentIndex() == 1:
+            self.strengthDisturb.strenSelect._initAllDict()
+
 

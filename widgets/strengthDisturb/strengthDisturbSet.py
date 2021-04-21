@@ -48,5 +48,5 @@ class Widget_Strength_Disturb_Set(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.tb_setProj.setWindowTitle(_translate("MainWindow", "toolBar"))
-        self.tb_selectSet.setText(_translate("MainWindow", "selectSet"))
+        self.tb_selectSet.setText(_translate("MainWindow", "查询目录设置"))
 import icons.resource_rc
