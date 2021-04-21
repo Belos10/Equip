@@ -16,6 +16,10 @@ class AddStrenthInfo(QWidget, Add_Strenth_Info):
         self.UnitID = None
         self.EquipID = None
         self.OrignNum = 0
+        header = ['批次号', '数量', '出厂年份', '生产厂家', '装备状态', '是否到位', '文件凭证', '备注']
+        self.tableWidget.setColumnCount(8)
+        self.tableWidget.setHorizontalHeaderLabels(header)
+        self.signalConnect()
 
     def signalConnect(self):
         self.pb_Increase.clicked.connect(self.slotAddSingle)
@@ -50,9 +54,6 @@ class AddStrenthInfo(QWidget, Add_Strenth_Info):
     def _initWeight(self, data):
         self.tableWidget.clear()
         self.tableWidget.setRowCount(0)
-        header = ['批次号', '数量', '出厂年份', '生产厂家', '装备状态', '是否到位', '文件凭证', '备注']
-        self.tableWidget.setColumnCount(8)
-        self.tableWidget.setHorizontalHeaderLabels(header)
 
         self.label_UnitName.setText(data[3])
         self.label_EquipName.setText(data[2])
@@ -63,6 +64,7 @@ class AddStrenthInfo(QWidget, Add_Strenth_Info):
 
     # 信息录入界面新增按钮
     def slotAddSingle(self):
+        print('''''''''''''')
         row_num = self.tableWidget.rowCount()
         # print("row num",row_num)
         clomn_num = self.tableWidget.columnCount()

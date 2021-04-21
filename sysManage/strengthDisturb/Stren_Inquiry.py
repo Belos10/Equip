@@ -35,15 +35,19 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         self.sw_strenSelectMan.setCurrentIndex(0)
 
         # 初始化单位和装备目录
+        self._initAllDict()
+
+        #信号连接
+        self.signalConnectSlot()
+
+    def _initAllDict(self):
+        # 初始化单位和装备目录
         self.tw_first.clear()
         self.tw_second.clear()
         self.tw_first.header().setVisible(False)
         self.tw_second.header().setVisible(False)
         self._initUnitTreeWidget("", self.tw_first)
         self._initEquipTreeWidget("", self.tw_second)
-
-        #信号连接
-        self.signalConnectSlot()
 
     # 信号与槽的连接
     def signalConnectSlot(self):
@@ -202,8 +206,10 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
     '''
     def slotDoubleClickedTableItem(self):
         currentRow = self.inquiry_result.tw_inquiryResult.currentRow()
+
         for row, data in self.inquiry_result.currentInquiryResult.items():
             if row == currentRow:
+                #print(data)
                 equipNotHaveChild = EquipNotHaveChild(data[0])
                 unitNotHaveChild = UnitNotHaveChild(data[1])
                 if equipNotHaveChild and unitNotHaveChild:

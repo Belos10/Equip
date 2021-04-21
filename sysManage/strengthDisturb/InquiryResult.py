@@ -149,8 +149,8 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
             根据查询到的结果初始化tablewidget
     '''
     def _initTableWidget(self, result):
+        #print(result)
         self.tw_inquiryResult.clear()
-        self.tw_inquiryResult.setRowCount(0)
         self.result = result
 
         self.result_num = len(result)
