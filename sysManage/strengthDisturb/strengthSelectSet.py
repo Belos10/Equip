@@ -49,6 +49,7 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
     def slotFirstInit(self):
         self.tw_first.clear()
         self.tw_second.clear()
+        self.tb_result.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self._initTreeWidget("", self.tw_first)
         self._initUnitTableWidget()
         self.pushButton.setDisabled(True)
@@ -74,6 +75,7 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
         self.pushButton_2.setDisabled(True)
         self.tw_first.clear()
         self.tw_second.clear()
+        self.tb_result.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self._initSecondTreeWidget("", self.tw_second)
         self._initEquipTableWidget()
         self.changeFirst = False
@@ -85,6 +87,7 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
         self.le_unitUper.clear()
         self.le_unitName.clear()
         self.le_unitID.clear()
+        self.le_unitID.setEnabled(0)
         self.le_unitUper.setEnabled(0)
         self.le_unitName.setEnabled(0)
 
@@ -368,7 +371,7 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
                     reply = QMessageBox.question(self, '删除', '删除失败', QMessageBox.Yes)
         # 装备目录
         else:
-            haveChild = selectUnitDictByUper(self.le_unitID.text())
+            haveChild = selectUnitDictByUper(self.le_equipID.text())
             if haveChild:
                 print("have")
                 reply = QMessageBox.question(self, '删除', '该单位有下级单位，是否将下级单位一起删除？', QMessageBox.Yes,
