@@ -600,7 +600,7 @@ def del_Equip_Dict(Equip_ID):
     conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="test")
     cur = conn.cursor()
     # 插入的sql语句
-    sql = "delete from dept where Equip_ID = '" + Equip_ID + "'"
+    sql = "delete from equip where Equip_ID = '" + Equip_ID + "'"
     # print(sql)
     # 执行sql语句，并发送给数据库
     cur.execute(sql)

@@ -11,7 +11,6 @@ class AddStrenthInfo(QWidget, Add_Strenth_Info):
     def __init__(self, parent=None):
         super(AddStrenthInfo, self).__init__(parent)
         self.setupUi(self)
-
         self.data = None
         self.UnitID = None
         self.EquipID = None
@@ -38,6 +37,7 @@ class AddStrenthInfo(QWidget, Add_Strenth_Info):
         print(result)
         self.currentLen = len(result)
         self.tableWidget.setRowCount(self.currentLen)
+        self.OrignNum = self.currentLen
         for i, data in enumerate(result):
             item = QTableWidgetItem(data[2])
             self.tableWidget.setItem(i, 0, item)

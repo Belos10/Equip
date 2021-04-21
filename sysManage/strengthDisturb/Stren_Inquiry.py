@@ -134,8 +134,9 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
             self.tw_first.setEnabled(1)
             self.tw_second.setEnabled(1)
 
+    # 信息录入界面保存
     def slotSaveAddInfo(self):
-        addNum = 0
+        #addNum = 0
         OrignNum = self.add_strenth_info.OrignNum
         #print(self.add_strenth_info.OrignNum, self.add_strenth_info.tableWidget.rowCount())
         self.tw_first.setEnabled(1)
@@ -155,11 +156,13 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
             confirm = self.add_strenth_info.tableWidget.item(i + OrignNum, 6).text()
             other = self.add_strenth_info.tableWidget.item(i + OrignNum, 7).text()
             #print(ID, num, year, shop, state, arrive, confirm, other)
-            addNum += int(num)
+            #addNum += int(num)
             print(Unit_ID, Equip_ID, ID, num, year, shop, state, arrive, confirm, other)
             insert_Clicked(Unit_ID, Equip_ID, ID, num, year, shop, state, arrive, confirm, other)
         #insert_Strength(Unit_ID, Equip_ID, addNum)
         self.sw_strenSelectMan.setCurrentIndex(0)
+
+
 
     def slotShowByEquip(self):
         unitRow = self.tw_first.currentIndex().row()
