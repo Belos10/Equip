@@ -21,6 +21,12 @@ class AddStrenthInfo(QWidget, Add_Strenth_Info):
         self.tableWidget.setHorizontalHeaderLabels(header)
         self.signalConnect()
 
+    def _initHeader(self):
+        self.tableWidget.setRowCount(0)
+        header = ['批次号', '数量', '出厂年份', '生产厂家', '装备状态', '是否到位', '文件凭证', '备注']
+        self.tableWidget.setColumnCount(8)
+        self.tableWidget.setHorizontalHeaderLabels(header)
+
     def signalConnect(self):
         self.pb_Increase.clicked.connect(self.slotAddSingle)
 

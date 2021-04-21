@@ -206,6 +206,7 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
     '''
     def slotDoubleClickedTableItem(self):
         currentRow = self.inquiry_result.tw_inquiryResult.currentRow()
+        self.add_strenth_info._initHeader()
 
         for row, data in self.inquiry_result.currentInquiryResult.items():
             if row == currentRow:
