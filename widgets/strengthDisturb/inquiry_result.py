@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Widget_Inquiry_Result(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(869, 777)
+        Form.resize(976, 777)
         self.verticalLayout = QtWidgets.QVBoxLayout(Form)
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout.setSpacing(0)
@@ -42,6 +42,9 @@ class Widget_Inquiry_Result(object):
         self.horizontalLayout_2.addWidget(self.cb_showDistence)
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem)
+        self.pb_delState = QtWidgets.QPushButton(self.widget)
+        self.pb_delState.setObjectName("pb_delState")
+        self.horizontalLayout_2.addWidget(self.pb_delState)
         self.pb_insert = QtWidgets.QPushButton(self.widget)
         self.pb_insert.setObjectName("pb_insert")
         self.horizontalLayout_2.addWidget(self.pb_insert)
@@ -74,6 +77,7 @@ class Widget_Inquiry_Result(object):
         self.rb_unitShow.setText(_translate("Form", "按单位展开显示"))
         self.cb_showLast.setText(_translate("Form", "展开到末级"))
         self.cb_showDistence.setText(_translate("Form", "只列存在偏差"))
+        self.pb_delState.setText(_translate("Form", "删除展开状态"))
         self.pb_insert.setText(_translate("Form", "信息录入"))
         self.pb_clearCheck.setText(_translate("Form", "清除选中装备"))
         self.pb_clearAll.setText(_translate("Form", "清除全部装备"))

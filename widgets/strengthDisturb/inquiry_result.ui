@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>869</width>
+    <width>976</width>
     <height>777</height>
    </rect>
   </property>
@@ -92,6 +92,13 @@
            </size>
           </property>
          </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pb_delState">
+          <property name="text">
+           <string>删除展开状态</string>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QPushButton" name="pb_insert">

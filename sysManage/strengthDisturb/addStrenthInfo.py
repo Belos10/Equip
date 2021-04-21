@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QTableWidgetItem
 from widgets.strengthDisturb.add_strenth_info import Add_Strenth_Info
-from database.ConnectAndSql import Clicked, delete_Clicked
+from database.ConnectAndSql import Clicked, delete_Clicked, select_Add_Info
 
 '''
     类功能：
@@ -23,14 +23,13 @@ class AddStrenthInfo(QWidget, Add_Strenth_Info):
     def slotDisconnect(self):
         self.pb_Increase.clicked.disconnect(self.slotAddSingle)
 
-    def _initWidget(self):
-        sql = "select * from inputinfo where Unit_ID = '" + self.UnitID + \
-              "' and Equip_ID = '" + self.EquipID + "'"
-        print("_initweight", sql)
-        currentInfo = Clicked(sql)
-        self.tableWidget.setRowCount(len(currentInfo))
-        self.OrignNum = len(currentInfo)
-        for i, data in enumerate(currentInfo):
+    def _initTableWidget(self, data):
+        self.equipID = data[0]
+        self.unitID = data[1]
+
+        result = select_Add_Info(self.unitID, self.equipID)
+        self.currentLen = len(result)
+        for i, data in enumerate(result):
             item = QTableWidgetItem(data[2])
             self.tableWidget.setItem(i, 0, item)
             item = QTableWidgetItem(data[3])
@@ -49,19 +48,18 @@ class AddStrenthInfo(QWidget, Add_Strenth_Info):
             self.tableWidget.setItem(i, 7, item)
 
     def _initWeight(self, data):
-        # print(data)
         self.tableWidget.clear()
+        self.tableWidget.setRowCount(0)
         header = ['批次号', '数量', '出厂年份', '生产厂家', '装备状态', '是否到位', '文件凭证', '备注']
-        self.tableWidget.setColumnCount(len(header))
+        self.tableWidget.setColumnCount(8)
         self.tableWidget.setHorizontalHeaderLabels(header)
+
         self.label_UnitName.setText(data[3])
         self.label_EquipName.setText(data[2])
         self.label_PowerNumber.setText(data[4])
         self.label_ExistNumber.setText(data[6])
-        self.UnitID = data[1]
-        self.EquipID = data[0]
-        self.data = data
-        self._initWidget()
+
+        self._initTableWidget(data)
 
     # 信息录入界面新增按钮
     def slotAddSingle(self):

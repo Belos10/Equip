@@ -13,12 +13,53 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
     def __init__(self, parent=None):
         super(Inquiry_Result, self).__init__(parent)
         self.setupUi(self)
+
+        #存储当前查询结果，结构为：{'行号':该行数据'}
         self.currentInquiryResult = {}
+
+        #tableWidget可编辑
         self.tw_inquiryResult.setEditTriggers(QAbstractItemView.CurrentChanged)
+
         self.pb_insert.setText("信息展示及修改")
+        self.result = []
+
+        #信号和槽连接
+        self.signalConnect()
+
+    '''
+        信号和槽连接
+    '''
+    def signalConnect(self):
+        #当前是否可以修改TableWidget数据
         self.pb_insert.clicked.connect(self.slotStateChange)
 
+        #清除单选按钮选中状态
+        self.pb_delState.clicked.connect(self.slotChangeCheckState)
 
+        self.cb_showDistence.clicked.connect(self.slotClickedDistence)
+    '''
+        信号和槽连接断开
+    '''
+    def slotDisconnect(self):
+        self.pb_insert.clicked.disconnect(self.slotStateChange)
+        self.pb_delState.clicked.disconnect(self.slotChangeCheckState)
+
+
+    '''
+        功能：
+            清除单选按钮选中状态
+    '''
+    def slotChangeCheckState(self):
+        if self.rb_unitShow.isChecked():
+            self.rb_unitShow.setChecked(False)
+
+        if self.rb_equipShow.isChecked():
+            self.rb_equipShow.setChecked(False)
+
+    '''
+        功能：
+            当前是否可以修改TableWidget数据
+    '''
     def slotStateChange(self):
         if self.tw_inquiryResult.editTriggers() == QAbstractItemView.CurrentChanged:
             self.tw_inquiryResult.setEditTriggers(QAbstractItemView.NoEditTriggers)
@@ -27,80 +68,160 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
             self.tw_inquiryResult.setEditTriggers(QAbstractItemView.CurrentChanged)
             self.pb_insert.setText("信息展示及修改")
 
-    def findEquipId(self, EquipID, EquipIDList):
-        sql = "select Equip_ID from equip where Equip_Uper = '" + EquipID + "'"
-        FindEquipID = Clicked(sql)
-        EquipIDList.append(EquipID)
-        for id in FindEquipID:
-            sql = "select Equip_ID from equip where Equip_Uper = '" + id[0] + "'"
-            # print(sql)
-            haveChild = Clicked(sql)
-            for child in haveChild:
-                self.findEquipId(child[0], EquipIDList)
-            EquipIDList.append(id[0])
-
-    '''
-        QTableWidget显示查询结果
-    '''
-
-    def InquiryResult(self, UnitID, EquipID, isRoot):
+    def slotClickedDistence(self):
         self.tw_inquiryResult.clear()
-        EquipIDList = []
-        # EquipIDList.append(EquipID)
-        sql = "select Dept_Name from dept where Dept_ID = '" + UnitID + "'"
-        # print(sql)
-        UnitName = Clicked(sql)
-        if isRoot:
-            self.findEquipId(EquipID, EquipIDList)
-        else:
-            EquipIDList.append(EquipID)
-        self.showInquiryResult(UnitID,EquipIDList)
-
-    def showInquiryResult(self,UnitID,EquipIDList):
-        inquiry_result = []
-        self.result_num = 0
-        for id in EquipIDList:
-            sql = "select * from equipandunit where Equip_ID = '" + id + "' and Unit_ID = '" + UnitID + "'"
-            result = Clicked(sql)
-            for row in result:
-                inquiry_result.append(row)
-            self.result_num += len(result)
-
+        self.tw_inquiryResult.setRowCount(0)
+        self.result_num = len(self.result)
         self.tw_inquiryResult.setRowCount(self.result_num)
         self.tw_inquiryResult.setColumnCount(13)
         headerlist = ['单位名称', '装备名称', '实力数', '编制数', '现有数', '偏差', '准备退役数', '未到位数', '提前退役', '待核查无实物', '待核查无实力', '单独建账',
                       '正常到位']
         self.tw_inquiryResult.setHorizontalHeaderLabels(headerlist)
-        for i, data in enumerate(inquiry_result):
-            item = QTableWidgetItem(data[3])
-            self.tw_inquiryResult.setItem(i, 0, item)
-            item = QTableWidgetItem(data[2])
-            self.tw_inquiryResult.setItem(i, 1, item)
-            item = QTableWidgetItem(data[4])
-            self.tw_inquiryResult.setItem(i, 2, item)
-            item = QTableWidgetItem(data[5])
-            self.tw_inquiryResult.setItem(i, 3, item)
-            item = QTableWidgetItem(data[6])
-            self.tw_inquiryResult.setItem(i, 4, item)
-            item = QTableWidgetItem(data[7])
-            self.tw_inquiryResult.setItem(i, 5, item)
-            item = QTableWidgetItem(data[8])
-            self.tw_inquiryResult.setItem(i, 6, item)
-            item = QTableWidgetItem(data[9])
-            self.tw_inquiryResult.setItem(i, 7, item)
-            item = QTableWidgetItem(data[10])
-            self.tw_inquiryResult.setItem(i, 8, item)
-            item = QTableWidgetItem(data[11])
-            self.tw_inquiryResult.setItem(i, 9, item)
-            item = QTableWidgetItem(data[12])
-            self.tw_inquiryResult.setItem(i, 10, item)
-            item = QTableWidgetItem(data[13])
-            self.tw_inquiryResult.setItem(i, 11, item)
-            item = QTableWidgetItem(data[14])
-            self.tw_inquiryResult.setItem(i, 12, item)
+        self.currentInquiryResult.clear()
+        i = 0
+        for data in self.result:
+            if self.cb_showDistence.isChecked():
+                if int(data[7]) != 0:
+                    item = QTableWidgetItem(data[3])
+                    self.tw_inquiryResult.setItem(i, 0, item)
+                    item = QTableWidgetItem(data[2])
+                    self.tw_inquiryResult.setItem(i, 1, item)
+                    item = QTableWidgetItem(data[4])
+                    self.tw_inquiryResult.setItem(i, 2, item)
+                    item = QTableWidgetItem(data[5])
+                    self.tw_inquiryResult.setItem(i, 3, item)
+                    item = QTableWidgetItem(data[6])
+                    self.tw_inquiryResult.setItem(i, 4, item)
+                    item = QTableWidgetItem(data[7])
+                    self.tw_inquiryResult.setItem(i, 5, item)
+                    item = QTableWidgetItem(data[8])
+                    self.tw_inquiryResult.setItem(i, 6, item)
+                    item = QTableWidgetItem(data[9])
+                    self.tw_inquiryResult.setItem(i, 7, item)
+                    item = QTableWidgetItem(data[10])
+                    self.tw_inquiryResult.setItem(i, 8, item)
+                    item = QTableWidgetItem(data[11])
+                    self.tw_inquiryResult.setItem(i, 9, item)
+                    item = QTableWidgetItem(data[12])
+                    self.tw_inquiryResult.setItem(i, 10, item)
+                    item = QTableWidgetItem(data[13])
+                    self.tw_inquiryResult.setItem(i, 11, item)
+                    item = QTableWidgetItem(data[14])
+                    self.tw_inquiryResult.setItem(i, 12, item)
 
-            self.currentInquiryResult[i] = data
-            # print(self.currentInquryResult)
+                    self.currentInquiryResult[i] = data
+                    i = i + 1
+                else:
+                    pass
+            else:
+                item = QTableWidgetItem(data[3])
+                self.tw_inquiryResult.setItem(i, 0, item)
+                item = QTableWidgetItem(data[2])
+                self.tw_inquiryResult.setItem(i, 1, item)
+                item = QTableWidgetItem(data[4])
+                self.tw_inquiryResult.setItem(i, 2, item)
+                item = QTableWidgetItem(data[5])
+                self.tw_inquiryResult.setItem(i, 3, item)
+                item = QTableWidgetItem(data[6])
+                self.tw_inquiryResult.setItem(i, 4, item)
+                item = QTableWidgetItem(data[7])
+                self.tw_inquiryResult.setItem(i, 5, item)
+                item = QTableWidgetItem(data[8])
+                self.tw_inquiryResult.setItem(i, 6, item)
+                item = QTableWidgetItem(data[9])
+                self.tw_inquiryResult.setItem(i, 7, item)
+                item = QTableWidgetItem(data[10])
+                self.tw_inquiryResult.setItem(i, 8, item)
+                item = QTableWidgetItem(data[11])
+                self.tw_inquiryResult.setItem(i, 9, item)
+                item = QTableWidgetItem(data[12])
+                self.tw_inquiryResult.setItem(i, 10, item)
+                item = QTableWidgetItem(data[13])
+                self.tw_inquiryResult.setItem(i, 11, item)
+                item = QTableWidgetItem(data[14])
+                self.tw_inquiryResult.setItem(i, 12, item)
+
+                self.currentInquiryResult[i] = data
+                i = i + 1
+        self.tw_inquiryResult.setRowCount(i)
+    '''
+        功能：
+            根据查询到的结果初始化tablewidget
+    '''
+    def _initTableWidget(self, result):
+        self.tw_inquiryResult.clear()
+        self.tw_inquiryResult.setRowCount(0)
+        self.result = result
+
+        self.result_num = len(result)
+        self.tw_inquiryResult.setRowCount(self.result_num)
+        self.tw_inquiryResult.setColumnCount(13)
+        headerlist = ['单位名称', '装备名称', '实力数', '编制数', '现有数', '偏差', '准备退役数', '未到位数', '提前退役', '待核查无实物', '待核查无实力', '单独建账',
+                      '正常到位']
+        self.tw_inquiryResult.setHorizontalHeaderLabels(headerlist)
+        self.currentInquiryResult.clear()
+        for i, data in enumerate(self.result):
+            if self.cb_showDistence.isChecked():
+                if int(data[7]) != 0:
+                    item = QTableWidgetItem(data[3])
+                    self.tw_inquiryResult.setItem(i, 0, item)
+                    item = QTableWidgetItem(data[2])
+                    self.tw_inquiryResult.setItem(i, 1, item)
+                    item = QTableWidgetItem(data[4])
+                    self.tw_inquiryResult.setItem(i, 2, item)
+                    item = QTableWidgetItem(data[5])
+                    self.tw_inquiryResult.setItem(i, 3, item)
+                    item = QTableWidgetItem(data[6])
+                    self.tw_inquiryResult.setItem(i, 4, item)
+                    item = QTableWidgetItem(data[7])
+                    self.tw_inquiryResult.setItem(i, 5, item)
+                    item = QTableWidgetItem(data[8])
+                    self.tw_inquiryResult.setItem(i, 6, item)
+                    item = QTableWidgetItem(data[9])
+                    self.tw_inquiryResult.setItem(i, 7, item)
+                    item = QTableWidgetItem(data[10])
+                    self.tw_inquiryResult.setItem(i, 8, item)
+                    item = QTableWidgetItem(data[11])
+                    self.tw_inquiryResult.setItem(i, 9, item)
+                    item = QTableWidgetItem(data[12])
+                    self.tw_inquiryResult.setItem(i, 10, item)
+                    item = QTableWidgetItem(data[13])
+                    self.tw_inquiryResult.setItem(i, 11, item)
+                    item = QTableWidgetItem(data[14])
+                    self.tw_inquiryResult.setItem(i, 12, item)
+
+                    self.currentInquiryResult[i] = data
+                else:
+                    pass
+            else:
+                item = QTableWidgetItem(data[3])
+                self.tw_inquiryResult.setItem(i, 0, item)
+                item = QTableWidgetItem(data[2])
+                self.tw_inquiryResult.setItem(i, 1, item)
+                item = QTableWidgetItem(data[4])
+                self.tw_inquiryResult.setItem(i, 2, item)
+                item = QTableWidgetItem(data[5])
+                self.tw_inquiryResult.setItem(i, 3, item)
+                item = QTableWidgetItem(data[6])
+                self.tw_inquiryResult.setItem(i, 4, item)
+                item = QTableWidgetItem(data[7])
+                self.tw_inquiryResult.setItem(i, 5, item)
+                item = QTableWidgetItem(data[8])
+                self.tw_inquiryResult.setItem(i, 6, item)
+                item = QTableWidgetItem(data[9])
+                self.tw_inquiryResult.setItem(i, 7, item)
+                item = QTableWidgetItem(data[10])
+                self.tw_inquiryResult.setItem(i, 8, item)
+                item = QTableWidgetItem(data[11])
+                self.tw_inquiryResult.setItem(i, 9, item)
+                item = QTableWidgetItem(data[12])
+                self.tw_inquiryResult.setItem(i, 10, item)
+                item = QTableWidgetItem(data[13])
+                self.tw_inquiryResult.setItem(i, 11, item)
+                item = QTableWidgetItem(data[14])
+                self.tw_inquiryResult.setItem(i, 12, item)
+
+                self.currentInquiryResult[i] = data
 
     # 删除选中装备
     def deleteInquiryResult(self):
