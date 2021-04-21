@@ -368,7 +368,7 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
                     reply = QMessageBox.question(self, '删除', '删除失败', QMessageBox.Yes)
         # 装备目录
         else:
-            haveChild = selectUnitDictByUper(self.le_unitID.text())
+            haveChild = selectUnitDictByUper(self.le_equipID.text())
             if haveChild:
                 print("have")
                 reply = QMessageBox.question(self, '删除', '该单位有下级单位，是否将下级单位一起删除？', QMessageBox.Yes,
