@@ -10,5 +10,9 @@
     <file>manage.png</file>
     <file>schedule.png</file>
     <file>plan.png</file>
+    <file>factory.png</file>
+    <file>handbook.png</file>
+    <file>room.png</file>
+    <file>regular.png</file>
   </qresource>
 </RCC>
