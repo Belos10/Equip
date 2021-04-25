@@ -734,18 +734,16 @@ def findEquipUperIDList(Equip_ID, EquipIDList):
             findEquipUperIDList(uperIDInfo[0], EquipIDList)
     disconnectMySql(conn, cur)
 
-#通过单位号和装备号查找strength某条记录的现有数
-def seletNowNumAboutStrength(Unit_ID, Equip_ID, year):
+#通过单位号和装备号查找strength某条记录的实力数，现有数
+def seletNumAboutStrength(Unit_ID, Equip_ID, year):
     conn, cur = connectMySql()
-    sql = "select Now from strength where Equip_ID = '" + Equip_ID + "' and Unit_ID = '" + Unit_ID + "' and year = '" + year + "'"
-    print(sql)
+    sql = "select Strength, Now from strength where Equip_ID = '" + Equip_ID + "' and Unit_ID = '" + Unit_ID + "' and year = '" + year + "'"
     cur.execute(sql)
     nowNumTuple = cur.fetchall()
     disconnectMySql(conn, cur)
-    print(nowNumTuple)
 
     for nowNumInfo in nowNumTuple:
-        return nowNumInfo[0]
+        return nowNumInfo[0], nowNumInfo[1]
 
 #往录入表inputinfo中插入一条数据
 def addDataIntoInputInfo(Unit_ID, Equip_ID, ID, num, year, shop, state, arrive, confirm, other):
@@ -765,15 +763,17 @@ def addDataIntoInputInfo(Unit_ID, Equip_ID, ID, num, year, shop, state, arrive, 
 
     for UnitID in UnitIDList:
         for EquipID in EquipIDList:
-            nowYearNum = seletNowNumAboutStrength(UnitID, EquipID, year)
-            changeYearNum = int(nowYearNum) + addNum
-            nowAllNum = seletNowNumAboutStrength(UnitID, EquipID, '')
-            changeAllNum = int(nowAllNum) + addNum
-            sql = "Update strength set Now = '" + str(changeYearNum) + "' where Equip_ID = '" + \
+            strengthYearNum, nowYearNum = seletNumAboutStrength(UnitID, EquipID, year)
+            changeYearNowNum = int(nowYearNum) + addNum
+            changeYearErrorNum = int(strengthYearNum) - changeYearNowNum
+            strengthAllNum, nowAllNum = seletNumAboutStrength(UnitID, EquipID, '')
+            changeAllNowNum = int(nowAllNum) + addNum
+            changeAllErrorNum = int(strengthAllNum) - changeAllNowNum
+            sql = "Update strength set Now = '" + str(changeYearNowNum) + "', Error = '" + str(changeYearErrorNum) + "' where Equip_ID = '" + \
                   EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + year + "'"
 
             cur.execute(sql)
-            sql = "update strength set Now = '" + str(changeAllNum) + "' where Unit_ID = '" \
+            sql = "update strength set Now = '"  + str(changeAllNowNum) + "', Error = '" + str(changeAllErrorNum) +  "' where Unit_ID = '" \
                   + UnitID + "' and Equip_ID = '" + EquipID + "' and year = ''"
             print(sql)
             cur.execute(sql)
@@ -789,6 +789,36 @@ def selectNowNumAndStrengthNum(Unit_ID, Equip_ID):
     result = cur.fetchall()
     for resultInfo in result:
         return resultInfo[0], resultInfo[1]
+
+#根据单位号，装备号修改某年的实力数，strengthNum为修改后的实力数，orginStrengthNum为原来的实力数
+def updateStrengthAboutStrengrh(Unit_ID, Equip_ID, year, strengthNum, orginStrengthNum):
+    conn, cur = connectMySql()
+
+    EquipIDList = []
+    UnitIDList = []
+    findUnitUperIDList(Unit_ID, UnitIDList)
+    findEquipUperIDList(Equip_ID, EquipIDList)
+
+    for UnitID in UnitIDList:
+        for EquipID in EquipIDList:
+            orginYearStrengthNum,  YearNowNum= seletNumAboutStrength(UnitID, EquipID, year) #获取原有的实力数以及现有数
+            changeYearStrengthNum = int(orginYearStrengthNum) - int(orginStrengthNum) + int(strengthNum)
+            changeYearErrorNum = int(changeYearStrengthNum) - int(YearNowNum)
+            orginAllStrengthNum, nowAllNum = seletNumAboutStrength(UnitID, EquipID, '')
+            changeAllStrengthNum = int(orginAllStrengthNum) - int(orginStrengthNum) + int(strengthNum)
+            changeAllErrorNum = int(changeAllStrengthNum) - int(nowAllNum)
+            sql = "Update strength set Strength = '" + str(changeYearStrengthNum) + "', Error = '" + str(
+                changeYearErrorNum) + "' where Equip_ID = '" + \
+                  EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + year + "'"
+
+            cur.execute(sql)
+            sql = "update strength set Strength = '" + str(changeAllStrengthNum) + "', Error = '" + str(
+                changeAllErrorNum) + "' where Unit_ID = '" \
+                  + UnitID + "' and Equip_ID = '" + EquipID + "' and year = ''"
+            cur.execute(sql)
+
+    conn.commit()
+    disconnectMySql(conn, cur)
 
 if __name__ == '__main__':
     pass

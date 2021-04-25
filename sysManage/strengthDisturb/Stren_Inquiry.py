@@ -138,6 +138,7 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
                                      self.add_strenth_info.tableWidget.item(i + orginRowNum, 6).text(),
                                      self.add_strenth_info.tableWidget.item(i + orginRowNum, 7).text())
             self.sw_strenSelectMan.setCurrentIndex(0)
+            self.slotInquryStrengthResult()
         else:
             #添加新增的数据
             for i in range(currentRowNum - orginRowNum):
@@ -150,6 +151,8 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
                                      self.add_strenth_info.tableWidget.item(i + orginRowNum, 5).text(),
                                      self.add_strenth_info.tableWidget.item(i + orginRowNum, 6).text(),
                                      self.add_strenth_info.tableWidget.item(i + orginRowNum, 7).text())
+            self.sw_strenSelectMan.setCurrentIndex(0)
+            self.slotInquryStrengthResult()
     '''
         功能：
             录入界面的返回按钮
@@ -236,7 +239,7 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
             查询实力结果
     '''
     def slotInquryStrengthResult(self):
-        self.yearList = ['全部']
+        self.yearList = ['2001']
         self.currentCheckedUnitList = []
         self.currentCheckedEquipList = []
         for unitID, unitItem in self.first_treeWidget_dict.items():

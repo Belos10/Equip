@@ -2,7 +2,7 @@ import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QTableWidgetItem, QAbstractItemView, QMessageBox
 from widgets.strengthDisturb.inquiry_result import Widget_Inquiry_Result
 from database.strengthDisturbSql import selectAboutStrengthByUnitListAndEquipList, selectUnitIsHaveChild, selectEquipIsHaveChild,\
-    selectAboutStrengthByEquipShow,selectAboutStrengthByUnitShow
+    selectAboutStrengthByEquipShow,selectAboutStrengthByUnitShow, updateStrengthAboutStrengrh
 from PyQt5.Qt import Qt
 import  EmptyDelegate
 
@@ -81,12 +81,21 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                         reply = QMessageBox.question(self, '修改', '只能修改末级实力数，修改失败', QMessageBox.Yes)
                         self.tw_inquiryResult.item(currentRow, currentColumn).setText(resultInfo[4])
                         return
+                    elif len(self.yearList) != 1:
+                        reply = QMessageBox.question(self, '修改', '只能某一年，修改失败', QMessageBox.Yes)
+                        self.tw_inquiryResult.item(currentRow, currentColumn).setText(resultInfo[4])
+                        return
+                    elif self.yearList[0] == '全部':
+                        reply = QMessageBox.question(self, '修改', '只能某一年，修改失败', QMessageBox.Yes)
+                        self.tw_inquiryResult.item(currentRow, currentColumn).setText(resultInfo[4])
+                        return
                     else:
                         if self.tw_inquiryResult.item(currentRow, currentColumn).text() != resultInfo[4]:
                             reply = QMessageBox.question(self, '修改', '是否修改当前实力数？', QMessageBox.Yes,
                                                          QMessageBox.Cancel)
                             if reply == QMessageBox.Yes:
-                                pass
+                                updateStrengthAboutStrengrh(Unit_ID, Equip_ID, self.yearList[0], self.tw_inquiryResult.item(currentRow, currentColumn).text(),resultInfo[4])
+                                self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.yearList)
                             else:
                                 self.tw_inquiryResult.item(currentRow, currentColumn).setText(resultInfo[4])
                         return
