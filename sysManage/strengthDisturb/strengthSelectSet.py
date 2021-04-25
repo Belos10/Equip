@@ -1,7 +1,8 @@
 from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, QAbstractItemView, QMessageBox
-from database.ConnectAndSql import Clicked, add_UnitDictDept, update_Unit_Dict, selectUnitDictByUper, del_Unit_Dict, \
-    del_Unit_And_Child, add_UnitDictEquip, update_Equip_Dict, del_Equip_And_Child, del_Equip_Dict
+from database.strengthDisturbSql import selectUnitInfoByDeptUper, selectAllDataAboutUnit, selectEquipInfoByEquipUper, \
+    selectAllDataAboutEquip, addDataIntoUnit, addDataIntoEquip, updateDataIntoUnit, updateDataIntoEquip, delDataInEquip, delDataInUnit
 from widgets.strengthDisturb.select_set import Widget_Select_Set
+from PyQt5.Qt import Qt
 
 
 class strengthSelectSet(QWidget, Widget_Select_Set):
@@ -9,11 +10,11 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
         super(strengthSelectSet, self).__init__(parent)
         self.setupUi(self)
 
-        self.tw_first.clear()
-        self.tw_second.clear()
+        self.tw_first.clear()           #删除单位目录所有数据显示
+        self.tw_second.clear()          #删除装备目录所有数据显示
         self.tw_first.header().setVisible(False)  # 不显示树窗口的title
         self.tw_second.header().setVisible(False)  # 不显示树窗口的title
-        self.changeFirst = True  # 是否是修改单元的目录
+        self.changeUnit = True  # 是否是修改单元的目录
 
         # QTableWidget设置整行选中
         self.tb_result.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -23,83 +24,143 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
         self.second_treeWidget_dict = {}  # 当前装备目录列表对象，结构为：{'行号':对应的item}
         self.signalConnect()
 
-    def signalConnect(self):
-        self.pb_add.clicked.connect(self.slotAddDict)  # 添加数据
-        self.tb_result.itemClicked.connect(self.slotClickedRow)  # 点击当前tablewidget
-        self.pb_update.clicked.connect(self.slotUpdate)  # 修改数据
-        self.pushButton.clicked.connect(self.slotFirstInit)  # 设置单元目录
-        self.pb_del.clicked.connect(self.slotDelDict)  # 删除数据
-        self.pushButton_2.clicked.connect(self.slotSecondInit)  # 设置装备目录
-        self.tw_first.currentItemChanged.connect(self.slotSelectIndex)  # 将单位目录与装备目录相关联
-
-    def slotDisconnect(self):
-        self.pb_add.clicked.disconnect(self.slotAddDict)  # 添加数据
-        self.tb_result.itemClicked.disconnect(self.slotClickedRow)  # 点击当前tablewidget
-        self.pb_update.clicked.disconnect(self.slotUpdate)  # 修改数据
-        self.pushButton.clicked.disconnect(self.slotFirstInit)  # 设置单元目录
-        self.pb_del.clicked.disconnect(self.slotDelDict)  # 删除数据
-        self.pushButton_2.clicked.disconnect(self.slotSecondInit)  # 设置装备目录
-        self.tw_first.currentItemChanged.disconnect(self.slotSelectIndex)  # 将单位目录与装备目录相关联
-
     '''
         功能：
-            更改当前状态为设置单元目录，并初始化单元目录以及tablewidget
+            所有信号的连接
     '''
+    def signalConnect(self):
+        self.pb_add.clicked.connect(self.slotAddDict)  # 添加数据
+        self.pb_update.clicked.connect(self.slotUpdate)  # 修改数据
+        self.pb_del.clicked.connect(self.slotDelDict)  # 删除数据
 
-    def slotFirstInit(self):
-        self.tw_first.clear()
-        self.tw_second.clear()
-        self.tb_result.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self._initTreeWidget("", self.tw_first)
-        self._initUnitTableWidget()
-        self.pushButton.setDisabled(True)
-        self.pushButton_2.setDisabled(False)
-        self.changeFirst = True
-        self.le_equipID.clear()
-        self.le_equipName.clear()
-        self.le_equipUper.clear()
-        self.le_unitID.clear()
-        self.le_equipID.setEnabled(0)
-        self.le_equipName.setEnabled(0)
-        self.le_equipUper.setEnabled(0)
-        self.le_unitUper.setEnabled(1)
-        self.le_unitName.setEnabled(1)
+        self.tb_result.itemClicked.connect(self.slotClickedRow)  # 选中当前tablewidget的某行
+
+        self.pb_setUnit.clicked.connect(self.slotUnitDictInit)  # 设置单元目录
+
+        self.pb_setEquip.clicked.connect(self.slotEquipDictInit)  # 设置装备目录
 
     '''
             功能：
-                更改当前状态为设置装备目录，并初始化装备目录以及tablewidget
+                所有信号的断开
     '''
+    def slotDisconnect(self):
+        self.pb_add.clicked.disconnect(self.slotAddDict)  # 添加数据
+        self.pb_update.clicked.disconnect(self.slotUpdate)  # 修改数据
+        self.pb_del.clicked.disconnect(self.slotDelDict)  # 删除数据
 
-    def slotSecondInit(self):
-        self.pushButton.setDisabled(False)
-        self.pushButton_2.setDisabled(True)
-        self.tw_first.clear()
-        self.tw_second.clear()
-        self.tb_result.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self._initSecondTreeWidget("", self.tw_second)
-        self._initEquipTableWidget()
-        self.changeFirst = False
-        self.le_equipID.setEnabled(1)
-        self.le_equipName.setEnabled(1)
-        self.le_equipUper.setEnabled(1)
+        self.tb_result.itemClicked.disconnect(self.slotClickedRow)  # 选中当前tablewidget的某行
+
+        self.pb_setUnit.clicked.disconnect(self.slotUnitDictInit)  # 设置单元目录
+
+        self.pb_setEquip.clicked.disconnect(self.slotEquipDictInit)  # 设置装备目录
+
+    '''
+        功能：
+            清除所有数据
+    '''
+    def delAllData(self):
+        self.tw_first.clear()  # 清除单元目录所有数据
+        self.tw_second.clear()  # 清除装备目录所有数据
+        self.tb_result.clear()  # 清除tableWidget中所有数据
+        self.le_first.clear()
+        self.le_second.clear()
+        self.le_equipID.clear()
+        self.le_unitID.clear()
         self.le_unitUper.clear()
         self.le_unitName.clear()
-        self.le_unitID.clear()
-        self.le_unitID.setEnabled(0)
-        self.le_unitUper.setEnabled(0)
-        self.le_unitName.setEnabled(0)
+        self.le_equipName.clear()
+        self.le_equipUper.clear()
 
     '''
         功能：
-            当设置单位目录时，初始化tableWidget
+            点击设置单元目录按钮后的初始化
     '''
+    def slotUnitDictInit(self):
+        self.delAllData()
+        self.tb_result.setEditTriggers(QAbstractItemView.NoEditTriggers)        #设置tablewidget不能修改
+        #设置当前控件状态
+        self.tw_second.setDisabled(True)     #设置装备目录为灰色
+        self.le_second.setDisabled(True)
+        self.pb_secondSelect.setDisabled(True)   #设置装备目录上面的查询为灰色
+        self.tw_first.setDisabled(False)    #设置单位目录为可选中
+        self.le_first.setDisabled(False)
+        self.pb_firstSelect.setDisabled(False)
+        self.le_equipID.setDisabled(True)
+        self.le_equipName.setDisabled(True)
+        self.le_equipUper.setDisabled(True)
+        self.cb_equipType.setDisabled(True)
+        self.cb_inputType.setDisabled(True)
+        self.le_unitUper.setDisabled(False)
+        self.le_unitName.setDisabled(False)
+        self.le_unitID.setDisabled(False)
+        self.pb_setEquip.setDisabled(False)
+        self.pb_setUnit.setDisabled(True)
 
+        #从数据库中单位表中获取数据初始化单位目录，tableWidget显示所有的单位表
+        self._initUnitTreeWidget("", self.tw_first)
+        self._initUnitTableWidget()
+
+        self.changeUnit = True              #设置当前为修改单位状态
+
+    '''
+            功能：
+                点击设置装备目录按钮后的初始化
+    '''
+    def slotEquipDictInit(self):
+        self.delAllData()
+        self.tb_result.setEditTriggers(QAbstractItemView.NoEditTriggers)  # 设置tablewidget不能修改
+        # 设置当前控件状态
+        self.tw_second.setDisabled(False)  # 设置装备目录为灰色
+        self.le_second.setDisabled(False)
+        self.pb_secondSelect.setDisabled(False)  # 设置装备目录上面的查询为灰色
+        self.tw_first.setDisabled(True)  # 设置单位目录为可选中
+        self.le_first.setDisabled(True)
+        self.pb_firstSelect.setDisabled(True)
+        self.le_equipID.setDisabled(False)
+        self.le_equipName.setDisabled(False)
+        self.le_equipUper.setDisabled(False)
+        self.cb_equipType.setDisabled(False)
+        self.cb_inputType.setDisabled(False)
+        self.le_unitUper.setDisabled(True)
+        self.le_unitName.setDisabled(True)
+        self.le_unitID.setDisabled(True)
+        self.pb_setEquip.setDisabled(True)
+        self.pb_setUnit.setDisabled(False)
+
+        # 从数据库中单位表中获取数据初始化单位目录，tableWidget显示所有的单位表
+        self._initEquipTreeWidget("", self.tw_second)
+        self._initEquipTableWidget()
+
+        self.changeUnit = False  # 设置当前为修改单位状态
+
+    '''
+        功能：
+            单位目录的初始化，显示整个单位表
+            参数表：root为上级单位名字，mother为上级节点对象
+    '''
+    def _initUnitTreeWidget(self, root, mother):
+        if root == '':
+            result = selectUnitInfoByDeptUper('')
+        else:
+            result = selectUnitInfoByDeptUper(root)
+
+        #rowData: (单位编号，单位名称，上级单位编号)
+        for rowData in result:
+            item = QTreeWidgetItem(mother)
+            item.setText(0, rowData[1])
+            self.first_treeWidget_dict[rowData[0]] = item
+            if rowData[0] != '':
+                self._initUnitTreeWidget(rowData[0], item)
+
+    '''
+        功能：
+            设置单元时的初始化tableWidget，显示整个单位表
+    '''
     def _initUnitTableWidget(self):
-        sql = " select * from dept"
-        result = Clicked(sql)
+        result = selectAllDataAboutUnit()
 
         header = ['单位编号', '单位名称', '上级单位编号']
-        self.tb_result.setColumnCount(3)
+        self.tb_result.setColumnCount(len(header))
         self.tb_result.setRowCount(len(result))
         self.tb_result.setHorizontalHeaderLabels(header)
 
@@ -115,117 +176,88 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
 
     '''
         功能：
-            当设置装备目录时，初始化tableWidget
+            装备目录的初始化，显示整个装备表
+            参数表：root为上级装备名字，mother为上级节点对象
     '''
-
-    def _initEquipTableWidget(self):
-        sql = " select * from equip "
-        result = Clicked(sql)
-
-        header = ['装备编号', '装备名称', '上级装备编号']
-        self.tb_result.setColumnCount(3)
-        self.tb_result.setRowCount(len(result))
-        self.tb_result.setHorizontalHeaderLabels(header)
-
-        for i, data in enumerate(result):
-            item = QTableWidgetItem(data[0])
-            self.tb_result.setItem(i, 0, item)
-            item = QTableWidgetItem(data[1])
-            self.tb_result.setItem(i, 1, item)
-            item = QTableWidgetItem(data[2])
-            self.tb_result.setItem(i, 2, item)
-
-        # print(result)   #测试查找到的数据
-
-    '''
-        功能：
-            当设置装备目录时，根据当前选中的单位查找对应的装备
-    '''
-
-    def slotSelectIndex(self):
-        if self.changeFirst:
-            pass
-        else:
-            # self.slotDisconnect()
-            # 在clear前要现将该控件上的信号和槽的连接进行disconnect，不然会发生段错误
-            self.tw_second.clear()
-
-            for UnitID, item in self.first_treeWidget_dict.items():
-                if item == self.tw_first.currentItem():
-                    print(item)
-                    self._initSecondTreeWidget("", self.tw_second)
-                    self._initEquipTableWidget()
-                    # break
-            # self.signalConnect()
-
-    '''
-        功能：
-            当设置装备目录时，初始化装备目录
-    '''
-
-    def _initSecondTreeWidget(self, root, mother):
-
-        # if UnitID:
-        #     sql = "select Equip_Name,Equip_ID from equip where Unit_ID ='" + UnitID + "'" + "AND Equip_Uper = ''"
-        #     # print(sql)
-        # else:
-
-        sql = "select Equip_Name,Equip_ID from equip where Equip_Uper ='" + root + "'"
-            # print(sql)
-        result = Clicked(sql)
-        for data in result:
-            item = QTreeWidgetItem(mother)
-            item.setText(0, data[0])
-            self.second_treeWidget_dict[data[1]] = item
-            if data[0] != '':
-                self._initSecondTreeWidget(data[1], item)
-
-    '''
-        功能：
-            当设置单位目录时，初始化单位目录
-    '''
-
-    def _initTreeWidget(self, root, mother):
-
+    def _initEquipTreeWidget(self, root, mother):
         if root == '':
-            sql = 'select Dept_Name,Dept_ID from dept where Dept_Uper = ""'
+            result = selectEquipInfoByEquipUper('')
         else:
-            sql = " select Dept_Name,Dept_ID from dept where Dept_Uper='" + root + "'"
+            result = selectEquipInfoByEquipUper(root)
 
-        result = Clicked(sql)
-        for data in result:
+        #rowData: (装备编号，装备名称，上级装备编号, 录入类型, 装备类型)
+        for rowData in result:
             item = QTreeWidgetItem(mother)
-            item.setText(0, data[0])
-            self.first_treeWidget_dict[data[1]] = item
-            if data[0] != '':
-                self._initTreeWidget(data[1], item)
+            item.setText(0, rowData[1])
+            self.second_treeWidget_dict[rowData[0]] = item
+            if rowData[0] != '':
+                self._initEquipTreeWidget(rowData[0], item)
+
+    '''
+        功能：
+            设置装备时的初始化tableWidget，显示整个装备表
+    '''
+    def _initEquipTableWidget(self):
+        result = selectAllDataAboutEquip()
+
+        header = ['装备编号', '装备名称', '上级装备编号', '录入类型', '装备类型']
+        self.tb_result.setColumnCount(len(header))
+        self.tb_result.setRowCount(len(result))
+        self.tb_result.setHorizontalHeaderLabels(header)
+
+        for i, data in enumerate(result):
+            item = QTableWidgetItem(data[0])
+            self.tb_result.setItem(i, 0, item)
+            item = QTableWidgetItem(data[1])
+            self.tb_result.setItem(i, 1, item)
+            item = QTableWidgetItem(data[2])
+            self.tb_result.setItem(i, 2, item)
+            item = QTableWidgetItem(data[3])
+            self.tb_result.setItem(i, 3, item)
+            item = QTableWidgetItem(data[4])
+            self.tb_result.setItem(i, 4, item)
+
+        # print(result)   #测试查找到的数据
 
     '''
         功能：
             当选中tablewidget某行时，显示对应的lineedit
     '''
-
     def slotClickedRow(self):
-        print(self.tb_result.currentRow())
+
         currentRow = self.tb_result.currentRow()
-        if self.changeFirst:
+        if self.changeUnit:
             self.le_unitID.setText(self.tb_result.item(currentRow, 0).text())
             self.le_unitName.setText(self.tb_result.item(currentRow, 1).text())
             self.le_unitUper.setText(self.tb_result.item(currentRow, 2).text())
         else:
             self.le_equipID.setText((self.tb_result.item(currentRow,0).text()))
-            #self.le_unitID.setText((self.tb_result.item(currentRow, 1).text()))
             self.le_equipName.setText((self.tb_result.item(currentRow, 1).text()))
             self.le_equipUper.setText((self.tb_result.item(currentRow, 2).text()))
+            inputType = self.tb_result.item(currentRow, 3).text()
+            equipType = self.tb_result.item(currentRow, 4).text()
+
+            if inputType == '空':
+                self.cb_inputType.setCurrentIndex(0)
+            elif inputType == '逐号录入':
+                self.cb_inputType.setCurrentIndex(1)
+            else:
+                self.cb_inputType.setCurrentIndex(2)
+
+            if equipType == '空':
+                self.cb_equipType.setCurrentIndex(0)
+            elif equipType == '通用装备':
+                self.cb_equipType.setCurrentIndex(1)
+            else:
+                self.cb_equipType.setCurrentIndex(2)
 
     '''
         功能：
             添加目录
     '''
-
     def slotAddDict(self):
         # 单位目录
-        if self.changeFirst:
+        if self.changeUnit:
             if self.le_unitID.text() == "" or self.le_unitName.text() == "":
                 reply = QMessageBox.question(self, '新增失败', '单位ID或单位名字为空，拒绝增加，请重新填写', QMessageBox.Yes,
                                              QMessageBox.Cancel)
@@ -233,48 +265,70 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
                 Unit_ID = self.le_unitID.text()
                 Unit_Name = self.le_unitName.text()
                 Unit_Uper = self.le_unitUper.text()
-                add_UnitDictDept(Unit_ID, Unit_Name, Unit_Uper)
-                self.slotDisconnect()
-                self.tb_result.clear()
-                self.tw_first.clear()
-                self.tw_second.clear()
-                self.tb_result.setRowCount(0)
-                self.first_treeWidget_dict.clear()
-                self.second_treeWidget_dict.clear()
-                self._initUnitTableWidget()
-                self._initTreeWidget("", self.tw_first)
-                self.signalConnect()
+                unitInfoTuple = selectAllDataAboutUnit()
+
+                haveID = False
+                haveUperID = False
+                if Unit_Uper == '':
+                    haveUperID = True
+
+                for unitInfo in unitInfoTuple:
+                    if Unit_ID == unitInfo[0]:
+                        reply = QMessageBox.question(self, '新增失败', '单位ID已存在, 请重新填写', QMessageBox.Yes,
+                                                     QMessageBox.Cancel)
+                        haveID = True
+                        break
+                    elif Unit_Uper == unitInfo[0]:
+                        haveUperID = True
+
+                if haveUperID == False:
+                    reply = QMessageBox.question(self, '新增失败', '上级单位ID不存在, 请重新填写', QMessageBox.Yes,
+                                                 QMessageBox.Cancel)
+                elif haveUperID == True and haveID == False:
+                    addDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper)
+
+                self.slotUnitDictInit()
         # 装备目录
         else:
             if self.le_equipID.text() == "" or self.le_equipName.text() == "":
-                reply = QMessageBox.question(self, '新增失败', '单位ID或单位名字为空，拒绝增加，请重新填写', QMessageBox.Yes,
+                reply = QMessageBox.question(self, '新增失败', '装备ID或装备名字为空，拒绝增加，请重新填写', QMessageBox.Yes,
                                              QMessageBox.Cancel)
             else:
-                # Equip_ID,Unit_ID, Equip_Name, Equip_Uper
                 Equip_ID = self.le_equipID.text()
-                #Unit_ID = self.le_unitID.text()
                 Equip_Name = self.le_equipName.text()
                 Equip_Uper = self.le_equipUper.text()
-                add_UnitDictEquip(Equip_ID,Equip_Name,Equip_Uper)
-                self.slotDisconnect()
-                self.tb_result.clear()
-                self.tw_first.clear()
-                self.tw_second.clear()
-                self.tb_result.setRowCount(0)
-                self.first_treeWidget_dict.clear()
-                self.second_treeWidget_dict.clear()
-                self._initEquipTableWidget()
-                self._initSecondTreeWidget("", self.tw_second)
-                self.signalConnect()
+                Input_Type = self.cb_inputType.currentText()
+                Equip_Type = self.cb_equipType.currentText()
+                equipInfoTuple = selectAllDataAboutEquip()
+
+                haveID = False
+                haveUperID = False
+                if Equip_Uper == '':
+                    haveUperID = True
+
+                for equipInfo in equipInfoTuple:
+                    if Equip_ID == equipInfo[0]:
+                        reply = QMessageBox.question(self, '新增失败', '装备ID已存在, 请重新填写', QMessageBox.Yes,
+                                                     QMessageBox.Cancel)
+                        haveID = True
+                        break
+                    elif Equip_Uper == equipInfo[0]:
+                        haveUperID = True
+
+                if haveUperID == False:
+                    reply = QMessageBox.question(self, '新增失败', '上级装备ID不存在, 请重新填写', QMessageBox.Yes,
+                                                 QMessageBox.Cancel)
+                elif haveUperID == True and haveID == False:
+                    addDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type)
+                self.slotEquipDictInit()
 
     '''
         功能：
             修改目录
     '''
-
     def slotUpdate(self):
         # 单位目录
-        if self.changeFirst:
+        if self.changeUnit:
             if (self.tb_result.item(self.tb_result.currentRow(),
                                     0).text() != self.le_unitID.text()) or self.le_unitName.text() == "":
                 reply = QMessageBox.question(self, '修改失败', '单位ID不能修改或单位名字为空，拒绝修改，请重新填写', QMessageBox.Yes,
@@ -283,40 +337,46 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
                 Unit_ID = self.le_unitID.text()
                 Unit_Name = self.le_unitName.text()
                 Unit_Uper = self.le_unitUper.text()
-                update_Unit_Dict(Unit_ID, Unit_Name, Unit_Uper)
-                self.slotDisconnect()
-                self.tb_result.clear()
-                self.tw_first.clear()
-                self.tw_second.clear()
-                self.tb_result.setRowCount(0)
-                self.first_treeWidget_dict = {}
-                self.second_treeWidget_dict = {}
-                self.signalConnect()
-                self._initUnitTableWidget()
-                self._initTreeWidget("", self.tw_first)
+                unitInfoTuple = selectAllDataAboutUnit()
+                haveUperID = False
+
+                if Unit_Uper == '':
+                    haveUperID = True
+
+                for unitInfo in unitInfoTuple:
+                    if Unit_Uper == unitInfo[0]:
+                        haveUperID = True
+
+                if haveUperID == False:
+                    reply = QMessageBox.question(self, '修改失败', '上级单位ID在单位列表中不存在，拒绝修改，请重新填写', QMessageBox.Yes,
+                                                 QMessageBox.Cancel)
+                else:
+                    updateDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper)
+                    self.slotUnitDictInit()
         # 装备目录
         else:
             if (self.tb_result.item(self.tb_result.currentRow(),
                                     0).text() != self.le_equipID.text()) or self.le_equipName.text() == "":
-                reply = QMessageBox.question(self, '修改失败', '单位ID不能修改或单位名字为空，拒绝修改，请重新填写', QMessageBox.Yes,
+                reply = QMessageBox.question(self, '修改失败', '装备ID不能修改或装备名字为空，拒绝修改，请重新填写', QMessageBox.Yes,
                                              QMessageBox.Cancel)
             else:
                 Equip_ID = self.le_equipID.text()
-                #Unit_ID = self.le_unitID.text()
                 Equip_Name = self.le_equipName.text()
                 Equip_Uper = self.le_equipUper.text()
-                update_Equip_Dict(Equip_ID,Equip_Name,Equip_Uper)
-                self.slotDisconnect()
-                self.tb_result.clear()
-                self.tw_first.clear()
-                self.tw_second.clear()
-                self.tb_result.setRowCount(0)
-                self.first_treeWidget_dict = {}
-                self.second_treeWidget_dict = {}
-                self.signalConnect()
-                self._initEquipTableWidget()
-                self._initSecondTreeWidget("", self.tw_second)
+                Input_Type = self.cb_inputType.currentText()
+                Equip_Type = self.cb_equipType.currentText()
+                haveUperID = False
+                equipInfoTuple = selectAllDataAboutEquip()
+                for equipInfo in equipInfoTuple:
+                    if Equip_Uper == equipInfo[0]:
+                        haveUperID = True
 
+                if haveUperID == False:
+                    reply = QMessageBox.question(self, '修改失败', '上级装备ID在装备列表中不存在，拒绝修改，请重新填写', QMessageBox.Yes,
+                                                 QMessageBox.Cancel)
+                else:
+                    updateDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type)
+                    self.slotEquipDictInit()
 
     '''
         功能：
@@ -325,86 +385,30 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
 
     def slotDelDict(self):
         # 单位目录
-        if self.changeFirst:
-            haveChild = selectUnitDictByUper(self.le_unitID.text())
-            if haveChild:
-                print("have")
-                reply = QMessageBox.question(self, '删除', '该单位有下级单位，是否将下级单位一起删除？', QMessageBox.Yes,
+        if self.changeUnit:
+            reply = QMessageBox.question(self, '删除', '是否将下级单位以及所涉及的其他表关于该单位的信息一起删除？', QMessageBox.Yes,
                                              QMessageBox.Cancel)
-                if reply == QMessageBox.Yes:
-                    del_Unit_And_Child(self.le_unitID.text())
-                    reply = QMessageBox.question(self, '删除', '删除成功', QMessageBox.Yes)
-                    self.slotDisconnect()
-                    self.tb_result.clear()
-                    self.tw_first.clear()
-                    self.tw_second.clear()
-                    self.tb_result.setRowCount(0)
-                    self.first_treeWidget_dict = {}
-                    self.second_treeWidget_dict = {}
-                    self.signalConnect()
-                    self._initUnitTableWidget()
-                    self._initTreeWidget("", self.tw_first)
-                else:
-                    reply = QMessageBox.question(self, '删除', '删除失败', QMessageBox.Yes)
+            if reply == QMessageBox.Yes:
+                delDataInUnit(self.le_unitID.text())
+                reply = QMessageBox.question(self, '删除', '删除成功', QMessageBox.Yes)
+                self.slotUnitDictInit()
+
             else:
-                reply = QMessageBox.question(self, '删除', '确定删除吗？', QMessageBox.Yes,
-                                             QMessageBox.Cancel)
-                if reply == QMessageBox.Yes:
-                    Unit_ID=self.le_unitID.text()
-                    del_Unit_Dict(self.le_unitID.text())
-                    reply = QMessageBox.question(self, '删除', '删除成功', QMessageBox.Yes)
-                    self.slotDisconnect()
-                    self.tb_result.clear()
-                    self.tw_first.clear()
-                    self.tw_second.clear()
-                    self.tb_result.setRowCount(0)
-                    self.first_treeWidget_dict = {}
-                    self.second_treeWidget_dict = {}
-                    self.signalConnect()
-                    self._initEquipTableWidget()
-                    self._initSecondTreeWidget("", self.tw_first)
-                else:
-                    reply = QMessageBox.question(self, '删除', '删除失败', QMessageBox.Yes)
-        # 装备目录
+                reply = QMessageBox.question(self, '删除', '删除失败', QMessageBox.Yes)
+        #装备目录
         else:
-            haveChild = selectUnitDictByUper(self.le_equipID.text())
-            if haveChild:
-                print("have")
-                reply = QMessageBox.question(self, '删除', '该单位有下级单位，是否将下级单位一起删除？', QMessageBox.Yes,
-                                             QMessageBox.Cancel)
-                if reply == QMessageBox.Yes:
-                    Equip_ID = self.le_equipID.text()
-                    Equip_Uper = self.le_equipUper.text()
-                    del_Equip_And_Child(Equip_ID,Equip_Uper)
-                    reply = QMessageBox.question(self, '删除', '删除成功', QMessageBox.Yes)
-                    self.slotDisconnect()
-                    self.tb_result.clear()
-                    self.tw_first.clear()
-                    self.tw_second.clear()
-                    self.tb_result.setRowCount(0)
-                    self.first_treeWidget_dict = {}
-                    self.second_treeWidget_dict = {}
-                    self.signalConnect()
-                    self._initEquipTableWidget()
-                    self._initSecondTreeWidget("", self.tw_second)
-                else:
-                    reply = QMessageBox.question(self, '删除', '删除失败', QMessageBox.Yes)
+            reply = QMessageBox.question(self, '删除', '是否将下级装备以及所涉及的其他表关于该装备的信息一起删除？', QMessageBox.Yes,
+                                         QMessageBox.Cancel)
+            if reply == QMessageBox.Yes:
+                delDataInEquip(self.le_equipID.text())
+                reply = QMessageBox.question(self, '删除', '删除成功', QMessageBox.Yes)
+                self.slotEquipDictInit()
             else:
-                reply = QMessageBox.question(self, '删除', '确定删除吗？', QMessageBox.Yes,
-                                             QMessageBox.Cancel)
-                if reply == QMessageBox.Yes:
-                    Equip_ID = self.le_equipID.text()
-                    del_Equip_Dict(Equip_ID)
-                    reply = QMessageBox.question(self, '删除', '删除成功', QMessageBox.Yes)
-                    self.slotDisconnect()
-                    self.tb_result.clear()
-                    self.tw_first.clear()
-                    self.tw_second.clear()
-                    self.tb_result.setRowCount(0)
-                    self.first_treeWidget_dict = {}
-                    self.second_treeWidget_dict = {}
-                    self.signalConnect()
-                    self._initEquipTableWidget()
-                    self._initSecondTreeWidget("", self.tw_second)
-                else:
-                    reply = QMessageBox.question(self, '删除', '删除失败', QMessageBox.Yes)
+                reply = QMessageBox.question(self, '删除', '删除失败', QMessageBox.Yes)
+
+'''
+    功能：
+        单元测试
+'''
+if __name__ == '__main__':
+    pass
