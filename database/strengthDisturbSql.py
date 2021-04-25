@@ -3,6 +3,9 @@ from database.connectAndDisSql  import connectMySql, disconnectMySql
 
 
 '''
+    实力分布所涉及的表的sql
+'''
+'''
     功能：
         找到某个单位的所有下级单位
         Unit_ID: 需要找的单位的ID号
@@ -100,242 +103,10 @@ def findEquipList(EquipID, EquipList, cur):
     for data in result:
         findEquipList(data[0], EquipList, cur)
 
-
-'''
-    功能：
-        按照单位展开查找实力表
-'''
-def select_Equip_And_Unit_ByUnit(UnitID, EquipID):
-    conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="test")
-    cur = conn.cursor()
-    unitHaveNoChild = UnitNotHaveChild(UnitID)
-    equipHaveNoChild = EquipNotHaveChild(EquipID)
-
-    # 如果单位和装备都没有下级
-    if unitHaveNoChild and equipHaveNoChild:
-        sql = "select * from strength where Unit_ID = '" + UnitID + "' and Equip_ID = '" + EquipID + "'"
-        cur.execute(sql)
-        # 获取查询到的数据，是以字典的形式存储的，所以读取需要使用data[i][j]下标定位
-        data = cur.fetchall()
-        if data:
-            pass
-        else:
-            # 如果没有记录，则显示结果都为0
-            result = []
-            final_result = []
-            addResult = ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0']
-            equipName = selectEquipNameByEquipID(EquipID)
-            unitName = selectUnitNameByUnitID(UnitID)
-            result.append(EquipID)
-            result.append(UnitID)
-            result.append(equipName)
-            result.append(unitName)
-            for value in addResult:
-                result.append(value)
-            final_result.append(result)
-            cur.close()
-            conn.close()
-            return final_result
-        return data
-    result = []
-    final_result = []
-    addResult = ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0']
-    UnitList = []
-    childEquipList = []
-    findUnitList(UnitID, UnitList, cur)
-    findChildEquip(EquipID, childEquipList, cur)
-    equipName = selectEquipNameByEquipID(EquipID)
-    # 对于每一个单位统计他们在该装备下有多少
-    for childUnit in UnitList:
-        result = []
-        addResult = ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0']
-
-        result.append(EquipID)
-        result.append(childUnit[0])
-        result.append(equipName)
-        unitName = selectUnitNameByUnitID(childUnit[0])
-        result.append(unitName)
-
-        for equip_ID in childEquipList:
-            for each_ID in childUnit:
-                sql = "select * from strength where Unit_ID = '" + each_ID + "' and Equip_ID = '" + equip_ID + "'"
-                cur.execute(sql)
-                # 获取查询到的数据，是以字典的形式存储的，所以读取需要使用data[i][j]下标定位
-                data = cur.fetchall()
-                for item in data:
-                    addList = item[4:]
-                    for i, value in enumerate(addList):
-                        add = int(addResult[i]) + int(addList[i])
-                        addResult[i] = str(add)
-        for value in addResult:
-            result.append(value)
-        final_result.append(result)
-    #print(final_result)
-    cur.close()
-    conn.close()
-    return final_result
-
-
-'''
-    功能：
-        按照装备展开查找实力表
-'''
-
-
-def select_Equip_And_Unit_ByEquip(UnitID, EquipID):
-    conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="test")
-    cur = conn.cursor()
-    unitHaveNoChild = UnitNotHaveChild(UnitID)
-    equipHaveNoChild = EquipNotHaveChild(EquipID)
-
-    # 如果单位和装备都没有下级
-    if unitHaveNoChild and equipHaveNoChild:
-        sql = "select * from strength where Unit_ID = '" + UnitID + "' and Equip_ID = '" + EquipID + "'"
-        cur.execute(sql)
-        # 获取查询到的数据，是以字典的形式存储的，所以读取需要使用data[i][j]下标定位
-        data = cur.fetchall()
-        if data:
-            pass
-        else:
-            # 如果没有记录，则显示结果都为0
-            result = []
-            final_result = []
-            addResult = ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0']
-            equipName = selectEquipNameByEquipID(EquipID)
-            unitName = selectUnitNameByUnitID(UnitID)
-            result.append(EquipID)
-            result.append(UnitID)
-            result.append(equipName)
-            result.append(unitName)
-            for value in addResult:
-                result.append(value)
-            final_result.append(result)
-            cur.close()
-            conn.close()
-            return final_result
-        return data
-    result = []
-    final_result = []
-    addResult = ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0']
-    childUnitList = []
-    EquipList = []
-    findChildUnit(UnitID, childUnitList, cur)
-    # print(childUnitList)
-    findEquipList(EquipID, EquipList, cur)
-    unitName = selectUnitNameByUnitID(UnitID)
-    # print(EquipList)
-    # 对于每一个装备统计他们在该单位下有多少
-    for childEquip in EquipList:
-        result = []
-        addResult = ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0']
-
-        result.append(childEquip[0])
-        result.append(UnitID)
-        equipName = selectEquipNameByEquipID(childEquip[0])
-        result.append(equipName)
-        result.append(unitName)
-
-        for unit_ID in childUnitList:
-            for each_ID in childEquip:
-                sql = "select * from strength where Unit_ID = '" + unit_ID + "' and Equip_ID = '" + each_ID + "'"
-                cur.execute(sql)
-                # 获取查询到的数据，是以字典的形式存储的，所以读取需要使用data[i][j]下标定位
-                data = cur.fetchall()
-                for item in data:
-                    addList = item[4:]
-                    for i, value in enumerate(addList):
-                        add = int(addResult[i]) + int(addList[i])
-                        addResult[i] = str(add)
-        for value in addResult:
-            result.append(value)
-        final_result.append(result)
-
-    cur.close()
-    conn.close()
-    return final_result
-
-
-'''
-    功能：
-        通过左边目录进行实力查询,没有展开
-'''
-
-
-def select_Equip_And_Unit(Unit_ID, Equip_ID):
-    conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="test")
-    cur = conn.cursor()
-    unitHaveNoChild = UnitNotHaveChild(Unit_ID)
-    equipHaveNoChild = EquipNotHaveChild(Equip_ID)
-    if unitHaveNoChild and equipHaveNoChild:
-        sql = "select * from strength where Unit_ID = '" + Unit_ID + "' and Equip_ID = '" + Equip_ID + "'"
-        cur.execute(sql)
-        # print(sql)
-        # 获取查询到的数据，是以字典的形式存储的，所以读取需要使用data[i][j]下标定位
-        data = cur.fetchall()
-        if data:
-            pass
-        else:
-            result = []
-            final_result = []
-            addResult = ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0']
-            equipName = selectEquipNameByEquipID(Equip_ID)
-            unitName = selectUnitNameByUnitID(Unit_ID)
-            result.append(Equip_ID)
-            result.append(Unit_ID)
-            result.append(equipName)
-            result.append(unitName)
-            for value in addResult:
-                result.append(value)
-            final_result.append(result)
-            cur.close()
-            conn.close()
-            return final_result
-        return data
-    result = []
-    final_result = []
-    addResult = ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0']
-    childUnitList = []
-    childEquipList = []
-    findChildUnit(Unit_ID, childUnitList, cur)
-    findChildEquip(Equip_ID, childEquipList, cur)
-    equipName = selectEquipNameByEquipID(Equip_ID)
-    unitName = selectUnitNameByUnitID(Unit_ID)
-    result.append(Equip_ID)
-    result.append(Unit_ID)
-    result.append(equipName)
-    result.append(unitName)
-    # print(childUnitList, childEquipList)
-    for unitID in childUnitList:
-        for equipID in childEquipList:
-            sql = "select * from strength where Unit_ID = '" + unitID + "' and Equip_ID = '" + equipID + "'"
-            # print(sql)
-            cur.execute(sql)
-            # print(sql)
-            # 获取查询到的数据，是以字典的形式存储的，所以读取需要使用data[i][j]下标定位
-            data = cur.fetchall()
-            # print(data)
-            for item in data:
-                # print(item)
-                addList = item[4:]
-                for i, value in enumerate(addList):
-                    add = int(addResult[i]) + int(addList[i])
-                    addResult[i] = str(add)
-            # 打印测试
-            # print(data)
-    for value in addResult:
-        result.append(value)
-    final_result.append(result)
-    cur.close()
-    conn.close()
-    return final_result
-
-
 '''
     功能：
         判断装备是否是最底层装备
 '''
-
-
 def EquipNotHaveChild(Equip_ID):
     conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="test")
     cur = conn.cursor()
@@ -351,7 +122,10 @@ def EquipNotHaveChild(Equip_ID):
     else:
         return True
 
-
+'''
+    功能：
+        判断单位是否是最底层单位
+'''
 def UnitNotHaveChild(Unit_ID):
     conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="test")
     cur = conn.cursor()
@@ -367,96 +141,6 @@ def UnitNotHaveChild(Unit_ID):
     else:
         return True
 
-
-'''
-    功能：
-        通过装备号和单位号查找录入信息
-'''
-
-
-def select_Add_Info(Unit_ID, Equip_ID):
-    conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="test")
-    cur = conn.cursor()
-    sql = "select * from inputinfo where Unit_ID = '" + Unit_ID + \
-          "' and Equip_ID = '" + Equip_ID + "'"
-    cur.execute(sql)
-    result = cur.fetchall()
-    cur.close()
-    conn.close()
-    return result
-
-
-def insert_Strength(Unit_ID, Equip_ID, addNum):
-    conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="test")
-    cur = conn.cursor()
-    changeNum = 0
-    # 插入的sql语句
-    sql = "select * from strength where Unit_ID = '" + Unit_ID + "' and Equip_ID = '" + Equip_ID + "'"
-    cur.execute(sql)
-    result = cur.fetchall()
-    for num in result:
-        changeNum = int(num[4]) + int(addNum)
-    sql = "Update strength set Strengh = '" + changeNum + "' where Equip_ID = '" + Equip_ID + "' and Unit_ID = '" + Unit_ID + "'"
-    # 执行sql语句，并发送给数据库
-    cur.execute(sql)
-    conn.commit()
-    cur.close()
-    conn.close()
-
-
-def insert_Clicked(Unit_ID, Equip_ID, ID, num, year, shop, state, arrive, confirm, other):
-    conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="test")
-    cur = conn.cursor()
-    # 插入的sql语句
-    sql = "INSERT INTO inputinfo (Unit_ID, Equip_ID, ID, num, year, shop, state, arrive, confirm, other) VALUES" \
-          + "('" + Unit_ID + "','" + Equip_ID + "','" + ID + "','" + num + "','" + year + "','" + shop + "','" + state \
-          + "','" + arrive + "','" + confirm + "','" + other + "')"
-    # 执行sql语句，并发送给数据库
-    cur.execute(sql)
-    conn.commit()
-    cur.close()
-    conn.close()
-
-
-def add_UnitDict(Unit_ID, Unit_Name, Unit_Uper):
-    conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="test")
-    cur = conn.cursor()
-    # 插入的sql语句
-    sql = "INSERT INTO unit (Unit_ID, Unit_Name, Unit_Uper) VALUES" \
-          + "('" + Unit_ID + "','" + Unit_Name + "','" + Unit_Uper + "')"
-    cur.execute(sql)
-    conn.commit()
-    cur.close()
-    conn.close()
-
-
-def delete_Clicked(Unit_ID, Equip_ID, ID, num, year, shop, state, arrive, confirm, other):
-    conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="test")
-    cur = conn.cursor()
-    sql = "delete from inputinfo where (Unit_ID=  '" + (Unit_ID or None) + "' AND Equip_ID='" + (Equip_ID or None) \
-          + "' AND ID='" + (ID or None) + "' AND num='" + (num or None) + "')"
-    # 执行sql语句，并发送给数据库
-    cur.execute(sql)
-    conn.commit()
-    cur.close()
-    conn.close()
-
-
-def delete_Inquiry_Clicked(Unit_ID, Equip_ID):
-    conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="test")
-    cur = conn.cursor()
-    sql = "delete from strength where (Unit_ID=  '" + Unit_ID + "' AND Equip_ID='" + Equip_ID + "')"
-    cur.execute(sql)
-    sql = "delete from inputinfo where (Unit_ID=  '" + Unit_ID + "' AND Equip_ID='" + Equip_ID + "')"
-    # 执行sql语句，并发送给数据库
-    cur.execute(sql)
-    conn.commit()
-    cur.close()
-    conn.close()
-
-
-
-
 def selectUnitDictByUper(Unit_Uper):
     conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="test")
     cur = conn.cursor()
@@ -467,30 +151,6 @@ def selectUnitDictByUper(Unit_Uper):
     cur.close()
     conn.close()
     return data
-
-
-def del_Unit_Dict(Unit_ID):
-    conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="test")
-    cur = conn.cursor()
-    # 插入的sql语句
-    sql = "delete from unit where Unit_ID = '" + Unit_ID + "'"
-    # 执行sql语句，并发送给数据库
-    cur.execute(sql)
-    conn.commit()
-    cur.close()
-    conn.close()
-
-
-def del_Unit_And_Child(Unit_ID):
-    conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="test")
-    cur = conn.cursor()
-    # 插入的sql语句
-    sql = "delete from unit where Unit_ID = '" + Unit_ID + "'" + "and Unit_Uper = '" + Unit_ID + "'"
-    cur.execute(sql)
-    conn.commit()
-    cur.close()
-    conn.close()
-
 
 # 增加装备目录
 def add_UnitDictEquip(Equip_ID, Equip_Name, Equip_Uper):
@@ -508,7 +168,6 @@ def add_UnitDictEquip(Equip_ID, Equip_Name, Equip_Uper):
     cur.close()
     conn.close()
 
-
 # 更改装备目录
 def update_Equip_Dict(Equip_ID, Equip_Name, Equip_Uper):
     print("''''''''''")
@@ -524,7 +183,6 @@ def update_Equip_Dict(Equip_ID, Equip_Name, Equip_Uper):
     cur.close()
     conn.close()
 
-
 # 删除装备及子目录
 def del_Equip_And_Child(Equip_ID, Equip_Uper):
     conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="test")
@@ -538,7 +196,6 @@ def del_Equip_And_Child(Equip_ID, Equip_Uper):
     cur.close()
     conn.close()
 
-
 # 删除装备目录
 def del_Equip_Dict(Equip_ID):
     conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="test")
@@ -551,10 +208,6 @@ def del_Equip_Dict(Equip_ID):
     conn.commit()
     cur.close()
     conn.close()
-
-'''
-    实力分布所涉及的表的sql
-'''
 
 #根据Dept_Uper查询单位信息,并返回
 def selectUnitInfoByDeptUper(Unit_Uper):
