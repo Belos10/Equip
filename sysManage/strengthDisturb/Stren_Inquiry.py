@@ -63,6 +63,15 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         self.inquiry_result.setDisabled(True)
         self.tb_inqury.setDisabled(False)
         self.tb_rechoose.setDisabled(False)
+
+        self.first_treeWidget_dict = {}
+        self.second_treeWidget_dict = {}
+
+        # 当前选中的单位列表和装备列表
+        self.currentCheckedUnitList = []
+        self.currentCheckedEquipList = []
+
+        self.yearList = []
         self.cb_yearAll = QCheckBox(self.sa_yearChoose)
 
     '''

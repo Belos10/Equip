@@ -2,6 +2,7 @@ from widgets.strengthDisturb.StrengthDisturb import Strength_Disturb_Widget
 import sys
 from PyQt5.QtWidgets import QMainWindow,QApplication,QWidget
 from widgets.alocatMange.alocatMange import Widget_Alocat_Mange
+from sysManage.alocatMange.transferManage import transferManage
 
 class alocatMange(QMainWindow, Widget_Alocat_Mange):
     def __init__(self, parent=None):
@@ -10,11 +11,11 @@ class alocatMange(QMainWindow, Widget_Alocat_Mange):
 
         self.disturbPlan = QWidget(self)
         self.disturbSchedule = QWidget(self)
-        self.disturbManage = QWidget(self)
+        self.transferManage = transferManage(self)
 
         self.stackedWidget.addWidget(self.disturbPlan)
         self.stackedWidget.addWidget(self.disturbSchedule)
-        self.stackedWidget.addWidget(self.disturbManage)
+        self.stackedWidget.addWidget(self.transferManage)
 
         self.stackedWidget.setCurrentIndex(0)
         self.tb_disturbPlan.setDisabled(True)
@@ -39,4 +40,7 @@ class alocatMange(QMainWindow, Widget_Alocat_Mange):
         pass
 
     def slotDisturbManage(self):
-        pass
+        self.stackedWidget.setCurrentIndex(2)
+        self.tb_disturbPlan.setDisabled(False)
+        self.tb_disturbSchedule.setDisabled(False)
+        self.tb_disturbManage.setDisabled(True)

@@ -14,5 +14,7 @@
     <file>handbook.png</file>
     <file>room.png</file>
     <file>regular.png</file>
+    <file>army.png</file>
+    <file>rocket.png</file>
   </qresource>
 </RCC>
