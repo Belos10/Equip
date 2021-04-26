@@ -3,7 +3,8 @@ from PyQt5.QtWidgets import QWidget, QTreeWidgetItemIterator, QTreeWidgetItem, Q
 from PyQt5 import QtWidgets
 from sysManage.strengthDisturb.InquiryResult import Inquiry_Result
 from sysManage.strengthDisturb.addStrenthInfo import AddStrenthInfo
-from database.strengthDisturbSql import selectAllDataAboutStrengthYear, selectUnitInfoByDeptUper, selectEquipInfoByEquipUper\
+from database.strengthDisturbSql import selectAllDataAboutStrengthYear, selectUnitInfoByDeptUper, \
+    selectEquipInfoByEquipUper \
     , selectEquipIsHaveChild, selectUnitIsHaveChild, addDataIntoInputInfo
 from PyQt5.Qt import Qt
 
@@ -11,7 +12,7 @@ from PyQt5.Qt import Qt
     类功能：
         管理查询结果界面，包含查询结果相关逻辑代码
 '''
-#更新
+# 更新
 first_treeWidget_dict = {}
 second_treeWidget_dict = {}
 
@@ -25,33 +26,34 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         self.first_treeWidget_dict = {}
         self.second_treeWidget_dict = {}
 
-        self.inquiry_result = Inquiry_Result()      #右边显示查询结果
-        self.add_strenth_info = AddStrenthInfo()    #录入数据
+        self.inquiry_result = Inquiry_Result()  # 右边显示查询结果
+        self.add_strenth_info = AddStrenthInfo()  # 录入数据
 
         # 将查询结果界面和录入数据界面嵌入stackWidget
         self.sw_strenSelectMan.addWidget(self.inquiry_result)
         self.sw_strenSelectMan.addWidget(self.add_strenth_info)
 
-        #当前选中的单位列表和装备列表
+        # 当前选中的单位列表和装备列表
         self.currentCheckedUnitList = []
         self.currentCheckedEquipList = []
 
-        #设置当前显示查询结果界面
+        # 设置当前显示查询结果界面
         self.sw_strenSelectMan.setCurrentIndex(0)
 
-        #设置当前查询的年份的list
+        # 设置当前查询的年份的list
         self.yearList = []
 
-        #初始化界面
+        # 初始化界面
         self._initStrenInquiry()
 
-        #信号连接
+        # 信号连接
         self.signalConnectSlot()
 
     '''
         功能：
             当选择出厂年份时，设置当前可选项和不可选项,并初始化年份目录
     '''
+
     def _initStrenInquiry(self):
         self.tw_first.clear()
         self.tw_first.header().setVisible(False)
@@ -78,6 +80,7 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         功能：
             点击查询按钮时，设置当前可选项和不可选项，并初始化装备和单位目录
     '''
+
     def slotClickedInqury(self):
         self.tw_first.clear()
         self.tw_second.clear()
@@ -95,27 +98,28 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
 
     # 信号与槽的连接
     def signalConnectSlot(self):
-        #点击查询按钮后显示单位和装备目录
+        # 点击查询按钮后显示单位和装备目录
         self.tb_inqury.clicked.connect(self.slotClickedInqury)
 
-        #当前单位目录被点击
+        # 当前单位目录被点击
         self.tw_first.itemChanged.connect(self.slotInquryStrengthResult)
 
-        #当前装备目录被点击
+        # 当前装备目录被点击
         self.tw_second.itemChanged.connect(self.slotInquryStrengthResult)
 
-        #设置单位目录级联选中
-        #self.tw_first.itemChanged.connect(self.slotCheckedChange)
-        #self.tw_second.itemChanged.connect(self.slotCheckedChange)
+        # 设置单位目录级联选中
+        # self.tw_first.itemChanged.connect(self.slotCheckedChange)
+        # self.tw_second.itemChanged.connect(self.slotCheckedChange)
 
-        #双击某行进入录入界面
+        # 双击某行进入录入界面
         self.inquiry_result.tw_inquiryResult.doubleClicked.connect(self.slotInputStrengthInfo)
 
-        #录入界面返回按钮
+        # 录入界面返回按钮
         self.add_strenth_info.pb_back.clicked.connect(self.slotAddWidgetReturn)
 
-        #录入界面保存按钮
+        # 录入界面保存按钮
         self.add_strenth_info.pb_Save.clicked.connect(self.slotSaveUpdate)
+
     # 信号与槽连接的断开
     def signalDisconnectSlot(self):
         pass
@@ -135,7 +139,7 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
                     return
 
         if columnNum == 8:
-            #添加新增的数据
+            # 添加新增的数据
             for i in range(currentRowNum - orginRowNum):
                 addDataIntoInputInfo(Unit_ID, Equip_ID,
                                      self.add_strenth_info.tableWidget.item(i + orginRowNum, 0).text(),
@@ -149,7 +153,7 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
             self.sw_strenSelectMan.setCurrentIndex(0)
             self.slotInquryStrengthResult()
         else:
-            #添加新增的数据
+            # 添加新增的数据
             for i in range(currentRowNum - orginRowNum):
                 addDataIntoInputInfo(Unit_ID, Equip_ID,
                                      self.add_strenth_info.tableWidget.item(i + orginRowNum, 0).text(),
@@ -162,21 +166,25 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
                                      self.add_strenth_info.tableWidget.item(i + orginRowNum, 7).text())
             self.sw_strenSelectMan.setCurrentIndex(0)
             self.slotInquryStrengthResult()
+
     '''
         功能：
             录入界面的返回按钮
     '''
+
     def slotAddWidgetReturn(self):
         reply = QMessageBox.question(self, '返回', '是否不保存直接返回？', QMessageBox.Yes,
-                                         QMessageBox.Cancel)
+                                     QMessageBox.Cancel)
         if reply == QMessageBox.Yes:
-                self.sw_strenSelectMan.setCurrentIndex(0)
+            self.sw_strenSelectMan.setCurrentIndex(0)
         else:
-                pass
+            pass
+
     '''
         功能：
             双击进入录入界面
     '''
+
     def slotInputStrengthInfo(self):
         self.currentRow = self.inquiry_result.tw_inquiryResult.currentRow()
         self.currentColumn = self.inquiry_result.tw_inquiryResult.currentColumn()
@@ -200,6 +208,7 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         功能：
             设置级目录联选中状态
     '''
+
     def slotCheckedChange(self, item, num):
         # 如果是顶部节点，只考虑Child：
         if item.childCount() and not item.parent():  # 判断是顶部节点，也就是根节点
@@ -247,6 +256,7 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         功能：
             查询实力结果
     '''
+
     def slotInquryStrengthResult(self):
         self.yearList = ['2001']
         self.currentCheckedUnitList = []
@@ -259,11 +269,13 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
             if equipItem.checkState(0) == Qt.Checked:
                 self.currentCheckedEquipList.append(equipID)
 
-        self.inquiry_result._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList, self.yearList)
+        self.inquiry_result._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList,
+                                                                   self.currentCheckedEquipList, self.yearList)
 
     '''
         初始化单位目录
     '''
+
     def _initUnitTreeWidget(self, root, mother):
         if root == '':
             result = selectUnitInfoByDeptUper('')
@@ -283,6 +295,7 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         功能：
             初始化装备目录
     '''
+
     def _initEquipTreeWidget(self, root, mother):
         if root == '':
             result = selectEquipInfoByEquipUper('')

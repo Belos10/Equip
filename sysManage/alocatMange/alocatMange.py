@@ -1,18 +1,22 @@
 from widgets.strengthDisturb.StrengthDisturb import Strength_Disturb_Widget
 import sys
-from PyQt5.QtWidgets import QMainWindow,QApplication,QWidget
+from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget
 from widgets.alocatMange.alocatMange import Widget_Alocat_Mange
 from sysManage.alocatMange.transferManage import transferManage
+from widgets.alocatMange.yearListForm import yearListForm
+
 
 class alocatMange(QMainWindow, Widget_Alocat_Mange):
     def __init__(self, parent=None):
         super(alocatMange, self).__init__(parent)
         self.setupUi(self)
 
-        self.disturbPlan = QWidget(self)
+        #self.disturbPlan = QWidget(self)
         self.disturbSchedule = QWidget(self)
         self.transferManage = transferManage(self)
         self.alocatSet = QWidget(self)
+
+        self.disturbPlan = yearListForm()
 
         self.stackedWidget.addWidget(self.disturbPlan)
         self.stackedWidget.addWidget(self.disturbSchedule)

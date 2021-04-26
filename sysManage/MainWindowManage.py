@@ -1,7 +1,7 @@
 from widgets.manage_widget import Widget_Manage_Widgets
 from PyQt5.QtWidgets import QMainWindow, QWidget
 from sysManage.strengthDisturb.strengthDisturb import strengthDisturb
-from sysManage.alocatMange.alocatMangeInfo import alocatMange
+from sysManage.alocatMange.alocatMange import alocatMange
 from sysManage.dictSelect.dictSelect import dictSelect
 
 class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):

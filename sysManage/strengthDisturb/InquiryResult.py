@@ -11,7 +11,7 @@ import  EmptyDelegate
         管理实力分布下实力查询结果界面，包含查询结果相关逻辑代码
 '''
 
-
+#更新
 class Inquiry_Result(QWidget, Widget_Inquiry_Result):
     def __init__(self, parent=None):
         super(Inquiry_Result, self).__init__(parent)
