@@ -53,7 +53,7 @@ class strengthDisturb(QMainWindow, Strength_Disturb_Widget):
         self.tb_strengthDisturbSet.setDisabled(False)
         self.slotDisconnect()
         self.stackedWidget.setCurrentIndex(0)
-        self.strenSelect._initAllDict()
+        self.strenSelect._initStrenInquiry()
         self.connectSignal()
 
     def slotMaintenMange(self):

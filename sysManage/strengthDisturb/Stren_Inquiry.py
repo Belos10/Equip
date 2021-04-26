@@ -1,10 +1,11 @@
 from widgets.strengthDisturb.stren_inquiry import Widget_Stren_Inquiry
-from PyQt5.QtWidgets import QWidget, QTreeWidgetItemIterator, QTreeWidgetItem, QMessageBox
+from PyQt5.QtWidgets import QWidget, QTreeWidgetItemIterator, QTreeWidgetItem, QMessageBox, QCheckBox
 from PyQt5 import QtWidgets
 from sysManage.strengthDisturb.InquiryResult import Inquiry_Result
 from sysManage.strengthDisturb.addStrenthInfo import AddStrenthInfo
-from database.ConnectAndSql import Clicked, insert_Clicked, select_Equip_And_Unit, EquipNotHaveChild \
-    , UnitNotHaveChild, insert_Strength, select_Equip_And_Unit_ByUnit, select_Equip_And_Unit_ByEquip
+from database.strengthDisturbSql import selectAllDataAboutStrengthYear, selectUnitInfoByDeptUper, selectEquipInfoByEquipUper\
+    , selectEquipIsHaveChild, selectUnitIsHaveChild, addDataIntoInputInfo
+from PyQt5.Qt import Qt
 
 '''
     类功能：
@@ -24,382 +25,275 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         self.first_treeWidget_dict = {}
         self.second_treeWidget_dict = {}
 
-        self.inquiry_result = Inquiry_Result()  # 右边显示查询结果
-        self.add_strenth_info = AddStrenthInfo()  # 录入数据
+        self.inquiry_result = Inquiry_Result()      #右边显示查询结果
+        self.add_strenth_info = AddStrenthInfo()    #录入数据
 
         # 将查询结果界面和录入数据界面嵌入stackWidget
         self.sw_strenSelectMan.addWidget(self.inquiry_result)
         self.sw_strenSelectMan.addWidget(self.add_strenth_info)
 
-        # 设置当前显示查询结果界面
+        #当前选中的单位列表和装备列表
+        self.currentCheckedUnitList = []
+        self.currentCheckedEquipList = []
+
+        #设置当前显示查询结果界面
         self.sw_strenSelectMan.setCurrentIndex(0)
 
-        # 初始化单位和装备目录
-        self._initAllDict()
+        #设置当前查询的年份的list
+        self.yearList = []
 
-        # 信号连接
+        #初始化界面
+        self._initStrenInquiry()
+
+        #信号连接
         self.signalConnectSlot()
 
-    def _initAllDict(self):
-        # 初始化单位和装备目录
+    '''
+        功能：
+            当选择出厂年份时，设置当前可选项和不可选项,并初始化年份目录
+    '''
+    def _initStrenInquiry(self):
+        self.tw_first.clear()
+        self.tw_first.header().setVisible(False)
+        self.tw_second.header().setVisible(False)
+        self.le_first.setDisabled(True)
+        self.le_second.setDisabled(True)
+        self.tw_first.setDisabled(True)
+        self.tw_second.setDisabled(True)
+        self.inquiry_result.setDisabled(True)
+        self.tb_inqury.setDisabled(False)
+        self.tb_rechoose.setDisabled(False)
+
+        self.first_treeWidget_dict = {}
+        self.second_treeWidget_dict = {}
+
+        # 当前选中的单位列表和装备列表
+        self.currentCheckedUnitList = []
+        self.currentCheckedEquipList = []
+
+        self.yearList = []
+        self.cb_yearAll = QCheckBox(self.sa_yearChoose)
+
+    '''
+        功能：
+            点击查询按钮时，设置当前可选项和不可选项，并初始化装备和单位目录
+    '''
+    def slotClickedInqury(self):
         self.tw_first.clear()
         self.tw_second.clear()
         self.tw_first.header().setVisible(False)
         self.tw_second.header().setVisible(False)
+        self.le_first.setDisabled(False)
+        self.le_second.setDisabled(False)
+        self.tw_first.setDisabled(False)
+        self.tw_second.setDisabled(False)
+        self.inquiry_result.setDisabled(False)
+        self.tb_inqury.setDisabled(True)
+        self.tb_rechoose.setDisabled(False)
         self._initUnitTreeWidget("", self.tw_first)
         self._initEquipTreeWidget("", self.tw_second)
 
     # 信号与槽的连接
     def signalConnectSlot(self):
-        # 按查询按钮时第一个目录的查询
-        self.pb_firstSelect.clicked.connect(self.slotFilterFirstTreeWidget)
-        # 按查询按钮时第二个目录的查询
-        self.pb_secondSelect.clicked.connect(self.slotFilterSecondTreeWidget)
+        #点击查询按钮后显示单位和装备目录
+        self.tb_inqury.clicked.connect(self.slotClickedInqury)
 
-        # 按搜索框更改第一个目录的查询
-        self.le_first.textChanged.connect(self.slotFilterFirstTreeWidget)
-        # 按搜索框更改第二个目录的查询
-        self.le_second.textChanged.connect(self.slotFilterSecondTreeWidget)
+        #当前单位目录被点击
+        self.tw_first.itemChanged.connect(self.slotInquryStrengthResult)
 
-        # 第一个目录更改后重新查询并显示结果
-        self.tw_first.currentItemChanged.connect(self.slotReInqury)
+        #当前装备目录被点击
+        self.tw_second.itemChanged.connect(self.slotInquryStrengthResult)
 
-        # 第二个目录选定后进行查询并显示结果
-        self.tw_second.currentItemChanged.connect(self.slotInqury)
+        #设置单位目录级联选中
+        #self.tw_first.itemChanged.connect(self.slotCheckedChange)
+        #self.tw_second.itemChanged.connect(self.slotCheckedChange)
 
-        # 从录入数据界面点击返回按钮返回查询界面
-        self.add_strenth_info.pb_back.clicked.connect(self.slotBack)
+        #双击某行进入录入界面
+        self.inquiry_result.tw_inquiryResult.doubleClicked.connect(self.slotInputStrengthInfo)
 
-        # 从查询结果界面处双击进入录入界面
-        self.inquiry_result.tw_inquiryResult.itemDoubleClicked.connect(self.slotDoubleClickedTableItem)
+        #录入界面返回按钮
+        self.add_strenth_info.pb_back.clicked.connect(self.slotAddWidgetReturn)
 
-        # 录入界面保存
-        self.add_strenth_info.pb_Save.clicked.connect(self.slotSaveAddInfo)
-
-        # 录入界面删除
-        self.add_strenth_info.pb_Delete.clicked.connect(self.add_strenth_info.deleteNote)
-
-        # 查询结果删除
-        self.inquiry_result.pb_clearCheck.clicked.connect(self.inquiry_result.deleteInquiryResult)
-        self.inquiry_result.pb_clearAll.clicked.connect(self.inquiry_result.deleteAllInquiryResult)
-
-        # 点击按单位展开按钮
-        self.inquiry_result.rb_unitShow.clicked.connect(self.slotShowByUnit)
-
-        # 点击按装备展开按钮
-        self.inquiry_result.rb_equipShow.clicked.connect(self.slotShowByEquip)
-
+        #录入界面保存按钮
+        self.add_strenth_info.pb_Save.clicked.connect(self.slotSaveUpdate)
     # 信号与槽连接的断开
     def signalDisconnectSlot(self):
-        # 按查询按钮时第一个目录的查询
-        self.pb_firstSelect.clicked.disconnect(self.slotFilterFirstTreeWidget)
-        # 按查询按钮时第二个目录的查询
-        self.pb_secondSelect.clicked.disconnect(self.slotFilterSecondTreeWidget)
+        pass
 
-        # 按搜索框更改第一个目录的查询
-        self.le_first.textChanged.disconnect(self.slotFilterFirstTreeWidget)
-        # 按搜索框更改第二个目录的查询
-        self.le_second.textChanged.disconnect(self.slotFilterSecondTreeWidget)
+    def slotSaveUpdate(self):
+        Unit_ID = self.add_strenth_info.strgenthInfo[1]
+        Equip_ID = self.add_strenth_info.strgenthInfo[0]
+        orginRowNum = self.add_strenth_info.orginRowNum
+        currentRowNum = self.add_strenth_info.tableWidget.rowCount()
+        columnNum = self.add_strenth_info.tableWidget.columnCount()
 
-        # 第一个目录更改后重新查询并显示结果
-        self.tw_first.currentItemChanged.disconnect(self.slotReInqury)
+        for i in range(currentRowNum):
+            for j in range(columnNum):
+                if self.add_strenth_info.tableWidget.item(i, j).text() == '':
+                    reply = QMessageBox.question(self, '保存', '数据不能为空，保存失败', QMessageBox.Yes,
+                                                 QMessageBox.Cancel)
+                    return
 
-        # 第二个目录选定后进行查询并显示结果
-        self.tw_second.currentItemChanged.disconnect(self.slotInqury)
-
-        # 从录入数据界面点击返回按钮返回查询界面
-        self.add_strenth_info.pb_back.clicked.disconnect(self.slotBack)
-
-        # 从查询结果界面处双击进入录入界面
-        self.inquiry_result.tw_inquiryResult.itemDoubleClicked.disconnect(self.slotDoubleClickedTableItem)
-
-        # 录入界面保存
-        self.add_strenth_info.pb_Save.clicked.disconnect(self.slotSaveAddInfo)
-
-        # 录入界面删除
-        self.add_strenth_info.pb_Delete.clicked.disconnect(self.add_strenth_info.deleteNote)
-
-        # 查询结果删除
-        self.inquiry_result.pb_clearCheck.clicked.disconnect(self.inquiry_result.deleteInquiryResult)
-        self.inquiry_result.pb_clearAll.clicked.disconnect(self.inquiry_result.deleteAllInquiryResult)
-
-        # 点击按单位展开按钮
-        self.inquiry_result.rb_unitShow.clicked.disconnect(self.slotShowByUnit)
-
-    def slotBack(self, event):
-        reply = QtWidgets.QMessageBox.question(self, '提示', '是否退出信息录入?',
-                                               QtWidgets.QMessageBox.Yes, QtWidgets.QMessageBox.No)
-        if reply == QtWidgets.QMessageBox.Yes:
+        if columnNum == 8:
+            #添加新增的数据
+            for i in range(currentRowNum - orginRowNum):
+                addDataIntoInputInfo(Unit_ID, Equip_ID,
+                                     self.add_strenth_info.tableWidget.item(i + orginRowNum, 0).text(),
+                                     self.add_strenth_info.tableWidget.item(i + orginRowNum, 1).text(),
+                                     self.add_strenth_info.tableWidget.item(i + orginRowNum, 2).text(),
+                                     self.add_strenth_info.tableWidget.item(i + orginRowNum, 3).text(),
+                                     self.add_strenth_info.tableWidget.item(i + orginRowNum, 4).text(),
+                                     self.add_strenth_info.tableWidget.item(i + orginRowNum, 5).text(),
+                                     self.add_strenth_info.tableWidget.item(i + orginRowNum, 6).text(),
+                                     self.add_strenth_info.tableWidget.item(i + orginRowNum, 7).text())
             self.sw_strenSelectMan.setCurrentIndex(0)
-            self.tw_first.setEnabled(1)
-            self.tw_second.setEnabled(1)
-
-    # 信息录入界面保存
-    def slotSaveAddInfo(self):
-        # addNum = 0
-        OrignNum = self.add_strenth_info.OrignNum
-        # print(self.add_strenth_info.OrignNum, self.add_strenth_info.tableWidget.rowCount())
-        self.tw_first.setEnabled(1)
-        self.tw_second.setEnabled(1)
-        if self.add_strenth_info.OrignNum == self.add_strenth_info.tableWidget.rowCount():
-            self.sw_strenSelectMan.setCurrentIndex(0)
-            return
-        Unit_ID = self.add_strenth_info.UnitID
-        Equip_ID = self.add_strenth_info.EquipID
-        for i in range(self.add_strenth_info.row_num - OrignNum):
-            ID = self.add_strenth_info.tableWidget.item(i + OrignNum, 0).text()
-            num = self.add_strenth_info.tableWidget.item(i + OrignNum, 1).text()
-            year = self.add_strenth_info.tableWidget.item(i + OrignNum, 2).text()
-            shop = self.add_strenth_info.tableWidget.item(i + OrignNum, 3).text()
-            state = self.add_strenth_info.tableWidget.item(i + OrignNum, 4).text()
-            arrive = self.add_strenth_info.tableWidget.item(i + OrignNum, 5).text()
-            confirm = self.add_strenth_info.tableWidget.item(i + OrignNum, 6).text()
-            other = self.add_strenth_info.tableWidget.item(i + OrignNum, 7).text()
-            # print(ID, num, year, shop, state, arrive, confirm, other)
-            # addNum += int(num)
-            print(Unit_ID, Equip_ID, ID, num, year, shop, state, arrive, confirm, other)
-            insert_Clicked(Unit_ID, Equip_ID, ID, num, year, shop, state, arrive, confirm, other)
-        # insert_Strength(Unit_ID, Equip_ID, addNum)
-        self.sw_strenSelectMan.setCurrentIndex(0)
-
-    def slotShowByEquip(self):
-        unitRow = self.tw_first.currentIndex().row()
-        euqipRow = self.tw_second.currentIndex().row()
-        currentUnitID = ""
-        currentEquipID = ""
-        if unitRow == -1 or euqipRow == -1:
-            reply = QMessageBox.question(self, '查询', '请同时选中单位和装备', QMessageBox.Yes)
+            self.slotInquryStrengthResult()
         else:
-            # 按装备展开
-            if self.inquiry_result.rb_equipShow.isChecked():
-                for unitID, unitItem in self.first_treeWidget_dict.items():
-                    if self.tw_first.currentItem() == unitItem:
-                        currentUnitID = unitID
-                for equipID, equipItem in self.second_treeWidget_dict.items():
-                    if self.tw_second.currentItem() == equipItem:
-                        currentEquipID = equipID
-                result = select_Equip_And_Unit_ByEquip(currentUnitID, currentEquipID)
-                self.inquiry_result._initTableWidget(result)
+            #添加新增的数据
+            for i in range(currentRowNum - orginRowNum):
+                addDataIntoInputInfo(Unit_ID, Equip_ID,
+                                     self.add_strenth_info.tableWidget.item(i + orginRowNum, 0).text(),
+                                     1,
+                                     self.add_strenth_info.tableWidget.item(i + orginRowNum, 2).text(),
+                                     self.add_strenth_info.tableWidget.item(i + orginRowNum, 3).text(),
+                                     self.add_strenth_info.tableWidget.item(i + orginRowNum, 4).text(),
+                                     self.add_strenth_info.tableWidget.item(i + orginRowNum, 5).text(),
+                                     self.add_strenth_info.tableWidget.item(i + orginRowNum, 6).text(),
+                                     self.add_strenth_info.tableWidget.item(i + orginRowNum, 7).text())
+            self.sw_strenSelectMan.setCurrentIndex(0)
+            self.slotInquryStrengthResult()
+    '''
+        功能：
+            录入界面的返回按钮
+    '''
+    def slotAddWidgetReturn(self):
+        reply = QMessageBox.question(self, '返回', '是否不保存直接返回？', QMessageBox.Yes,
+                                         QMessageBox.Cancel)
+        if reply == QMessageBox.Yes:
+                self.sw_strenSelectMan.setCurrentIndex(0)
+        else:
+                pass
+    '''
+        功能：
+            双击进入录入界面
+    '''
+    def slotInputStrengthInfo(self):
+        self.currentRow = self.inquiry_result.tw_inquiryResult.currentRow()
+        self.currentColumn = self.inquiry_result.tw_inquiryResult.currentColumn()
+
+        if self.currentColumn != 2:
+            for i, resultRowInfo in self.inquiry_result.currentInquiryResult.items():
+                if i == self.currentRow:
+                    unitHaveChild = selectUnitIsHaveChild(resultRowInfo[1])
+                    equipHaveChild = selectEquipIsHaveChild(resultRowInfo[0])
+                    if unitHaveChild or equipHaveChild:
+                        reply = QMessageBox.question(self, '录入', '该单位或装备不是末级，无法录入', QMessageBox.Yes,
+                                                     QMessageBox.Cancel)
+                    else:
+                        self.sw_strenSelectMan.setCurrentIndex(1)
+                        self.add_strenth_info._initTableWidget_(resultRowInfo, self.yearList)
+                    break
+        else:
+            pass
 
     '''
         功能：
-            点击按单位展开按钮
+            设置级目录联选中状态
     '''
+    def slotCheckedChange(self, item, num):
+        # 如果是顶部节点，只考虑Child：
+        if item.childCount() and not item.parent():  # 判断是顶部节点，也就是根节点
+            if item.checkState(num) == 0:  # 规定点击根节点只有两态切换，没有中间态
+                for i in range(item.childCount()):  # 遍历子节点进行状态切换
+                    item.child(i).setCheckState(num, 0)
+            elif item.checkState(num) == 2:
+                for i in range(item.childCount()):
+                    item.child(i).setCheckState(num, 2)
+        # 如果是底部节点，只考虑Parent
+        if item.parent() and not item.childCount():
+            parent_item = item.parent()  # 获得父节点
+            brother_item_num = parent_item.childCount()  # 获得兄弟节点的数目，包括自身在内
+            checked_num = 0  # 设置计数器
+            for i in range(brother_item_num):  # 根据三态不同状态值进行数值累计
+                checked_num += parent_item.child(i).checkState(num)
+            if checked_num == 0:  # 最终结果进行比较，决定父节点的三态
+                parent_item.setCheckState(num, 0)
+            elif checked_num / 2 == brother_item_num:
+                parent_item.setCheckState(num, 2)
+            else:
+                parent_item.setCheckState(num, 1)
 
-    def slotShowByUnit(self):
-        unitRow = self.tw_first.currentIndex().row()
-        euqipRow = self.tw_second.currentIndex().row()
-        currentUnitID = ""
-        currentEquipID = ""
-        if unitRow == -1 or euqipRow == -1:
-            reply = QMessageBox.question(self, '查询', '请同时选中单位和装备', QMessageBox.Yes)
-        else:
-            # 按装备展开
-            if self.inquiry_result.rb_unitShow.isChecked():
-                for unitID, unitItem in self.first_treeWidget_dict.items():
-                    if self.tw_first.currentItem() == unitItem:
-                        currentUnitID = unitID
-                for equipID, equipItem in self.second_treeWidget_dict.items():
-                    if self.tw_second.currentItem() == equipItem:
-                        currentEquipID = equipID
-                result = select_Equip_And_Unit_ByUnit(currentUnitID, currentEquipID)
-                self.inquiry_result._initTableWidget(result)
+            # 中间层需要全面考虑
+        if item.parent() and item.childCount():
+            if item.checkState(num) == 0:  # 规定点击根节点只有两态切换，没有中间态
+                for i in range(item.childCount()):  # 遍历子节点进行状态切换
+                    item.child(i).setCheckState(num, 0)
+            elif item.checkState(num) == 2:
+                for i in range(item.childCount()):
+                    item.child(i).setCheckState(num, 2)
+            parent_item = item.parent()  # 获得父节点
+            brother_item_num = parent_item.childCount()  # 获得兄弟节点的数目，包括自身在内
+            checked_num = 0  # 设置计数器
+            for i in range(brother_item_num):  # 根据三态不同状态值进行数值累计
+                checked_num += parent_item.child(i).checkState(num)
+            if checked_num == 0:  # 最终结果进行比较，决定父节点的三态
+                parent_item.setCheckState(num, 0)
+            elif checked_num / 2 == brother_item_num:
+                parent_item.setCheckState(num, 2)
+            else:
+                parent_item.setCheckState(num, 1)
 
     '''
         功能：
-            双击某行数据后进入录入界面
+            查询实力结果
     '''
+    def slotInquryStrengthResult(self):
+        self.yearList = ['2001']
+        self.currentCheckedUnitList = []
+        self.currentCheckedEquipList = []
+        for unitID, unitItem in self.first_treeWidget_dict.items():
+            if unitItem.checkState(0) == Qt.Checked:
+                self.currentCheckedUnitList.append(unitID)
 
-    def slotDoubleClickedTableItem(self):
-        currentRow = self.inquiry_result.tw_inquiryResult.currentRow()
-        self.add_strenth_info._initHeader()
+        for equipID, equipItem in self.second_treeWidget_dict.items():
+            if equipItem.checkState(0) == Qt.Checked:
+                self.currentCheckedEquipList.append(equipID)
 
-        for row, data in self.inquiry_result.currentInquiryResult.items():
-            if row == currentRow:
-                # print(data)
-                equipNotHaveChild = EquipNotHaveChild(data[0])
-                unitNotHaveChild = UnitNotHaveChild(data[1])
-                if equipNotHaveChild and unitNotHaveChild:
-                    self.add_strenth_info._initWeight(data)
-                    self.tw_first.setEnabled(False)
-                    self.tw_second.setEnabled(False)
-                    self.sw_strenSelectMan.setCurrentIndex(1)
-                else:
-                    reply = QMessageBox.question(self, '录入', '只能通过最基本的信息进行录入', QMessageBox.Yes)
-                break
+        self.inquiry_result._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList, self.yearList)
 
     '''
         初始化单位目录
     '''
-
     def _initUnitTreeWidget(self, root, mother):
         if root == '':
-            sql = 'select Dept_Name,Dept_ID from dept where Dept_Uper = ""'
+            result = selectUnitInfoByDeptUper('')
         else:
-            sql = " select Dept_Name,Dept_ID from dept where Dept_Uper='" + root + "'"
+            result = selectUnitInfoByDeptUper(root)
 
-        result = Clicked(sql)
-        for data in result:
+        # rowData: (单位编号，单位名称，上级单位编号)
+        for rowData in result:
             item = QTreeWidgetItem(mother)
-            item.setText(0, data[0])
-            self.first_treeWidget_dict[data[1]] = item
-            if data[0] != '':
-                self._initUnitTreeWidget(data[1], item)
+            item.setText(0, rowData[1])
+            item.setCheckState(0, Qt.Unchecked)
+            self.first_treeWidget_dict[rowData[0]] = item
+            if rowData[0] != '':
+                self._initUnitTreeWidget(rowData[0], item)
 
     '''
         功能：
             初始化装备目录
     '''
-
     def _initEquipTreeWidget(self, root, mother):
         if root == '':
-            sql = 'select Equip_Name,Equip_ID from equip where Equip_Uper = ""'
+            result = selectEquipInfoByEquipUper('')
         else:
-            sql = "select Equip_Name,Equip_ID from equip where Equip_Uper='" + root + "'"
+            result = selectEquipInfoByEquipUper(root)
 
-        result = Clicked(sql)
-        for data in result:
+        # rowData: (装备编号，装备名称，上级装备编号, 录入类型, 装备类型)
+        for rowData in result:
             item = QTreeWidgetItem(mother)
-            item.setText(0, data[0])
-            self.second_treeWidget_dict[data[1]] = item
-            if data[0] != '':
-                self._initEquipTreeWidget(data[1], item)
-
-    '''
-        功能：
-            让第一个目录进行过滤筛选出想选择的项目
-    '''
-
-    def slotFilterFirstTreeWidget(self):
-        """以text开头作为过滤条件示例"""
-        find = False
-        text = self.le_first.text()
-
-        cursor = QTreeWidgetItemIterator(self.tw_first)
-        while cursor.value():
-            item = cursor.value()
-            if item.text(0).startswith(text):
-                self.tw_first.setCurrentItem(item)
-                find = True
-                # 需要让父节点也显示,不然子节点显示不出来
-                try:
-                    self.tw_first.setCurrentItem(item)
-                    find = True
-                except Exception:
-                    pass
-            else:
-                pass
-
-            cursor = cursor.__iadd__(1)
-
-    '''
-        功能：
-            让第二个目录进行过滤筛选出想选择的项目
-    '''
-
-    def slotFilterSecondTreeWidget(self):
-        """以text开头作为过滤条件示例"""
-        text = self.le_second.text()
-        find = False
-        cursor = QTreeWidgetItemIterator(self.tw_second)
-        while cursor.value():
-            item = cursor.value()
-            if item.text(0).startswith(text):
-                self.tw_second.setCurrentItem(item)
-                # 需要让父节点也显示,不然子节点显示不出来
-                try:
-                    self.tw_second.setCurrentItem(item)
-                except Exception:
-                    pass
-            else:
-                pass
-
-            cursor = cursor.__iadd__(1)
-
-    '''
-        功能：
-            第一个TreeWidget选中后查询想要查询的结果并显示
-    '''
-
-    def slotReInqury(self):
-        unitRow = self.tw_first.currentIndex().row()
-        euqipRow = self.tw_second.currentIndex().row()
-        currentUnitID = ""
-        currentEquipID = ""
-        if unitRow == -1 or euqipRow == -1:
-            # reply = QMessageBox.question(self, '查询', '请同时选中单位和装备', QMessageBox.Yes)
-            pass
-        else:
-            # 按装备展开
-            if self.inquiry_result.rb_equipShow.isChecked():
-                for unitID, unitItem in self.first_treeWidget_dict.items():
-                    if self.tw_first.currentItem() == unitItem:
-                        currentUnitID = unitID
-                for equipID, equipItem in self.second_treeWidget_dict.items():
-                    if self.tw_second.currentItem() == equipItem:
-                        currentEquipID = equipID
-                result = select_Equip_And_Unit_ByEquip(currentUnitID, currentEquipID)
-                self.inquiry_result._initTableWidget(result)
-            # 按照单位展开
-            elif self.inquiry_result.rb_unitShow.isChecked():
-                for unitID, unitItem in self.first_treeWidget_dict.items():
-                    if self.tw_first.currentItem() == unitItem:
-                        currentUnitID = unitID
-                for equipID, equipItem in self.second_treeWidget_dict.items():
-                    if self.tw_second.currentItem() == equipItem:
-                        currentEquipID = equipID
-                result = select_Equip_And_Unit_ByUnit(currentUnitID, currentEquipID)
-                self.inquiry_result._initTableWidget(result)
-            else:
-                for unitID, unitItem in self.first_treeWidget_dict.items():
-                    if self.tw_first.currentItem() == unitItem:
-                        currentUnitID = unitID
-                for equipID, equipItem in self.second_treeWidget_dict.items():
-                    if self.tw_second.currentItem() == equipItem:
-                        currentEquipID = equipID
-
-                result = select_Equip_And_Unit(currentUnitID, currentEquipID)
-                self.inquiry_result._initTableWidget(result)
-
-    '''
-        功能：
-            第二个TreeWidget选中后查询想要查询的结果并显示
-    '''
-
-    def slotInqury(self):
-        unitRow = self.tw_first.currentIndex().row()
-        euqipRow = self.tw_second.currentIndex().row()
-        currentUnitID = ""
-        currentEquipID = ""
-        if unitRow == -1 or euqipRow == -1:
-            # reply = QMessageBox.question(self, '查询', '请同时选中单位和装备', QMessageBox.Yes)
-            pass
-        else:
-            if self.inquiry_result.rb_equipShow.isChecked():
-                for unitID, unitItem in self.first_treeWidget_dict.items():
-                    if self.tw_first.currentItem() == unitItem:
-                        currentUnitID = unitID
-                for equipID, equipItem in self.second_treeWidget_dict.items():
-                    if self.tw_second.currentItem() == equipItem:
-                        currentEquipID = equipID
-                result = select_Equip_And_Unit_ByEquip(currentUnitID, currentEquipID)
-                self.inquiry_result._initTableWidget(result)
-            elif self.inquiry_result.rb_unitShow.isChecked():
-                for unitID, unitItem in self.first_treeWidget_dict.items():
-                    if self.tw_first.currentItem() == unitItem:
-                        currentUnitID = unitID
-                for equipID, equipItem in self.second_treeWidget_dict.items():
-                    if self.tw_second.currentItem() == equipItem:
-                        currentEquipID = equipID
-                result = select_Equip_And_Unit_ByUnit(currentUnitID, currentEquipID)
-                self.inquiry_result._initTableWidget(result)
-            else:
-                for unitID, unitItem in self.first_treeWidget_dict.items():
-                    if self.tw_first.currentItem() == unitItem:
-                        currentUnitID = unitID
-                for equipID, equipItem in self.second_treeWidget_dict.items():
-                    if self.tw_second.currentItem() == equipItem:
-                        currentEquipID = equipID
-
-                result = select_Equip_And_Unit(currentUnitID, currentEquipID)
-                self.inquiry_result._initTableWidget(result)
+            item.setText(0, rowData[1])
+            item.setCheckState(0, Qt.Unchecked)
+            self.second_treeWidget_dict[rowData[0]] = item
+            if rowData[0] != '':
+                self._initEquipTreeWidget(rowData[0], item)

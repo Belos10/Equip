@@ -1,7 +1,10 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QTableWidgetItem, QAbstractItemView
+from PyQt5.QtWidgets import QApplication, QWidget, QTableWidgetItem, QAbstractItemView, QMessageBox
 from widgets.strengthDisturb.inquiry_result import Widget_Inquiry_Result
-from database.ConnectAndSql import Clicked, delete_Inquiry_Clicked
+from database.strengthDisturbSql import selectAboutStrengthByUnitListAndEquipList, selectUnitIsHaveChild, selectEquipIsHaveChild,\
+    selectAboutStrengthByEquipShow,selectAboutStrengthByUnitShow, updateStrengthAboutStrengrh
+from PyQt5.Qt import Qt
+import  EmptyDelegate
 
 '''
     类功能：
@@ -16,11 +19,13 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
 
         #存储当前查询结果，结构为：{'行号':该行数据'}
         self.currentInquiryResult = {}
+        self.unitList = []
+        self.equipList = []
+        self.yearList = []
 
         #tableWidget可编辑
-        self.tw_inquiryResult.setEditTriggers(QAbstractItemView.CurrentChanged)
+        #self.tw_inquiryResult.setEditTriggers(QAbstractItemView.CurrentChanged)
 
-        self.pb_insert.setText("信息展示及修改")
         self.result = []
 
         #信号和槽连接
@@ -30,125 +35,176 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         信号和槽连接
     '''
     def signalConnect(self):
-        #当前是否可以修改TableWidget数据
-        self.pb_insert.clicked.connect(self.slotStateChange)
+        #当前表格中某个值被修改
+        self.tw_inquiryResult.itemChanged.connect(self.slotItemChange)
 
-        #清除单选按钮选中状态
-        self.pb_delState.clicked.connect(self.slotChangeCheckState)
+        #当点击按装备展开时
+        self.rb_equipShow.clicked.connect(self.slotClickedRB)
 
-        self.cb_showDistence.clicked.connect(self.slotClickedDistence)
+        #当点击按单位展开时
+        self.rb_unitShow.clicked.connect(self.slotClickedRB)
+
+        #当展开到末级被点击时
+        self.cb_showLast.clicked.connect(self.slotClickedRB)
+
+        #当只列存在偏差被点击时
+        self.cb_showDistence.clicked.connect(self.slotClickedRB)
     '''
         信号和槽连接断开
     '''
     def slotDisconnect(self):
-        self.pb_insert.clicked.disconnect(self.slotStateChange)
-        self.pb_delState.clicked.disconnect(self.slotChangeCheckState)
-
+        pass
 
     '''
         功能：
             清除单选按钮选中状态
     '''
     def slotChangeCheckState(self):
-        if self.rb_unitShow.isChecked():
-            self.rb_unitShow.setChecked(False)
+        pass
 
-        if self.rb_equipShow.isChecked():
-            self.rb_equipShow.setChecked(False)
 
     '''
         功能：
-            当前是否可以修改TableWidget数据
+            当前表格中某个值被修改
     '''
-    def slotStateChange(self):
-        if self.tw_inquiryResult.editTriggers() == QAbstractItemView.CurrentChanged:
-            self.tw_inquiryResult.setEditTriggers(QAbstractItemView.NoEditTriggers)
-            self.pb_insert.setText("信息录入")
-        else:
-            self.tw_inquiryResult.setEditTriggers(QAbstractItemView.CurrentChanged)
-            self.pb_insert.setText("信息展示及修改")
+    def slotItemChange(self, item):
+        currentRow = self.tw_inquiryResult.currentRow()
+        currentColumn = self.tw_inquiryResult.currentColumn()
+        if currentColumn == 2:
+            for i, resultInfo in self.currentInquiryResult.items():
+                if i == currentRow:
+                    Unit_ID = resultInfo[1]
+                    Equip_ID = resultInfo[0]
+                    unitHaveChild = selectUnitIsHaveChild(Unit_ID)
+                    equipHaveChild = selectEquipIsHaveChild(Equip_ID)
+                    if unitHaveChild or equipHaveChild:
+                        reply = QMessageBox.question(self, '修改', '只能修改末级实力数，修改失败', QMessageBox.Yes)
+                        self.tw_inquiryResult.item(currentRow, currentColumn).setText(resultInfo[4])
+                        return
+                    elif len(self.yearList) != 1:
+                        reply = QMessageBox.question(self, '修改', '只能某一年，修改失败', QMessageBox.Yes)
+                        self.tw_inquiryResult.item(currentRow, currentColumn).setText(resultInfo[4])
+                        return
+                    elif self.yearList[0] == '全部':
+                        reply = QMessageBox.question(self, '修改', '只能某一年，修改失败', QMessageBox.Yes)
+                        self.tw_inquiryResult.item(currentRow, currentColumn).setText(resultInfo[4])
+                        return
+                    else:
+                        if self.tw_inquiryResult.item(currentRow, currentColumn).text() != resultInfo[4]:
+                            reply = QMessageBox.question(self, '修改', '是否修改当前实力数？', QMessageBox.Yes,
+                                                         QMessageBox.Cancel)
+                            if reply == QMessageBox.Yes:
+                                updateStrengthAboutStrengrh(Unit_ID, Equip_ID, self.yearList[0], self.tw_inquiryResult.item(currentRow, currentColumn).text(),resultInfo[4])
+                                self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.yearList)
+                            else:
+                                self.tw_inquiryResult.item(currentRow, currentColumn).setText(resultInfo[4])
+                        return
 
-    def slotClickedDistence(self):
+    #当某个单击按钮被选中时
+    def slotClickedRB(self):
+        self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.yearList)
+
+    #初始化tableWidget
+    def _initTableWidgetByUnitListAndEquipList(self, UnitList, EquipList, YearList):
         self.tw_inquiryResult.clear()
         self.tw_inquiryResult.setRowCount(0)
-        self.result_num = len(self.result)
-        self.tw_inquiryResult.setRowCount(self.result_num)
-        self.tw_inquiryResult.setColumnCount(13)
+        self.unitList = UnitList
+        self.equipList = EquipList
+        self.yearList = YearList
+
+        if self.rb_equipShow.isChecked():
+            #按装备展开
+            resultList = selectAboutStrengthByEquipShow(UnitList, EquipList, YearList)
+        elif self.rb_unitShow.isChecked():
+            #按单位展开
+            resultList = selectAboutStrengthByUnitShow(UnitList, EquipList, YearList)
+        else:
+            resultList = selectAboutStrengthByUnitListAndEquipList(UnitList, EquipList, YearList)
+
+        if self.cb_showLast.isChecked():
+            resultListEquip = selectAboutStrengthByEquipShow(UnitList, EquipList, YearList)
+            resultListUnit = selectAboutStrengthByUnitShow(UnitList, EquipList, YearList)
+            resultList = resultListEquip + resultListUnit
+
         headerlist = ['单位名称', '装备名称', '实力数', '编制数', '现有数', '偏差', '准备退役数', '未到位数', '提前退役', '待核查无实物', '待核查无实力', '单独建账',
                       '正常到位']
         self.tw_inquiryResult.setHorizontalHeaderLabels(headerlist)
         self.currentInquiryResult.clear()
+        self.tw_inquiryResult.setColumnCount(len(headerlist))
+        self.tw_inquiryResult.setRowCount(len(resultList))
+
         i = 0
-        for data in self.result:
+        for LineInfo in resultList:
             if self.cb_showDistence.isChecked():
-                if int(data[7]) != 0:
-                    item = QTableWidgetItem(data[3])
+                if int(LineInfo[7]) != 0:
+                    item = QTableWidgetItem(LineInfo[3])
+                    item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                     self.tw_inquiryResult.setItem(i, 0, item)
-                    item = QTableWidgetItem(data[2])
+                    item = QTableWidgetItem(LineInfo[2])
                     self.tw_inquiryResult.setItem(i, 1, item)
-                    item = QTableWidgetItem(data[4])
+                    item = QTableWidgetItem(LineInfo[4])
                     self.tw_inquiryResult.setItem(i, 2, item)
-                    item = QTableWidgetItem(data[5])
+                    item = QTableWidgetItem(LineInfo[5])
                     self.tw_inquiryResult.setItem(i, 3, item)
-                    item = QTableWidgetItem(data[6])
+                    item = QTableWidgetItem(LineInfo[6])
                     self.tw_inquiryResult.setItem(i, 4, item)
-                    item = QTableWidgetItem(data[7])
+                    item = QTableWidgetItem(LineInfo[7])
                     self.tw_inquiryResult.setItem(i, 5, item)
-                    item = QTableWidgetItem(data[8])
+                    item = QTableWidgetItem(LineInfo[8])
                     self.tw_inquiryResult.setItem(i, 6, item)
-                    item = QTableWidgetItem(data[9])
+                    item = QTableWidgetItem(LineInfo[9])
                     self.tw_inquiryResult.setItem(i, 7, item)
-                    item = QTableWidgetItem(data[10])
+                    item = QTableWidgetItem(LineInfo[10])
                     self.tw_inquiryResult.setItem(i, 8, item)
-                    item = QTableWidgetItem(data[11])
+                    item = QTableWidgetItem(LineInfo[11])
                     self.tw_inquiryResult.setItem(i, 9, item)
-                    item = QTableWidgetItem(data[12])
+                    item = QTableWidgetItem(LineInfo[12])
                     self.tw_inquiryResult.setItem(i, 10, item)
-                    item = QTableWidgetItem(data[13])
+                    item = QTableWidgetItem(LineInfo[13])
                     self.tw_inquiryResult.setItem(i, 11, item)
-                    item = QTableWidgetItem(data[14])
+                    item = QTableWidgetItem(LineInfo[14])
                     self.tw_inquiryResult.setItem(i, 12, item)
 
-                    self.currentInquiryResult[i] = data
+                    self.currentInquiryResult[i] = LineInfo
                     i = i + 1
                 else:
                     pass
             else:
-                item = QTableWidgetItem(data[3])
+                item = QTableWidgetItem(LineInfo[3])
                 self.tw_inquiryResult.setItem(i, 0, item)
-                item = QTableWidgetItem(data[2])
+                item = QTableWidgetItem(LineInfo[2])
                 self.tw_inquiryResult.setItem(i, 1, item)
-                item = QTableWidgetItem(data[4])
+                item = QTableWidgetItem(LineInfo[4])
                 self.tw_inquiryResult.setItem(i, 2, item)
-                item = QTableWidgetItem(data[5])
+                item = QTableWidgetItem(LineInfo[5])
                 self.tw_inquiryResult.setItem(i, 3, item)
-                item = QTableWidgetItem(data[6])
+                item = QTableWidgetItem(LineInfo[6])
                 self.tw_inquiryResult.setItem(i, 4, item)
-                item = QTableWidgetItem(data[7])
+                item = QTableWidgetItem(LineInfo[7])
                 self.tw_inquiryResult.setItem(i, 5, item)
-                item = QTableWidgetItem(data[8])
+                item = QTableWidgetItem(LineInfo[8])
                 self.tw_inquiryResult.setItem(i, 6, item)
-                item = QTableWidgetItem(data[9])
+                item = QTableWidgetItem(LineInfo[9])
                 self.tw_inquiryResult.setItem(i, 7, item)
-                item = QTableWidgetItem(data[10])
+                item = QTableWidgetItem(LineInfo[10])
                 self.tw_inquiryResult.setItem(i, 8, item)
-                item = QTableWidgetItem(data[11])
+                item = QTableWidgetItem(LineInfo[11])
                 self.tw_inquiryResult.setItem(i, 9, item)
-                item = QTableWidgetItem(data[12])
+                item = QTableWidgetItem(LineInfo[12])
                 self.tw_inquiryResult.setItem(i, 10, item)
-                item = QTableWidgetItem(data[13])
+                item = QTableWidgetItem(LineInfo[13])
                 self.tw_inquiryResult.setItem(i, 11, item)
-                item = QTableWidgetItem(data[14])
+                item = QTableWidgetItem(LineInfo[14])
                 self.tw_inquiryResult.setItem(i, 12, item)
 
-                self.currentInquiryResult[i] = data
+                self.currentInquiryResult[i] = LineInfo
                 i = i + 1
         self.tw_inquiryResult.setRowCount(i)
     '''
         功能：
             根据查询到的结果初始化tablewidget
     '''
-    def _initTableWidget(self, result):
+    def _initTableWidgetBySelectResult(self, result):
         #print(result)
         self.tw_inquiryResult.clear()
         self.result = result
@@ -222,30 +278,6 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                 self.tw_inquiryResult.setItem(i, 12, item)
 
                 self.currentInquiryResult[i] = data
-
-    # 删除选中装备
-    def deleteInquiryResult(self):
-        item = self.tw_inquiryResult.selectedItems()
-        if len(item) == 0:
-            return
-        i = self.tw_inquiryResult.currentRow()
-        UnitID = self.currentInquiryResult[i][1]
-        EquipID = self.currentInquiryResult[i][0]
-        print("UnitID=",UnitID,"EquipId=",EquipID)
-        delete_Inquiry_Clicked(UnitID, EquipID)
-        EquipIDList1=[]
-        a=[e for e in range(self.result_num) if e != i]
-        for j in a:
-            EquipIDList1.append(self.currentInquiryResult[j][0])
-        self.showInquiryResult(UnitID, EquipIDList1)
-
-    # 删除所有装备
-    def deleteAllInquiryResult(self):
-        for i in range(0, self.tw_inquiryResult.rowCount()):
-            UnitID = self.currentInquiryResult[i][1]
-            EquipID = self.currentInquiryResult[i][0]
-            delete_Inquiry_Clicked(UnitID, EquipID)
-        self.InquiryResult(UnitID, EquipID, 1)
 
 
 if __name__ == "__main__":

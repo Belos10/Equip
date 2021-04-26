@@ -23,9 +23,6 @@ class Widget_Strength_Disturb_Set(object):
         self.sw_setManage.setObjectName("sw_setManage")
         self.gridLayout.addWidget(self.sw_setManage, 0, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
-        self.statusbar = QtWidgets.QStatusBar(MainWindow)
-        self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)
         self.tb_setProj = QtWidgets.QToolBar(MainWindow)
         self.tb_setProj.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
         self.tb_setProj.setObjectName("tb_setProj")
@@ -39,6 +36,14 @@ class Widget_Strength_Disturb_Set(object):
         self.tb_selectSet.setToolButtonStyle(Qt.Qt.ToolButtonTextUnderIcon)
         self.tb_setProj.addWidget(self.tb_selectSet)
 
+        self.tb_factoryYearSet = QtWidgets.QToolButton(MainWindow)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(":/pic/selectSet.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.tb_factoryYearSet.setIcon(icon)
+        self.tb_factoryYearSet.setObjectName("tb_factoryYearSet")
+        self.tb_factoryYearSet.setToolButtonStyle(Qt.Qt.ToolButtonTextUnderIcon)
+        self.tb_setProj.addWidget(self.tb_factoryYearSet)
+
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
@@ -49,4 +54,5 @@ class Widget_Strength_Disturb_Set(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.tb_setProj.setWindowTitle(_translate("MainWindow", "toolBar"))
         self.tb_selectSet.setText(_translate("MainWindow", "查询目录设置"))
+        self.tb_factoryYearSet.setText(_translate("MainWindow", "出厂年份设置"))
 import icons.resource_rc

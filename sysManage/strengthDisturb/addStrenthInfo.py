@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QTableWidgetItem
 from widgets.strengthDisturb.add_strenth_info import Add_Strenth_Info
-from database.ConnectAndSql import Clicked, delete_Clicked, select_Add_Info
+from database.strengthDisturbSql import selectEquipInputType, selectInfoAboutInput, selectNowNumAndStrengthNum
 
 '''
     类功能：
@@ -11,74 +11,117 @@ class AddStrenthInfo(QWidget, Add_Strenth_Info):
     def __init__(self, parent=None):
         super(AddStrenthInfo, self).__init__(parent)
         self.setupUi(self)
-        self.data = None
-        self.UnitID = None
-        self.EquipID = None
-        self.OrignNum = 0
-        header = ['批次号', '数量', '出厂年份', '生产厂家', '装备状态', '是否到位', '文件凭证', '备注']
-        self.tableWidget.setColumnCount(8)
-        self.tableWidget.setHorizontalHeaderLabels(header)
+        self.currentResult = {}
+        self.orginRowNum = 0
+        self.strgenthInfo = None
+        self.isChange = False
+        self.unitID = None
+        self.equipID = None
+
         self.signalConnect()
 
-    def _initHeader(self):
-        self.tableWidget.setRowCount(0)
-        header = ['批次号', '数量', '出厂年份', '生产厂家', '装备状态', '是否到位', '文件凭证', '备注']
-        self.tableWidget.setColumnCount(8)
-        self.tableWidget.setHorizontalHeaderLabels(header)
-
     def signalConnect(self):
+        #新增按钮
         self.pb_Increase.clicked.connect(self.slotAddSingle)
+
+        #查看数据是否修改
+        self.tableWidget.itemChanged.connect(self.slotItemChanged)
+
 
     def slotDisconnect(self):
         self.pb_Increase.clicked.disconnect(self.slotAddSingle)
 
-    def _initTableWidget(self, data):
-        result = select_Add_Info(self.UnitID, self.EquipID)
-        print(result)
-        self.currentLen = len(result)
-        self.tableWidget.setRowCount(self.currentLen)
-        self.OrignNum = self.currentLen
-        for i, data in enumerate(result):
-            item = QTableWidgetItem(data[2])
-            self.tableWidget.setItem(i, 0, item)
-            item = QTableWidgetItem(data[3])
-            self.tableWidget.setItem(i, 1, item)
-            item = QTableWidgetItem(data[4])
-            self.tableWidget.setItem(i, 2, item)
-            item = QTableWidgetItem(data[5])
-            self.tableWidget.setItem(i, 3, item)
-            item = QTableWidgetItem(data[6])
-            self.tableWidget.setItem(i, 4, item)
-            item = QTableWidgetItem(data[7])
-            self.tableWidget.setItem(i, 5, item)
-            item = QTableWidgetItem(data[8])
-            self.tableWidget.setItem(i, 6, item)
-            item = QTableWidgetItem(data[9])
-            self.tableWidget.setItem(i, 7, item)
-
-    def _initWeight(self, data):
-        self.tableWidget.clear()
+    def slotItemChanged(self, item):
+        row = item.row()
+        for i, resultRow in enumerate(self.currentResult):
+            if i == row:
+                self.tableWidget.item(row, 0).setText(resultRow[2])
+    '''
+        功能：
+            初始化录入信息界面以及tablewidget
+    '''
+    def _initTableWidget_(self, RowData, yearList):
+        self.yearList = yearList
         self.tableWidget.setRowCount(0)
-
-        self.UnitID = data[1]
-        self.EquipID = data[0]
-        self.data = data
-        self.label_UnitName.setText(data[3])
-        self.label_EquipName.setText(data[2])
-        self.label_PowerNumber.setText(data[4])
-        self.label_ExistNumber.setText(data[6])
-
-        self._initHeader()
-        self._initTableWidget(data)
+        self.strgenthInfo = RowData
+        self.now, self.strength= selectNowNumAndStrengthNum(RowData[1], RowData[0])
+        self.label_UnitName.setText(RowData[3])
+        self.label_EquipName.setText(RowData[2])
+        self.label_ExistNumber.setText(self.now)
+        self.label_PowerNumber.setText(self.strength)
+        isMutilInput = selectEquipInputType(RowData[0]) #查看是否是逐批信息录入
+        if isMutilInput:
+            self.textBrowser.setText("逐批信息录入")
+            self.header = ['批次号', '数量', '出厂年份', '生产厂家', '装备状态', '是否到位', '文件凭证', '备注']
+            self.tableWidget.setColumnCount(len(self.header))
+            self.tableWidget.setHorizontalHeaderLabels(self.header)
+            self.currentResult = selectInfoAboutInput(RowData[1], RowData[0])
+            self.tableWidget.setRowCount(len(self.currentResult))
+            self.orginRowNum = len(self.currentResult)
+            for i, data in enumerate(self.currentResult):
+                item = QTableWidgetItem(data[2])
+                self.tableWidget.setItem(i, 0, item)
+                item = QTableWidgetItem(data[3])
+                self.tableWidget.setItem(i, 1, item)
+                item = QTableWidgetItem(data[4])
+                self.tableWidget.setItem(i, 2, item)
+                item = QTableWidgetItem(data[5])
+                self.tableWidget.setItem(i, 3, item)
+                item = QTableWidgetItem(data[6])
+                self.tableWidget.setItem(i, 4, item)
+                item = QTableWidgetItem(data[7])
+                self.tableWidget.setItem(i, 5, item)
+                item = QTableWidgetItem(data[8])
+                self.tableWidget.setItem(i, 6, item)
+                item = QTableWidgetItem(data[9])
+                self.tableWidget.setItem(i, 7, item)
+                self.currentResult[i] = data
+        else:
+            self.textBrowser.setText("逐号信息录入")
+            self.header = ['批次号', '出厂年份', '生产厂家', '装备状态', '是否到位', '文件凭证', '备注']
+            self.tableWidget.setColumnCount(len(self.header))
+            self.tableWidget.setHorizontalHeaderLabels(self.header)
+            self.currentResult = selectInfoAboutInput(RowData[1], RowData[0])
+            self.orginRowNum = len(self.currentResult)
+            for i, data in enumerate(self.currentResult):
+                item = QTableWidgetItem(data[2])
+                self.tableWidget.setItem(i, 0, item)
+                item = QTableWidgetItem(data[4])
+                self.tableWidget.setItem(i, 1, item)
+                item = QTableWidgetItem(data[5])
+                self.tableWidget.setItem(i, 2, item)
+                item = QTableWidgetItem(data[6])
+                self.tableWidget.setItem(i, 3, item)
+                item = QTableWidgetItem(data[7])
+                self.tableWidget.setItem(i, 4, item)
+                item = QTableWidgetItem(data[8])
+                self.tableWidget.setItem(i, 5, item)
+                item = QTableWidgetItem(data[9])
+                self.tableWidget.setItem(i, 6, item)
+                self.currentResult[i] = data
+        self.isChange = False
 
     # 信息录入界面新增按钮
     def slotAddSingle(self):
-        print('''''''''''''')
-        row_num = self.tableWidget.rowCount()
-        # print("row num",row_num)
-        clomn_num = self.tableWidget.columnCount()
-        self.tableWidget.insertRow(row_num)
-        self.row_num = row_num + 1
+        row = self.tableWidget.rowCount()
+        self.tableWidget.setRowCount(row + 1)
+        item = QTableWidgetItem("")
+        self.tableWidget.setItem(row + 1, 0, item)
+        item = QTableWidgetItem("")
+        self.tableWidget.setItem(row + 1, 1, item)
+        item = QTableWidgetItem("")
+        self.tableWidget.setItem(row + 1, 2, item)
+        item = QTableWidgetItem("")
+        self.tableWidget.setItem(row + 1, 3, item)
+        item = QTableWidgetItem("")
+        self.tableWidget.setItem(row + 1, 4, item)
+        item = QTableWidgetItem("")
+        self.tableWidget.setItem(row + 1, 5, item)
+        item = QTableWidgetItem("")
+        self.tableWidget.setItem(row + 1, 6, item)
+        item = QTableWidgetItem("")
+        self.tableWidget.setItem(row + 1, 7, item)
+
 
     # 信息录入界面删除按钮
     def deleteNote(self):

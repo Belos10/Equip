@@ -101,9 +101,9 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pb_insert">
+         <widget class="QPushButton" name="pb_save">
           <property name="text">
-           <string>信息录入</string>
+           <string>保存修改</string>
           </property>
          </widget>
         </item>
