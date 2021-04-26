@@ -1,9 +1,10 @@
 import pymysql
-
+from database.connectAndDisSql import connectMySql
 
 def Clicked(sql):
-    conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="test")
-    cur = conn.cursor()
+    #conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="test")
+    [conn,cur]=connectMySql()
+    #cur = conn.cursor()
     cur.execute(sql)
     # 获取查询到的数据，是以字典的形式存储的，所以读取需要使用data[i][j]下标定位
     data = cur.fetchall()
