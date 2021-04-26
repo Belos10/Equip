@@ -12,6 +12,7 @@ class alocatMange(QMainWindow, Widget_Alocat_Mange):
         self.disturbPlan = QWidget(self)
         self.disturbSchedule = QWidget(self)
         self.transferManage = transferManage(self)
+        self.alocatSet = QWidget(self)
 
         self.stackedWidget.addWidget(self.disturbPlan)
         self.stackedWidget.addWidget(self.disturbSchedule)

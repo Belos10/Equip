@@ -52,9 +52,17 @@ class Widget_Alocat_Mange(object):
         self.tb_disturbManage.setObjectName("tb_disturbManage")
         self.tb_disturbManage.setToolButtonStyle(Qt.Qt.ToolButtonTextUnderIcon)
 
+        self.tb_alocatSet = QtWidgets.QToolButton(MainWindow)
+        icon4 = QtGui.QIcon()
+        icon4.addPixmap(QtGui.QPixmap(":/pic/set.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.tb_alocatSet.setIcon(icon4)
+        self.tb_alocatSet.setObjectName("tb_alocatSet")
+        self.tb_alocatSet.setToolButtonStyle(Qt.Qt.ToolButtonTextUnderIcon)
+
         self.toolBar.addWidget(self.tb_disturbPlan)
         self.toolBar.addWidget(self.tb_disturbSchedule)
         self.toolBar.addWidget(self.tb_disturbManage)
+        self.toolBar.addWidget(self.tb_alocatSet)
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -68,6 +76,7 @@ class Widget_Alocat_Mange(object):
         self.tb_disturbPlan.setText(_translate("MainWindow", "分配调整计划"))
         self.tb_disturbSchedule.setText(_translate("MainWindow", "调拨进度"))
         self.tb_disturbManage.setText(_translate("MainWindow", "调拨单管理"))
+        self.tb_alocatSet.setText(_translate("MainWindow", "调配管理设置"))
 
 import icons.resource_rc
 
