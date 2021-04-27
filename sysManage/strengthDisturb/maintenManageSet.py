@@ -4,7 +4,7 @@ from database.strengthDisturbSql import selectAllStrengthYearInfo, selectAllData
     updateUnitIsGroupFromUnit, selectAllFromPulicEquip, selectUnitInfoByDeptUper
 from PyQt5.Qt import Qt
 
-
+#new
 class maintenManageSet(QWidget, Widget_Mainten_Manage_Set):
     def __init__(self, parent=None):
         super(maintenManageSet, self).__init__(parent)

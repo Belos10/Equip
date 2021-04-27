@@ -10,7 +10,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-
+#new
 class Widget_Mainten_Manage_Set(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")

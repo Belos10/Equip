@@ -25,9 +25,9 @@ def selectArmyTransferByYear(year):
     conn, cur = connectMySql()
 
     if year == '全部':
-        sql = "select * from armytransferyear"
+        sql = "select * from armytransfer"
     else:
-        sql = "select * from armytransferyear where year = '" + year + "'"
+        sql = "select * from armytransfer where year = '" + year + "'"
 
     cur.execute(sql)
     result = cur.fetchall()
@@ -37,3 +37,15 @@ def selectArmyTransferByYear(year):
     # print(result)
 
     return result
+
+#向陆军调拨单年份表中添加年份
+def insertIntoArmyTransferYear(year):
+    conn, cur = connectMySql()
+
+    result = selectYearListAboutArmy()
+    sql = "insert into armytransferyear (ID, year) VALUES" \
+          + "('" + str(len(result) + 1) + "', '" + str(year) + "')"
+    print(sql)
+    cur.execute(sql)
+    conn.commit()
+    disconnectMySql(conn, cur)

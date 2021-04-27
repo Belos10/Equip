@@ -5,7 +5,7 @@ from database.strengthDisturbSql import selectAboutStrengthByUnitListAndEquipLis
     selectAboutStrengthByEquipShow,selectAboutStrengthByUnitShow, updateStrengthAboutStrengrh
 from PyQt5.Qt import Qt
 import  EmptyDelegate
-
+#new
 '''
     类功能：
         管理实力分布下实力查询结果界面，包含查询结果相关逻辑代码

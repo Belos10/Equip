@@ -10,7 +10,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets, Qt
 
-
+#new
 class Widget_Alocat_Manage_Set(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")

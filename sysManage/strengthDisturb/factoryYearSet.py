@@ -3,7 +3,7 @@ from widgets.strengthDisturb.factoryYearSet import Widget_Factory_Year_Set
 from database.strengthDisturbSql import selectAllStrengthYearInfo
 from PyQt5.Qt import Qt
 
-
+#new
 class factoryYearSet(QWidget, Widget_Factory_Year_Set):
     def __init__(self, parent=None):
         super(factoryYearSet, self).__init__(parent)

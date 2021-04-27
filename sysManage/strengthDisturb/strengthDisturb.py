@@ -3,7 +3,7 @@ import sys
 from PyQt5.QtWidgets import QMainWindow,QApplication,QWidget
 from sysManage.strengthDisturb.Stren_Inquiry import Stren_Inquiry
 from sysManage.strengthDisturb.strengthDisturbSet import strengthDisturbSet
-
+#new
 class strengthDisturb(QMainWindow, Strength_Disturb_Widget):
     def __init__(self, parent=None):
         super(strengthDisturb, self).__init__(parent)

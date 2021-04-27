@@ -1,7 +1,7 @@
 import pymysql
 from database.connectAndDisSql  import connectMySql, disconnectMySql
 
-
+#new
 '''
     实力分布所涉及的表的sql
 '''

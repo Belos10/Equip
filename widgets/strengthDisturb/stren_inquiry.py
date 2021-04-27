@@ -10,8 +10,9 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-
+#new
 class Widget_Stren_Inquiry(object):
+
     def setupUi(self, Form):
         Form.setObjectName("Form")
         Form.resize(1216, 755)
@@ -38,6 +39,15 @@ class Widget_Stren_Inquiry(object):
         self.lw_chooseYear = QtWidgets.QListWidget(self.groupBox)
         self.lw_chooseYear.setObjectName("lw_chooseYear")
         self.gridLayout.addWidget(self.lw_chooseYear, 0, 0, 1, 1)
+        self.tb_del = QtWidgets.QToolButton(self.groupBox)
+        self.tb_del.setObjectName("tb_del")
+        self.gridLayout.addWidget(self.tb_del, 2, 0, 1, 1)
+        self.tb_add = QtWidgets.QToolButton(self.groupBox)
+        self.tb_add.setObjectName("tb_add")
+        self.gridLayout.addWidget(self.tb_add, 1, 0, 1, 1)
+        self.tb_input = QtWidgets.QToolButton(self.groupBox)
+        self.tb_input.setObjectName("tb_input")
+        self.gridLayout.addWidget(self.tb_input, 3, 0, 1, 1)
         self.horizontalLayout_5.addWidget(self.groupBox)
         self.groupBox_2 = QtWidgets.QGroupBox(Form)
         self.groupBox_2.setObjectName("groupBox_2")
@@ -134,6 +144,9 @@ class Widget_Stren_Inquiry(object):
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "Form"))
         self.groupBox.setTitle(_translate("Form", "年份筛选"))
+        self.tb_del.setText(_translate("Form", "删除"))
+        self.tb_add.setText(_translate("Form", "新增"))
+        self.tb_input.setText(_translate("Form", "导入"))
         self.groupBox_2.setTitle(_translate("Form", "目录查询"))
         self.pb_firstSelect.setText(_translate("Form", "查询"))
         self.pb_secondSelect.setText(_translate("Form", "查询"))

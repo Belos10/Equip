@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QMainWindow, QWidget
 from sysManage.strengthDisturb.strengthDisturb import strengthDisturb
 from sysManage.alocatMange.alocatMange import alocatMange
 from sysManage.dictSelect.dictSelect import dictSelect
-
+#new
 class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
     def __init__(self, parent=None):
         super(Manage_Widgets, self).__init__(parent)

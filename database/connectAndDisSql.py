@@ -16,7 +16,7 @@ def connectMySql():
     cur = conn.cursor()
 
     return conn, cur
-
+#new
 '''
     功能：
         断开数据库的连接，需要传入conn以及cur

@@ -10,7 +10,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets, Qt
 
-
+#new
 class Widget_Strength_Disturb_Set(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")

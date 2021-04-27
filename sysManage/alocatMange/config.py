@@ -9,3 +9,5 @@ ArmyTransferReceiveUnit = {
     '联系人': '',
     '联系电话': ''
 }
+
+#new

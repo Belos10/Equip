@@ -4,7 +4,7 @@ from widgets.strengthDisturb.strengthDisturbSet import Widget_Strength_Disturb_S
 from sysManage.strengthDisturb.strengthSelectSet import strengthSelectSet
 from sysManage.strengthDisturb.factoryYearSet import factoryYearSet
 from sysManage.strengthDisturb.maintenManageSet import maintenManageSet
-
+#new
 class strengthDisturbSet(QMainWindow, Widget_Strength_Disturb_Set):
     def __init__(self, parent=None):
         super(strengthDisturbSet, self).__init__(parent)

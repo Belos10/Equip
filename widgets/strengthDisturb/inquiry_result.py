@@ -10,7 +10,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-
+#new
 class Widget_Inquiry_Result(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
