@@ -21,7 +21,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         self.currentInquiryResult = {}
         self.unitList = []
         self.equipList = []
-        self.yearList = []
+        self.year = None
 
         #tableWidget可编辑
         #self.tw_inquiryResult.setEditTriggers(QAbstractItemView.CurrentChanged)
@@ -81,11 +81,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                         reply = QMessageBox.question(self, '修改', '只能修改末级实力数，修改失败', QMessageBox.Yes)
                         self.tw_inquiryResult.item(currentRow, currentColumn).setText(resultInfo[4])
                         return
-                    elif len(self.yearList) != 1:
-                        reply = QMessageBox.question(self, '修改', '只能某一年，修改失败', QMessageBox.Yes)
-                        self.tw_inquiryResult.item(currentRow, currentColumn).setText(resultInfo[4])
-                        return
-                    elif self.yearList[0] == '全部':
+                    elif self.year == '全部':
                         reply = QMessageBox.question(self, '修改', '只能某一年，修改失败', QMessageBox.Yes)
                         self.tw_inquiryResult.item(currentRow, currentColumn).setText(resultInfo[4])
                         return
@@ -94,36 +90,36 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                             reply = QMessageBox.question(self, '修改', '是否修改当前实力数？', QMessageBox.Yes,
                                                          QMessageBox.Cancel)
                             if reply == QMessageBox.Yes:
-                                updateStrengthAboutStrengrh(Unit_ID, Equip_ID, self.yearList[0], self.tw_inquiryResult.item(currentRow, currentColumn).text(),resultInfo[4])
-                                self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.yearList)
+                                updateStrengthAboutStrengrh(Unit_ID, Equip_ID, self.year, self.tw_inquiryResult.item(currentRow, currentColumn).text(),resultInfo[4])
+                                self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
                             else:
                                 self.tw_inquiryResult.item(currentRow, currentColumn).setText(resultInfo[4])
                         return
 
     #当某个单击按钮被选中时
     def slotClickedRB(self):
-        self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.yearList)
+        self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
 
     #初始化tableWidget
-    def _initTableWidgetByUnitListAndEquipList(self, UnitList, EquipList, YearList):
+    def _initTableWidgetByUnitListAndEquipList(self, UnitList, EquipList, year):
         self.tw_inquiryResult.clear()
         self.tw_inquiryResult.setRowCount(0)
         self.unitList = UnitList
         self.equipList = EquipList
-        self.yearList = YearList
+        self.year = year
 
         if self.rb_equipShow.isChecked():
             #按装备展开
-            resultList = selectAboutStrengthByEquipShow(UnitList, EquipList, YearList)
+            resultList = selectAboutStrengthByEquipShow(UnitList, EquipList, year)
         elif self.rb_unitShow.isChecked():
             #按单位展开
-            resultList = selectAboutStrengthByUnitShow(UnitList, EquipList, YearList)
+            resultList = selectAboutStrengthByUnitShow(UnitList, EquipList, year)
         else:
-            resultList = selectAboutStrengthByUnitListAndEquipList(UnitList, EquipList, YearList)
+            resultList = selectAboutStrengthByUnitListAndEquipList(UnitList, EquipList, year)
 
         if self.cb_showLast.isChecked():
-            resultListEquip = selectAboutStrengthByEquipShow(UnitList, EquipList, YearList)
-            resultListUnit = selectAboutStrengthByUnitShow(UnitList, EquipList, YearList)
+            resultListEquip = selectAboutStrengthByEquipShow(UnitList, EquipList, year)
+            resultListUnit = selectAboutStrengthByUnitShow(UnitList, EquipList, year)
             resultList = resultListEquip + resultListUnit
 
         headerlist = ['单位名称', '装备名称', '实力数', '编制数', '现有数', '偏差', '准备退役数', '未到位数', '提前退役', '待核查无实物', '待核查无实力', '单独建账',

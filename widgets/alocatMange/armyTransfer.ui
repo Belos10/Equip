@@ -133,6 +133,9 @@
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
          <widget class="QTableWidget" name="tw_result">
+          <property name="layoutDirection">
+           <enum>Qt::LeftToRight</enum>
+          </property>
           <row>
            <property name="text">
             <string>New Row</string>
@@ -253,9 +256,49 @@
             <string/>
            </property>
           </item>
+          <item row="0" column="8">
+           <property name="text">
+            <string>交装单位</string>
+           </property>
+          </item>
+          <item row="0" column="9">
+           <property name="text">
+            <string/>
+           </property>
+          </item>
+          <item row="0" column="11">
+           <property name="text">
+            <string>接装单位</string>
+           </property>
+          </item>
+          <item row="0" column="12">
+           <property name="text">
+            <string/>
+           </property>
+          </item>
+          <item row="0" column="14">
+           <property name="text">
+            <string>装备名称</string>
+           </property>
+          </item>
+          <item row="0" column="15">
+           <property name="text">
+            <string>计量单位</string>
+           </property>
+          </item>
+          <item row="0" column="16">
+           <property name="text">
+            <string>应发数</string>
+           </property>
+          </item>
           <item row="0" column="17">
            <property name="text">
             <string/>
+           </property>
+          </item>
+          <item row="0" column="18">
+           <property name="text">
+            <string>备注</string>
            </property>
           </item>
           <item row="1" column="1">
@@ -325,12 +368,12 @@
           </item>
           <item row="1" column="14">
            <property name="text">
-            <string>装备名称</string>
+            <string/>
            </property>
           </item>
           <item row="1" column="15">
            <property name="text">
-            <string>计量单位</string>
+            <string/>
            </property>
           </item>
           <item row="1" column="16">
@@ -345,7 +388,7 @@
           </item>
           <item row="1" column="18">
            <property name="text">
-            <string>备注</string>
+            <string/>
            </property>
           </item>
          </widget>
@@ -416,10 +459,17 @@
             </property>
            </spacer>
           </item>
-          <item row="0" column="3" colspan="2">
+          <item row="0" column="3">
            <widget class="QPushButton" name="pb_update">
             <property name="text">
              <string>修改</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="4">
+           <widget class="QPushButton" name="pb_save">
+            <property name="text">
+             <string>保存</string>
             </property>
            </widget>
           </item>
