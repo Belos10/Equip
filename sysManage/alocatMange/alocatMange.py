@@ -3,7 +3,7 @@ import sys
 from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget
 from widgets.alocatMange.alocatMange import Widget_Alocat_Mange
 from sysManage.alocatMange.transferManage import transferManage
-from widgets.alocatMange.yearListForm import yearListForm
+from sysManage.alocatMange.DisturbPlan import DisturbPlan
 
 
 class alocatMange(QMainWindow, Widget_Alocat_Mange):
@@ -16,7 +16,7 @@ class alocatMange(QMainWindow, Widget_Alocat_Mange):
         self.transferManage = transferManage(self)
         self.alocatSet = QWidget(self)
 
-        self.disturbPlan = yearListForm()
+        self.disturbPlan = DisturbPlan()
 
         self.stackedWidget.addWidget(self.disturbPlan)
         self.stackedWidget.addWidget(self.disturbSchedule)

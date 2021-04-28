@@ -11,7 +11,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class yearListForm(object):
+class yearList_Form(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
         Form.resize(1098, 743)
