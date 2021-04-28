@@ -1,7 +1,7 @@
 import pymysql
 from database.connectAndDisSql  import connectMySql, disconnectMySql
 
-
+#new
 '''
     实力分布所涉及的表的sql
 '''
@@ -277,8 +277,8 @@ def selectAllDataAboutEquip():
 def addDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper):
     conn, cur = connectMySql()
     # 插入的sql语句
-    sql = "INSERT INTO unit (Unit_ID, Unit_Name, Unit_Uper) VALUES" \
-          + "('" + Unit_ID + "','" + Unit_Name + "','" + Unit_Uper + "')"
+    sql = "INSERT INTO unit (Unit_ID, Unit_Name, Unit_Uper, Is_Group) VALUES" \
+          + "('" + Unit_ID + "','" + Unit_Name + "','" + Unit_Uper + "', Is_Group = '否')"
     # print(sql)
     # 执行sql语句，并发送给数据库
     cur.execute(sql)
@@ -453,34 +453,33 @@ def selectAboutStrengthByEquipShow(UnitList, EquipList, yearList):
     tempList = []
     resultList = []
     # 如果只查询某年的
-    if len(yearList) == 1:
-        # 如果查询全部年的
-        if yearList[0] == '全部':
-            for Unit_ID in UnitList:
-                for Equip_ID in EquipList:
-                    #查询当前装备ID的孩子序列
-                    EquipIDChildList = []
-                    findChildEquip(Equip_ID, EquipIDChildList, cur)
-                    for childEquipID in EquipIDChildList:
-                        sql = "select * from strength where Unit_ID = '" + Unit_ID + "' and Equip_ID = '" + childEquipID + "' and year = ''"
-                        cur.execute(sql)
-                        result = cur.fetchall()
-                        for resultInfo in result:
-                            resultList.append(resultInfo)
-        # 如果查询某一年的
-        else:
-            for Unit_ID in UnitList:
-                for Equip_ID in EquipList:
-                    # 查询当前装备ID的孩子序列
-                    EquipIDChildList = []
-                    findChildEquip(Equip_ID, EquipIDChildList, cur)
-                    for childEquipID in EquipIDChildList:
-                        sql = "select * from strength where Unit_ID = '" + Unit_ID + \
-                            "' and Equip_ID = '" + childEquipID + "' and year = '" + yearList[0] + "'"
-                        cur.execute(sql)
-                        result = cur.fetchall()
-                        for resultInfo in result:
-                            resultList.append(resultInfo)
+    if yearList == '全部':
+        for Unit_ID in UnitList:
+            for Equip_ID in EquipList:
+                #查询当前装备ID的孩子序列
+                EquipIDChildList = []
+                findChildEquip(Equip_ID, EquipIDChildList, cur)
+                for childEquipID in EquipIDChildList:
+                    sql = "select * from strength where Unit_ID = '" + Unit_ID + "' and Equip_ID = '" + childEquipID + "' and year = ''"
+                    cur.execute(sql)
+                    result = cur.fetchall()
+                    for resultInfo in result:
+                        resultList.append(resultInfo)
+    # 如果查询某一年的
+    else:
+        for Unit_ID in UnitList:
+            for Equip_ID in EquipList:
+                # 查询当前装备ID的孩子序列
+                EquipIDChildList = []
+                findChildEquip(Equip_ID, EquipIDChildList, cur)
+                for childEquipID in EquipIDChildList:
+                    sql = "select * from strength where Unit_ID = '" + Unit_ID + \
+                        "' and Equip_ID = '" + childEquipID + "' and year = '" + yearList + "'"
+                    cur.execute(sql)
+                    result = cur.fetchall()
+                    for resultInfo in result:
+                        resultList.append(resultInfo)
+    '''
     # 如果查询多年的
     else:
         for Unit_ID in UnitList:
@@ -512,7 +511,7 @@ def selectAboutStrengthByEquipShow(UnitList, EquipList, yearList):
                         temp[14] = str(int(temp[14]) + int(tempInfo[14]))
 
                     resultList.append(temp)
-
+    '''
     disconnectMySql(conn, cur)
     return resultList
 
@@ -529,34 +528,35 @@ def selectAboutStrengthByUnitShow(UnitList, EquipList, yearList):
     tempList = []
     resultList = []
     # 如果只查询某年的
-    if len(yearList) == 1:
+    #if len(yearList) == 1:
         # 如果查询全部年的
-        if yearList[0] == '全部':
-            for Equip_ID in EquipList:
-                for Unit_ID in UnitList:
-                    #查询当前单位ID的孩子序列
-                    UnitIDChildList = []
-                    findChildUnit(Unit_ID, UnitIDChildList, cur)
-                    for childUnitID in UnitIDChildList:
-                        sql = "select * from strength where Unit_ID = '" + childUnitID + "' and Equip_ID = '" + Equip_ID + "' and year = ''"
-                        cur.execute(sql)
-                        result = cur.fetchall()
-                        for resultInfo in result:
-                            resultList.append(resultInfo)
-        # 如果查询某一年的
-        else:
-            for Equip_ID in EquipList:
-                for Unit_ID in UnitList:
-                    #查询当前单位ID的孩子序列
-                    UnitIDChildList = []
-                    findChildUnit(Unit_ID, UnitIDChildList, cur)
-                    for childUnitID in UnitIDChildList:
-                        sql = "select * from strength where Unit_ID = '" + childUnitID + \
-                            "' and Equip_ID = '" + Equip_ID + "' and year = '" + yearList[0] + "'"
-                        cur.execute(sql)
-                        result = cur.fetchall()
-                        for resultInfo in result:
-                            resultList.append(resultInfo)
+    if yearList == '全部':
+        for Equip_ID in EquipList:
+            for Unit_ID in UnitList:
+                #查询当前单位ID的孩子序列
+                UnitIDChildList = []
+                findChildUnit(Unit_ID, UnitIDChildList, cur)
+                for childUnitID in UnitIDChildList:
+                    sql = "select * from strength where Unit_ID = '" + childUnitID + "' and Equip_ID = '" + Equip_ID + "' and year = ''"
+                    cur.execute(sql)
+                    result = cur.fetchall()
+                    for resultInfo in result:
+                        resultList.append(resultInfo)
+    # 如果查询某一年的
+    else:
+        for Equip_ID in EquipList:
+            for Unit_ID in UnitList:
+                #查询当前单位ID的孩子序列
+                UnitIDChildList = []
+                findChildUnit(Unit_ID, UnitIDChildList, cur)
+                for childUnitID in UnitIDChildList:
+                    sql = "select * from strength where Unit_ID = '" + childUnitID + \
+                            "' and Equip_ID = '" + Equip_ID + "' and year = '" + yearList + "'"
+                    cur.execute(sql)
+                    result = cur.fetchall()
+                    for resultInfo in result:
+                        resultList.append(resultInfo)
+    '''
     # 如果查询多年的
     else:
         for Equip_ID in EquipList:
@@ -589,7 +589,7 @@ def selectAboutStrengthByUnitShow(UnitList, EquipList, yearList):
                         temp[14] = str(int(temp[14]) + int(tempInfo[14]))
 
                     resultList.append(temp)
-
+    '''
     disconnectMySql(conn, cur)
     return resultList
 
@@ -607,26 +607,27 @@ def selectAboutStrengthByUnitListAndEquipList(UnitList, EquipList, yearList):
     tempList = []
     resultList = []
     #如果只查询某年的
-    if len(yearList) == 1:
+    #if len(yearList) == 1:
         #如果查询全部年的
-        if yearList[0] == '全部':
-            for Unit_ID in UnitList:
-                for Equip_ID in EquipList:
-                    sql = "select * from strength where Unit_ID = '" + Unit_ID + "' and Equip_ID = '" + Equip_ID + "' and year = ''"
-                    cur.execute(sql)
-                    result = cur.fetchall()
-                    for resultInfo in result:
-                        resultList.append(resultInfo)
+    if yearList == '全部':
+        for Unit_ID in UnitList:
+            for Equip_ID in EquipList:
+                sql = "select * from strength where Unit_ID = '" + Unit_ID + "' and Equip_ID = '" + Equip_ID + "' and year = ''"
+                cur.execute(sql)
+                result = cur.fetchall()
+                for resultInfo in result:
+                    resultList.append(resultInfo)
         #如果查询某一年的
-        else:
-            for Unit_ID in UnitList:
-                for Equip_ID in EquipList:
-                    sql = "select * from strength where Unit_ID = '" + Unit_ID + \
-                          "' and Equip_ID = '" + Equip_ID + "' and year = '" + yearList[0] + "'"
-                    cur.execute(sql)
-                    result = cur.fetchall()
-                    for resultInfo in result:
-                        resultList.append(resultInfo)
+    else:
+        for Unit_ID in UnitList:
+            for Equip_ID in EquipList:
+                sql = "select * from strength where Unit_ID = '" + Unit_ID + \
+                          "' and Equip_ID = '" + Equip_ID + "' and year = '" + yearList + "'"
+                cur.execute(sql)
+                result = cur.fetchall()
+                for resultInfo in result:
+                    resultList.append(resultInfo)
+    '''
     #如果查询多年的
     else:
         for Unit_ID in UnitList:
@@ -655,7 +656,7 @@ def selectAboutStrengthByUnitListAndEquipList(UnitList, EquipList, yearList):
                     temp[14] = str(int(temp[14]) + int(tempInfo[14]))
 
                 resultList.append(temp)
-
+    '''
     disconnectMySql(conn, cur)
     return resultList
 
@@ -819,6 +820,64 @@ def updateStrengthAboutStrengrh(Unit_ID, Equip_ID, year, strengthNum, orginStren
 
     conn.commit()
     disconnectMySql(conn, cur)
+
+#查找所有末级装备
+def selectAllEndEquip():
+    resultList = []
+    allEquipTuple = selectAllDataAboutEquip()
+    for equipInfo in allEquipTuple:
+        if selectEquipIsHaveChild(equipInfo[0]):
+            pass
+        else:
+            resultList.append(equipInfo)
+    return resultList
+
+#查找实力查询所有年份名字
+def selectAllStrengthYear():
+    yearList = []
+    conn, cur = connectMySql()
+    sql = "SELECT * from strengthyear "
+    cur.execute(sql)
+    yearListTuple = cur.fetchall()
+    for yearInfo in yearListTuple:
+        yearList.append(yearInfo[1])
+
+    return yearList
+
+#查找实力查询所有年份信息
+def selectAllStrengthYearInfo():
+    yearList = []
+    conn, cur = connectMySql()
+    sql = "SELECT * from strengthyear "
+    cur.execute(sql)
+    yearListTuple = cur.fetchall()
+    return yearListTuple
+
+#获取公用装备信息
+def selectAllFromPulicEquip():
+    conn, cur = connectMySql()
+    sql = "select * from pubilcequip"
+    cur.execute(sql)
+    result = cur.fetchall()
+    return result
+
+#修改单位是否是旅团状态
+def updateUnitIsGroupFromUnit(Unit_ID, Is_Group):
+    conn, cur = connectMySql()
+    if Is_Group == '否':
+        pass
+    else:
+        result = selectAllFromPulicEquip()
+        currentNum = len(result)
+        sql = "update unit set Is_Group = '" + Is_Group + "' where Unit_ID = '" + Unit_ID + "'"
+        cur.execute(sql)
+        sql = "insert into pubilcequip (Equip_ID, Group_ID, work_Num) VALUES"\
+              + "('" + str(currentNum + 1) + "', '" + Unit_ID + "', '0')"
+        print(sql)
+        cur.execute(sql)
+    conn.commit()
+    disconnectMySql(conn, cur)
+
 
 if __name__ == '__main__':
     pass

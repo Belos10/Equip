@@ -10,7 +10,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets, Qt
 
-
+#new
 class Widget_Strength_Disturb_Set(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -44,6 +44,14 @@ class Widget_Strength_Disturb_Set(object):
         self.tb_factoryYearSet.setToolButtonStyle(Qt.Qt.ToolButtonTextUnderIcon)
         self.tb_setProj.addWidget(self.tb_factoryYearSet)
 
+        self.tb_maintenManageSet = QtWidgets.QToolButton(MainWindow)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(":/pic/selectSet.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.tb_maintenManageSet.setIcon(icon)
+        self.tb_maintenManageSet.setObjectName("tb_maintenManageSet")
+        self.tb_maintenManageSet.setToolButtonStyle(Qt.Qt.ToolButtonTextUnderIcon)
+        self.tb_setProj.addWidget(self.tb_maintenManageSet)
+
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
@@ -55,4 +63,5 @@ class Widget_Strength_Disturb_Set(object):
         self.tb_setProj.setWindowTitle(_translate("MainWindow", "toolBar"))
         self.tb_selectSet.setText(_translate("MainWindow", "查询目录设置"))
         self.tb_factoryYearSet.setText(_translate("MainWindow", "出厂年份设置"))
+        self.tb_maintenManageSet.setText(_translate("MainWindow", "编制数维护目录"))
 import icons.resource_rc

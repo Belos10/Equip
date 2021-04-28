@@ -2,7 +2,7 @@ from widgets.strengthDisturb.StrengthDisturb import Strength_Disturb_Widget
 import sys
 from PyQt5.QtWidgets import QMainWindow,QApplication,QWidget
 from widgets.dictSelect.dictSelect import Widget_Dict_Select
-
+#new
 class dictSelect(QMainWindow, Widget_Dict_Select):
     def __init__(self, parent=None):
         super(dictSelect, self).__init__(parent)

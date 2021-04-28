@@ -1,11 +1,13 @@
 from widgets.strengthDisturb.stren_inquiry import Widget_Stren_Inquiry
-from PyQt5.QtWidgets import QWidget, QTreeWidgetItemIterator, QTreeWidgetItem, QMessageBox, QCheckBox
+from PyQt5.QtWidgets import QWidget, QTreeWidgetItemIterator, QTreeWidgetItem, QMessageBox, QCheckBox, QListWidgetItem
 from PyQt5 import QtWidgets
 from sysManage.strengthDisturb.InquiryResult import Inquiry_Result
 from sysManage.strengthDisturb.addStrenthInfo import AddStrenthInfo
 from database.strengthDisturbSql import selectAllDataAboutStrengthYear, selectUnitInfoByDeptUper, \
     selectEquipInfoByEquipUper \
     , selectEquipIsHaveChild, selectUnitIsHaveChild, addDataIntoInputInfo
+from database.strengthDisturbSql import selectAllDataAboutStrengthYear, selectUnitInfoByDeptUper, selectEquipInfoByEquipUper\
+    , selectEquipIsHaveChild, selectUnitIsHaveChild, addDataIntoInputInfo, selectAllStrengthYear
 from PyQt5.Qt import Qt
 
 '''
@@ -42,6 +44,8 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
 
         # 设置当前查询的年份的list
         self.yearList = []
+        #设置当前查询的年份
+        self.currentYear = None
 
         # 初始化界面
         self._initStrenInquiry()
@@ -63,8 +67,8 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         self.tw_first.setDisabled(True)
         self.tw_second.setDisabled(True)
         self.inquiry_result.setDisabled(True)
-        self.tb_inqury.setDisabled(False)
-        self.tb_rechoose.setDisabled(False)
+        #self.tb_inqury.setDisabled(False)
+        #self.tb_rechoose.setDisabled(False)
 
         self.first_treeWidget_dict = {}
         self.second_treeWidget_dict = {}
@@ -74,7 +78,10 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         self.currentCheckedEquipList = []
 
         self.yearList = []
-        self.cb_yearAll = QCheckBox(self.sa_yearChoose)
+
+        #初始化年份选择列表
+        self._initSelectYear_()
+        #self.cb_yearAll = QCheckBox(self.sa_yearChoose)
 
     '''
         功能：
@@ -82,6 +89,8 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
     '''
 
     def slotClickedInqury(self):
+        self.first_treeWidget_dict = {}
+        self.second_treeWidget_dict = {}
         self.tw_first.clear()
         self.tw_second.clear()
         self.tw_first.header().setVisible(False)
@@ -91,15 +100,17 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         self.tw_first.setDisabled(False)
         self.tw_second.setDisabled(False)
         self.inquiry_result.setDisabled(False)
-        self.tb_inqury.setDisabled(True)
-        self.tb_rechoose.setDisabled(False)
+#        self.tb_inqury.setDisabled(True)
+#        self.tb_rechoose.setDisabled(False)
+
+        self.currentYear = self.lw_chooseYear.currentItem().text()
         self._initUnitTreeWidget("", self.tw_first)
         self._initEquipTreeWidget("", self.tw_second)
 
     # 信号与槽的连接
     def signalConnectSlot(self):
-        # 点击查询按钮后显示单位和装备目录
-        self.tb_inqury.clicked.connect(self.slotClickedInqury)
+        #点击某个年份后显示单位和装备目录
+        self.lw_chooseYear.clicked.connect(self.slotClickedInqury)
 
         # 当前单位目录被点击
         self.tw_first.itemChanged.connect(self.slotInquryStrengthResult)
@@ -123,6 +134,21 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
     # 信号与槽连接的断开
     def signalDisconnectSlot(self):
         pass
+
+    def _initSelectYear_(self):
+        self.currentYearListItem = {}
+        self.yearList = ['全部']
+        self.lw_chooseYear.clear()
+        allyearList = selectAllStrengthYear()
+
+        for year in allyearList:
+            self.yearList.append(year)
+
+        for year in self.yearList:
+            item = QListWidgetItem()
+            item.setText(year)
+            self.lw_chooseYear.addItem(item)
+            self.currentYearListItem[year] = item
 
     def slotSaveUpdate(self):
         Unit_ID = self.add_strenth_info.strgenthInfo[1]
@@ -270,7 +296,7 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
                 self.currentCheckedEquipList.append(equipID)
 
         self.inquiry_result._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList,
-                                                                   self.currentCheckedEquipList, self.yearList)
+                                                                   self.currentCheckedEquipList, self.currentYear)
 
     '''
         初始化单位目录

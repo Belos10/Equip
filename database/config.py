@@ -2,7 +2,7 @@
     功能：
         数据库连接信息
 '''
-
+#new
 ConnectMySqlDict = {
     'host': 'localhost',
     'port': 3306,

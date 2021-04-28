@@ -4,7 +4,7 @@ from database.strengthDisturbSql import selectUnitInfoByDeptUper, selectAllDataA
 from widgets.strengthDisturb.select_set import Widget_Select_Set
 from PyQt5.Qt import Qt
 
-
+#new
 class strengthSelectSet(QWidget, Widget_Select_Set):
     def __init__(self, parent=None):
         super(strengthSelectSet, self).__init__(parent)
