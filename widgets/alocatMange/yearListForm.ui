@@ -116,16 +116,6 @@
                   <string>全部</string>
                  </property>
                 </item>
-                <item>
-                 <property name="text">
-                  <string>2001年</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>2002年</string>
-                 </property>
-                </item>
                </widget>
               </item>
               <item>

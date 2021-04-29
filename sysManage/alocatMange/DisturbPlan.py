@@ -259,10 +259,11 @@ class DisturbPlan(QWidget, yearList_Form):
                 self.currentCheckedEquipList.append(equipID)
                 #findChildEquip(equipID,self.currentCheckedEquipList,None)
 
-
+        # 将装备列表、单位子列表、选中年份传入
         self._initDisturbPlanByUnitListAndEquipList(self.currentCheckedUnitChildNameList,
                                                     self.currentCheckedEquipList, self.currentYear)
 
+    # 初始化分配计划结果
     def _initDisturbPlanByUnitListAndEquipList(self, UnitList, EquipList, YearList):
         self.disturbResult.clear()
         self.disturbResult.setRowCount(0)
