@@ -15,10 +15,15 @@ class maintenManageSet(QWidget, Widget_Mainten_Manage_Set):
         # 设置整行选中
         self.tw_publicEquip.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        #初始化单元表
+        #初始化
+        self._initAll_()
+        self.signalConnect()
+
+    def _initAll_(self):
+        # 初始化单元表
         self._initUnitTableWidget()
 
-        #初始化公用装备表
+        # 初始化公用装备表
         self._initPublicEquipTableWidget_()
 
         self.orignUnitResult = {}
@@ -28,8 +33,6 @@ class maintenManageSet(QWidget, Widget_Mainten_Manage_Set):
         self.tw_first.clear()
         self.tw_first.header().setVisible(False)
         self._initUnitTreeWidget("", self.tw_first)
-        self.signalConnect()
-
 
     def signalConnect(self):
         self.tw_unit.clicked.connect(self.slotUnitTableClicked)

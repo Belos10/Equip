@@ -107,6 +107,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         self.unitList = UnitList
         self.equipList = EquipList
         self.year = year
+        resultList = []
 
         if self.rb_equipShow.isChecked():
             #按装备展开

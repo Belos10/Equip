@@ -175,13 +175,13 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
             for i in range(currentRowNum - orginRowNum):
                 addDataIntoInputInfo(Unit_ID, Equip_ID,
                                      self.add_strenth_info.tableWidget.item(i + orginRowNum, 0).text(),
-                                     1,
+                                     "1",
+                                     self.add_strenth_info.tableWidget.item(i + orginRowNum, 1).text(),
                                      self.add_strenth_info.tableWidget.item(i + orginRowNum, 2).text(),
                                      self.add_strenth_info.tableWidget.item(i + orginRowNum, 3).text(),
                                      self.add_strenth_info.tableWidget.item(i + orginRowNum, 4).text(),
                                      self.add_strenth_info.tableWidget.item(i + orginRowNum, 5).text(),
-                                     self.add_strenth_info.tableWidget.item(i + orginRowNum, 6).text(),
-                                     self.add_strenth_info.tableWidget.item(i + orginRowNum, 7).text())
+                                     self.add_strenth_info.tableWidget.item(i + orginRowNum, 6).text())
             self.sw_strenSelectMan.setCurrentIndex(0)
             self.slotInquryStrengthResult()
     '''

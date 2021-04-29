@@ -55,6 +55,7 @@ class strengthDisturbSet(QMainWindow, Widget_Strength_Disturb_Set):
         self.tb_selectSet.setDisabled(False)
         self.tb_factoryYearSet.setDisabled(False)
         self.tb_maintenManageSet.setDisabled(True)
+        self.maintenManageSet._initAll_()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
