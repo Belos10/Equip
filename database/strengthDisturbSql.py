@@ -32,12 +32,14 @@ def findChildUnit(Unit_ID, childUnitList, cur):
 
 
 def findChildEquip(Equip_ID, childEquipList, cur):
+    conn, cur = connectMySql()
     childEquipList.append(Equip_ID)
     sql = "select Equip_ID from equip where Equip_Uper = '" + Equip_ID + "'"
     cur.execute(sql)
     Equip_tuple = cur.fetchall()
     for equip in Equip_tuple:
         findChildEquip(equip[0], childEquipList, cur)
+    disconnectMySql(conn, cur)
 
 
 '''
@@ -949,14 +951,66 @@ def findUnitChildName(unitId):
     else:
         return []
 
+# 获取某装备的所有子装备ID
+def findEquipChildID(equipId):
+    conn, cur = connectMySql()
+    sql = "select Unit_Name from equip where Equip_Uper = '" + equipId + "'"
+    cur.execute(sql)
+    result = cur.fetchall()
+    disconnectMySql(conn, cur)
+    if result:
+        return result
+    else:
+        return []
 
 def selectDisturbPlan(UnitList, EquipList, YearList):
+    # print("******",YearList)
     conn, cur = connectMySql()
-    for i in UnitList:
-        for j in EquipList:
-            sql = "select * from disturbplan where "
+    temp = ['Equip_ID', 'Unit_ID', 'Equip_Name', 'Unit_Name', '0', '0', '0', '0', '0', '0',
+            '0', '0', '0', '0', '0']
+    tempList = []
+    resultList = []
+    print("UnitList", UnitList)
+    print("EquipList", EquipList)
+    # 如果只查询某年的
+    if YearList == '全部':
+        for Unit_ID in UnitList:
+            for Equip_ID in EquipList:
+                # 查询当前装备ID的孩子序列
+                # EquipIDChildList = []
+                # findChildEquip(Equip_ID, EquipIDChildList, cur)
+                # for childEquipID in EquipIDChildList:
+                sql = "select * from disturbplan where Unit_Name = '" + Unit_ID + "' and Equip_Id = '" + Equip_ID + "' and Year = ''"
+                cur.execute(sql)
+                result = cur.fetchall()
+                for resultInfo in result:
+                    resultList.append(resultInfo)
+    # 如果查询某一年的
+    else:
+        for Unit_ID in UnitList:
+            for Equip_ID in EquipList:
+                # 查询当前装备ID的孩子序列
+                # EquipIDChildList = []
+                # findChildEquip(Equip_ID, EquipIDChildList, cur)
+                # for childEquipID in EquipIDChildList:
+                sql = "select * from disturbplan where Unit_Name = '" + Unit_ID + \
+                      "' and Equip_Id = '" + Equip_ID + "' and Year = '" + YearList + "'"
+                print("sql=",sql)
+                cur.execute(sql)
+                result = cur.fetchall()
+                for resultInfo in result:
+                    resultList.append(resultInfo)
     disconnectMySql(conn, cur)
-    pass
+    return resultList
+
+
+def findUnitNameFromID(UnitID):
+    conn, cur = connectMySql()
+    sql = "select Unit_Name from unit where Unit_ID = '" + UnitID + "'"
+    cur.execute(sql)
+    result = cur.fetchall()
+    disconnectMySql(conn, cur)
+    return result
 
 
 if __name__ == '__main__':
