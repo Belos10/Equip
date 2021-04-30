@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1098</width>
-    <height>743</height>
+    <width>1134</width>
+    <height>687</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -33,64 +33,6 @@
     <widget class="QWidget" name="widget" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_7">
       <item>
-       <widget class="QGroupBox" name="groupBox">
-        <property name="maximumSize">
-         <size>
-          <width>110</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="title">
-         <string>年份筛选</string>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout">
-         <property name="spacing">
-          <number>0</number>
-         </property>
-         <property name="leftMargin">
-          <number>5</number>
-         </property>
-         <property name="rightMargin">
-          <number>5</number>
-         </property>
-         <property name="bottomMargin">
-          <number>0</number>
-         </property>
-         <item>
-          <widget class="QListWidget" name="lw_yearChoose">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>80</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <item>
-            <property name="text">
-             <string>全部</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>2001年</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>2002年</string>
-            </property>
-           </item>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item>
        <widget class="QWidget" name="wg_directory" native="true">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
@@ -100,13 +42,13 @@
         </property>
         <property name="minimumSize">
          <size>
-          <width>50</width>
+          <width>300</width>
           <height>0</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>350</width>
+          <width>450</width>
           <height>16777215</height>
          </size>
         </property>
@@ -131,6 +73,75 @@
            <property name="spacing">
             <number>0</number>
            </property>
+           <item>
+            <widget class="QGroupBox" name="groupBox">
+             <property name="maximumSize">
+              <size>
+               <width>110</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="title">
+              <string>年份筛选</string>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <property name="leftMargin">
+               <number>5</number>
+              </property>
+              <property name="rightMargin">
+               <number>5</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QListWidget" name="lw_yearChoose">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>80</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <item>
+                 <property name="text">
+                  <string>全部</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item>
+               <widget class="QToolButton" name="tb_add">
+                <property name="text">
+                 <string>新增</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QToolButton" name="tb_del">
+                <property name="text">
+                 <string>删除</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QToolButton" name="tb_input">
+                <property name="text">
+                 <string>导入</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
            <item>
             <layout class="QVBoxLayout" name="verticalLayout_2">
              <property name="spacing">
@@ -177,76 +188,17 @@
              </item>
              <item>
               <widget class="QTreeWidget" name="tw_first">
+               <property name="minimumSize">
+                <size>
+                 <width>100</width>
+                 <height>0</height>
+                </size>
+               </property>
                <column>
                 <property name="text">
                  <string/>
                 </property>
                </column>
-               <item>
-                <property name="text">
-                 <string>火箭军</string>
-                </property>
-                <item>
-                 <property name="text">
-                  <string>火箭军基地</string>
-                 </property>
-                 <item>
-                  <property name="text">
-                   <string>New Subitem</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>New Subitem</string>
-                  </property>
-                 </item>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>火箭军院校</string>
-                 </property>
-                 <item>
-                  <property name="text">
-                   <string>New Subitem</string>
-                  </property>
-                 </item>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>火箭军直属部队</string>
-                 </property>
-                 <item>
-                  <property name="text">
-                   <string>New Subitem</string>
-                  </property>
-                 </item>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>火箭军机关</string>
-                 </property>
-                 <item>
-                  <property name="text">
-                   <string>New Subitem</string>
-                  </property>
-                 </item>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>火箭军研究院、所</string>
-                 </property>
-                 <item>
-                  <property name="text">
-                   <string>New Subitem</string>
-                  </property>
-                 </item>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>库存</string>
-                 </property>
-                </item>
-               </item>
               </widget>
              </item>
             </layout>
@@ -288,26 +240,17 @@
              </item>
              <item>
               <widget class="QTreeWidget" name="tw_second">
+               <property name="minimumSize">
+                <size>
+                 <width>100</width>
+                 <height>0</height>
+                </size>
+               </property>
                <column>
                 <property name="text">
                  <string notr="true"/>
                 </property>
                </column>
-               <item>
-                <property name="text">
-                 <string>装备</string>
-                </property>
-                <item>
-                 <property name="text">
-                  <string>防化车辆</string>
-                 </property>
-                 <item>
-                  <property name="text">
-                   <string>防化团指挥车</string>
-                  </property>
-                 </item>
-                </item>
-               </item>
               </widget>
              </item>
             </layout>
@@ -344,68 +287,7 @@
          </layout>
         </item>
         <item>
-         <widget class="QTableWidget" name="tableWidget">
-          <row>
-           <property name="text">
-            <string>新建行</string>
-           </property>
-          </row>
-          <row>
-           <property name="text">
-            <string>新建行</string>
-           </property>
-          </row>
-          <column>
-           <property name="text">
-            <string>装备名称及规格型号</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>单位</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>军委分配计划数</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>此次分配计划数</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>单位1</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>库存</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>备注</string>
-           </property>
-          </column>
-          <item row="0" column="0">
-           <property name="text">
-            <string/>
-           </property>
-          </item>
-          <item row="0" column="1">
-           <property name="text">
-            <string/>
-           </property>
-          </item>
-          <item row="1" column="0">
-           <property name="text">
-            <string/>
-           </property>
-          </item>
-         </widget>
+         <widget class="QTableWidget" name="disturbResult"/>
         </item>
        </layout>
       </item>

@@ -115,6 +115,8 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         # 当前单位目录被点击
         self.tw_first.itemChanged.connect(self.slotInquryStrengthResult)
 
+
+
         # 当前装备目录被点击
         self.tw_second.itemChanged.connect(self.slotInquryStrengthResult)
 
