@@ -6,6 +6,7 @@ from database.strengthDisturbSql import selectEquipInputType, selectInfoAboutInp
     类功能：
         信息录入界面管理
 '''
+#更新
 #new
 class AddStrenthInfo(QWidget, Add_Strenth_Info):
     def __init__(self, parent=None):
