@@ -1,3 +1,5 @@
+from pymysql.cursors import DictCursor
+
 from database.connectAndDisSql import *
 
 '''
@@ -12,6 +14,27 @@ def selectData(sql):
     cur.close()
     conn.close()
     return data
+
+def selectDateDict(sql):
+    conn, cur = connectMySql()
+    cur = conn.cursor(DictCursor)
+    cur.execute(sql)
+    dataDict = cur.fetchall()
+    cur.close()
+    conn.close()
+    return dataDict
+def selectOne(sql):
+    conn, cur = connectMySql()
+    cur = conn.cursor(DictCursor)
+    cur.execute(sql)
+    data = cur.fetchone()
+    cur.close()
+    conn.close()
+    return data
+
+
+
+
 
 def executeSql(sql):
     """执行sql语句，针对读操作返回结果集
@@ -80,16 +103,52 @@ def deleteYear(year):
         sqlDelete = "delete from equipment_balance where equip_balance_id=%s" % id
         executeCommit(sqlDelete)
 
+def _dateSaveToList(dataDict):
+    newDateList = []
+    if dataDict is None or len(dataDict) is 0:
+       pass
+    else:
+        for key in range(len(dataDict)):
+            newDateList.append(dataDict[key][0])
+    return newDateList
 
 
 
 
+def getResultByYear(year):
+    sql = "select equip_balance_id,Equip_ID from equipment_balance where year=%s "%year
+    result = selectDateDict(sql)
+    resultList = []
 
-
-
+    if result is None:
+        return resultList
+    else:
+        for item in result:
+            itemDict = {}
+            sql = "select Equip_Name from equip where Equip_ID=%s"%item['Equip_ID']
+            itemDict.update(selectOne(sql))
+            sql = "select * from equipment_balance where equip_balance_id=%s"%item['equip_balance_id']
+            itemDict.update(selectOne(sql))
+            sql = "select * from eb_quality_status where equip_balance_id=%s"%item['equip_balance_id']
+            itemDict.update(selectOne(sql))
+            sql = "select * from eb_change_project where equip_balance_id=%s"%item['equip_balance_id']
+            itemDict.update(selectOne(sql))
+            sql = "select * from eb_carry where equip_balance_id=%s" % item['equip_balance_id']
+            itemDict.update(selectOne(sql))
+            sql = "select * from eb_stock where equip_balance_id=%s" % item['equip_balance_id']
+            itemDict.update(selectOne(sql))
+            sql = "select * from eb_management where equip_balance_id=%s" % item['equip_balance_id']
+            itemDict.update(selectOne(sql))
+            sql = "select * from eb_repair_time where equip_balance_id=%s" % item['equip_balance_id']
+            itemDict.update(selectOne(sql))
+            sql = "select * from eb_production_year where equip_balance_id=%s" % item['equip_balance_id']
+            itemDict.update(selectOne(sql))
+            resultList.append(itemDict)
+        return resultList
 
 
 
 if __name__ == "__main__":
-    print(findYear())
-    deleteYear(2016)
+    result = getResultByYear(2017)
+    print(result)
+
