@@ -115,40 +115,55 @@ def _dateSaveToList(dataDict):
 
 
 
-def getResultByYear(year):
-    sql = "select equip_balance_id,Equip_ID from equipment_balance where year=%s "%year
-    result = selectDateDict(sql)
+def getResultByYearAndEquip(year,equipList):
     resultList = []
-
-    if result is None:
+    # print(equipList)
+    if equipList is None:
         return resultList
     else:
-        for item in result:
-            itemDict = {}
-            sql = "select Equip_Name from equip where Equip_ID=%s"%item['Equip_ID']
-            itemDict.update(selectOne(sql))
-            sql = "select * from equipment_balance where equip_balance_id=%s"%item['equip_balance_id']
-            itemDict.update(selectOne(sql))
-            sql = "select * from eb_quality_status where equip_balance_id=%s"%item['equip_balance_id']
-            itemDict.update(selectOne(sql))
-            sql = "select * from eb_change_project where equip_balance_id=%s"%item['equip_balance_id']
-            itemDict.update(selectOne(sql))
-            sql = "select * from eb_carry where equip_balance_id=%s" % item['equip_balance_id']
-            itemDict.update(selectOne(sql))
-            sql = "select * from eb_stock where equip_balance_id=%s" % item['equip_balance_id']
-            itemDict.update(selectOne(sql))
-            sql = "select * from eb_management where equip_balance_id=%s" % item['equip_balance_id']
-            itemDict.update(selectOne(sql))
-            sql = "select * from eb_repair_time where equip_balance_id=%s" % item['equip_balance_id']
-            itemDict.update(selectOne(sql))
-            sql = "select * from eb_production_year where equip_balance_id=%s" % item['equip_balance_id']
-            itemDict.update(selectOne(sql))
-            resultList.append(itemDict)
-        return resultList
+        for equip in equipList:
+            # print(equip)
+            sql = "select equip_balance_id,Equip_ID from equipment_balance where year=%s and Equip_ID=%s"%(year,equip)
+            result = selectDateDict(sql)
+            # print(result)
+            try:
+                if len(result) is not 0:
+                        for item in result:
+                            itemDict = {}
+                            sql = "select Equip_Name from equip where Equip_ID=%s"%item['Equip_ID']
+                            itemDict.update(selectOne(sql))
+                            sql = "select * from equipment_balance where equip_balance_id=%s"%item['equip_balance_id']
+                            itemDict.update(selectOne(sql))
+                            sql = "select * from eb_quality_status where equip_balance_id=%s"%item['equip_balance_id']
+                            itemDict.update(selectOne(sql))
+                            sql = "select * from eb_change_project where equip_balance_id=%s"%item['equip_balance_id']
+                            itemDict.update(selectOne(sql))
+                            sql = "select * from eb_carry where equip_balance_id=%s" % item['equip_balance_id']
+                            itemDict.update(selectOne(sql))
+                            sql = "select * from eb_stock where equip_balance_id=%s" % item['equip_balance_id']
+                            itemDict.update(selectOne(sql))
+                            sql = "select * from eb_management where equip_balance_id=%s" % item['equip_balance_id']
+                            itemDict.update(selectOne(sql))
+                            sql = "select * from eb_repair_time where equip_balance_id=%s" % item['equip_balance_id']
+                            itemDict.update(selectOne(sql))
+                            sql = "select * from eb_production_year where equip_balance_id=%s" % item['equip_balance_id']
+                            itemDict.update(selectOne(sql))
+                            resultList.append(itemDict)
+                        return resultList
+
+            except:
+                return None
+
+
+
+
+
+
 
 
 
 if __name__ == "__main__":
-    result = getResultByYear(2017)
+    list = ['1','2']
+    result = getResultByYearAndEquip(2018,list)
     print(result)
 

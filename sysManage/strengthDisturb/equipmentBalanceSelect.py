@@ -3,8 +3,7 @@ import sys
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QApplication, QMessageBox, QTableWidgetItem, QTableWidget, QTreeWidgetItem, \
     QHeaderView
-
-from database.SD_EquipmentBanlanceSql import getResultByYear
+from database.SD_EquipmentBanlanceSql import *
 from database.strengthDisturbSql import *
 from widgets.strengthDisturb.equipmentBalance.equipmentBalanceSelectUI import EquipmentBalanceSelectUI
 
@@ -35,7 +34,7 @@ class Equip_Balance_Select(QWidget, EquipmentBalanceSelectUI):
     # 信号与槽的连接
     def signalConnectSlot(self):
         # 当前单位目录被点击
-        self.tw_first.itemChanged.connect(self.slotSelectedResult)
+        # self.tw_first.itemChanged.connect(self.slotSelectedResult)
 
         # 当前装备目录被点击
         self.tw_second.itemChanged.connect(self.slotSelectedResult)
@@ -57,7 +56,12 @@ class Equip_Balance_Select(QWidget, EquipmentBalanceSelectUI):
         self.tw_second.header().setVisible(False)
         self.le_first.setDisabled(False)
         self.le_second.setDisabled(False)
-        self.tw_first.setDisabled(False)
+        self.tw_first.setDisabled(True)
+        self.tw_first.setVisible(False)
+        self.pb_firstSelect.setVisible(False)
+        self.pb_firstSelect.setDisabled(True)
+        self.le_first.setVisible(False)
+        self.le_first.setDisabled(True)
         self.tw_second.setDisabled(False)
         self.tb_result.setDisabled(False)
         self.first_treeWidget_dict = {}
@@ -65,20 +69,17 @@ class Equip_Balance_Select(QWidget, EquipmentBalanceSelectUI):
         # 当前选中的单位列表和装备列表
         self.currentCheckedUnitList = []
         self.currentCheckedEquipList = []
-        self._initUnitTreeWidget("", self.tw_first)
+        # self._initUnitTreeWidget("", self.tw_first)
         self._initEquipTreeWidget("", self.tw_second)
         self._initTableHeader()
 
-    '''
-        功能：
-            点击查询按钮时，设置当前可选项和不可选项，并初始化装备和单位目录
-    '''
 
     def slotClickedInqury(self):
         self.first_treeWidget_dict = {}
         self.second_treeWidget_dict = {}
         self.tw_first.clear()
         self.tw_second.clear()
+        self.tw_first.setVisible(False)
         self.tw_first.header().setVisible(False)
         self.tw_second.header().setVisible(False)
         self.le_first.setDisabled(False)
@@ -150,172 +151,165 @@ class Equip_Balance_Select(QWidget, EquipmentBalanceSelectUI):
             查询实力结果
     '''
     def slotSelectedResult(self):
-        self.currentCheckedUnitList = []
         self.currentCheckedEquipList = []
-        for unitID, unitItem in self.first_treeWidget_dict.items():
-            if unitItem.checkState(0) == Qt.Checked:
-                self.currentCheckedUnitList.append(unitID)
-
         for equipID, equipItem in self.second_treeWidget_dict.items():
             if equipItem.checkState(0) == Qt.Checked:
                 self.currentCheckedEquipList.append(equipID)
         #初始化单位和装备目录
-        self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList, self.currentYear)
+        self._initTableWidgetByUnitListAndEquipList(self.currentCheckedEquipList, self.currentYear)
 
     # 初始化tableWidget
-    def _initTableWidgetByUnitListAndEquipList(self, UnitList, EquipList, year):
+    def _initTableWidgetByUnitListAndEquipList(self, EquipList, year):
         self.tb_result.clear()
         self._initTableHeader()
         self.tb_result.setRowCount(3)
-        self.unitList = UnitList
         self.equipList = EquipList
         self.currentInquiryResult.clear()
-        self.lenOfColumn = 67
+        self.lenOfColumn = 66
         self.tb_result.setColumnCount(self.lenOfColumn)
+        resultList = getResultByYearAndEquip(year,self.equipList)
+        print(resultList)
+        if resultList is not None and len(resultList) is not 0:
+            self.tb_result.setRowCount(len(resultList) + 3)
+            for row in range(len(resultList)):
+                print(row)
 
-        resultList = getResultByYear(year)
-        self.tb_result.setRowCount(len(resultList) + 3)
-
-        if len(resultList) is not 0:
-            for row in range(resultList):
-                for column in range(self.lenOfColumn):
-                    self.tb_result.setItem(row + 3,column,
-                                           QTableWidgetItem(resultList[row]['Equip_Name']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['original_authorized_value']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['authorized_value']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['authorized_value_change']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['original_value']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['issue_new_product']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['issue_inferior_product']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['issue_need_repaired']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['issue_need_retire']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['report_new_product']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['report_inferior_product']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['report_need_repaired']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['report_need_retire']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['change_value']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['existing_value']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['increase_count']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['increase_superior_supplement']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['increase_model_change']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['increase_missing_reports']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['increase_self_purchase']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['increase_transfer_in']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['increase_other']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['reduce_count']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['reduce_model_change']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['reduce_callout']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['reduce_train_consumption']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['reduce_restatement']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['reduce_retire']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['reduce_scrap']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['reduce_other']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['unmatched_value']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['uncutdown_value']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['count']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['new_product']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['original_authorized_value']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['need_repaired']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['need_retire']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['unprepared_value']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['un_cutdown_value']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['authorized_rate']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['matched_rate']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['prepared_rate']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['intact_rate']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['never_repair']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['once']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['twice']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['three_times']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['More_than_three']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['bBefore1970']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['between1971and1975']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['between1976and1980']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['between1981and1985']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['between1986and1990']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['between1991and1995']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['between1996and2000']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['between2001and2005']))
-                    self.tb_result.setItem(row + 3, column,
-                                           QTableWidgetItem(resultList[row]['after2006']))
+                print(resultList[row]['Equip_Name'])
+                self.tb_result.setItem(row + 3, 0,
+                                       QTableWidgetItem(resultList[row]['Equip_Name']))
+                self.tb_result.setItem(row + 3,  1,
+                                       QTableWidgetItem(resultList[row]['original_authorized_value']))
+                self.tb_result.setItem(row + 3,  2,
+                                       QTableWidgetItem(resultList[row]['authorized_value']))
+                self.tb_result.setItem(row + 3,  3,
+                                       QTableWidgetItem(resultList[row]['authorized_value_change']))
+                self.tb_result.setItem(row + 3,  4,
+                                       QTableWidgetItem(resultList[row]['original_value']))
+                self.tb_result.setItem(row + 3,  5,
+                                       QTableWidgetItem(resultList[row]['issue_new_product']))
+                self.tb_result.setItem(row + 3,  6,
+                                       QTableWidgetItem(resultList[row]['issue_inferior_product']))
+                self.tb_result.setItem(row + 3,  7,
+                                       QTableWidgetItem(resultList[row]['issue_need_repaired']))
+                self.tb_result.setItem(row + 3,  8,
+                                       QTableWidgetItem(resultList[row]['issue_need_retire']))
+                self.tb_result.setItem(row + 3, 9,
+                                       QTableWidgetItem(resultList[row]['report_new_product']))
+                self.tb_result.setItem(row + 3, 10,
+                                       QTableWidgetItem(resultList[row]['report_inferior_product']))
+                self.tb_result.setItem(row + 3, 11,
+                                       QTableWidgetItem(resultList[row]['report_need_repaired']))
+                self.tb_result.setItem(row + 3, 12,
+                                       QTableWidgetItem(resultList[row]['report_need_retire']))
+                self.tb_result.setItem(row + 3, 13,
+                                       QTableWidgetItem(resultList[row]['change_value']))
+                self.tb_result.setItem(row + 3, 14,
+                                       QTableWidgetItem(resultList[row]['existing_value']))
+                self.tb_result.setItem(row + 3, 15,
+                                       QTableWidgetItem(resultList[row]['increase_count']))
+                self.tb_result.setItem(row + 3, 16,
+                                       QTableWidgetItem(resultList[row]['increase_superior_supplement']))
+                self.tb_result.setItem(row + 3, 17,
+                                       QTableWidgetItem(resultList[row]['increase_model_change']))
+                self.tb_result.setItem(row + 3, 18,
+                                       QTableWidgetItem(resultList[row]['increase_missing_reports']))
+                self.tb_result.setItem(row + 3, 19,
+                                       QTableWidgetItem(resultList[row]['increase_self_purchase']))
+                self.tb_result.setItem(row + 3, 20,
+                                       QTableWidgetItem(resultList[row]['increase_transfer_in']))
+                self.tb_result.setItem(row + 3, 21,
+                                       QTableWidgetItem(resultList[row]['increase_other']))
+                self.tb_result.setItem(row + 3, 22,
+                                       QTableWidgetItem(resultList[row]['reduce_count']))
+                self.tb_result.setItem(row + 3, 23,
+                                       QTableWidgetItem(resultList[row]['reduce_model_change']))
+                self.tb_result.setItem(row + 3, 24,
+                                       QTableWidgetItem(resultList[row]['reduce_callout']))
+                self.tb_result.setItem(row + 3, 25,
+                                       QTableWidgetItem(resultList[row]['reduce_train_consumption']))
+                self.tb_result.setItem(row + 3, 26,
+                                       QTableWidgetItem(resultList[row]['reduce_restatement']))
+                self.tb_result.setItem(row + 3, 27,
+                                       QTableWidgetItem(resultList[row]['reduce_retire']))
+                self.tb_result.setItem(row + 3, 28,
+                                       QTableWidgetItem(resultList[row]['reduce_scrap']))
+                self.tb_result.setItem(row + 3, 29,
+                                       QTableWidgetItem(resultList[row]['reduce_other']))
+                self.tb_result.setItem(row + 3, 30,
+                                       QTableWidgetItem(resultList[row]['unprepared_value']))
+                self.tb_result.setItem(row + 3, 31,
+                                       QTableWidgetItem(resultList[row]['unmatched_value']))
+                self.tb_result.setItem(row + 3, 32,
+                                       QTableWidgetItem(resultList[row]['uncutdown_value']))
+                self.tb_result.setItem(row + 3, 33,
+                                       QTableWidgetItem(resultList[row]['carry_count']))
+                self.tb_result.setItem(row + 3, 34,
+                                       QTableWidgetItem(resultList[row]['carry_new_product']))
+                self.tb_result.setItem(row + 3, 35,
+                                       QTableWidgetItem(resultList[row]['carry_inferior_product']))
+                self.tb_result.setItem(row + 3, 36,
+                                       QTableWidgetItem(resultList[row]['carry_need_repaired']))
+                self.tb_result.setItem(row + 3, 37,
+                                       QTableWidgetItem(resultList[row]['carry_need_retire']))
+                self.tb_result.setItem(row + 3, 38,
+                                       QTableWidgetItem(resultList[row]['carry_unprepared_value']))
+                self.tb_result.setItem(row + 3, 39,
+                                       QTableWidgetItem(resultList[row]['carryUn_cutdown_value']))
+                self.tb_result.setItem(row + 3, 40,
+                                       QTableWidgetItem(resultList[row]['stock_count']))
+                self.tb_result.setItem(row + 3, 41,
+                                       QTableWidgetItem(resultList[row]['stock_new_product']))
+                self.tb_result.setItem(row + 3, 42,
+                                       QTableWidgetItem(resultList[row]['stock_inferior_product']))
+                self.tb_result.setItem(row + 3, 43,
+                                       QTableWidgetItem(resultList[row]['stock_need_repaired']))
+                self.tb_result.setItem(row + 3, 44,
+                                       QTableWidgetItem(resultList[row]['stock_need_retire']))
+                self.tb_result.setItem(row + 3, 45,
+                                       QTableWidgetItem(resultList[row]['stock_unprepared_value']))
+                self.tb_result.setItem(row + 3, 46,
+                                       QTableWidgetItem(resultList[row]['stockUn_cutdown_value']))
+                self.tb_result.setItem(row + 3, 47,
+                                       QTableWidgetItem(resultList[row]['authorized_rate']))
+                self.tb_result.setItem(row + 3, 48,
+                                       QTableWidgetItem(resultList[row]['matched_rate']))
+                self.tb_result.setItem(row + 3, 49,
+                                       QTableWidgetItem(resultList[row]['instock_rate']))
+                self.tb_result.setItem(row + 3, 50,
+                                       QTableWidgetItem(resultList[row]['prepared_rate']))
+                self.tb_result.setItem(row + 3, 51,
+                                       QTableWidgetItem(resultList[row]['intact_rate']))
+                self.tb_result.setItem(row + 3, 52,
+                                       QTableWidgetItem(resultList[row]['never_repair']))
+                self.tb_result.setItem(row + 3, 53,
+                                       QTableWidgetItem(resultList[row]['once']))
+                self.tb_result.setItem(row + 3, 54,
+                                       QTableWidgetItem(resultList[row]['twice']))
+                self.tb_result.setItem(row + 3, 55,
+                                       QTableWidgetItem(resultList[row]['three_times']))
+                self.tb_result.setItem(row + 3, 56,
+                                       QTableWidgetItem(resultList[row]['More_than_three']))
+                self.tb_result.setItem(row + 3, 57,
+                                       QTableWidgetItem(resultList[row]['before1970']))
+                self.tb_result.setItem(row + 3, 58,
+                                       QTableWidgetItem(resultList[row]['between1971and1975']))
+                self.tb_result.setItem(row + 3, 59,
+                                       QTableWidgetItem(resultList[row]['between1976and1980']))
+                self.tb_result.setItem(row + 3, 60,
+                                       QTableWidgetItem(resultList[row]['between1981and1985']))
+                self.tb_result.setItem(row + 3, 61,
+                                       QTableWidgetItem(resultList[row]['between1986and1990']))
+                self.tb_result.setItem(row + 3, 62,
+                                       QTableWidgetItem(resultList[row]['between1991and1995']))
+                self.tb_result.setItem(row + 3, 63,
+                                       QTableWidgetItem(resultList[row]['between1996and2000']))
+                self.tb_result.setItem(row + 3, 64,
+                                       QTableWidgetItem(resultList[row]['between2001and2005']))
+                self.tb_result.setItem(row + 3, 65,
+                                       QTableWidgetItem(resultList[row]['after2006']))
         else:
             pass
 
-
-
-    '''
-        初始化单位目录
-    '''
-
-    def _initUnitTreeWidget(self, root, mother):
-        if root == '':
-            result = selectUnitInfoByDeptUper('')
-        else:
-            result = selectUnitInfoByDeptUper(root)
-
-        # rowData: (单位编号，单位名称，上级单位编号)
-        for rowData in result:
-            item = QTreeWidgetItem(mother)
-            item.setText(0, rowData[1])
-            item.setCheckState(0, Qt.Unchecked)
-            self.first_treeWidget_dict[rowData[0]] = item
-            if rowData[0] != '':
-                self._initUnitTreeWidget(rowData[0], item)
 
     '''
         功能：
@@ -491,153 +485,139 @@ class Equip_Balance_Select(QWidget, EquipmentBalanceSelectUI):
         self.tb_result.setItem(0, 31, item)
         self.tb_result.setSpan(0, 31, 3, 1)
 
-        item = QTableWidgetItem("未到位数")
+        item = QTableWidgetItem("未削减数")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.tb_result.setItem(0, 32, item)
         self.tb_result.setSpan(0, 32, 3, 1)
 
-        item = QTableWidgetItem("未配套数")
-        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tb_result.setItem(0, 33, item)
-        self.tb_result.setSpan(0, 33, 3, 1)
-
         item = QTableWidgetItem("携带数")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tb_result.setItem(0, 34, item)
-        self.tb_result.setSpan(0, 34, 2, 7)
+        self.tb_result.setItem(0, 33, item)
+        self.tb_result.setSpan(0, 33, 2, 7)
 
         item = QTableWidgetItem("合计")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tb_result.setItem(2, 34, item)
+        self.tb_result.setItem(2, 33, item)
         item = QTableWidgetItem("携带新品数")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tb_result.setItem(2, 35, item)
+        self.tb_result.setItem(2, 34, item)
         item = QTableWidgetItem("携带堪品数")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tb_result.setItem(2, 36, item)
+        self.tb_result.setItem(2, 35, item)
         item = QTableWidgetItem("携带待修数")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tb_result.setItem(2, 37, item)
+        self.tb_result.setItem(2, 36, item)
         item = QTableWidgetItem("携带退役数")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tb_result.setItem(2, 38, item)
+        self.tb_result.setItem(2, 37, item)
         item = QTableWidgetItem("未到位数")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tb_result.setItem(2, 39, item)
+        self.tb_result.setItem(2, 38, item)
         item = QTableWidgetItem("未削减数")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tb_result.setItem(2, 40, item)
+        self.tb_result.setItem(2, 39, item)
 
         item = QTableWidgetItem("库存")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tb_result.setItem(0, 41, item)
-        self.tb_result.setSpan(0, 41, 2, 7)
+        self.tb_result.setItem(0, 40, item)
+        self.tb_result.setSpan(0, 40, 2, 7)
 
         item = QTableWidgetItem("合计")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tb_result.setItem(2, 41, item)
+        self.tb_result.setItem(2, 40, item)
         item = QTableWidgetItem("新品")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tb_result.setItem(2, 42, item)
+        self.tb_result.setItem(2, 41, item)
         item = QTableWidgetItem("堪品")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tb_result.setItem(2, 43, item)
+        self.tb_result.setItem(2, 42, item)
         item = QTableWidgetItem("待修")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tb_result.setItem(2, 44, item)
+        self.tb_result.setItem(2, 43, item)
         item = QTableWidgetItem("带退役")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tb_result.setItem(2, 45, item)
+        self.tb_result.setItem(2, 44, item)
         item = QTableWidgetItem("未到位数")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tb_result.setItem(2, 46, item)
+        self.tb_result.setItem(2, 45, item)
         item = QTableWidgetItem("未削减数")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tb_result.setItem(2, 47, item)
+        self.tb_result.setItem(2, 46, item)
 
         item = QTableWidgetItem("管理情况")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tb_result.setItem(0, 48, item)
-        self.tb_result.setSpan(0, 48, 2, 5)
+        self.tb_result.setItem(0, 47, item)
+        self.tb_result.setSpan(0, 47, 2, 5)
 
         item = QTableWidgetItem("满编率")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tb_result.setItem(2, 48, item)
+        self.tb_result.setItem(2, 47, item)
         item = QTableWidgetItem("配套率")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tb_result.setItem(2, 49, item)
+        self.tb_result.setItem(2, 48, item)
         item = QTableWidgetItem("入库率")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tb_result.setItem(2, 50, item)
+        self.tb_result.setItem(2, 49, item)
         item = QTableWidgetItem("到位率")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tb_result.setItem(2, 51, item)
+        self.tb_result.setItem(2, 50, item)
         item = QTableWidgetItem("完好率")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tb_result.setItem(2, 52, item)
+        self.tb_result.setItem(2, 51, item)
 
         item = QTableWidgetItem("大修次数")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tb_result.setItem(0, 53, item)
-        self.tb_result.setSpan(0, 53, 2, 5)
+        self.tb_result.setItem(0, 52, item)
+        self.tb_result.setSpan(0, 52, 2, 5)
 
         item = QTableWidgetItem("未修")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tb_result.setItem(2, 53, item)
+        self.tb_result.setItem(2, 52, item)
         item = QTableWidgetItem("一次")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tb_result.setItem(2, 54, item)
+        self.tb_result.setItem(2, 53, item)
         item = QTableWidgetItem("二次")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tb_result.setItem(2, 55, item)
+        self.tb_result.setItem(2, 54, item)
         item = QTableWidgetItem("三次")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tb_result.setItem(2, 56, item)
+        self.tb_result.setItem(2, 55, item)
         item = QTableWidgetItem("三次以上")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tb_result.setItem(2, 57, item)
+        self.tb_result.setItem(2, 56, item)
 
         item = QTableWidgetItem("出场年限")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tb_result.setItem(0, 58, item)
-        self.tb_result.setSpan(0, 58, 2, 9)
-
-        item = QTableWidgetItem("三次以上")
-        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tb_result.setItem(2, 57, item)
-
-        item = QTableWidgetItem("出厂年限")
-        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tb_result.setItem(0, 58, item)
-        self.tb_result.setSpan(0, 58, 2, 9)
+        self.tb_result.setItem(0, 57, item)
+        self.tb_result.setSpan(0, 57, 2, 9)
 
         item = QTableWidgetItem("70年以前")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tb_result.setItem(2, 58, item)
+        self.tb_result.setItem(2, 57, item)
         item = QTableWidgetItem("71至75年")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tb_result.setItem(2, 59, item)
+        self.tb_result.setItem(2, 58, item)
         item = QTableWidgetItem("76至80年")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tb_result.setItem(2, 60, item)
+        self.tb_result.setItem(2, 59, item)
         item = QTableWidgetItem("81至85年")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tb_result.setItem(2, 61, item)
+        self.tb_result.setItem(2, 60, item)
         item = QTableWidgetItem("86至90年")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tb_result.setItem(2, 62, item)
+        self.tb_result.setItem(2, 61, item)
         item = QTableWidgetItem("91至95年")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tb_result.setItem(2, 63, item)
+        self.tb_result.setItem(2, 62, item)
         item = QTableWidgetItem("96至2000年")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tb_result.setItem(2, 64, item)
+        self.tb_result.setItem(2, 63, item)
         item = QTableWidgetItem("2001至2005年")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tb_result.setItem(2, 65, item)
+        self.tb_result.setItem(2, 64, item)
         item = QTableWidgetItem("2006年以后")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tb_result.setItem(2, 66, item)
+        self.tb_result.setItem(2, 65, item)
 
 
 
