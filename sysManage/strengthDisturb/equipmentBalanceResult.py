@@ -10,6 +10,10 @@ class Equip_Balance_Result(QWidget, EquipmentBalanceResult):
     def __init__(self, parent=None):
         super(Equip_Balance_Result, self).__init__(parent)
         self.setupUi(self)
+        self.first_treeWidget_dict = {}
+        self.second_treeWidget_dict = {}
+
+
 
 
 

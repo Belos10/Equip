@@ -22,12 +22,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         self.unitList = []
         self.equipList = []
         self.year = None
-
-        #tableWidget可编辑
-        #self.tw_inquiryResult.setEditTriggers(QAbstractItemView.CurrentChanged)
-
         self.result = []
-
         #信号和槽连接
         self.signalConnect()
 
