@@ -350,6 +350,7 @@ def addDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper):
     conn.commit()
     disconnectMySql(conn, cur)
 
+
 #往装备表equip中插入一条数据
 def addDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type):
     conn, cur = connectMySql()
@@ -969,6 +970,110 @@ def seletNumAboutStrength(Unit_ID, Equip_ID, year):
     for nowNumInfo in nowNumTuple:
         return nowNumInfo[0], nowNumInfo[1]
 
+#通过单位号和装备号查找strength某条记录的编制数
+def seletNumAboutWork(Unit_ID, Equip_ID, year):
+    conn, cur = connectMySql()
+    sql = "select Work from weave where Equip_ID = '" + Equip_ID + "' and Unit_ID = '" + Unit_ID + "' and year = '" + year + "'"
+    cur.execute(sql)
+    nowNumTuple = cur.fetchall()
+    disconnectMySql(conn, cur)
+
+    if nowNumTuple:
+        for nowNumInfo in nowNumTuple:
+            return nowNumInfo[0]
+    else:
+        return "0"
+
+#删除某条录入信息
+def delFromInputInfo(Unit_ID, Equip_ID, ID, num, year):
+    conn, cur = connectMySql()
+    EquipIDList = []
+    UnitIDList = []
+    delNum = int(num)
+    findUnitUperIDList(Unit_ID, UnitIDList)
+    findEquipUperIDList(Equip_ID, EquipIDList)
+
+    for UnitID in UnitIDList:
+        for EquipID in EquipIDList:
+            strengthYearNum, nowYearNum = seletNumAboutStrength(UnitID, EquipID, year)
+            changeYearNowNum = int(nowYearNum) - delNum
+            changeYearErrorNum = int(strengthYearNum) - changeYearNowNum
+            strengthAllNum, nowAllNum = seletNumAboutStrength(UnitID, EquipID, '')
+            changeAllNowNum = int(nowAllNum) - delNum
+            changeAllErrorNum = int(strengthAllNum) - changeAllNowNum
+            sql = "Update strength set Now = '" + str(changeYearNowNum) + "', Error = '" + str(
+                changeYearErrorNum) + "' where Equip_ID = '" + \
+                  EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + year + "'"
+
+            cur.execute(sql)
+
+            sql = "Update weave set Now = '" + str(changeYearNowNum) + "' where Equip_ID = '" + \
+                  EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + year + "'"
+
+            cur.execute(sql)
+            sql = "update strength set Now = '" + str(changeAllNowNum) + "', Error = '" + str(
+                changeAllErrorNum) + "' where Unit_ID = '" \
+                  + UnitID + "' and Equip_ID = '" + EquipID + "' and year = ''"
+            # print(sql)
+            cur.execute(sql)
+
+            sql = "update weave set Now = '" + str(changeAllNowNum) + "' where Unit_ID = '" \
+                  + UnitID + "' and Equip_ID = '" + EquipID + "' and year = ''"
+            # print(sql)
+            cur.execute(sql)
+    sql = "delete from inputinfo where Unit_ID = '" + Unit_ID + "' and Equip_ID = '" +\
+          Equip_ID + "' and ID = '" + ID + "' and year = '" + year + "' and ID = '" + ID + "'"
+    cur.execute(sql)
+    # print(sql)
+    cur.execute(sql)
+    conn.commit()
+    disconnectMySql(conn, cur)
+
+#修改批量录入某条数据的数量
+def updateNumMutilInput(Unit_ID, Equip_ID, ID, num, orginNum, year):
+    conn, cur = connectMySql()
+    EquipIDList = []
+    UnitIDList = []
+    updateNum = int(num)
+    findUnitUperIDList(Unit_ID, UnitIDList)
+    findEquipUperIDList(Equip_ID, EquipIDList)
+
+    for UnitID in UnitIDList:
+        for EquipID in EquipIDList:
+            strengthYearNum, nowYearNum = seletNumAboutStrength(UnitID, EquipID, year)
+            changeYearNowNum = int(nowYearNum) - int(orginNum) + updateNum
+            changeYearErrorNum = int(strengthYearNum) - changeYearNowNum
+            strengthAllNum, nowAllNum = seletNumAboutStrength(UnitID, EquipID, '')
+            changeAllNowNum = int(nowAllNum) - int(orginNum) + updateNum
+            changeAllErrorNum = int(strengthAllNum) - changeAllNowNum
+            sql = "Update strength set Now = '" + str(changeYearNowNum) + "', Error = '" + str(
+                changeYearErrorNum) + "' where Equip_ID = '" + \
+                  EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + year + "'"
+
+            cur.execute(sql)
+
+            sql = "Update weave set Now = '" + str(changeYearNowNum) + "' where Equip_ID = '" + \
+                  EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + year + "'"
+
+            cur.execute(sql)
+            sql = "update strength set Now = '" + str(changeAllNowNum) + "', Error = '" + str(
+                changeAllErrorNum) + "' where Unit_ID = '" \
+                  + UnitID + "' and Equip_ID = '" + EquipID + "' and year = ''"
+            # print(sql)
+            cur.execute(sql)
+
+            sql = "update weave set Now = '" + str(changeAllNowNum) + "' where Unit_ID = '" \
+                  + UnitID + "' and Equip_ID = '" + EquipID + "' and year = ''"
+            # print(sql)
+            cur.execute(sql)
+    sql = "update inputinfo set num = '" + num + "' where Unit_ID = '" + Unit_ID + \
+          "' and Equip_ID = '" + Equip_ID + "' and ID = '" + ID + "' and year = '" + year + "'"
+    cur.execute(sql)
+    # print(sql)
+    cur.execute(sql)
+    conn.commit()
+    disconnectMySql(conn, cur)
+
 #往录入表inputinfo中插入一条数据
 def addDataIntoInputInfo(Unit_ID, Equip_ID, ID, num, year, shop, state, arrive, confirm, other):
     conn, cur = connectMySql()
@@ -1024,6 +1129,67 @@ def selectNowNumAndStrengthNum(Unit_ID, Equip_ID):
     for resultInfo in result:
         return resultInfo[0], resultInfo[1]
 
+#修改当前编制数
+def updateWeaveNum(Unit_ID, Equip_ID, weaveNum, orginWeave, year):
+    print("weavechange:", Unit_ID, Equip_ID, weaveNum, orginWeave, year)
+    conn, cur = connectMySql()
+    if selectIsPublicEquip(Unit_ID):
+        Group_ID = selectEquipIDByPublicEquip(Unit_ID)
+        UnitIDList = []
+        UnitIDList.append(Unit_ID)
+        EquipIDList = []
+        findUnitUperIDList(Group_ID, UnitIDList)
+        findEquipUperIDList(Equip_ID, EquipIDList)
+        print("unit and equip:", UnitIDList, EquipIDList)
+        for UnitID in UnitIDList:
+            for EquipID in EquipIDList:
+                orginYearWorkNum = seletNumAboutWork(UnitID, EquipID, year)  # 获取原有的实力数以及现有数
+                print("orginYearWorkNum:", orginYearWorkNum)
+                changeYearStrengthNum = int(orginYearWorkNum) - int(orginWeave) + int(weaveNum)
+                orginAllWorkNum = seletNumAboutWork(UnitID, EquipID, '')
+                changeAllStrengthNum = int(orginAllWorkNum) - int(orginWeave) + int(weaveNum)
+                sql = "Update strength set Work = '" + str(changeYearStrengthNum) + "' where Equip_ID = '" + \
+                      EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + year + "'"
+                cur.execute(sql)
+
+                sql = "Update weave set Work = '" + str(changeYearStrengthNum) + "' where Equip_ID = '" + \
+                      EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + year + "'"
+                cur.execute(sql)
+                sql = "update strength set Work = '" + str(changeAllStrengthNum) + "' where Unit_ID = '" \
+                      + UnitID + "' and Equip_ID = '" + EquipID + "' and year = ''"
+                cur.execute(sql)
+                sql = "update weave set Work = '" + str(changeAllStrengthNum) + "' where Unit_ID = '" \
+                      + UnitID + "' and Equip_ID = '" + EquipID + "' and year = ''"
+                cur.execute(sql)
+    else:
+        EquipIDList = []
+        UnitIDList = []
+        findUnitUperIDList(Unit_ID, UnitIDList)
+        findEquipUperIDList(Equip_ID, EquipIDList)
+        print("unit and equip:", UnitIDList, EquipIDList)
+        for UnitID in UnitIDList:
+            for EquipID in EquipIDList:
+                orginYearWorkNum = seletNumAboutWork(UnitID, EquipID, year)  # 获取原有的实力数以及现有数
+                changeYearStrengthNum = int(orginYearWorkNum) - int(orginWeave) + int(weaveNum)
+                orginAllWorkNum = seletNumAboutWork(UnitID, EquipID, '')
+                changeAllStrengthNum = int(orginAllWorkNum) - int(orginWeave) + int(weaveNum)
+                sql = "Update strength set Work = '" + str(changeYearStrengthNum) + "' where Equip_ID = '" + \
+                      EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + year + "'"
+                cur.execute(sql)
+
+                sql = "Update weave set Work = '" + str(changeYearStrengthNum) + "' where Equip_ID = '" + \
+                      EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + year + "'"
+                cur.execute(sql)
+                sql = "update strength set Work = '" + str(changeAllStrengthNum) + "' where Unit_ID = '" \
+                      + UnitID + "' and Equip_ID = '" + EquipID + "' and year = ''"
+                cur.execute(sql)
+                sql = "update weave set Work = '" + str(changeAllStrengthNum) + "' where Unit_ID = '" \
+                      + UnitID + "' and Equip_ID = '" + EquipID + "' and year = ''"
+                cur.execute(sql)
+
+    conn.commit()
+    disconnectMySql(conn, cur)
+
 #根据单位号，装备号修改某年的实力数，strengthNum为修改后的实力数，orginStrengthNum为原来的实力数
 def updateStrengthAboutStrengrh(Unit_ID, Equip_ID, year, strengthNum, orginStrengthNum):
     conn, cur = connectMySql()
@@ -1047,8 +1213,7 @@ def updateStrengthAboutStrengrh(Unit_ID, Equip_ID, year, strengthNum, orginStren
 
             cur.execute(sql)
 
-            sql = "Update weave set Strength = '" + str(changeYearStrengthNum) + "', Error = '" + str(
-                changeYearErrorNum) + "' where Equip_ID = '" + \
+            sql = "Update weave set Strength = '" + str(changeYearStrengthNum) + "' where Equip_ID = '" + \
                   EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + year + "'"
 
             cur.execute(sql)
@@ -1056,8 +1221,7 @@ def updateStrengthAboutStrengrh(Unit_ID, Equip_ID, year, strengthNum, orginStren
                 changeAllErrorNum) + "' where Unit_ID = '" \
                   + UnitID + "' and Equip_ID = '" + EquipID + "' and year = ''"
             cur.execute(sql)
-            sql = "update weave set Strength = '" + str(changeAllStrengthNum) + "', Error = '" + str(
-                changeAllErrorNum) + "' where Unit_ID = '" \
+            sql = "update weave set Strength = '" + str(changeAllStrengthNum) + "' where Unit_ID = '" \
                   + UnitID + "' and Equip_ID = '" + EquipID + "' and year = ''"
             cur.execute(sql)
 
@@ -1196,6 +1360,18 @@ def selectEquipIDByPublicEquip(Equip_ID):
         return result[0][0]
     else:
         return "0"
+
+#修改录入信息表的某个信息
+def updateInputInfo(Unit_ID, Equip_ID, ID, num, year, shop, state, arrive, confirm, other):
+    conn, cur = connectMySql()
+    sql = "update inputinfo set year = '" + year + "', shop = '" + shop + "', state = '" \
+          + state + "', arrive = '" + arrive + "', confirm = '" + confirm + "', other = '" + other + \
+          "' where Unit_ID = '" + Unit_ID + "' and Equip_ID = '" + Equip_ID + "' and ID = '" + ID + "'"
+    print(sql)
+    cur.execute(sql)
+    conn.commit()
+    return
+
 
 if __name__ == '__main__':
     pass

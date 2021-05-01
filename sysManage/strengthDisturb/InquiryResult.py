@@ -2,7 +2,7 @@ import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QTableWidgetItem, QAbstractItemView, QMessageBox
 from widgets.strengthDisturb.inquiry_result import Widget_Inquiry_Result
 from database.strengthDisturbSql import selectAboutStrengthByUnitListAndEquipList, selectUnitIsHaveChild, selectEquipIsHaveChild,\
-    selectAboutStrengthByEquipShow,selectAboutStrengthByUnitShow, updateStrengthAboutStrengrh
+    selectAboutStrengthByEquipShow,selectAboutStrengthByUnitShow, updateStrengthAboutStrengrh,updateStrengthAboutStrengrh
 from PyQt5.Qt import Qt
 import  EmptyDelegate
 #new
@@ -49,6 +49,12 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
 
         #当只列存在偏差被点击时
         self.cb_showDistence.clicked.connect(self.slotClickedRB)
+
+        #删除当前装备
+        self.pb_clearCheck.clicked.connect(self.slotClearCurrentRow)
+
+        #清除当前页面全部装备实力数
+        self.pb_clearAll.clicked.connect(self.slotClearCurrentPage)
     '''
         信号和槽连接断开
     '''
@@ -62,7 +68,52 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
     def slotChangeCheckState(self):
         pass
 
+    def slotClearCurrentPage(self):
+        if self.year == '全部':
+            reply = QMessageBox.question(self, '清除', '只能某一年，清除失败', QMessageBox.Yes)
+            return
+        reply = QMessageBox.question(self, '清除', '是否清除当前页面所有行的实力数？', QMessageBox.Yes, QMessageBox.Cancel)
+        if reply == QMessageBox.Cancel:
+            return
 
+        for i, resultInfo in self.currentInquiryResult.items():
+            Unit_ID = resultInfo[1]
+            Equip_ID = resultInfo[0]
+            orginNum = resultInfo[4]
+            year = resultInfo[15]
+            unitHaveChild = selectUnitIsHaveChild(Unit_ID)
+            equipHaveChild = selectEquipIsHaveChild(Equip_ID)
+            if unitHaveChild or equipHaveChild:
+                reply = QMessageBox.question(self, '清除', '第' + str(i) + "行清除失败，只能清除末级单位和装备实力数", QMessageBox.Yes)
+                continue
+            else:
+
+                updateStrengthAboutStrengrh(Unit_ID, Equip_ID, year, "0", orginNum)
+                self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
+
+    def slotClearCurrentRow(self):
+        currentRow = self.tw_inquiryResult.currentRow()
+        if currentRow < 0:
+            return
+        else:
+            for i, resultInfo in self.currentInquiryResult.items():
+                if i == currentRow:
+                    Unit_ID = resultInfo[1]
+                    Equip_ID = resultInfo[0]
+                    orginNum = resultInfo[4]
+                    year = resultInfo[15]
+                    unitHaveChild = selectUnitIsHaveChild(Unit_ID)
+                    equipHaveChild = selectEquipIsHaveChild(Equip_ID)
+                    if unitHaveChild or equipHaveChild:
+                        reply = QMessageBox.question(self, '清除', '只能清除末级单位和装备的实力数', QMessageBox.Yes)
+                        return
+                    elif self.year == '全部':
+                        reply = QMessageBox.question(self, '清除', '只能某一年，清除失败', QMessageBox.Yes)
+                        return
+                    else:
+                        reply = QMessageBox.question(self, '清除', '是否清除当前行的实力数？', QMessageBox.Yes, QMessageBox.Cancel)
+                        updateStrengthAboutStrengrh(Unit_ID, Equip_ID, year, "0", orginNum)
+                        self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
     '''
         功能：
             当前表格中某个值被修改
@@ -95,6 +146,21 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                             else:
                                 self.tw_inquiryResult.item(currentRow, currentColumn).setText(resultInfo[4])
                         return
+        elif currentColumn == 0:
+            for i, resultInfo in self.currentInquiryResult.items():
+                if i == currentRow:
+                    print(resultInfo)
+                    self.tw_inquiryResult.item(currentRow, currentColumn).setText(resultInfo[3])
+        elif currentColumn == 1:
+            for i, resultInfo in self.currentInquiryResult.items():
+                if i == currentRow:
+                    print(resultInfo)
+                    self.tw_inquiryResult.item(currentRow, currentColumn).setText(resultInfo[2])
+        else:
+            for i, resultInfo in self.currentInquiryResult.items():
+                if i == currentRow:
+                    print(resultInfo)
+                    self.tw_inquiryResult.item(currentRow, currentColumn).setText(resultInfo[currentColumn + 2])
 
     #当某个单击按钮被选中时
     def slotClickedRB(self):

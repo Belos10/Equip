@@ -115,8 +115,6 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         # 当前单位目录被点击
         self.tw_first.itemChanged.connect(self.slotInquryStrengthResult)
 
-
-
         # 当前装备目录被点击
         self.tw_second.itemChanged.connect(self.slotInquryStrengthResult)
 
@@ -158,32 +156,59 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         orginRowNum = self.add_strenth_info.orginRowNum
         currentRowNum = self.add_strenth_info.tableWidget.rowCount()
         columnNum = self.add_strenth_info.tableWidget.columnCount()
-
+        allYear = selectAllStrengthYear()
         for i in range(currentRowNum):
             for j in range(columnNum):
                 if self.add_strenth_info.tableWidget.item(i, j).text() == '':
                     reply = QMessageBox.question(self, '保存', '数据不能为空，保存失败', QMessageBox.Yes,
                                                  QMessageBox.Cancel)
                     return
-
         if columnNum == 8:
-            # 添加新增的数据
             for i in range(currentRowNum - orginRowNum):
-                addDataIntoInputInfo(Unit_ID, Equip_ID,
-                                     self.add_strenth_info.tableWidget.item(i + orginRowNum, 0).text(),
-                                     self.add_strenth_info.tableWidget.item(i + orginRowNum, 1).text(),
-                                     self.add_strenth_info.tableWidget.item(i + orginRowNum, 2).text(),
-                                     self.add_strenth_info.tableWidget.item(i + orginRowNum, 3).text(),
-                                     self.add_strenth_info.tableWidget.item(i + orginRowNum, 4).text(),
-                                     self.add_strenth_info.tableWidget.item(i + orginRowNum, 5).text(),
-                                     self.add_strenth_info.tableWidget.item(i + orginRowNum, 6).text(),
-                                     self.add_strenth_info.tableWidget.item(i + orginRowNum, 7).text())
+                print("data:", Unit_ID, Equip_ID,
+                      self.add_strenth_info.tableWidget.item(i + orginRowNum, 0).text(),
+                      self.add_strenth_info.tableWidget.item(i + orginRowNum, 1).text(),
+                      self.add_strenth_info.tableWidget.item(i + orginRowNum, 2).text(),
+                      self.add_strenth_info.tableWidget.item(i + orginRowNum, 3).text(),
+                      self.add_strenth_info.tableWidget.item(i + orginRowNum, 4).text(),
+                      self.add_strenth_info.tableWidget.item(i + orginRowNum, 5).text(),
+                      self.add_strenth_info.tableWidget.item(i + orginRowNum, 6).text(),
+                      self.add_strenth_info.tableWidget.item(i + orginRowNum, 7).text())
+                haveYear = False
+                # 添加新增的数据
+                year = self.add_strenth_info.tableWidget.item(i + orginRowNum, 2).text()
+                for y in allYear:
+                    if y == year:
+                        haveYear = True
+                if haveYear == False:
+                    print("meiyounian")
+                    reply = QMessageBox.question(self, '增加', '第' + str(i + orginRowNum + 1) + "行年份不存在，添加失败",
+                                                 QMessageBox.Yes)
+                else:
+                    addDataIntoInputInfo(Unit_ID, Equip_ID,
+                                        self.add_strenth_info.tableWidget.item(i + orginRowNum, 0).text(),
+                                        self.add_strenth_info.tableWidget.item(i + orginRowNum, 1).text(),
+                                        self.add_strenth_info.tableWidget.item(i + orginRowNum, 2).text(),
+                                        self.add_strenth_info.tableWidget.item(i + orginRowNum, 3).text(),
+                                        self.add_strenth_info.tableWidget.item(i + orginRowNum, 4).text(),
+                                        self.add_strenth_info.tableWidget.item(i + orginRowNum, 5).text(),
+                                        self.add_strenth_info.tableWidget.item(i + orginRowNum, 6).text(),
+                                        self.add_strenth_info.tableWidget.item(i + orginRowNum, 7).text())
+
             self.sw_strenSelectMan.setCurrentIndex(0)
             self.slotInquryStrengthResult()
-        else:
+        elif columnNum == 7:
             # 添加新增的数据
             for i in range(currentRowNum - orginRowNum):
-                addDataIntoInputInfo(Unit_ID, Equip_ID,
+                year = self.add_strenth_info.tableWidget.item(i + orginRowNum, 1).text()
+                for y in allYear:
+                    if y == year:
+                        haveYear = True
+                if haveYear == False:
+                    reply = QMessageBox.question(self, '增加', '第' + str(i + orginRowNum + 1) + "行年份不存在，添加失败",
+                                                 QMessageBox.Yes)
+                else:
+                    addDataIntoInputInfo(Unit_ID, Equip_ID,
                                      self.add_strenth_info.tableWidget.item(i + orginRowNum, 0).text(),
                                      "1",
                                      self.add_strenth_info.tableWidget.item(i + orginRowNum, 1).text(),
@@ -194,6 +219,8 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
                                      self.add_strenth_info.tableWidget.item(i + orginRowNum, 6).text())
             self.sw_strenSelectMan.setCurrentIndex(0)
             self.slotInquryStrengthResult()
+        self.groupBox.setDisabled(False)
+        self.groupBox_2.setDisabled(False)
 
     '''
         功能：
@@ -205,6 +232,9 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
                                      QMessageBox.Cancel)
         if reply == QMessageBox.Yes:
             self.sw_strenSelectMan.setCurrentIndex(0)
+            self.groupBox.setDisabled(False)
+            self.groupBox_2.setDisabled(False)
+            self.slotInquryStrengthResult()
         else:
             pass
 
@@ -228,6 +258,8 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
                     else:
                         self.sw_strenSelectMan.setCurrentIndex(1)
                         self.add_strenth_info._initTableWidget_(resultRowInfo, self.yearList)
+                        self.groupBox.setDisabled(True)
+                        self.groupBox_2.setDisabled(True)
                     break
         else:
             pass

@@ -10,7 +10,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-#new
+
 class Widget_Inquiry_Result(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
@@ -45,9 +45,6 @@ class Widget_Inquiry_Result(object):
         self.pb_delState = QtWidgets.QPushButton(self.widget)
         self.pb_delState.setObjectName("pb_delState")
         self.horizontalLayout_2.addWidget(self.pb_delState)
-        self.pb_save = QtWidgets.QPushButton(self.widget)
-        self.pb_save.setObjectName("pb_save")
-        self.horizontalLayout_2.addWidget(self.pb_save)
         self.pb_clearCheck = QtWidgets.QPushButton(self.widget)
         self.pb_clearCheck.setObjectName("pb_clearCheck")
         self.horizontalLayout_2.addWidget(self.pb_clearCheck)
@@ -78,6 +75,5 @@ class Widget_Inquiry_Result(object):
         self.cb_showLast.setText(_translate("Form", "展开到末级"))
         self.cb_showDistence.setText(_translate("Form", "只列存在偏差"))
         self.pb_delState.setText(_translate("Form", "删除展开状态"))
-        self.pb_save.setText(_translate("Form", "保存修改"))
         self.pb_clearCheck.setText(_translate("Form", "清除选中装备"))
         self.pb_clearAll.setText(_translate("Form", "清除全部装备"))

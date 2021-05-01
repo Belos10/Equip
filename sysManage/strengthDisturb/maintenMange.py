@@ -3,7 +3,7 @@ from widgets.strengthDisturb.maintenMange import Widget_Mainten_Manage
 from database.strengthDisturbSql import selectAllStrengthYearInfo, selectAllDataAboutUnit, \
     updateUnitIsGroupFromUnit, selectAllFromPulicEquip, selectUnitInfoByDeptUper, selectGroupIDByPublicEquip,\
     selectAllDataAboutWeaveYear, selectEquipInfoByEquipUper, selectAboutWeaveByUnitListAndEquipList, \
-    selectAboutWeaveByEquipShow, selectAboutWeaveByUnitShow
+    selectAboutWeaveByEquipShow, selectAboutWeaveByUnitShow, selectUnitIsHaveChild, selectEquipIsHaveChild, updateWeaveNum
 from PyQt5.Qt import Qt
 
 #new
@@ -48,6 +48,82 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
         # 当点击按单位展开时
         self.rb_unitShow.clicked.connect(self.slotClickedRB)
 
+        #当前查询结果要修改时
+        self.tw_result.itemChanged.connect(self.slotResultItemChange)
+
+        #清除当前选中行的编制数
+        self.pb_clearCheck.clicked.connect(self.slotClearCurrentRow)
+
+        #清除当前页面的编制数
+        self.pb_clearCheck.clicked.connect(self.slotClearAllRow)
+
+    def slotResultItemChange(self):
+        self.currentRow = self.tw_result.currentRow()
+        self.currentColumn = self.tw_result.currentColumn()
+
+        if self.currentColumn == 3:
+            for i, resultRowInfo in self.currentInquiryResult.items():
+                if i == self.currentRow:
+                    unitHaveChild = selectUnitIsHaveChild(resultRowInfo[0])
+                    equipHaveChild = selectEquipIsHaveChild(resultRowInfo[1])
+                    if unitHaveChild or equipHaveChild:
+                        reply = QMessageBox.question(self, '录入', '该单位或装备不是末级，无法修改', QMessageBox.Yes)
+                        self.tw_result.item(self.currentRow, 3).setText(resultRowInfo[5])
+                    else:
+                        reply = QMessageBox.question(self, '修改', '是否修改当前装备、单位的编制数?', QMessageBox.Yes, QMessageBox.Cancel)
+                        if reply == QMessageBox.Yes:
+                            updateWeaveNum(resultRowInfo[0], resultRowInfo[1], self.tw_result.item(self.currentRow, 3).text(), resultRowInfo[5], self.year)
+                        else:
+                            self.tw_result.item(self.currentRow, 3).setText(resultRowInfo[5])
+                    break
+        else:
+            pass
+
+    def slotClearAllRow(self):
+        if self.year == '全部':
+            reply = QMessageBox.question(self, '清除', '只能某一年，清除失败', QMessageBox.Yes)
+            return
+        reply = QMessageBox.question(self, '清除', '是否清除当前页面所有行的编制数？', QMessageBox.Yes, QMessageBox.Cancel)
+        if reply == QMessageBox.Cancel:
+            return
+
+        for i, resultInfo in self.currentInquiryResult.items():
+            Unit_ID = resultInfo[0]
+            Equip_ID = resultInfo[1]
+            orginNum = resultInfo[5]
+            year = resultInfo[7]
+            unitHaveChild = selectUnitIsHaveChild(Unit_ID)
+            equipHaveChild = selectEquipIsHaveChild(Equip_ID)
+            if unitHaveChild or equipHaveChild:
+                reply = QMessageBox.question(self, '清除', '第' + str(i) + "行清除失败，只能清除末级单位和装备编制数", QMessageBox.Yes)
+                continue
+            else:
+                updateWeaveNum(Unit_ID, Equip_ID, year, "0", orginNum)
+                self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
+
+    def slotClearCurrentRow(self):
+        currentRow = self.tw_result.currentRow()
+        if currentRow < 0:
+            return
+        else:
+            for i, resultInfo in self.currentInquiryResult.items():
+                if i == currentRow:
+                    Unit_ID = resultInfo[0]
+                    Equip_ID = resultInfo[1]
+                    orginNum = resultInfo[5]
+                    year = resultInfo[7]
+                    unitHaveChild = selectUnitIsHaveChild(Unit_ID)
+                    equipHaveChild = selectEquipIsHaveChild(Equip_ID)
+                    if unitHaveChild or equipHaveChild:
+                        reply = QMessageBox.question(self, '清除', '只能清除末级单位和装备的编制数', QMessageBox.Yes)
+                        return
+                    elif self.year == '全部':
+                        reply = QMessageBox.question(self, '清除', '只能某一年，清除失败', QMessageBox.Yes)
+                        return
+                    else:
+                        reply = QMessageBox.question(self, '清除', '是否清除当前行的编制数？', QMessageBox.Yes, QMessageBox.Cancel)
+                        updateWeaveNum(Unit_ID, Equip_ID, "0", orginNum, year)
+                        self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
     def slotClickedRB(self):
         self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
 
@@ -122,13 +198,16 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.tw_result.setItem(i, 0, item)
             item = QTableWidgetItem(LineInfo[3])
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.tw_result.setItem(i, 1, item)
             item = QTableWidgetItem(LineInfo[4])
             self.tw_result.setItem(i, 2, item)
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             item = QTableWidgetItem(LineInfo[5])
             self.tw_result.setItem(i, 3, item)
             item = QTableWidgetItem(LineInfo[6])
             self.tw_result.setItem(i, 4, item)
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.currentInquiryResult[i] = LineInfo
             i = i + 1
 
@@ -185,7 +264,7 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
         self.currentYearListItem = {}
         self.yearList = ['全部']
         self.lw_year.clear()
-        allyearList = selectAllDataAboutWeaveYear()
+        allyearList = selectAllStrengthYearInfo()
 
         for year in allyearList:
             self.yearList.append(year[1])
