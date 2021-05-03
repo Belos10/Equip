@@ -6,7 +6,9 @@ from database.strengthDisturbSql import selectAllStrengthYearInfo, selectAllData
     selectAboutWeaveByEquipShow, selectAboutWeaveByUnitShow, selectUnitIsHaveChild, selectEquipIsHaveChild, updateWeaveNum
 from PyQt5.Qt import Qt
 
-#new
+'''
+   编制数维护
+'''
 class maintenManage(QWidget, Widget_Mainten_Manage):
     def __init__(self, parent=None):
         super(maintenManage, self).__init__(parent)
@@ -20,6 +22,7 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
         self._initAll_()
         self.signalConnect()
 
+    #初始化编制数维护界面
     def _initAll_(self):
         self.first_treeWidget_dict = {}
         self.tw_first.clear()
@@ -32,6 +35,7 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
         self.equipList = []
         self.year = '全部'
 
+    #信号连接
     def signalConnect(self):
         # 点击某个年份后显示单位和装备目录
         self.lw_year.clicked.connect(self.slotClickedInqury)
@@ -57,6 +61,11 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
         #清除当前页面的编制数
         self.pb_clearCheck.clicked.connect(self.slotClearAllRow)
 
+        #当点击展开到末级的时候
+        self.cb_showLast.clicked.connect(self.slotClickedRB)
+
+
+    #当前结果的值被修改
     def slotResultItemChange(self):
         self.currentRow = self.tw_result.currentRow()
         self.currentColumn = self.tw_result.currentColumn()
@@ -79,6 +88,7 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
         else:
             pass
 
+    #清除当前页面的所有编制数
     def slotClearAllRow(self):
         if self.year == '全部':
             reply = QMessageBox.question(self, '清除', '只能某一年，清除失败', QMessageBox.Yes)
@@ -101,6 +111,7 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
                 updateWeaveNum(Unit_ID, Equip_ID, year, "0", orginNum)
                 self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
 
+    #清除当前行的编制数
     def slotClearCurrentRow(self):
         currentRow = self.tw_result.currentRow()
         if currentRow < 0:
@@ -124,14 +135,15 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
                         reply = QMessageBox.question(self, '清除', '是否清除当前行的编制数？', QMessageBox.Yes, QMessageBox.Cancel)
                         updateWeaveNum(Unit_ID, Equip_ID, "0", orginNum, year)
                         self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
+
+    #当选择按单位展开或按装备展开或展开到末级按钮时
     def slotClickedRB(self):
         self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
 
     '''
            功能：
                点击查询按钮时，设置当前可选项和不可选项，并初始化装备和单位目录
-       '''
-
+    '''
     def slotClickedInqury(self):
         self.first_treeWidget_dict = {}
         self.second_treeWidget_dict = {}
@@ -150,6 +162,7 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
         self._initUnitTreeWidget("", self.tw_first)
         self._initEquipTreeWidget("", self.tw_second)
 
+    #查看当前被选中的单位和装备并初试化
     def slotInquryStrengthResult(self):
         self.currentCheckedUnitList = []
         self.currentCheckedEquipList = []
@@ -181,10 +194,18 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
             self.resultList = selectAboutWeaveByUnitListAndEquipList(UnitList, EquipList, year)
 
         if self.cb_showLast.isChecked():
-            pass
-            #resultListEquip = selectAboutStrengthByEquipShow(UnitList, EquipList, year)
-            #resultListUnit = selectAboutStrengthByUnitShow(UnitList, EquipList, year)
-            #resultList = resultListEquip + resultListUnit
+            self.resultListEquip = selectAboutWeaveByEquipShow(UnitList, EquipList, year)
+            self.resultListUnit = selectAboutWeaveByUnitShow(UnitList, EquipList, year)
+            self.resultList = self.resultListEquip + self.resultListUnit
+            self.rb_unitShow.setCheckable(False)
+            self.rb_equipShow.setCheckable(False)
+            self.rb_equipShow.setDisabled(True)
+            self.rb_unitShow.setDisabled(True)
+        else:
+            self.rb_unitShow.setCheckable(True)
+            self.rb_equipShow.setCheckable(True)
+            self.rb_equipShow.setDisabled(False)
+            self.rb_unitShow.setDisabled(False)
 
         headerlist = ['单位名称', '装备名称', '实力数', '编制数', '现有数']
         self.tw_result.setHorizontalHeaderLabels(headerlist)
@@ -217,7 +238,6 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
             功能：
                 初始化装备目录
     '''
-
     def _initEquipTreeWidget(self, root, mother):
         if root == '':
             result = selectEquipInfoByEquipUper('')
@@ -260,6 +280,8 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
         # 初始化年份选择列表
         self._initSelectYear_()
         # self.cb_yearAll = QCheckBox(self.sa_yearChoose)
+
+    #初始化年份listwidget
     def _initSelectYear_(self):
         self.currentYearListItem = {}
         self.yearList = ['全部']
@@ -275,6 +297,7 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
             self.lw_year.addItem(item)
             self.currentYearListItem[year[1]] = item
 
+    #初始化单位目录
     def _initUnitTreeWidget(self, root, mother):
         if root == '':
             result = selectUnitInfoByDeptUper('')

@@ -7,26 +7,27 @@ from database.strengthDisturbSql import selectAllEndEquip
 from sysManage.alocatMange.config import ArmyTransferReceiveUnit, ArmyTransferSendUnit
 from PyQt5.Qt import Qt
 #new
+'''
+    功能：
+        陆军调拨单管理
+'''
 class armyTransfer(QWidget, Widget_Army_Transfer):
     def __init__(self, parent=None):
         super(armyTransfer, self).__init__(parent)
         self.setupUi(self)
 
+        #设置tablewidget左侧栏以及头部不显示
         self.tw_result.horizontalHeader().setVisible(False)
         self.tw_result.verticalHeader().setVisible(False)
 
+        #初始化当前界面
         self._initSelf_()
 
+        #信号连接
         self.signalConnect()
 
+        #存储当前结果，结构为：{i（行数）：一行数据}
         self.currentResult = {}
-
-    '''
-        设置当前查询结果见面为灰
-    '''
-    def _initSelf_(self):
-        self.groupBox_2.setDisabled(True)
-        self._initYearWidget_()
 
     '''
         信号连接
@@ -46,18 +47,47 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
         self.tb_del.clicked.connect(self.slotDelCurrentYear)
 
     '''
+        关闭信号
+    '''
+    def disconnectSlot(self):
+        # 当前年份筛选列表被选中某行
+        self.lw_yearChoose.itemPressed.disconnect(self.slotSelectResult)
+        # 新增一行空白行
+        self.pb_add.clicked.disconnect(self.addNewRow)
+        # 新增一个年份
+        self.tb_add.clicked.disconnect(self.slotAddNewYear)
+        # 保存新增的数据
+        self.pb_save.clicked.disconnect(self.slotSaveNewAdd)
+        # 删除当前行
+        self.pb_del.clicked.disconnect(self.slotDelCurrentRow)
+        # 删除某年
+        self.tb_del.clicked.disconnect(self.slotDelCurrentYear)
+
+    '''
+        初始化当前界面，设置当前查询结果界面为灰
+    '''
+    def _initSelf_(self):
+        self.groupBox_2.setDisabled(True)
+        #初始化年份listwidget
+        self._initYearWidget_()
+
+    '''
         删除当前行
+        逻辑：
+            查看当前行是否在范围内，是的话删除
     '''
     def slotDelCurrentRow(self):
         currentRow = self.tw_result.currentRow()
-        print(currentRow)
+        #print(currentRow)
         if currentRow < 2:
             reply = QMessageBox.question(self, '删除', '当前未选中某行，请选中某行删除', QMessageBox.Yes)
             return
         else:
             reply = QMessageBox.question(self, '删除', '是否删除当前行？', QMessageBox.Yes, QMessageBox.Cancel)
             if reply == QMessageBox.Yes:
+                #根据陆军调拨单的序号以及年份删除当前行
                 delArmyTransferByIDAndYear(self.tw_result.item(currentRow, 0).text(), self.currentYear)
+                #删除后重新显示结果界面
                 self.slotSelectResult()
             else:
                 return
@@ -69,7 +99,7 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
         currentRowNum = self.tw_result.rowCount() - 2
         addRow = 2 + self.orginRowCount
         IDList = selectIDFromArmyByYear(self.currentYear)
-        print("IDList :", IDList)
+        #print("IDList :", IDList)
         for i in range(currentRowNum - self.orginRowCount):
             haveID = False
             ID = self.tw_result.item(i + addRow, 0).text()
@@ -123,6 +153,9 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
             insertIntoArmyTransferYear(year)
             self._initYearWidget_()
 
+    '''
+       删除当前选中年份
+    '''
     def slotDelCurrentYear(self):
         currentRow = self.lw_yearChoose.currentRow()
         if currentRow == 0:
@@ -140,6 +173,9 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
             else:
                 return
 
+    '''
+        初始化年份listwidget
+    '''
     def _initYearWidget_(self):
         self.yearList = []
         self.currentYear = ''
@@ -154,7 +190,9 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
             item.setText(year)
             self.lw_yearChoose.addItem(item)
 
-    #初始化表格头部
+    '''
+        初始化结果tablewidget表头
+    '''
     def _initResultHeader_(self):
         self.orginRowCount = 0
         self.tw_result.clear()
@@ -251,7 +289,7 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
         self.tw_result.setItem(1, 16, item)
         item = QTableWidgetItem()
         item.setText('数量')
-        item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+        item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)   #设置当前item不能被修改
         self.tw_result.setItem(1, 17, item)
 
         self.tw_result.setSpan(0, 0, 2, 1)
@@ -264,6 +302,9 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
         self.tw_result.setSpan(0, 18, 2, 1)
         self.equipTuple = selectAllEndEquip()
 
+    '''
+        查找当前要显示的数据并显示到tablewidget上
+    '''
     def slotSelectResult(self):
         self.currentResult = {}
         self.groupBox_2.setDisabled(False)
@@ -354,6 +395,9 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
             self.tw_result.setItem(i + 2, 18, item)
             self.currentResult[i] = armyTransferInfo
 
+    '''
+        增加新行等待用户输入
+    '''
     def addNewRow(self):
         if self.currentYear == '全部' or self.currentYear == None:
             reply = QMessageBox.question(self, '新增', '只能对某年的数据进行新增，请重新选择', QMessageBox.Yes)

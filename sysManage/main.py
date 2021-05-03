@@ -11,3 +11,6 @@ if __name__ == "__main__":
     widget = Manage_Widgets()
     widget.show()
     sys.exit(app.exec_())
+
+python2: raw_input("please input any key to exit!")
+python3: input("please input any key to exit!")

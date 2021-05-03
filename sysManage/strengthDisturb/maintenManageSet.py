@@ -4,7 +4,9 @@ from database.strengthDisturbSql import selectAllStrengthYearInfo, selectAllData
     updateUnitIsGroupFromUnit, selectAllFromPulicEquip, selectUnitInfoByDeptUper
 from PyQt5.Qt import Qt
 
-#new
+'''
+   编制数维护目录设置
+'''
 class maintenManageSet(QWidget, Widget_Mainten_Manage_Set):
     def __init__(self, parent=None):
         super(maintenManageSet, self).__init__(parent)
@@ -35,10 +37,15 @@ class maintenManageSet(QWidget, Widget_Mainten_Manage_Set):
         self._initUnitTreeWidget("", self.tw_first)
 
     def signalConnect(self):
+        #当前单位结果界面某行被选中
         self.tw_unit.clicked.connect(self.slotUnitTableClicked)
 
+        #更新当前单位是否为旅团
         self.pb_update.clicked.connect(self.slotUpdateIsGroup)
 
+    '''
+       当前单位被选中
+    '''
     def slotUnitTableClicked(self):
         self.currentRow = self.tw_unit.currentRow()
         unitID = self.tw_unit.item(self.tw_unit.currentRow(), 0).text()
@@ -49,6 +56,9 @@ class maintenManageSet(QWidget, Widget_Mainten_Manage_Set):
         else:
             self.cb_isGroup.setCurrentIndex(1)
 
+    '''
+        初始化界面
+    '''
     def _initUnitTableWidget(self):
         self.orignUnitResult = {}
         self.tw_unit.clear()
@@ -71,6 +81,9 @@ class maintenManageSet(QWidget, Widget_Mainten_Manage_Set):
             self.tw_unit.setItem(i, 2, item)
             self.orignUnitResult[i] = unitInfo
 
+    '''
+        初始化公共装备tablewidget
+    '''
     def _initPublicEquipTableWidget_(self):
         self.tw_publicEquip.clear()
         header = ['装备编号', '旅团编号', '编制数']
@@ -110,6 +123,9 @@ class maintenManageSet(QWidget, Widget_Mainten_Manage_Set):
             if rowData[0] != '':
                 self._initUnitTreeWidget(rowData[0], item)
 
+    '''
+        更新当前是否为旅团
+    '''
     def slotUpdateIsGroup(self):
         if self.tw_unit.item(self.currentRow, 2).text() != self.cb_isGroup.currentText():
             updateUnitIsGroupFromUnit(self.lb_unitID.text(), self.cb_isGroup.currentText())

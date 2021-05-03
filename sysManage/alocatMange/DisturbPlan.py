@@ -6,7 +6,9 @@ from database.strengthDisturbSql import *
 from PyQt5.Qt import Qt
 from database.alocatMangeSql import *
 
-
+'''
+    分配调整计划
+'''
 class DisturbPlan(QWidget, yearList_Form):
     def __init__(self, parent=None):
         super(DisturbPlan, self).__init__(parent)

@@ -160,6 +160,10 @@ def UnitNotHaveChild(Unit_ID):
     else:
         return True
 
+'''
+    功能：
+        找到某个单位的一级上级单位
+'''
 def selectUnitDictByUper(Unit_Uper):
     conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="test")
     cur = conn.cursor()
@@ -171,7 +175,10 @@ def selectUnitDictByUper(Unit_Uper):
     conn.close()
     return data
 
-# 增加装备目录
+'''
+    功能：
+        增加装备目录
+'''
 def add_UnitDictEquip(Equip_ID, Equip_Name, Equip_Uper):
     # print("''''''''''")
     conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="test")

@@ -4,14 +4,11 @@ from widgets.strengthDisturb.inquiry_result import Widget_Inquiry_Result
 from database.strengthDisturbSql import selectAboutStrengthByUnitListAndEquipList, selectUnitIsHaveChild, selectEquipIsHaveChild,\
     selectAboutStrengthByEquipShow,selectAboutStrengthByUnitShow, updateStrengthAboutStrengrh,updateStrengthAboutStrengrh
 from PyQt5.Qt import Qt
-import  EmptyDelegate
 #new
 '''
     类功能：
         管理实力分布下实力查询结果界面，包含查询结果相关逻辑代码
 '''
-
-#更新
 class Inquiry_Result(QWidget, Widget_Inquiry_Result):
     def __init__(self, parent=None):
         super(Inquiry_Result, self).__init__(parent)
@@ -50,6 +47,9 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
 
         #清除当前页面全部装备实力数
         self.pb_clearAll.clicked.connect(self.slotClearCurrentPage)
+
+        #清除选中状态
+        self.pb_delState.clicked.connect(self.slotChangeCheckState)
     '''
         信号和槽连接断开
     '''
@@ -61,8 +61,12 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
             清除单选按钮选中状态
     '''
     def slotChangeCheckState(self):
-        pass
+        if self.rb_unitShow.isChecked():
+            self.rb_unitShow.setChecked(False)
 
+    '''
+       清除当前结果页面所有的实力数
+    '''
     def slotClearCurrentPage(self):
         if self.year == '全部':
             reply = QMessageBox.question(self, '清除', '只能某一年，清除失败', QMessageBox.Yes)
@@ -86,6 +90,9 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                 updateStrengthAboutStrengrh(Unit_ID, Equip_ID, year, "0", orginNum)
                 self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
 
+    '''
+        清除当前行的实力数
+    '''
     def slotClearCurrentRow(self):
         currentRow = self.tw_inquiryResult.currentRow()
         if currentRow < 0:
@@ -183,6 +190,15 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
             resultListEquip = selectAboutStrengthByEquipShow(UnitList, EquipList, year)
             resultListUnit = selectAboutStrengthByUnitShow(UnitList, EquipList, year)
             resultList = resultListEquip + resultListUnit
+            self.rb_unitShow.setCheckable(False)
+            self.rb_equipShow.setCheckable(False)
+            self.rb_equipShow.setDisabled(True)
+            self.rb_unitShow.setDisabled(True)
+        else:
+            self.rb_unitShow.setCheckable(True)
+            self.rb_equipShow.setCheckable(True)
+            self.rb_equipShow.setDisabled(False)
+            self.rb_unitShow.setDisabled(False)
 
         headerlist = ['单位名称', '装备名称', '实力数', '编制数', '现有数', '偏差', '准备退役数', '未到位数', '提前退役', '待核查无实物', '待核查无实力', '单独建账',
                       '正常到位']

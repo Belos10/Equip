@@ -2,6 +2,7 @@ from widgets.strengthDisturb.StrengthDisturb import Strength_Disturb_Widget
 import sys
 from PyQt5.QtWidgets import QMainWindow,QApplication,QWidget
 from widgets.dictSelect.dictSelect import Widget_Dict_Select
+from sysManage.dictSelect.regularManage import regularManage
 #new
 class dictSelect(QMainWindow, Widget_Dict_Select):
     def __init__(self, parent=None):
@@ -11,7 +12,7 @@ class dictSelect(QMainWindow, Widget_Dict_Select):
         self.equipHandbook = QWidget(self)
         self.factoryDict = QWidget(self)
         self.presentRoom = QWidget(self)
-        self.regularManage = QWidget(self)
+        self.regularManage = regularManage(self)
 
         self.sw_dictSelectMange.addWidget(self.equipHandbook)
         self.sw_dictSelectMange.addWidget(self.factoryDict)

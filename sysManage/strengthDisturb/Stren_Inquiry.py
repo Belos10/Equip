@@ -131,10 +131,12 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         # 录入界面保存按钮
         self.add_strenth_info.pb_Save.clicked.connect(self.slotSaveUpdate)
 
+
     # 信号与槽连接的断开
     def signalDisconnectSlot(self):
         pass
 
+    #初始化年份listwidget
     def _initSelectYear_(self):
         self.currentYearListItem = {}
         self.yearList = ['全部']
@@ -150,6 +152,7 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
             self.lw_chooseYear.addItem(item)
             self.currentYearListItem[year] = item
 
+    #当信息录入界面点击保存按钮时
     def slotSaveUpdate(self):
         Unit_ID = self.add_strenth_info.strgenthInfo[1]
         Equip_ID = self.add_strenth_info.strgenthInfo[0]
@@ -226,7 +229,6 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         功能：
             录入界面的返回按钮
     '''
-
     def slotAddWidgetReturn(self):
         reply = QMessageBox.question(self, '返回', '是否不保存直接返回？', QMessageBox.Yes,
                                      QMessageBox.Cancel)
@@ -242,7 +244,6 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         功能：
             双击进入录入界面
     '''
-
     def slotInputStrengthInfo(self):
         self.currentRow = self.inquiry_result.tw_inquiryResult.currentRow()
         self.currentColumn = self.inquiry_result.tw_inquiryResult.currentColumn()
@@ -316,7 +317,6 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         功能：
             查询实力结果
     '''
-
     def slotInquryStrengthResult(self):
         self.yearList = ['2001']
         self.currentCheckedUnitList = []
@@ -335,7 +335,6 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
     '''
         初始化单位目录
     '''
-
     def _initUnitTreeWidget(self, root, mother):
         if root == '':
             result = selectUnitInfoByDeptUper('')
@@ -355,7 +354,6 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         功能：
             初始化装备目录
     '''
-
     def _initEquipTreeWidget(self, root, mother):
         if root == '':
             result = selectEquipInfoByEquipUper('')

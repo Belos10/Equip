@@ -3,7 +3,10 @@ from sysManage.alocatMange.rocketTransfer import rocketTransfer
 import sys
 from PyQt5.QtWidgets import QMainWindow,QApplication,QWidget
 from sysManage.alocatMange.armyTransfer import armyTransfer
-#new
+
+'''
+   调拨单管理界面
+'''
 class transferManage(QMainWindow, Widget_Transfer_Manage):
     def __init__(self, parent=None):
         super(transferManage, self).__init__(parent)
