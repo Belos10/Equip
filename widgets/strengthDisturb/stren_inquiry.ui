@@ -188,7 +188,7 @@
               <widget class="QTreeWidget" name="tw_first">
                <column>
                 <property name="text">
-                 <string notr="true">1</string>
+                 <string/>
                 </property>
                </column>
               </widget>
@@ -234,7 +234,7 @@
               <widget class="QTreeWidget" name="tw_second">
                <column>
                 <property name="text">
-                 <string notr="true">1</string>
+                 <string/>
                 </property>
                </column>
               </widget>

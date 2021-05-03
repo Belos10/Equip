@@ -10,9 +10,8 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-#new
-class Widget_Stren_Inquiry(object):
 
+class Widget_Stren_Inquiry(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
         Form.resize(1216, 755)
@@ -94,7 +93,6 @@ class Widget_Stren_Inquiry(object):
         self.verticalLayout.addLayout(self.horizontalLayout)
         self.tw_first = QtWidgets.QTreeWidget(self.wg_directory)
         self.tw_first.setObjectName("tw_first")
-        self.tw_first.headerItem().setText(0, "1")
         self.verticalLayout.addWidget(self.tw_first)
         self.horizontalLayout_3.addLayout(self.verticalLayout)
         self.verticalLayout_3 = QtWidgets.QVBoxLayout()
@@ -122,7 +120,6 @@ class Widget_Stren_Inquiry(object):
         self.verticalLayout_3.addLayout(self.horizontalLayout_2)
         self.tw_second = QtWidgets.QTreeWidget(self.wg_directory)
         self.tw_second.setObjectName("tw_second")
-        self.tw_second.headerItem().setText(0, "1")
         self.verticalLayout_3.addWidget(self.tw_second)
         self.horizontalLayout_3.addLayout(self.verticalLayout_3)
         self.horizontalLayout_4.addLayout(self.horizontalLayout_3)

@@ -1,14 +1,11 @@
 import sys
 from PyQt5.QtWidgets import *
 from widgets.alocatMange.yearListForm import yearList_Form
-from sysManage.strengthDisturb.Stren_Inquiry import Stren_Inquiry
 from database.strengthDisturbSql import *
 from PyQt5.Qt import Qt
 from database.alocatMangeSql import *
 
-'''
-    分配调整计划
-'''
+
 class DisturbPlan(QWidget, yearList_Form):
     def __init__(self, parent=None):
         super(DisturbPlan, self).__init__(parent)
@@ -19,32 +16,24 @@ class DisturbPlan(QWidget, yearList_Form):
         self.setupUi(self)
         self.signalConnect()
         self.signalDisconnectSlot()
+        self.le_first.setDisabled(1)
+        self.le_second.setDisabled(1)
+        self.tw_first.setDisabled(1)
+        self.tw_second.setDisabled(1)
         self._initYearWidget_()
 
     def signalConnect(self):
         # 点击选择年份后刷新页面 初始化
         self.lw_yearChoose.doubleClicked.connect(self.slotClickedInqury)
-        # 按查询按钮时第一个目录的查询
 
         # 点击第一目录结果
         self.tw_first.itemChanged.connect(self.slotDisturbStrengthResult)
-        # 按查询按钮时第二个目录的查询
 
-        #self.tw_first.itemChanged.connect(self.slotCheckedChange)
         self.tw_second.itemChanged.connect(self.slotCheckedChange)
 
         # 点击第二目录结果
         self.tw_second.itemChanged.connect(self.slotDisturbStrengthResult)
-        # 按搜索框更改第一个目录的查询
 
-        # 按搜索框更改第二个目录的查询
-
-        # 将第一个目录和第二个目录进行关联
-        # self.tw_first.currentItemChanged.connect(Stren_Inquiry.slotSelectIndex)
-        # 第二个目录选定后进行查询并显示结果
-        # self.tw_second.currentItemChanged.connect(Stren_Inquiry.slotInquiry)
-
-        # self.lw_yearChoose.itemPressed.connect(self.slotSelectResult)
 
         self.tb_add.clicked.connect(self.slotAddNewYear)
 
@@ -75,73 +64,6 @@ class DisturbPlan(QWidget, yearList_Form):
             item.setText(year)
             self.lw_yearChoose.addItem(item)
 
-    # 选择年份
-    # def slotSelectResult(self):
-    #     self._initResultHeader_()
-    #     row = self.lw_yearChoose.currentRow()
-    #     self.currentYear = self.lw_yearChoose.item(row).text()
-    #     resultList = selectArmyTransferByYear(self.currentYear)
-    #     self.tw_result.setRowCount(len(resultList) + 2)
-    #     print(resultList)
-    #     for i, armyTransferInfo in enumerate(resultList):
-    #         item = QTableWidgetItem()
-    #         item.setText(armyTransferInfo[0])
-    #         self.tw_result.setItem(i + 2, 0, item)
-    #         item = QTableWidgetItem()
-    #         item.setText(armyTransferInfo[1])
-    #         self.tw_result.setItem(i + 2, 1, item)
-    #         item = QTableWidgetItem()
-    #         item.setText(armyTransferInfo[2])
-    #         self.tw_result.setItem(i + 2, 2, item)
-    #         item = QTableWidgetItem()
-    #         item.setText(armyTransferInfo[3])
-    #         self.tw_result.setItem(i + 2, 3, item)
-    #         item = QTableWidgetItem()
-    #         item.setText(armyTransferInfo[4])
-    #         self.tw_result.setItem(i + 2, 4, item)
-    #         item = QTableWidgetItem()
-    #         item.setText(armyTransferInfo[5])
-    #         self.tw_result.setItem(i + 2, 5, item)
-    #         item = QTableWidgetItem()
-    #         item.setText(armyTransferInfo[6])
-    #         self.tw_result.setItem(i + 2, 6, item)
-    #         item = QTableWidgetItem()
-    #         item.setText(armyTransferInfo[7])
-    #         self.tw_result.setItem(i + 2, 7, item)
-    #         item = QTableWidgetItem()
-    #         item.setText(armyTransferInfo[9])
-    #         self.tw_result.setItem(i + 2, 8, item)
-    #         item = QTableWidgetItem()
-    #         item.setText(armyTransferInfo[10])
-    #         self.tw_result.setItem(i + 2, 9, item)
-    #         item = QTableWidgetItem()
-    #         item.setText(armyTransferInfo[11])
-    #         self.tw_result.setItem(i + 2, 10, item)
-    #         item = QTableWidgetItem()
-    #         item.setText(armyTransferInfo[12])
-    #         self.tw_result.setItem(i + 2, 11, item)
-    #         item = QTableWidgetItem()
-    #         item.setText(armyTransferInfo[13])
-    #         self.tw_result.setItem(i + 2, 12, item)
-    #         item = QTableWidgetItem()
-    #         item.setText(armyTransferInfo[14])
-    #         self.tw_result.setItem(i + 2, 13, item)
-    #         item = QTableWidgetItem()
-    #         item.setText(armyTransferInfo[16])
-    #         self.tw_result.setItem(i + 2, 14, item)
-    #         item = QTableWidgetItem()
-    #         item.setText(armyTransferInfo[17])
-    #         self.tw_result.setItem(i + 2, 15, item)
-    #         item = QTableWidgetItem()
-    #         item.setText(armyTransferInfo[18])
-    #         self.tw_result.setItem(i + 2, 16, item)
-    #         item = QTableWidgetItem()
-    #         item.setText(armyTransferInfo[19])
-    #         self.tw_result.setItem(i + 2, 17, item)
-    #         item = QTableWidgetItem()
-    #         item.setText(armyTransferInfo[20])
-    #         self.tw_result.setItem(i + 2, 18, item)
-
     def slotClickedInqury(self):
         self.tw_first.clear()
         self.tw_second.clear()
@@ -155,53 +77,6 @@ class DisturbPlan(QWidget, yearList_Form):
         self._initUnitTreeWidget("", self.tw_first)
         self._initEquipTreeWidget("", self.tw_second)
 
-    '''
-        功能：
-            设置级目录联选中状态0
-    '''
-
-    def slotCheckedChange(self, item, num):
-        # 如果是顶部节点，只考虑Child：
-        if item.childCount() and not item.parent():  # 判断是顶部节点，也就是根节点
-            if item.checkState(num) == 0:  # 规定点击根节点只有两态切换，没有中间态
-                for i in range(item.childCount()):  # 遍历子节点进行状态切换
-                    item.child(i).setCheckState(num, 0)
-            elif item.checkState(num) == 2:
-                for i in range(item.childCount()):
-                    item.child(i).setCheckState(num, 2)
-        # 如果是底部节点，只考虑Parent
-        if item.parent() and not item.childCount():
-            parent_item = item.parent()  # 获得父节点
-            brother_item_num = parent_item.childCount()  # 获得兄弟节点的数目，包括自身在内
-            checked_num = 0  # 设置计数器
-            for i in range(brother_item_num):  # 根据三态不同状态值进行数值累计
-                checked_num += parent_item.child(i).checkState(num)
-            if checked_num == 0:  # 最终结果进行比较，决定父节点的三态
-                parent_item.setCheckState(num, 0)
-            elif checked_num / 2 == brother_item_num:
-                parent_item.setCheckState(num, 2)
-            else:
-                parent_item.setCheckState(num, 1)
-
-            # 中间层需要全面考虑
-        if item.parent() and item.childCount():
-            if item.checkState(num) == 0:  # 规定点击根节点只有两态切换，没有中间态
-                for i in range(item.childCount()):  # 遍历子节点进行状态切换
-                    item.child(i).setCheckState(num, 0)
-            elif item.checkState(num) == 2:
-                for i in range(item.childCount()):
-                    item.child(i).setCheckState(num, 2)
-            parent_item = item.parent()  # 获得父节点
-            brother_item_num = parent_item.childCount()  # 获得兄弟节点的数目，包括自身在内
-            checked_num = 0  # 设置计数器
-            for i in range(brother_item_num):  # 根据三态不同状态值进行数值累计
-                checked_num += parent_item.child(i).checkState(num)
-            if checked_num == 0:  # 最终结果进行比较，决定父节点的三态
-                parent_item.setCheckState(num, 0)
-            elif checked_num / 2 == brother_item_num:
-                parent_item.setCheckState(num, 2)
-            else:
-                parent_item.setCheckState(num, 1)
 
     def _initUnitTreeWidget(self, root, mother):
         if root == '':
@@ -240,20 +115,21 @@ class DisturbPlan(QWidget, yearList_Form):
     '''
 
     def slotDisturbStrengthResult(self):
-        self.yearList = ['2001']
+        self.yearList = []
         self.currentCheckedUnitChildList = []
         self.currentCheckedUnitChildNameList = []
         self.currentCheckedEquipList = []
+        # 获取子单位名
         for unitID, unitItem in self.first_treeWidget_dict.items():
             if unitItem.checkState(0) == Qt.Checked:
-                # self.currentCheckedUnitList.append(unitID)
-
+                # print("len(findUnitChildName(unitID))",len(findUnitChildName(unitID)))
                 if len(findUnitChildName(unitID)):
                     for i in findUnitChildName(unitID)[0]:
                         self.currentCheckedUnitChildNameList.append(i)
                 else:
-                    self.currentCheckedUnitChildNameList.append(findUnitNameFromID(unitID))
-        print("!!!!!!", self.currentCheckedUnitChildNameList)
+                    print("unitID",unitID)
+                    self.currentCheckedUnitChildNameList.append(findUnitNameFromID(unitID)[0][0])
+        # 获取当前装备名
         for equipID, equipItem in self.second_treeWidget_dict.items():
             if equipItem.checkState(0) == Qt.Checked:
                 self.currentCheckedEquipList.append(equipID)
@@ -300,9 +176,6 @@ class DisturbPlan(QWidget, yearList_Form):
             self.disturbResult.setItem(i, 2, item)
             item = QTableWidgetItem("")
             self.disturbResult.setItem(i, 3, item)
-            # for x,y in zip(self.currentCheckedUnitChildNameList,range(0,n)):
-            #     item = QTableWidgetItem(x)
-            #     self.disturbResult.setItem(i, y+4, item)
             for x in range(0, n):
                 item = QTableWidgetItem("")
                 self.disturbResult.setItem(i, x + 4, item)
