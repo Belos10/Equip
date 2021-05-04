@@ -13,19 +13,24 @@ class DisturbPlan(QWidget, yearList_Form):
         self.first_treeWidget_dict = {}
         self.second_treeWidget_dict = {}
         self.currentDisturbPlan = {}
+        self.currentUnitDisturbPlanNum = {}
         self.setupUi(self)
         self.signalConnect()
         self.signalDisconnectSlot()
+        self.tw_first.header().setVisible(False)
+        self.tw_second.header().setVisible(False)
         self.le_first.setDisabled(1)
         self.le_second.setDisabled(1)
         self.tw_first.setDisabled(1)
         self.tw_second.setDisabled(1)
         self._initYearWidget_()
+        initDisturbPlanDatabase()
+
+
 
     def signalConnect(self):
         # 点击选择年份后刷新页面 初始化
         self.lw_yearChoose.doubleClicked.connect(self.slotClickedInqury)
-
         # 点击第一目录结果
         self.tw_first.itemChanged.connect(self.slotDisturbStrengthResult)
 
@@ -33,7 +38,6 @@ class DisturbPlan(QWidget, yearList_Form):
 
         # 点击第二目录结果
         self.tw_second.itemChanged.connect(self.slotDisturbStrengthResult)
-
 
         self.tb_add.clicked.connect(self.slotAddNewYear)
 
@@ -54,7 +58,7 @@ class DisturbPlan(QWidget, yearList_Form):
         self.yearList = []
         self.currentYear = None
         self.lw_yearChoose.clear()
-        self.yearList = ['全部']
+        # self.yearList = ['全部']
         allYear = selectYearListAboutArmy()
         for year in allYear:
             self.yearList.append(year)
@@ -76,7 +80,6 @@ class DisturbPlan(QWidget, yearList_Form):
         self.currentYear = self.lw_yearChoose.currentItem().text()
         self._initUnitTreeWidget("", self.tw_first)
         self._initEquipTreeWidget("", self.tw_second)
-
 
     def _initUnitTreeWidget(self, root, mother):
         if root == '':
@@ -116,7 +119,6 @@ class DisturbPlan(QWidget, yearList_Form):
 
     def slotDisturbStrengthResult(self):
         self.yearList = []
-        self.currentCheckedUnitChildList = []
         self.currentCheckedUnitChildNameList = []
         self.currentCheckedEquipList = []
         # 获取子单位名
@@ -127,7 +129,7 @@ class DisturbPlan(QWidget, yearList_Form):
                     for i in findUnitChildName(unitID)[0]:
                         self.currentCheckedUnitChildNameList.append(i)
                 else:
-                    print("unitID",unitID)
+                    print("unitID", unitID)
                     self.currentCheckedUnitChildNameList.append(findUnitNameFromID(unitID)[0][0])
         # 获取当前装备名
         for equipID, equipItem in self.second_treeWidget_dict.items():
@@ -135,42 +137,44 @@ class DisturbPlan(QWidget, yearList_Form):
                 self.currentCheckedEquipList.append(equipID)
             elif equipItem.checkState(0) == Qt.PartiallyChecked:
                 self.currentCheckedEquipList.append(equipID)
-                #findChildEquip(equipID,self.currentCheckedEquipList,None)
+                # findChildEquip(equipID,self.currentCheckedEquipList,None)
 
         # 将装备列表、单位子列表、选中年份传入
         self._initDisturbPlanByUnitListAndEquipList(self.currentCheckedUnitChildNameList,
                                                     self.currentCheckedEquipList, self.currentYear)
 
-    # 初始化分配计划结果
+
+
+
+    '''
+        初始化分配计划结果
+    '''
+
     def _initDisturbPlanByUnitListAndEquipList(self, UnitList, EquipList, YearList):
         self.disturbResult.clear()
         self.disturbResult.setRowCount(0)
-        self.unitList = UnitList
-        self.equipList = EquipList
-        self.yearList = YearList
-
+        # 存放数据
         disturbPlanList = selectDisturbPlan(UnitList, EquipList, YearList)
-        # print(YearList)
 
         headerlist = ['装备名称及规格型号', '单位', '军委分配计划数', '此次分配合计数']
         if len(self.currentCheckedUnitChildNameList):
             for i in self.currentCheckedUnitChildNameList:
                 headerlist.append(i)
-        headerlist.append('库存')
         headerlist.append('备注')
-        print("headerlist=",headerlist)
-        n = len(self.unitList)
-        self.disturbResult.setHorizontalHeaderLabels(headerlist)
-        self.currentDisturbPlan.clear()
+        #print("headerlist=", headerlist)
+        n = len(UnitList)
         self.disturbResult.setColumnCount(len(headerlist))
         self.disturbResult.setRowCount(len(disturbPlanList))
-        print("disturbPlanList=",disturbPlanList)
+        self.disturbResult.setHorizontalHeaderLabels(headerlist)
+        self.currentDisturbPlan.clear()
+        print("disturbPlanList=", disturbPlanList)
+        self.disturbResult.setColumnWidth(0,200)
 
         i = 0
         for LineInfo in disturbPlanList:
             item = QTableWidgetItem(LineInfo[1])
             self.disturbResult.setItem(i, 0, item)
-            item = QTableWidgetItem(LineInfo[4])
+            item = QTableWidgetItem("")
             self.disturbResult.setItem(i, 1, item)
             item = QTableWidgetItem("")
             self.disturbResult.setItem(i, 2, item)
@@ -179,20 +183,20 @@ class DisturbPlan(QWidget, yearList_Form):
             for x in range(0, n):
                 item = QTableWidgetItem("")
                 self.disturbResult.setItem(i, x + 4, item)
-            item = QTableWidgetItem(LineInfo[6])
+            item = QTableWidgetItem("")
             self.disturbResult.setItem(i, 4 + n, item)
-            item = QTableWidgetItem(LineInfo[5])
-            self.disturbResult.setItem(i, 4 + n + 1, item)
 
             self.currentDisturbPlan[i] = LineInfo
             i = i + 1
         self.disturbResult.setRowCount(i)
+    def setEquipStock(self):
+        pass
+
 
     '''
         功能：
             设置级目录联选中状态
     '''
-
     def slotCheckedChange(self, item, num):
         # 如果是顶部节点，只考虑Child：
         if item.childCount() and not item.parent():  # 判断是顶部节点，也就是根节点
@@ -235,3 +239,58 @@ class DisturbPlan(QWidget, yearList_Form):
                 parent_item.setCheckState(num, 2)
             else:
                 parent_item.setCheckState(num, 1)
+
+
+
+    '''
+        改变分配计划数
+    '''
+    def slotItemChange(self, item):
+        currentRow = self.disturbResult.currentRow()
+        currentColumn = self.disturbResult.currentColumn()
+        self.unitDisturbPlanList = selectUnitDisturbPlan(self.currentCheckedUnitChildNameList,
+                                                         self.currentCheckedEquipList, self.currentYear)
+        i = 0
+        for a in self.unitDisturbPlanList:
+            self.currentUnitDisturbPlanNum[i] = a
+            i = i + 1
+        print("self.currentUnitDisturbPlanNum",self.currentUnitDisturbPlanNum)
+        if currentColumn == 4:
+            for i, resultInfo in self.currentUnitDisturbPlanNum.items():
+                if i == currentRow:
+                    Unit_ID = resultInfo[2]
+                    Equip_ID = resultInfo[0]
+                    # unitHaveChild = selectUnitIsHaveChild(Unit_ID)
+                    # equipHaveChild = selectEquipIsHaveChild(Equip_ID)
+                    # if unitHaveChild or equipHaveChild:
+                    #     reply = QMessageBox.question(self, '修改', '只能修改末级实力数，修改失败', QMessageBox.Yes)
+                    #     self.tw_inquiryResult.item(currentRow, currentColumn).setText(resultInfo[4])
+                    #     return
+                    if self.year == '全部':
+                        reply = QMessageBox.question(self, '修改', '只能某一年，修改失败', QMessageBox.Yes)
+                        self.disturbResult.item(currentRow, currentColumn).setText(resultInfo[4])
+                        return
+                    else:
+                        if self.disturbResult.item(currentRow, currentColumn).text() != resultInfo[4]:
+                            reply = QMessageBox.question(self, '修改', '是否修改当前分配数？', QMessageBox.Yes,
+                                                         QMessageBox.Cancel)
+                            if reply == QMessageBox.Yes:
+                                #
+                                updateUnitDisturbPlanNum(Unit_ID, Equip_ID, self.currentYear,
+                                                         self.disturbResult.item(currentRow,
+                                                                                 currentColumn).text(),
+                                                         resultInfo[4])
+                                self._initDisturbPlanByUnitListAndEquipList(self.unitList, self.equipList, self.year)
+                            else:
+                                self.disturbResult.item(currentRow, currentColumn).setText(resultInfo[4])
+                        return
+        else:
+            for i, resultInfo in self.currentUnitDisturbPlanNum.items():
+                if i == currentRow:
+                    print("resultInfo", resultInfo)
+                    self.disturbResult.item(currentRow, currentColumn).setText(resultInfo[currentColumn + 4])
+
+    '''
+        分配计划保存
+    '''
+

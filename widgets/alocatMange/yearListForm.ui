@@ -284,6 +284,13 @@
         </spacer>
        </item>
        <item>
+        <widget class="QPushButton" name="pb_saveDisturbPlan">
+         <property name="text">
+          <string>保存</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="pb_issueOrderForm">
          <property name="text">
           <string>开具调拨单</string>

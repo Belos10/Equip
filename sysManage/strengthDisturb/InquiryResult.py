@@ -1,58 +1,66 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QTableWidgetItem, QAbstractItemView, QMessageBox
 from widgets.strengthDisturb.inquiry_result import Widget_Inquiry_Result
-from database.strengthDisturbSql import selectAboutStrengthByUnitListAndEquipList, selectUnitIsHaveChild, selectEquipIsHaveChild,\
-    selectAboutStrengthByEquipShow,selectAboutStrengthByUnitShow, updateStrengthAboutStrengrh,updateStrengthAboutStrengrh
+from database.strengthDisturbSql import selectAboutStrengthByUnitListAndEquipList, selectUnitIsHaveChild, \
+    selectEquipIsHaveChild, \
+    selectAboutStrengthByEquipShow, selectAboutStrengthByUnitShow, updateStrengthAboutStrengrh, \
+    updateStrengthAboutStrengrh
 from PyQt5.Qt import Qt
-#new
+
+# new
 '''
     类功能：
         管理实力分布下实力查询结果界面，包含查询结果相关逻辑代码
 '''
+
+
 class Inquiry_Result(QWidget, Widget_Inquiry_Result):
     def __init__(self, parent=None):
         super(Inquiry_Result, self).__init__(parent)
         self.setupUi(self)
 
-        #存储当前查询结果，结构为：{'行号':该行数据'}
+        # 存储当前查询结果，结构为：{'行号':该行数据'}
         self.currentInquiryResult = {}
         self.unitList = []
         self.equipList = []
         self.year = None
         self.result = []
-        #信号和槽连接
+        # 信号和槽连接
         self.signalConnect()
 
     '''
         信号和槽连接
     '''
+
     def signalConnect(self):
-        #当前表格中某个值被修改
+        # 当前表格中某个值被修改
         self.tw_inquiryResult.itemChanged.connect(self.slotItemChange)
 
-        #当点击按装备展开时
+        # 当点击按装备展开时
         self.rb_equipShow.clicked.connect(self.slotClickedRB)
 
-        #当点击按单位展开时
+        # 当点击按单位展开时
         self.rb_unitShow.clicked.connect(self.slotClickedRB)
 
-        #当展开到末级被点击时
+        # 当展开到末级被点击时
         self.cb_showLast.clicked.connect(self.slotClickedRB)
 
-        #当只列存在偏差被点击时
+        # 当只列存在偏差被点击时
         self.cb_showDistence.clicked.connect(self.slotClickedRB)
 
-        #删除当前装备
+        # 删除当前装备
         self.pb_clearCheck.clicked.connect(self.slotClearCurrentRow)
 
-        #清除当前页面全部装备实力数
+        # 清除当前页面全部装备实力数
         self.pb_clearAll.clicked.connect(self.slotClearCurrentPage)
 
-        #清除选中状态
+        # 清除选中状态
         self.pb_delState.clicked.connect(self.slotChangeCheckState)
+
     '''
         信号和槽连接断开
     '''
+
     def slotDisconnect(self):
         pass
 
@@ -60,6 +68,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         功能：
             清除单选按钮选中状态
     '''
+
     def slotChangeCheckState(self):
         if self.rb_unitShow.isChecked():
             self.rb_unitShow.setChecked(False)
@@ -67,6 +76,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
     '''
        清除当前结果页面所有的实力数
     '''
+
     def slotClearCurrentPage(self):
         if self.year == '全部':
             reply = QMessageBox.question(self, '清除', '只能某一年，清除失败', QMessageBox.Yes)
@@ -93,6 +103,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
     '''
         清除当前行的实力数
     '''
+
     def slotClearCurrentRow(self):
         currentRow = self.tw_inquiryResult.currentRow()
         if currentRow < 0:
@@ -116,10 +127,12 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                         reply = QMessageBox.question(self, '清除', '是否清除当前行的实力数？', QMessageBox.Yes, QMessageBox.Cancel)
                         updateStrengthAboutStrengrh(Unit_ID, Equip_ID, year, "0", orginNum)
                         self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
+
     '''
         功能：
             当前表格中某个值被修改
     '''
+
     def slotItemChange(self, item):
         currentRow = self.tw_inquiryResult.currentRow()
         currentColumn = self.tw_inquiryResult.currentColumn()
@@ -143,7 +156,10 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                             reply = QMessageBox.question(self, '修改', '是否修改当前实力数？', QMessageBox.Yes,
                                                          QMessageBox.Cancel)
                             if reply == QMessageBox.Yes:
-                                updateStrengthAboutStrengrh(Unit_ID, Equip_ID, self.year, self.tw_inquiryResult.item(currentRow, currentColumn).text(),resultInfo[4])
+                                updateStrengthAboutStrengrh(Unit_ID, Equip_ID, self.year,
+                                                            self.tw_inquiryResult.item(currentRow,
+                                                                                       currentColumn).text(),
+                                                            resultInfo[4])
                                 self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
                             else:
                                 self.tw_inquiryResult.item(currentRow, currentColumn).setText(resultInfo[4])
@@ -151,24 +167,24 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         elif currentColumn == 0:
             for i, resultInfo in self.currentInquiryResult.items():
                 if i == currentRow:
-                    print(resultInfo)
+                    print("resultInfo", resultInfo)
                     self.tw_inquiryResult.item(currentRow, currentColumn).setText(resultInfo[3])
         elif currentColumn == 1:
             for i, resultInfo in self.currentInquiryResult.items():
                 if i == currentRow:
-                    print(resultInfo)
+                    print("resultInfo", resultInfo)
                     self.tw_inquiryResult.item(currentRow, currentColumn).setText(resultInfo[2])
         else:
             for i, resultInfo in self.currentInquiryResult.items():
                 if i == currentRow:
-                    print(resultInfo)
+                    print("resultInfo", resultInfo)
                     self.tw_inquiryResult.item(currentRow, currentColumn).setText(resultInfo[currentColumn + 2])
 
-    #当某个单击按钮被选中时
+    # 当某个单击按钮被选中时
     def slotClickedRB(self):
         self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
 
-    #初始化tableWidget
+    # 初始化tableWidget
     def _initTableWidgetByUnitListAndEquipList(self, UnitList, EquipList, year):
         self.tw_inquiryResult.clear()
         self.tw_inquiryResult.setRowCount(0)
@@ -178,10 +194,10 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         resultList = []
 
         if self.rb_equipShow.isChecked():
-            #按装备展开
+            # 按装备展开
             resultList = selectAboutStrengthByEquipShow(UnitList, EquipList, year)
         elif self.rb_unitShow.isChecked():
-            #按单位展开
+            # 按单位展开
             resultList = selectAboutStrengthByUnitShow(UnitList, EquipList, year)
         else:
             resultList = selectAboutStrengthByUnitListAndEquipList(UnitList, EquipList, year)
@@ -274,12 +290,14 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                 self.currentInquiryResult[i] = LineInfo
                 i = i + 1
         self.tw_inquiryResult.setRowCount(i)
+
     '''
         功能：
             根据查询到的结果初始化tablewidget
     '''
+
     def _initTableWidgetBySelectResult(self, result):
-        #print(result)
+        # print(result)
         self.tw_inquiryResult.clear()
         self.result = result
 
