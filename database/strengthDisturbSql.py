@@ -1484,29 +1484,29 @@ def findEquipChildID(equipId):
         return []
 
 
-def selectDisturbPlan(UnitList, EquipList, YearList):
-    conn, cur = connectMySql()
-    # temp = ['Equip_ID', 'Unit_ID', 'Equip_Name', 'Unit_Name', '0', '0', '0', '0', '0', '0',
-    #         '0', '0', '0', '0', '0']
-    # tempList = []
-    resultList = []
-    print("UnitList", UnitList)
-    print("EquipList", EquipList)
-    for Unit_Name in UnitList:
-        for Equip_ID in EquipList:
-            # 查询当前装备ID的孩子序列
-            # EquipIDChildList = []
-            # findChildEquip(Equip_ID, EquipIDChildList, cur)
-            # for childEquipID in EquipIDChildList:
-            sql = "select * from disturbplan where Unit_Name = '" + Unit_Name + \
-                  "' and Equip_Id = '" + Equip_ID + "' and Year = '" + YearList + "'"
-            # print("sql=", sql)
-            cur.execute(sql)
-            result = cur.fetchall()
-            for resultInfo in result:
-                resultList.append(resultInfo)
-    disconnectMySql(conn, cur)
-    return resultList
+# def selectDisturbPlan(UnitList, EquipList, YearList):
+#     conn, cur = connectMySql()
+#     # temp = ['Equip_ID', 'Unit_ID', 'Equip_Name', 'Unit_Name', '0', '0', '0', '0', '0', '0',
+#     #         '0', '0', '0', '0', '0']
+#     # tempList = []
+#     resultList = []
+#     print("UnitList", UnitList)
+#     print("EquipList", EquipList)
+#     for Unit_Name in UnitList:
+#         for Equip_ID in EquipList:
+#             # 查询当前装备ID的孩子序列
+#             # EquipIDChildList = []
+#             # findChildEquip(Equip_ID, EquipIDChildList, cur)
+#             # for childEquipID in EquipIDChildList:
+#             sql = "select * from disturbplan where Unit_Name = '" + Unit_Name + \
+#                   "' and Equip_Id = '" + Equip_ID + "' and Year = '" + YearList + "'"
+#             # print("sql=", sql)
+#             cur.execute(sql)
+#             result = cur.fetchall()
+#             for resultInfo in result:
+#                 resultList.append(resultInfo)
+#     disconnectMySql(conn, cur)
+#     return resultList
 
 
 def findUnitNameFromID(UnitID):
@@ -1518,42 +1518,22 @@ def findUnitNameFromID(UnitID):
     return result
 
 
-def selectUnitDisturbPlan(UnitList, EquipList, YearList):
+def selectDisturbPlanNum(UnitList, EquipList, YearList):
     conn, cur = connectMySql()
-    # temp = ['Equip_ID', 'Unit_ID', 'Equip_Name', 'Unit_Name', '0', '0', '0', '0', '0', '0',
-    #         '0', '0', '0', '0', '0']
-    # tempList = []
     resultList = []
-    # print("UnitList", UnitList)
-    # print("EquipList", EquipList)
-    # 如果只查询某年的
-    # if YearList == '全部':
-    #     for Unit_ID in UnitList:
-    #         for Equip_ID in EquipList:
-    #             # 查询当前装备ID的孩子序列
-    #             # EquipIDChildList = []
-    #             # findChildEquip(Equip_ID, EquipIDChildList, cur)
-    #             # for childEquipID in EquipIDChildList:
-    #             sql = "select * from disturbplan where Unit_Name = '" + Unit_ID + "' and Equip_Id = '" + Equip_ID + "' and Year = ''"
-    #             cur.execute(sql)
-    #             result = cur.fetchall()
-    #             for resultInfo in result:
-    #                 resultList.append(resultInfo)
-    # 如果查询某一年的
-    # else:
     for Unit_Name in UnitList:
         for Equip_ID in EquipList:
-            # 查询当前装备ID的孩子序列
-            # EquipIDChildList = []
-            # findChildEquip(Equip_ID, EquipIDChildList, cur)
-            # for childEquipID in EquipIDChildList:
-            sql = "select * from unit_disturbplan where Unit_Name = '" + Unit_Name + \
+            sql = "select DisturbNum from disturbplan where Unit_Name = '" + Unit_Name + \
                   "' and Equip_Id = '" + Equip_ID + "' and Year = '" + YearList + "'"
-            print("sql=", sql)
+            #print("找分配数sql=", sql)
             cur.execute(sql)
             result = cur.fetchall()
-            for resultInfo in result:
-                resultList.append(resultInfo)
+            #print("result",result)
+            if len(result)!=0:
+                for resultInfo in result:
+                    resultList.append(resultInfo[0])
+            else:
+                resultList.append('-1')
     disconnectMySql(conn, cur)
     return resultList
 
@@ -1581,14 +1561,14 @@ def updateUnitDisturbPlanNum(Unit_ID, Equip_ID, year, disturbNum, orginDisturbNu
     disconnectMySql(conn, cur)
 
 
-def initDisturbPlanDatabase():
-    conn, cur = connectMySql()
-    sql = "replace into disturbplan(Equip_Id, Equip_Name, Unit_Id, Unit_Name, Year) select Equip_ID,Equip_Name," \
-          "Unit_ID,Unit_Name,year from strength "
-    cur.execute(sql)
-    conn.commit()
-    print("sqldatabase", sql)
-    disconnectMySql(conn, cur)
+# def initDisturbPlanDatabase():
+#     conn, cur = connectMySql()
+#     sql = "replace into disturbplan(Equip_Id, Equip_Name, Unit_Id, Unit_Name, Year) select Equip_ID,Equip_Name," \
+#           "Unit_ID,Unit_Name,year from strength "
+#     cur.execute(sql)
+#     conn.commit()
+#     print("sqldatabase", sql)
+#     disconnectMySql(conn, cur)
 
 
 if __name__ == '__main__':
