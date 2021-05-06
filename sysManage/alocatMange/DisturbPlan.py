@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import *
 from widgets.alocatMange.yearListForm import yearList_Form
 from database.strengthDisturbSql import *
 from PyQt5.Qt import Qt
-from PyQt5.QtGui import QColor, QBrush
+from PyQt5.QtGui import QColor, QBrush,QFont
 from database.alocatMangeSql import *
 
 
@@ -33,6 +33,8 @@ class DisturbPlan(QWidget, yearList_Form):
     def signalConnect(self):
         # 点击选择年份后刷新页面 初始化
         self.lw_yearChoose.itemClicked.connect(self.slotClickedInqury)
+        self.lw_yearChoose.itemClicked.connect(self.setDisturbPlanTitle)
+
         # 点击第一目录结果
         self.tw_first.itemChanged.connect(self.slotDisturbStrengthResult)
 
@@ -58,7 +60,7 @@ class DisturbPlan(QWidget, yearList_Form):
         year = 0
         year, ok = QInputDialog.getInt(self, "Get year", "year:", 0, 0, 100000, 1)
         if year:
-            insertIntoArmyTransferYear(year)
+            insertIntoDisturbPlanYear(year)
             self._initYearWidget_()
 
 
@@ -69,7 +71,7 @@ class DisturbPlan(QWidget, yearList_Form):
         self.currentYear = None
         self.lw_yearChoose.clear()
         # self.yearList = ['全部']
-        allYear = selectYearListAboutArmy()
+        allYear = selectYearListAboutDisturbPlan()
         for year in allYear:
             self.yearList.append(year)
 
@@ -144,9 +146,9 @@ class DisturbPlan(QWidget, yearList_Form):
             if unitItem.checkState(0) == Qt.Checked:
                 result = findUnitChildInfo(unitID)
                 for resultInfo in result:
-                    self.currentUnitdict[j] = resultInfo
+                    self.currentUnitChilddict[j] = resultInfo
                     j=j+1
-        #print("unit", self.currentUnitdict)
+        print("unit", self.currentUnitChilddict)
         # 获取当前装备名
         j = 0
         for equipID, equipItem in self.second_treeWidget_dict.items():
@@ -157,7 +159,7 @@ class DisturbPlan(QWidget, yearList_Form):
                 equipInfo = findEquipInfo(equipID)
                 self.currentEquipdict[j] = equipInfo[0]
             j=j+1
-        #print(self.currentEquipdict)
+        print("self.currentEquipdict",self.currentEquipdict)
 
         # 将装备列表、单位子列表、选中年份传入
         #self._initDisturbPlanByUnitListAndEquipList(self.currentCheckedUnitChildNameList,
@@ -172,23 +174,26 @@ class DisturbPlan(QWidget, yearList_Form):
     def _initDisturbPlanByUnitListAndEquipList(self):
         self.disturbResult.clear()
         self.disturbResult.setRowCount(0)
+        self.lenCurrentUnitChilddict=len(self.currentUnitChilddict)
+        self.lenCurrentEquipdict=len(self.currentEquipdict)
         # 存放数据
         #disturbPlanList = selectDisturbPlan(UnitList, EquipList, YearList)
 
         headerlist = ['装备名称及规格型号', '单位', '军委分配计划数', '此次分配合计数']
         if len(self.currentUnitChilddict):
-            for i in self.currentUnitChilddict[1]:
-                headerlist.append(i)
+            for i in self.currentUnitChilddict.values():
+                headerlist.append(i[1])
         headerlist.append('备注')
-        self.disturbResult.setColumnCount(len(headerlist))
+        self.lenHeaderList=len(headerlist)
+        self.disturbResult.setColumnCount(self.lenHeaderList)
         self.disturbResult.setRowCount(len(self.currentEquipdict))
         self.disturbResult.setHorizontalHeaderLabels(headerlist)
         self.currentDisturbPlan.clear()
         self.disturbResult.setColumnWidth(0, 200)
         #print("self.currentCheckedEquipNameList", self.currentCheckedEquipNameList)
         i = 0
-        for LineInfo in self.currentEquipdict[1]:
-            item = QTableWidgetItem(LineInfo)
+        for LineInfo in self.currentEquipdict.values():
+            item = QTableWidgetItem(LineInfo[1])
             self.disturbResult.setItem(i, 0, item)
             i = i + 1
             self.currentDisturbPlan[i] = LineInfo
@@ -210,16 +215,20 @@ class DisturbPlan(QWidget, yearList_Form):
                 if self.unitDisturbPlanList[num]!='-1':
                     item = QTableWidgetItem(self.unitDisturbPlanList[num])
                     self.disturbResult.setItem(j, 4 + i, item)
-                elif self.unitDisturbPlanList[num]!='None':
-                    item = QTableWidgetItem("")
-                    self.disturbResult.setItem(j, 4 + i, item)
                 else:
                     item = QTableWidgetItem("")
                     item.setFlags(Qt.NoItemFlags)
-                    item.setBackground(QBrush(QColor(240,240,240)))
+                    #item.setBackground(QBrush(QColor(240,240,240)))
                     self.disturbResult.setItem(j, 4 + i, item)
                 num=num+1
 
+        for i in self.currentEquipdict:
+            if selectEquipIsHaveChild(self.currentEquipdict[i][0]):
+                for j in range(1,self.disturbResult.columnCount()):
+                    item = QTableWidgetItem("")
+                    item.setFlags(Qt.NoItemFlags)
+                    #item.setBackground(QBrush(QColor(240, 240, 240)))
+                    self.disturbResult.setItem(i,j,item)
 
 
 
@@ -276,44 +285,17 @@ class DisturbPlan(QWidget, yearList_Form):
         改变分配计划数
     '''
     def slotItemChange(self):
-        currentRow = self.disturbResult.currentRow()
-        currentColumn = self.disturbResult.currentColumn()
-        #print("currentRow",currentRow,"currentColumn",currentColumn)
-        currentRowInfo=self.currentCheckedEquipNameList[currentRow]
-        currentColumnInfo=""
-        if self.disturbResult.horizontalHeaderItem(currentColumn)!= None:
-            currentColumnInfo=self.disturbResult.horizontalHeaderItem(currentColumn).text()
-        #print("currentRowInfo",currentRowInfo,"currentColumnInfo",currentColumnInfo)
+        self.currentRow = self.disturbResult.currentRow()
+        self.currentColumn = self.disturbResult.currentColumn()
+        if self.currentColumn >= 4 and self.currentColumn <= self.lenHeaderList-2:
+            upadteDisturbPlanNum(self.currentEquipdict[self.currentRow][0],self.currentUnitChilddict[self.currentColumn-4][0],
+                                 self.currentYear,self.disturbResult.item(self.currentRow,self.currentColumn).text())
 
 
-        i = 0
-        for a in self.unitDisturbPlanList:
-            self.currentUnitDisturbPlanNum[i] = a
-            i = i + 1
-        if currentColumn == 4:
-            for i, resultInfo in self.currentUnitDisturbPlanNum.items():
-                if i == currentRow:
-                    Unit_ID = resultInfo[2]
-                    Equip_ID = resultInfo[0]
-                    if self.disturbResult.item(currentRow, currentColumn).text() != resultInfo[4]:
-                        reply = QMessageBox.question(self, '修改', '是否修改当前分配数？', QMessageBox.Yes,
-                                                     QMessageBox.Cancel)
-                        if reply == QMessageBox.Yes:
-                            #
-                            updateUnitDisturbPlanNum(Unit_ID, Equip_ID, self.currentYear,
-                                                     self.disturbResult.item(currentRow,
-                                                                             currentColumn).text(),
-                                                     resultInfo[4])
-                            self._initDisturbPlanByUnitListAndEquipList(self.unitList, self.equipList, self.year)
-                        else:
-                            self.disturbResult.item(currentRow, currentColumn).setText(resultInfo[4])
-                    return
-        else:
-            for i, resultInfo in self.currentUnitDisturbPlanNum.items():
-                if i == currentRow:
-                    print("resultInfo", resultInfo)
-                    self.disturbResult.item(currentRow, currentColumn).setText(resultInfo[currentColumn + 4])
-
-    '''
-        分配计划保存
-    '''
+    def setDisturbPlanTitle(self):
+        txt=str(self.currentYear)+"年分配计划"
+        self.txt_disturbPlanYear.setFont(QFont("Microsoft YaHei"))
+        self.txt_disturbPlanYear.setAlignment(Qt.AlignCenter)
+        self.txt_disturbPlanYear.setTextInteractionFlags(Qt.NoTextInteraction)
+        self.txt_disturbPlanYear.setFontPointSize(15)
+        self.txt_disturbPlanYear.setText(txt)
