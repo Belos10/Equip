@@ -202,16 +202,18 @@ class DisturbPlan(QWidget, yearList_Form):
 
 
 
-
+    # 读取初始分配计划数
     def initDisturbPlanNum(self):
         self.unitDisturbPlanList = selectDisturbPlanNum(self.currentUnitChilddict,
                                                         self.currentEquipdict, self.currentYear)
-        #print("self.unitDisturbPlanList", self.unitDisturbPlanList)
-
+        print("self.unitDisturbPlanList", self.unitDisturbPlanList)
+        # 显示每个单位分配计划数
         num=0
         for i in range(0,len(self.currentUnitChilddict)):
             for j in range(0,len(self.currentEquipdict)):
-
+                # if j==0 or j==1 or j==2 or j==3:
+                #     item=QTableWidgetItem.setFlags(Qt.NoItemFlags)
+                #     self.disturbResult.setItem(j,i,item)
                 if self.unitDisturbPlanList[num]!='-1':
                     item = QTableWidgetItem(self.unitDisturbPlanList[num])
                     self.disturbResult.setItem(j, 4 + i, item)
@@ -221,7 +223,7 @@ class DisturbPlan(QWidget, yearList_Form):
                     #item.setBackground(QBrush(QColor(240,240,240)))
                     self.disturbResult.setItem(j, 4 + i, item)
                 num=num+1
-
+        # 若装备含子装备，则该行不可选中
         for i in self.currentEquipdict:
             if selectEquipIsHaveChild(self.currentEquipdict[i][0]):
                 for j in range(1,self.disturbResult.columnCount()):
@@ -229,7 +231,19 @@ class DisturbPlan(QWidget, yearList_Form):
                     item.setFlags(Qt.NoItemFlags)
                     #item.setBackground(QBrush(QColor(240, 240, 240)))
                     self.disturbResult.setItem(i,j,item)
-
+        # 显示此次分配计划数
+        sum=0
+        for i in range(0, len(self.currentEquipdict)):
+            for j in range(0,len(self.currentUnitChilddict)):
+                num=self.disturbResult.item(i,4+j).text()
+                if num=='-1' or num=='':
+                    sum=sum+0
+                else:
+                    sum=sum+int(num)
+            item = QTableWidgetItem(str(sum))
+            item.setFlags(Qt.NoItemFlags)
+            self.disturbResult.setItem(i,3,item)
+            sum=0
 
 
     '''
@@ -287,7 +301,7 @@ class DisturbPlan(QWidget, yearList_Form):
     def slotItemChange(self):
         self.currentRow = self.disturbResult.currentRow()
         self.currentColumn = self.disturbResult.currentColumn()
-        if self.currentColumn >= 4 and self.currentColumn <= self.lenHeaderList-2:
+        if 4 <= self.currentColumn <= self.lenHeaderList-2:
             upadteDisturbPlanNum(self.currentEquipdict[self.currentRow][0],self.currentUnitChilddict[self.currentColumn-4][0],
                                  self.currentYear,self.disturbResult.item(self.currentRow,self.currentColumn).text())
 
