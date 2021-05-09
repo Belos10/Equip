@@ -59,7 +59,11 @@ class alocatMange(QMainWindow, Widget_Alocat_Mange):
             点击分配调整计划按钮
     '''
     def slotDisturbPlan(self):
-        pass
+        self.stackedWidget.setCurrentIndex(0)
+        self.tb_disturbPlan.setDisabled(1)
+        self.tb_disturbSchedule.setDisabled(False)
+        self.tb_disturbManage.setDisabled(0)
+        self.tb_alocatSet.setDisabled(False)
 
     '''
         功能：
