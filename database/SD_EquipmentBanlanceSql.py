@@ -1,7 +1,7 @@
 from pymysql.cursors import DictCursor
 
 from database.connectAndDisSql import *
-
+import operator
 '''
 执行sql语句，查询数据并以字典的形式保存
 '''
@@ -149,10 +149,68 @@ def getResultByYearAndEquip(year,equipList):
                             sql = "select * from eb_production_year where equip_balance_id=%s" % item['equip_balance_id']
                             itemDict.update(selectOne(sql))
                             resultList.append(itemDict)
-                        return resultList
+                        return sorted(resultList,key=operator.itemgetter('Equip_ID'))
 
             except:
                 return None
+
+
+#根据年份、单位列表和装备列表定位申请退役表
+def getDataByUnitIdAndEquipmentId(year,unitId,equipmentId):
+    sql = "select apply_retirement_id,Equip_ID,Unit_ID,year,authorized_value,plan_to_retire,existing_value,apply_demand,note " \
+          "from apply_retirement where year=%s and Unit_ID=%s and Equip_ID=%s"%(year, unitId, equipmentId)
+    item = selectOne(sql)
+    if(item is None or len(item) == 0):
+        return None
+    else:
+        item['Equip_Name'] = getEquipmentNameByID(equipmentId)
+        item['Unit_Name'] = getUnitNameByID(unitId)
+        return item
+
+def getEquipmentNameByID(equipmentId):
+    if equipmentId is None:
+        return None
+    else:
+        sql = "select Equip_Name from equip where Equip_ID=%s"%equipmentId
+        data = selectOne(sql)
+        if(data is not None):
+            return data['Equip_Name']
+        else:
+            return None
+
+def getEquipmentTypeByID(equipmentId):
+    if equipmentId is None:
+        return ''
+    else:
+        sql = "select Equip_Type from equip where Equip_ID=%s"%equipmentId
+        data = selectOne(sql)
+        if(data is None):
+            return ''
+        else:
+            if (data['Equip_Type'] == '通用装备') :
+                return '件'
+            elif (data['Equip_Type'] == '专用装备'):
+                return '辆'
+            else:
+                return ''
+
+def getUnitNameByID(unitId):
+    if unitId is None:
+        return ''
+    else:
+        sql = "select Unit_Name from unit where Unit_ID=%s"%unitId
+        data = selectOne(sql)
+        if(data is None or len(data) == 0):
+            return ''
+        else:
+            return data['Unit_Name']
+
+
+
+
+
+
+
 
 
 
@@ -163,7 +221,6 @@ def getResultByYearAndEquip(year,equipList):
 
 
 if __name__ == "__main__":
-    list = ['1','2']
-    result = getResultByYearAndEquip(2018,list)
-    print(result)
+    unitList = ['3','4','5']
+    equipList = ['1','2','3']
 

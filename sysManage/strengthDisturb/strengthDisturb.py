@@ -1,3 +1,4 @@
+from sysManage.strengthDisturb.applyRetirement.applyRetirementControl import Apply_Retirement_Control
 from widgets.strengthDisturb.StrengthDisturb import Strength_Disturb_Widget
 import sys
 from PyQt5.QtWidgets import QMainWindow,QApplication,QWidget
@@ -14,7 +15,7 @@ class strengthDisturb(QMainWindow, Strength_Disturb_Widget):
         self.strenSelect = Stren_Inquiry(self)
         self.maintenMange = maintenManage(self)
         self.equipBalance = Equip_Balance_Control(self)
-        self.applyRetire = QWidget(self)
+        self.applyRetire = Apply_Retirement_Control(self)
         self.strengthDisturbSet = strengthDisturbSet(self)
 
         self.stackedWidget.addWidget(self.strenSelect)
