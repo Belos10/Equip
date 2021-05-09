@@ -392,8 +392,8 @@ def addDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper):
 def addDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type):
     conn, cur = connectMySql()
     # 插入的sql语句
-    sql = "INSERT INTO equip (Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type) VALUES" \
-          + "('" + Equip_ID + "','" + Equip_Name + "','" + Equip_Uper + "','" + Input_Type + "','" + Equip_Type + "')"
+    sql = "INSERT INTO equip (Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type,unit) VALUES" \
+          + "('" + Equip_ID + "','" + Equip_Name + "','" + Equip_Uper + "','" + Input_Type + "','" + Equip_Type + "','') "
     # print(sql)
     # 执行sql语句，并发送给数据库
     cur.execute(sql)
