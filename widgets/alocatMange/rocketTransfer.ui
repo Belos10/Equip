@@ -102,27 +102,6 @@
            </item>
           </widget>
          </item>
-         <item>
-          <widget class="QToolButton" name="tb_add">
-           <property name="text">
-            <string>新增</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QToolButton" name="tb_del">
-           <property name="text">
-            <string>删除</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QToolButton" name="tb_input">
-           <property name="text">
-            <string>导入</string>
-           </property>
-          </widget>
-         </item>
         </layout>
        </widget>
       </item>
@@ -416,35 +395,7 @@
         </item>
         <item>
          <layout class="QGridLayout" name="gridLayout">
-          <item row="0" column="3">
-           <widget class="QPushButton" name="pb_save">
-            <property name="text">
-             <string>保存</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QPushButton" name="pb_add">
-            <property name="text">
-             <string>新增</string>
-            </property>
-           </widget>
-          </item>
           <item row="0" column="2">
-           <widget class="QPushButton" name="pb_del">
-            <property name="text">
-             <string>删除</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="5">
-           <widget class="QPushButton" name="pb_output">
-            <property name="text">
-             <string>导出</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="6">
            <spacer name="horizontalSpacer_2">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -457,10 +408,10 @@
             </property>
            </spacer>
           </item>
-          <item row="0" column="4">
-           <widget class="QPushButton" name="pb_input">
+          <item row="0" column="1">
+           <widget class="QPushButton" name="pb_output">
             <property name="text">
-             <string>导入</string>
+             <string>导出</string>
             </property>
            </widget>
           </item>

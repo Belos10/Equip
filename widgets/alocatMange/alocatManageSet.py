@@ -10,24 +10,32 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets, Qt
 
-#new
+
 class Widget_Alocat_Manage_Set(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1056, 682)
-        self.centralwidget = QtWidgets.QWidget(MainWindow)
-        self.centralwidget.setObjectName("centralwidget")
-        MainWindow.setCentralWidget(self.centralwidget)
+        self.widget = QtWidgets.QWidget(MainWindow)
+        self.widget.setObjectName("widget")
+        self.gridLayout = QtWidgets.QGridLayout(self.widget)
+        self.gridLayout.setContentsMargins(0, 0, 0, 0)
+        self.gridLayout.setSpacing(0)
+        self.gridLayout.setObjectName("gridLayout")
+        self.sw_setWidget = QtWidgets.QStackedWidget(self.widget)
+        self.sw_setWidget.setObjectName("sw_setWidget")
+        self.gridLayout.addWidget(self.sw_setWidget, 0, 0, 1, 1)
+        MainWindow.setCentralWidget(self.widget)
         self.toolBar = QtWidgets.QToolBar(MainWindow)
         self.toolBar.setObjectName("toolBar")
         MainWindow.addToolBar(QtCore.Qt.LeftToolBarArea, self.toolBar)
 
-        self.tb_armyTransferYearSet = QtWidgets.QToolButton(MainWindow)
+        self.tb_dictSet = QtWidgets.QToolButton(MainWindow)
         icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap(":/pic/set.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.tb_armyTransferYearSet.setIcon(icon1)
-        self.tb_armyTransferYearSet.setObjectName("tb_armyTransferYearSet")
-        self.tb_armyTransferYearSet.setToolButtonStyle(Qt.Qt.ToolButtonTextUnderIcon)
+        icon1.addPixmap(QtGui.QPixmap(":/pict.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.tb_dictSet.setIcon(icon1)
+        self.tb_dictSet.setObjectName("tb_armyTransferYearSet")
+        self.tb_dictSet.setToolButtonStyle(Qt.Qt.ToolButtonTextUnderIcon)
+        self.toolBar.addWidget(self.tb_dictSet)
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -36,3 +44,4 @@ class Widget_Alocat_Manage_Set(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.toolBar.setWindowTitle(_translate("MainWindow", "toolBar"))
+        self.tb_dictSet.setText(_translate("MainWindow", "目录设置"))

@@ -357,7 +357,7 @@
         <item row="1" column="0">
          <widget class="QLabel" name="lb_unitUper">
           <property name="text">
-           <string>上级单位号：</string>
+           <string>别名</string>
           </property>
          </widget>
         </item>
@@ -448,7 +448,7 @@
          </spacer>
         </item>
         <item row="1" column="1">
-         <widget class="QLineEdit" name="le_unitUper">
+         <widget class="QLineEdit" name="le_otherName">
           <property name="maximumSize">
            <size>
             <width>150</width>
@@ -478,7 +478,7 @@
          </widget>
         </item>
         <item row="1" column="5">
-         <widget class="QLineEdit" name="le_equipUper">
+         <widget class="QLineEdit" name="le_uperID">
           <property name="maximumSize">
            <size>
             <width>150</width>

@@ -75,6 +75,7 @@ def selectRocketTransferByYear(year):
 
     return result
 
+
 #向陆军调拨单年份表中添加年份
 def insertIntoArmyTransferYear(year):
     conn, cur = connectMySql()

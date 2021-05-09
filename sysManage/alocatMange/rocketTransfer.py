@@ -26,15 +26,6 @@ class rocketTransfer(QWidget, Widget_Rocket_Transfer):
 
     def signalConnect(self):
         self.lw_yearChoose.itemPressed.connect(self.slotSelectResult)
-        self.pb_add.clicked.connect(self.addNewRow)
-        self.tb_add.clicked.connect(self.slotAddNewYear)
-
-    def slotAddNewYear(self):
-        year = 0
-        year, ok = QInputDialog.getInt(self, "Get year", "year:", 0, 0, 100000, 1)
-        if year:
-            insertIntoRocketTransferYear(year)
-            self._initYearWidget_()
 
     def _initYearWidget_(self):
         self.yearList = []
@@ -202,47 +193,3 @@ class rocketTransfer(QWidget, Widget_Rocket_Transfer):
             item.setText(rocketTransferInfo[20])
             self.tw_result.setItem(i + 2, 18, item)
 
-    def addNewRow(self):
-        currentRow = self.tw_result.rowCount()
-        self.tw_result.setRowCount(currentRow + 1)
-
-        for i in range(19):
-            if i == 14:
-                equipCombo = QComboBox()
-                for equipInfo in self.equipTuple:
-                    equipCombo.addItem(equipInfo[1])
-                self.tw_result.setCellWidget(currentRow, i, equipCombo)
-            elif i == 2:
-                dateEdit = QDateEdit()
-                self.tw_result.setCellWidget(currentRow, i, dateEdit)
-            elif i == 7:
-                dateEdit = QDateEdit()
-                self.tw_result.setCellWidget(currentRow, i, dateEdit)
-            elif i == 11:
-                item = QTableWidgetItem()
-                item.setText(ArmyTransferReceiveUnit['单位名称'])
-                self.tw_result.setItem(currentRow, i, item)
-            elif i == 12:
-                item = QTableWidgetItem()
-                item.setText(ArmyTransferReceiveUnit['联系人'])
-                self.tw_result.setItem(currentRow, i, item)
-            elif i == 13:
-                item = QTableWidgetItem()
-                item.setText(ArmyTransferReceiveUnit['联系电话'])
-                self.tw_result.setItem(currentRow, i, item)
-            elif i == 8:
-                item = QTableWidgetItem()
-                item.setText(ArmyTransferSendUnit['单位名称'])
-                self.tw_result.setItem(currentRow, i, item)
-            elif i == 9:
-                item = QTableWidgetItem()
-                item.setText(ArmyTransferSendUnit['联系人'])
-                self.tw_result.setItem(currentRow, i, item)
-            elif i == 10:
-                item = QTableWidgetItem()
-                item.setText(ArmyTransferSendUnit['联系电话'])
-                self.tw_result.setItem(currentRow, i, item)
-            else:
-                item = QTableWidgetItem()
-                item.setText("")
-                self.tw_result.setItem(currentRow, i, item)

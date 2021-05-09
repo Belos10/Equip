@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget
 from widgets.alocatMange.alocatMange import Widget_Alocat_Mange
 from sysManage.alocatMange.transferManage import transferManage
 from sysManage.alocatMange.DisturbPlan import DisturbPlan
+from sysManage.alocatMange.alocatManageSet import alocatManageSet
 
 '''
     功能：
@@ -17,7 +18,7 @@ class alocatMange(QMainWindow, Widget_Alocat_Mange):
         self.disturbPlan = DisturbPlan()            #分配调整计划
         self.disturbSchedule = QWidget(self)        #调拨进度
         self.transferManage = transferManage(self)  #调拨单管理
-        self.alocatSet = QWidget(self)              #调配管理设置
+        self.alocatSet = alocatManageSet(self)              #调配管理设置
 
         #添加页面
         self.stackedWidget.addWidget(self.disturbPlan)
@@ -30,6 +31,7 @@ class alocatMange(QMainWindow, Widget_Alocat_Mange):
         self.tb_disturbPlan.setDisabled(True)
         self.tb_disturbSchedule.setDisabled(False)
         self.tb_disturbManage.setDisabled(False)
+        self.tb_alocatSet.setDisabled(False)
         self.connectSignal()
 
     '''
@@ -40,6 +42,8 @@ class alocatMange(QMainWindow, Widget_Alocat_Mange):
         self.tb_disturbPlan.clicked.connect(self.slotDisturbPlan)
         self.tb_disturbSchedule.clicked.connect(self.slotDisturbSchedule)
         self.tb_disturbManage.clicked.connect(self.slotDisturbManage)
+        self.tb_alocatSet.clicked.connect(self.slotAlocatSet)
+        self.transferManage.armyTransfer.pb_equipSet.clicked.connect(self.slotSetEquip)
 
     '''
         功能：
@@ -55,10 +59,7 @@ class alocatMange(QMainWindow, Widget_Alocat_Mange):
             点击分配调整计划按钮
     '''
     def slotDisturbPlan(self):
-        self.stackedWidget.setCurrentIndex(0)
-        self.tb_disturbPlan.setDisabled(1)
-        self.tb_disturbSchedule.setDisabled(0)
-        self.tb_disturbManage.setDisabled(0)
+        pass
 
     '''
         功能：
@@ -76,3 +77,19 @@ class alocatMange(QMainWindow, Widget_Alocat_Mange):
         self.tb_disturbPlan.setDisabled(False)
         self.tb_disturbSchedule.setDisabled(False)
         self.tb_disturbManage.setDisabled(True)
+        self.tb_alocatSet.setDisabled(False)
+
+    def slotAlocatSet(self):
+        self.stackedWidget.setCurrentIndex(3)
+        self.tb_disturbPlan.setDisabled(False)
+        self.tb_disturbSchedule.setDisabled(False)
+        self.tb_disturbManage.setDisabled(False)
+        self.tb_alocatSet.setDisabled(True)
+
+    def slotSetEquip(self):
+        self.stackedWidget.setCurrentIndex(3)
+        self.tb_disturbPlan.setDisabled(False)
+        self.tb_disturbSchedule.setDisabled(False)
+        self.tb_disturbManage.setDisabled(False)
+        self.tb_alocatSet.setDisabled(True)
+        self.alocatSet.dictSet.slotEquipDictInit()

@@ -1,9 +1,11 @@
-from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, QAbstractItemView, QMessageBox, QListWidgetItem
+from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, QAbstractItemView, \
+    QMessageBox, QListWidgetItem,QInputDialog
 from widgets.strengthDisturb.maintenMange import Widget_Mainten_Manage
 from database.strengthDisturbSql import selectAllStrengthYearInfo, selectAllDataAboutUnit, \
     updateUnitIsGroupFromUnit, selectAllFromPulicEquip, selectUnitInfoByDeptUper, selectGroupIDByPublicEquip,\
     selectAllDataAboutWeaveYear, selectEquipInfoByEquipUper, selectAboutWeaveByUnitListAndEquipList, \
-    selectAboutWeaveByEquipShow, selectAboutWeaveByUnitShow, selectUnitIsHaveChild, selectEquipIsHaveChild, updateWeaveNum
+    selectAboutWeaveByEquipShow, selectAboutWeaveByUnitShow, selectUnitIsHaveChild, selectEquipIsHaveChild,\
+    updateWeaveNum,insertIntoWeaveYear,delWeaveYearByYear
 from PyQt5.Qt import Qt
 
 '''
@@ -64,7 +66,28 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
         #当点击展开到末级的时候
         self.cb_showLast.clicked.connect(self.slotClickedRB)
 
+        self.tb_add.clicked.connect(self.slotAddNewYear)
 
+        self.tb_del.clicked.connect(self.slotDelYear)
+
+
+    def slotDelYear(self):
+        currentRow = self.lw_year.currentRow()
+        if currentRow == 0:
+            reply = QMessageBox.question(self, '删除', '是否删除所有年份以及年份下所有数据？', QMessageBox.Yes, QMessageBox.Cancel)
+            if QMessageBox.Cancel:
+                return
+        if currentRow < 0:
+            reply = QMessageBox.question(self, '删除', '请选中某年进行删除', QMessageBox.Yes)
+        else:
+            currentYear = self.lw_year.currentItem().text()
+            reply = QMessageBox.question(self, '删除', '是否删除当前年份以及当前年份下所有数据？', QMessageBox.Yes, QMessageBox.Cancel)
+            if reply == QMessageBox.Yes:
+                delWeaveYearByYear(currentYear)
+                self._initAll_()
+
+            else:
+                return
     #当前结果的值被修改
     def slotResultItemChange(self):
         self.currentRow = self.tw_result.currentRow()
@@ -87,6 +110,13 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
                     break
         else:
             pass
+
+    def slotAddNewYear(self):
+        year = 0
+        year, ok = QInputDialog.getInt(self, "Get year", "year:", 0, 0, 100000, 1)
+        if year:
+            insertIntoWeaveYear(year)
+            self._initSelectYear_()
 
     #清除当前页面的所有编制数
     def slotClearAllRow(self):
@@ -286,7 +316,7 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
         self.currentYearListItem = {}
         self.yearList = ['全部']
         self.lw_year.clear()
-        allyearList = selectAllStrengthYearInfo()
+        allyearList = selectAllDataAboutWeaveYear()
 
         for year in allyearList:
             self.yearList.append(year[1])

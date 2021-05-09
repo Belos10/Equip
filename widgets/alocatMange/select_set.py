@@ -11,10 +11,10 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Widget_Select_Set(object):
+class Widget_Dict_Set(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(1018, 668)
+        Form.resize(1272, 743)
         self.gridLayout_5 = QtWidgets.QGridLayout(Form)
         self.gridLayout_5.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_5.setSpacing(0)
@@ -29,9 +29,6 @@ class Widget_Select_Set(object):
         self.horizontalLayout.setObjectName("horizontalLayout")
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem)
-        self.pb_setEquipUnit = QtWidgets.QPushButton(self.chooseWidget)
-        self.pb_setEquipUnit.setObjectName("pb_setEquipUnit")
-        self.horizontalLayout.addWidget(self.pb_setEquipUnit)
         self.pb_setUnit = QtWidgets.QPushButton(self.chooseWidget)
         self.pb_setUnit.setObjectName("pb_setUnit")
         self.horizontalLayout.addWidget(self.pb_setUnit)
@@ -202,10 +199,10 @@ class Widget_Select_Set(object):
         self.gridLayout_2.addWidget(self.lb_equipType, 1, 6, 1, 1)
         spacerItem1 = QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
         self.gridLayout_2.addItem(spacerItem1, 0, 8, 1, 1)
-        self.le_unitUper = QtWidgets.QLineEdit(self.inputWidget)
-        self.le_unitUper.setMaximumSize(QtCore.QSize(150, 16777215))
-        self.le_unitUper.setObjectName("le_unitUper")
-        self.gridLayout_2.addWidget(self.le_unitUper, 1, 1, 1, 1)
+        self.le_otherName = QtWidgets.QLineEdit(self.inputWidget)
+        self.le_otherName.setMaximumSize(QtCore.QSize(150, 16777215))
+        self.le_otherName.setObjectName("le_otherName")
+        self.gridLayout_2.addWidget(self.le_otherName, 1, 1, 1, 1)
         self.le_unitID = QtWidgets.QLineEdit(self.inputWidget)
         self.le_unitID.setMaximumSize(QtCore.QSize(150, 16777215))
         self.le_unitID.setObjectName("le_unitID")
@@ -214,10 +211,10 @@ class Widget_Select_Set(object):
         self.le_equipID.setMaximumSize(QtCore.QSize(150, 16777215))
         self.le_equipID.setObjectName("le_equipID")
         self.gridLayout_2.addWidget(self.le_equipID, 0, 5, 1, 1)
-        self.le_equipUper = QtWidgets.QLineEdit(self.inputWidget)
-        self.le_equipUper.setMaximumSize(QtCore.QSize(150, 16777215))
-        self.le_equipUper.setObjectName("le_equipUper")
-        self.gridLayout_2.addWidget(self.le_equipUper, 1, 5, 1, 1)
+        self.le_uperID = QtWidgets.QLineEdit(self.inputWidget)
+        self.le_uperID.setMaximumSize(QtCore.QSize(150, 16777215))
+        self.le_uperID.setObjectName("le_uperID")
+        self.gridLayout_2.addWidget(self.le_uperID, 1, 5, 1, 1)
         self.gridLayout_4.addLayout(self.gridLayout_2, 0, 0, 1, 1)
         self.gridLayout_5.addWidget(self.inputWidget, 2, 0, 1, 1)
 
@@ -227,7 +224,6 @@ class Widget_Select_Set(object):
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "Form"))
-        self.pb_setEquipUnit.setText(_translate("Form", "设置当前装备单位"))
         self.pb_setUnit.setText(_translate("Form", "设置单位目录"))
         self.pb_setEquip.setText(_translate("Form", "设置装备目录"))
         self.pb_firstSelect.setText(_translate("Form", "查询"))
@@ -241,7 +237,7 @@ class Widget_Select_Set(object):
         self.lb_inputType.setText(_translate("Form", "装备录入类型："))
         self.pb_add.setText(_translate("Form", "增加"))
         self.pb_update.setText(_translate("Form", "修改"))
-        self.lb_unitUper.setText(_translate("Form", "上级单位号："))
+        self.lb_unitUper.setText(_translate("Form", "别名"))
         self.lb_equipName.setText(_translate("Form", "装备名字："))
         self.lb_equipUper.setText(_translate("Form", "上级装备号："))
         self.cb_equipType.setItemText(0, _translate("Form", "空"))

@@ -1,20 +1,24 @@
-from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, \
-    QAbstractItemView, QMessageBox,QInputDialog,QLineEdit
-from database.strengthDisturbSql import selectUnitInfoByDeptUper, selectAllDataAboutUnit, selectEquipInfoByEquipUper, \
-    selectAllDataAboutEquip, addDataIntoUnit, addDataIntoEquip, updateDataIntoUnit,\
-    updateDataIntoEquip, delDataInEquip, delDataInUnit,updateEquipUnit
-from widgets.strengthDisturb.select_set import Widget_Select_Set
-from sysManage.strengthDisturb.equipUnitSet import equipUnitSet
+from widgets.alocatMange.select_set import Widget_Dict_Set
+import sys
+from PyQt5.QtWidgets import QApplication,QWidget, QListWidgetItem, QComboBox, QTableWidgetItem, QDateEdit, \
+    QInputDialog,QMessageBox,QAbstractItemView,QTreeWidgetItem
+from database.strengthDisturbSql import selectUnitInfoByDeptUper,selectAllDataAboutUnit,selectEquipInfoByEquipUper\
+    ,addDataIntoUnit,selectAllDataAboutEquip,addDataIntoEquip,updateDataIntoUnit,updateDataIntoEquip,delDataInEquip\
+    ,delDataInUnit
+from sysManage.alocatMange.config import ArmyTransferReceiveUnit, ArmyTransferSendUnit
 from PyQt5.Qt import Qt
-
 #new
-class strengthSelectSet(QWidget, Widget_Select_Set):
+'''
+    功能：
+        陆军调拨单管理
+'''
+class alocatDictSet(QWidget, Widget_Dict_Set):
     def __init__(self, parent=None):
-        super(strengthSelectSet, self).__init__(parent)
+        super(alocatDictSet, self).__init__(parent)
         self.setupUi(self)
 
-        self.tw_first.clear()           #删除单位目录所有数据显示
-        self.tw_second.clear()          #删除装备目录所有数据显示
+        self.tw_first.clear()  # 删除单位目录所有数据显示
+        self.tw_second.clear()  # 删除装备目录所有数据显示
         self.tw_first.header().setVisible(False)  # 不显示树窗口的title
         self.tw_second.header().setVisible(False)  # 不显示树窗口的title
         self.changeUnit = True  # 是否是修改单元的目录
@@ -42,17 +46,6 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
 
         self.pb_setEquip.clicked.connect(self.slotEquipDictInit)  # 设置装备目录
 
-        self.pb_setEquipUnit.clicked.connect(self.slotSetEquipUnit)
-
-    def slotSetEquipUnit(self):
-        if self.tb_result.currentRow() == -1:
-            return
-        text, okPressed = QInputDialog.getText(self, "Get text", "装备单位为:", QLineEdit.Normal, "")
-        if okPressed:
-            print(text)
-            updateEquipUnit(text, self.le_equipID.text())
-        self.slotEquipDictInit()
-
     '''
             功能：
                 所有信号的断开
@@ -64,7 +57,7 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
 
         self.tb_result.itemClicked.disconnect(self.slotClickedRow)  # 选中当前tablewidget的某行
 
-        self.pb_setUnit.clicked.disconnect(self.slotUnitDictInit)  # 设置单元目录
+        #self.pb_setUnit.clicked.disconnect(self.slotUnitDictInit)  # 设置单元目录
 
         self.pb_setEquip.clicked.disconnect(self.slotEquipDictInit)  # 设置装备目录
 
@@ -80,10 +73,9 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
         self.le_second.clear()
         self.le_equipID.clear()
         self.le_unitID.clear()
-        self.le_unitUper.clear()
         self.le_unitName.clear()
         self.le_equipName.clear()
-        self.le_equipUper.clear()
+        self.le_uperID.clear()
 
     '''
         功能：
@@ -101,7 +93,7 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
         self.pb_firstSelect.setDisabled(False)
         self.le_equipID.setDisabled(True)
         self.le_equipName.setDisabled(True)
-        self.le_equipUper.setDisabled(True)
+        self.le_uperID.setDisabled(True)
         self.cb_equipType.setDisabled(True)
         self.cb_inputType.setDisabled(True)
         self.le_unitUper.setDisabled(False)
@@ -109,7 +101,6 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
         self.le_unitID.setDisabled(False)
         self.pb_setEquip.setDisabled(False)
         self.pb_setUnit.setDisabled(True)
-        self.pb_setEquipUnit.setDisabled(True)
 
         #从数据库中单位表中获取数据初始化单位目录，tableWidget显示所有的单位表
         self._initUnitTreeWidget("", self.tw_first)
@@ -133,15 +124,14 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
         self.pb_firstSelect.setDisabled(True)
         self.le_equipID.setDisabled(False)
         self.le_equipName.setDisabled(False)
-        self.le_equipUper.setDisabled(False)
+        self.le_uperID.setDisabled(False)
         self.cb_equipType.setDisabled(False)
         self.cb_inputType.setDisabled(False)
-        self.le_unitUper.setDisabled(True)
         self.le_unitName.setDisabled(True)
         self.le_unitID.setDisabled(True)
         self.pb_setEquip.setDisabled(True)
         self.pb_setUnit.setDisabled(False)
-        self.pb_setEquipUnit.setDisabled(False)
+        self.le_otherName.setDisabled(True)
 
         # 从数据库中单位表中获取数据初始化单位目录，tableWidget显示所有的单位表
         self._initEquipTreeWidget("", self.tw_second)
@@ -216,7 +206,7 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
     def _initEquipTableWidget(self):
         result = selectAllDataAboutEquip()
 
-        header = ['装备编号', '装备名称', '上级装备编号', '录入类型', '装备类型', '装备单位']
+        header = ['装备编号', '装备名称', '上级装备编号', '录入类型', '装备类型']
         self.tb_result.setColumnCount(len(header))
         self.tb_result.setRowCount(len(result))
         self.tb_result.setHorizontalHeaderLabels(header)
@@ -232,8 +222,6 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
             self.tb_result.setItem(i, 3, item)
             item = QTableWidgetItem(data[4])
             self.tb_result.setItem(i, 4, item)
-            item = QTableWidgetItem(data[5])
-            self.tb_result.setItem(i, 5, item)
 
         # print(result)   #测试查找到的数据
 
@@ -251,7 +239,7 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
         else:
             self.le_equipID.setText((self.tb_result.item(currentRow,0).text()))
             self.le_equipName.setText((self.tb_result.item(currentRow, 1).text()))
-            self.le_equipUper.setText((self.tb_result.item(currentRow, 2).text()))
+            self.le_uperID.setText((self.tb_result.item(currentRow, 2).text()))
             inputType = self.tb_result.item(currentRow, 3).text()
             equipType = self.tb_result.item(currentRow, 4).text()
 
@@ -314,7 +302,7 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
             else:
                 Equip_ID = self.le_equipID.text()
                 Equip_Name = self.le_equipName.text()
-                Equip_Uper = self.le_equipUper.text()
+                Equip_Uper = self.le_uperID.text()
                 Input_Type = self.cb_inputType.currentText()
                 Equip_Type = self.cb_equipType.currentText()
                 equipInfoTuple = selectAllDataAboutEquip()
@@ -380,7 +368,7 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
             else:
                 Equip_ID = self.le_equipID.text()
                 Equip_Name = self.le_equipName.text()
-                Equip_Uper = self.le_equipUper.text()
+                Equip_Uper = self.le_uperID.text()
                 Input_Type = self.cb_inputType.currentText()
                 Equip_Type = self.cb_equipType.currentText()
                 haveUperID = False
@@ -428,5 +416,3 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
     功能：
         单元测试
 '''
-if __name__ == '__main__':
-    pass

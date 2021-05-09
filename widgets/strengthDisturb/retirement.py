@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'maintenMange.ui'
+# Form implementation generated from reading ui file 'retirement.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.2
 #
@@ -11,10 +11,10 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Widget_Mainten_Manage(object):
+class Widget_Retirement(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(1570, 764)
+        Form.resize(1370, 692)
         self.gridLayout_3 = QtWidgets.QGridLayout(Form)
         self.gridLayout_3.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_3.setSpacing(0)
@@ -122,37 +122,30 @@ class Widget_Mainten_Manage(object):
         self.groupBox_3 = QtWidgets.QGroupBox(Form)
         self.groupBox_3.setObjectName("groupBox_3")
         self.gridLayout_2 = QtWidgets.QGridLayout(self.groupBox_3)
-        self.gridLayout_2.setContentsMargins(5, 5, 5, 5)
-        self.gridLayout_2.setSpacing(5)
+        self.gridLayout_2.setContentsMargins(0, 0, 0, 0)
+        self.gridLayout_2.setSpacing(0)
         self.gridLayout_2.setObjectName("gridLayout_2")
-        self.horizontalLayout_5 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_5.setObjectName("horizontalLayout_5")
-        self.rb_equipShow = QtWidgets.QRadioButton(self.groupBox_3)
-        self.rb_equipShow.setObjectName("rb_equipShow")
-        self.horizontalLayout_5.addWidget(self.rb_equipShow)
-        self.rb_unitShow = QtWidgets.QRadioButton(self.groupBox_3)
-        self.rb_unitShow.setObjectName("rb_unitShow")
-        self.horizontalLayout_5.addWidget(self.rb_unitShow)
-        self.cb_showLast = QtWidgets.QCheckBox(self.groupBox_3)
-        self.cb_showLast.setObjectName("cb_showLast")
-        self.horizontalLayout_5.addWidget(self.cb_showLast)
-        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_5.addItem(spacerItem)
-        self.pb_delState = QtWidgets.QPushButton(self.groupBox_3)
-        self.pb_delState.setObjectName("pb_delState")
-        self.horizontalLayout_5.addWidget(self.pb_delState)
-        self.pb_clearCheck = QtWidgets.QPushButton(self.groupBox_3)
-        self.pb_clearCheck.setObjectName("pb_clearCheck")
-        self.horizontalLayout_5.addWidget(self.pb_clearCheck)
-        self.pb_clearAll = QtWidgets.QPushButton(self.groupBox_3)
-        self.pb_clearAll.setObjectName("pb_clearAll")
-        self.horizontalLayout_5.addWidget(self.pb_clearAll)
-        self.gridLayout_2.addLayout(self.horizontalLayout_5, 0, 0, 1, 1)
         self.tw_result = QtWidgets.QTableWidget(self.groupBox_3)
         self.tw_result.setObjectName("tw_result")
         self.tw_result.setColumnCount(0)
         self.tw_result.setRowCount(0)
-        self.gridLayout_2.addWidget(self.tw_result, 1, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.tw_result, 0, 0, 1, 1)
+        self.horizontalLayout_5 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_5.setObjectName("horizontalLayout_5")
+        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_5.addItem(spacerItem)
+        self.pb_save = QtWidgets.QPushButton(self.groupBox_3)
+        self.pb_save.setObjectName("pb_save")
+        self.horizontalLayout_5.addWidget(self.pb_save)
+        self.pb_input = QtWidgets.QPushButton(self.groupBox_3)
+        self.pb_input.setObjectName("pb_input")
+        self.horizontalLayout_5.addWidget(self.pb_input)
+        self.pb_output = QtWidgets.QPushButton(self.groupBox_3)
+        self.pb_output.setObjectName("pb_output")
+        self.horizontalLayout_5.addWidget(self.pb_output)
+        spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_5.addItem(spacerItem1)
+        self.gridLayout_2.addLayout(self.horizontalLayout_5, 1, 0, 1, 1)
         self.gridLayout_3.addWidget(self.groupBox_3, 0, 2, 1, 1)
 
         self.retranslateUi(Form)
@@ -169,9 +162,6 @@ class Widget_Mainten_Manage(object):
         self.pb_firstSelect.setText(_translate("Form", "查询"))
         self.pb_secondSelect.setText(_translate("Form", "查询"))
         self.groupBox_3.setTitle(_translate("Form", "查询结果"))
-        self.rb_equipShow.setText(_translate("Form", "按装备展开显示"))
-        self.rb_unitShow.setText(_translate("Form", "按单位展开显示"))
-        self.cb_showLast.setText(_translate("Form", "展开到末级"))
-        self.pb_delState.setText(_translate("Form", "删除展开状态"))
-        self.pb_clearCheck.setText(_translate("Form", "清除选中装备"))
-        self.pb_clearAll.setText(_translate("Form", "清除全部装备"))
+        self.pb_save.setText(_translate("Form", "保存"))
+        self.pb_input.setText(_translate("Form", "导入"))
+        self.pb_output.setText(_translate("Form", "导出"))
