@@ -198,6 +198,7 @@ class DisturbPlan(QWidget, yearList_Form):
         i = 0
         for LineInfo in self.currentEquipdict.values():
             item = QTableWidgetItem(LineInfo[1])
+            item.setFlags(Qt.ItemIsEnabled|Qt.ItemIsSelectable)
             self.disturbResult.setItem(i, 0, item)
             i = i + 1
             self.currentDisturbPlan[i] = LineInfo
@@ -222,7 +223,7 @@ class DisturbPlan(QWidget, yearList_Form):
                     self.disturbResult.setItem(j, 4 + i, item)
                 else:
                     item = QTableWidgetItem("")
-                    item.setFlags(Qt.NoItemFlags)
+                    item.setFlags(Qt.ItemIsEnabled|Qt.ItemIsSelectable)
                     #item.setBackground(QBrush(QColor(240,240,240)))
                     self.disturbResult.setItem(j, 4 + i, item)
                 num=num+1
@@ -236,7 +237,7 @@ class DisturbPlan(QWidget, yearList_Form):
                 else:
                     sum = sum + int(num)
             item = QTableWidgetItem(str(sum))
-            item.setFlags(Qt.NoItemFlags)
+            item.setFlags(Qt.ItemIsEnabled|Qt.ItemIsSelectable)
             self.disturbResult.setItem(i, 3, item)
             sum = 0
         # 若装备含子装备，则该行不可选中
@@ -244,7 +245,7 @@ class DisturbPlan(QWidget, yearList_Form):
             if selectEquipIsHaveChild(self.currentEquipdict[i][0]):
                 for j in range(1,self.disturbResult.columnCount()):
                     item = QTableWidgetItem("")
-                    item.setFlags(Qt.NoItemFlags)
+                    item.setFlags(Qt.ItemIsEnabled|Qt.ItemIsSelectable)
                     #item.setBackground(QBrush(QColor(240, 240, 240)))
                     self.disturbResult.setItem(i,j,item)
 
