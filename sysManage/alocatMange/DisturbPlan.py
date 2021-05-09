@@ -46,7 +46,7 @@ class DisturbPlan(QWidget, yearList_Form):
         self.tb_add.clicked.connect(self.slotAddNewYear)
         # 删除年份
         self.tb_del.clicked.connect(self.slotDelYear)
-        # 修改分配数
+        # 修改分配数与备注
         self.disturbResult.itemChanged.connect(self.slotItemChange)
 
 
@@ -226,6 +226,19 @@ class DisturbPlan(QWidget, yearList_Form):
                     #item.setBackground(QBrush(QColor(240,240,240)))
                     self.disturbResult.setItem(j, 4 + i, item)
                 num=num+1
+        # 显示此次分配计划数
+        sum = 0
+        for i in range(0, len(self.currentEquipdict)):
+            for j in range(0, len(self.currentUnitChilddict)):
+                num = self.disturbResult.item(i, 4 + j).text()
+                if num == '-1' or num == '':
+                    sum = sum + 0
+                else:
+                    sum = sum + int(num)
+            item = QTableWidgetItem(str(sum))
+            item.setFlags(Qt.NoItemFlags)
+            self.disturbResult.setItem(i, 3, item)
+            sum = 0
         # 若装备含子装备，则该行不可选中
         for i in self.currentEquipdict:
             if selectEquipIsHaveChild(self.currentEquipdict[i][0]):
@@ -234,19 +247,7 @@ class DisturbPlan(QWidget, yearList_Form):
                     item.setFlags(Qt.NoItemFlags)
                     #item.setBackground(QBrush(QColor(240, 240, 240)))
                     self.disturbResult.setItem(i,j,item)
-        # 显示此次分配计划数
-        sum=0
-        for i in range(0, len(self.currentEquipdict)):
-            for j in range(0,len(self.currentUnitChilddict)):
-                num=self.disturbResult.item(i,4+j).text()
-                if num=='-1' or num=='':
-                    sum=sum+0
-                else:
-                    sum=sum+int(num)
-            item = QTableWidgetItem(str(sum))
-            item.setFlags(Qt.NoItemFlags)
-            self.disturbResult.setItem(i,3,item)
-            sum=0
+
 
 
     '''
@@ -309,7 +310,6 @@ class DisturbPlan(QWidget, yearList_Form):
                                  self.currentYear,self.disturbResult.item(self.currentRow,self.currentColumn).text())
         if self.currentColumn == self.lenHeaderList-1:
             updateDisturbPlanNote(self.currentEquipdict[self.currentRow][0],self.currentYear,self.disturbResult.item(self.currentRow,self.currentColumn).text())
-
 
     # 初始化分配计划年份
     def setDisturbPlanTitle(self):
