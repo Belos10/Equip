@@ -32,8 +32,8 @@ class DisturbPlan(QWidget, yearList_Form):
 
     def signalConnect(self):
         # 点击选择年份后刷新页面 初始化
-        self.lw_yearChoose.itemClicked.connect(self.slotClickedInqury)
-        self.lw_yearChoose.itemClicked.connect(self.setDisturbPlanTitle)
+        self.lw_yearChoose.itemDoubleClicked.connect(self.slotClickedInqury)
+        self.lw_yearChoose.itemDoubleClicked.connect(self.setDisturbPlanTitle)
 
         # 点击第一目录结果
         self.tw_first.itemChanged.connect(self.slotDisturbStrengthResult)
@@ -42,8 +42,10 @@ class DisturbPlan(QWidget, yearList_Form):
 
         # 点击第二目录结果
         self.tw_second.itemChanged.connect(self.slotDisturbStrengthResult)
-
+        # 新增年份
         self.tb_add.clicked.connect(self.slotAddNewYear)
+        # 删除年份
+        self.tb_del.clicked.connect(self.slotDelYear)
         # 修改分配数
         self.disturbResult.itemChanged.connect(self.slotItemChange)
 
@@ -63,6 +65,13 @@ class DisturbPlan(QWidget, yearList_Form):
             insertIntoDisturbPlanYear(year)
             self._initYearWidget_()
 
+
+    # 删除年份
+    def slotDelYear(self):
+        currentYear=self.lw_yearChoose.currentItem()
+        #print(currentYear.text())
+        deleteDisturbPlanYear(currentYear.text())
+        self._initYearWidget_()
 
 
     # 初始化年份
@@ -199,6 +208,7 @@ class DisturbPlan(QWidget, yearList_Form):
             self.currentDisturbPlan[i] = LineInfo
         #self.disturbResult.setRowCount(n)
         self.initDisturbPlanNum()
+        self.initDisturbPlanNote()
 
 
 
@@ -296,16 +306,19 @@ class DisturbPlan(QWidget, yearList_Form):
 
 
     '''
-        改变分配计划数
+        改变分配计划数与备注
     '''
     def slotItemChange(self):
         self.currentRow = self.disturbResult.currentRow()
         self.currentColumn = self.disturbResult.currentColumn()
         if 4 <= self.currentColumn <= self.lenHeaderList-2:
-            upadteDisturbPlanNum(self.currentEquipdict[self.currentRow][0],self.currentUnitChilddict[self.currentColumn-4][0],
+            updateDisturbPlanNum(self.currentEquipdict[self.currentRow][0],self.currentUnitChilddict[self.currentColumn-4][0],
                                  self.currentYear,self.disturbResult.item(self.currentRow,self.currentColumn).text())
+        if self.currentColumn == self.lenHeaderList-1:
+            updateDisturbPlanNote(self.currentEquipdict[self.currentRow][0],self.currentYear,self.disturbResult.item(self.currentRow,self.currentColumn).text())
 
 
+    # 初始化分配计划年份
     def setDisturbPlanTitle(self):
         txt=str(self.currentYear)+"年分配计划"
         self.txt_disturbPlanYear.setFont(QFont("Microsoft YaHei"))
@@ -313,3 +326,16 @@ class DisturbPlan(QWidget, yearList_Form):
         self.txt_disturbPlanYear.setTextInteractionFlags(Qt.NoTextInteraction)
         self.txt_disturbPlanYear.setFontPointSize(15)
         self.txt_disturbPlanYear.setText(txt)
+
+
+    # 读取初始分配计划备注
+    def initDisturbPlanNote(self):
+        self.unitDisturbPlanNoteList = selectDisturbPlanNote(self.currentEquipdict, self.currentYear)
+        #print("self.unitDisturbPlanNoteList", self.unitDisturbPlanNoteList)
+        for i in range(0,len(self.unitDisturbPlanNoteList)):
+            if self.unitDisturbPlanNoteList[i] is not None:
+                item=QTableWidgetItem(str(self.unitDisturbPlanNoteList[i]))
+            else:
+                item = QTableWidgetItem("")
+            self.disturbResult.setItem(i,self.lenHeaderList-1,item)
+
