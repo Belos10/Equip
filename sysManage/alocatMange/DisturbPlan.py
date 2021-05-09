@@ -170,9 +170,6 @@ class DisturbPlan(QWidget, yearList_Form):
             j=j+1
         print("self.currentEquipdict",self.currentEquipdict)
 
-        # 将装备列表、单位子列表、选中年份传入
-        #self._initDisturbPlanByUnitListAndEquipList(self.currentCheckedUnitChildNameList,
-                                                    #self.currentCheckedEquipList, self.currentYear)
         self._initDisturbPlanByUnitListAndEquipList()
 
 
@@ -185,8 +182,6 @@ class DisturbPlan(QWidget, yearList_Form):
         self.disturbResult.setRowCount(0)
         self.lenCurrentUnitChilddict=len(self.currentUnitChilddict)
         self.lenCurrentEquipdict=len(self.currentEquipdict)
-        # 存放数据
-        #disturbPlanList = selectDisturbPlan(UnitList, EquipList, YearList)
 
         headerlist = ['装备名称及规格型号', '单位', '军委分配计划数', '此次分配合计数']
         if len(self.currentUnitChilddict):
@@ -221,9 +216,7 @@ class DisturbPlan(QWidget, yearList_Form):
         num=0
         for i in range(0,len(self.currentUnitChilddict)):
             for j in range(0,len(self.currentEquipdict)):
-                # if j==0 or j==1 or j==2 or j==3:
-                #     item=QTableWidgetItem.setFlags(Qt.NoItemFlags)
-                #     self.disturbResult.setItem(j,i,item)
+
                 if self.unitDisturbPlanList[num]!='-1':
                     item = QTableWidgetItem(self.unitDisturbPlanList[num])
                     self.disturbResult.setItem(j, 4 + i, item)
