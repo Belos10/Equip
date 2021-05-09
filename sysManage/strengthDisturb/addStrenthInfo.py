@@ -82,7 +82,7 @@ class AddStrenthInfo(QWidget, Add_Strenth_Info):
                                 confirm = self.tableWidget.item(row, 6).text()
                                 other = self.tableWidget.item(row, 7).text()
                                 print(self.unitID, self.equipID, ID, num, year, shop, state, arrive, confirm, other)
-                                updateInputInfo(self.unitID, self.equipID, ID, num, year, shop, state, arrive, confirm, other)
+                                updateInputInfo(self.unitID, self.equipID, ID, num, year, shop, state, arrive, confirm, other, self.yearList)
                             else:
                                 self.tableWidget.item(row, currentColumn).setText(resultRow[currentColumn + 2])
             else:
@@ -141,7 +141,7 @@ class AddStrenthInfo(QWidget, Add_Strenth_Info):
             self.header = ['批次号', '数量', '出厂年份', '生产厂家', '装备状态', '是否到位', '文件凭证', '备注']
             self.tableWidget.setColumnCount(len(self.header))
             self.tableWidget.setHorizontalHeaderLabels(self.header)
-            self.currentResult = selectInfoAboutInput(RowData[1], RowData[0])
+            self.currentResult = selectInfoAboutInput(RowData[1], RowData[0], self.yearList[0])
             self.tableWidget.setRowCount(len(self.currentResult))
             self.orginRowNum = len(self.currentResult)
             for i, data in enumerate(self.currentResult):
@@ -167,7 +167,7 @@ class AddStrenthInfo(QWidget, Add_Strenth_Info):
             self.header = ['批次号', '出厂年份', '生产厂家', '装备状态', '是否到位', '文件凭证', '备注']
             self.tableWidget.setColumnCount(len(self.header))
             self.tableWidget.setHorizontalHeaderLabels(self.header)
-            self.currentResult = selectInfoAboutInput(RowData[1], RowData[0])
+            self.currentResult = selectInfoAboutInput(RowData[1], RowData[0], self.yearList[0])
             self.tableWidget.setRowCount(len(self.currentResult))
             self.orginRowNum = len(self.currentResult)
             #print("结果为：", self.currentResult)

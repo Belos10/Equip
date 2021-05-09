@@ -1,11 +1,12 @@
 from widgets.strengthDisturb.stren_inquiry import Widget_Stren_Inquiry
-from PyQt5.QtWidgets import QWidget, QTreeWidgetItemIterator, QTreeWidgetItem, QMessageBox, QCheckBox, QListWidgetItem
+from PyQt5.QtWidgets import QWidget, QTreeWidgetItemIterator, QTreeWidgetItem, QMessageBox, \
+    QCheckBox, QListWidgetItem, QInputDialog
 from PyQt5 import QtWidgets
 from sysManage.strengthDisturb.InquiryResult import Inquiry_Result
 from sysManage.strengthDisturb.addStrenthInfo import AddStrenthInfo
 from database.strengthDisturbSql import selectAllDataAboutStrengthYear, selectUnitInfoByDeptUper, \
     selectEquipInfoByEquipUper \
-    , selectEquipIsHaveChild, selectUnitIsHaveChild, addDataIntoInputInfo
+    , selectEquipIsHaveChild, selectUnitIsHaveChild, addDataIntoInputInfo, insertIntoStrengthYear,delStrengthYearByYear
 from database.strengthDisturbSql import selectAllDataAboutStrengthYear, selectUnitInfoByDeptUper, selectEquipInfoByEquipUper\
     , selectEquipIsHaveChild, selectUnitIsHaveChild, addDataIntoInputInfo, selectAllStrengthYear
 from PyQt5.Qt import Qt
@@ -131,6 +132,33 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         # 录入界面保存按钮
         self.add_strenth_info.pb_Save.clicked.connect(self.slotSaveUpdate)
 
+        self.tb_add.clicked.connect(self.slotAddNewYear)
+
+        self.tb_del.clicked.connect(self.slotDelYear)
+
+    def slotDelYear(self):
+        currentRow = self.lw_chooseYear.currentRow()
+        if currentRow == 0:
+            reply = QMessageBox.question(self, '删除', '是否删除所有年份以及年份下所有数据？', QMessageBox.Yes, QMessageBox.Cancel)
+            if QMessageBox.Cancel:
+                return
+        if currentRow < 0:
+            reply = QMessageBox.question(self, '删除', '请选中某年进行删除', QMessageBox.Yes)
+        else:
+            currentYear = self.lw_chooseYear.currentItem().text()
+            reply = QMessageBox.question(self, '删除', '是否删除当前年份以及当前年份下所有数据？', QMessageBox.Yes, QMessageBox.Cancel)
+            if reply == QMessageBox.Yes:
+                delStrengthYearByYear(currentYear)
+                self._initSelectYear_()
+            else:
+                return
+
+    def slotAddNewYear(self):
+        year = 0
+        year, ok = QInputDialog.getInt(self, "Get year", "year:", 0, 0, 100000, 1)
+        if year:
+            insertIntoStrengthYear(year)
+            self._initSelectYear_()
 
     # 信号与槽连接的断开
     def signalDisconnectSlot(self):
@@ -139,7 +167,7 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
     #初始化年份listwidget
     def _initSelectYear_(self):
         self.currentYearListItem = {}
-        self.yearList = ['全部']
+        self.yearList = []
         self.lw_chooseYear.clear()
         allyearList = selectAllStrengthYear()
 
@@ -176,19 +204,20 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
                       self.add_strenth_info.tableWidget.item(i + orginRowNum, 4).text(),
                       self.add_strenth_info.tableWidget.item(i + orginRowNum, 5).text(),
                       self.add_strenth_info.tableWidget.item(i + orginRowNum, 6).text(),
-                      self.add_strenth_info.tableWidget.item(i + orginRowNum, 7).text())
+                      self.add_strenth_info.tableWidget.item(i + orginRowNum, 7).text(),
+                      self.yearList[0])
                 haveYear = False
                 # 添加新增的数据
                 year = self.add_strenth_info.tableWidget.item(i + orginRowNum, 2).text()
                 for y in allYear:
                     if y == year:
                         haveYear = True
-                if haveYear == False:
-                    print("meiyounian")
-                    reply = QMessageBox.question(self, '增加', '第' + str(i + orginRowNum + 1) + "行年份不存在，添加失败",
-                                                 QMessageBox.Yes)
-                else:
-                    addDataIntoInputInfo(Unit_ID, Equip_ID,
+                #if haveYear == False:
+                    #print("meiyounian")
+                    #reply = QMessageBox.question(self, '增加', '第' + str(i + orginRowNum + 1) + "行年份不存在，添加失败",
+                                                 #QMessageBox.Yes)
+                #else:
+                addDataIntoInputInfo(Unit_ID, Equip_ID,
                                         self.add_strenth_info.tableWidget.item(i + orginRowNum, 0).text(),
                                         self.add_strenth_info.tableWidget.item(i + orginRowNum, 1).text(),
                                         self.add_strenth_info.tableWidget.item(i + orginRowNum, 2).text(),
@@ -196,7 +225,8 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
                                         self.add_strenth_info.tableWidget.item(i + orginRowNum, 4).text(),
                                         self.add_strenth_info.tableWidget.item(i + orginRowNum, 5).text(),
                                         self.add_strenth_info.tableWidget.item(i + orginRowNum, 6).text(),
-                                        self.add_strenth_info.tableWidget.item(i + orginRowNum, 7).text())
+                                        self.add_strenth_info.tableWidget.item(i + orginRowNum, 7).text(),
+                                        self.yearList[0])
 
             self.sw_strenSelectMan.setCurrentIndex(0)
             self.slotInquryStrengthResult()
@@ -207,11 +237,11 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
                 for y in allYear:
                     if y == year:
                         haveYear = True
-                if haveYear == False:
-                    reply = QMessageBox.question(self, '增加', '第' + str(i + orginRowNum + 1) + "行年份不存在，添加失败",
-                                                 QMessageBox.Yes)
-                else:
-                    addDataIntoInputInfo(Unit_ID, Equip_ID,
+                #if haveYear == False:
+                   # reply = QMessageBox.question(self, '增加', '第' + str(i + orginRowNum + 1) + "行年份不存在，添加失败",
+                                                 #QMessageBox.Yes)
+                #else:
+                addDataIntoInputInfo(Unit_ID, Equip_ID,
                                      self.add_strenth_info.tableWidget.item(i + orginRowNum, 0).text(),
                                      "1",
                                      self.add_strenth_info.tableWidget.item(i + orginRowNum, 1).text(),
@@ -219,7 +249,8 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
                                      self.add_strenth_info.tableWidget.item(i + orginRowNum, 3).text(),
                                      self.add_strenth_info.tableWidget.item(i + orginRowNum, 4).text(),
                                      self.add_strenth_info.tableWidget.item(i + orginRowNum, 5).text(),
-                                     self.add_strenth_info.tableWidget.item(i + orginRowNum, 6).text())
+                                     self.add_strenth_info.tableWidget.item(i + orginRowNum, 6).text(),
+                                     self.yearList[0])
             self.sw_strenSelectMan.setCurrentIndex(0)
             self.slotInquryStrengthResult()
         self.groupBox.setDisabled(False)

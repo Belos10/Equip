@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>976</width>
-    <height>777</height>
+    <width>1194</width>
+    <height>764</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -92,6 +92,13 @@
            </size>
           </property>
          </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pb_factoryYear">
+          <property name="text">
+           <string>选择显示出厂年份</string>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QPushButton" name="pb_delState">

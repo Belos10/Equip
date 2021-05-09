@@ -179,16 +179,16 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
 
         if self.rb_equipShow.isChecked():
             #按装备展开
-            resultList = selectAboutStrengthByEquipShow(UnitList, EquipList, year)
+            resultList = selectAboutStrengthByEquipShow(UnitList, EquipList, year, '')
         elif self.rb_unitShow.isChecked():
             #按单位展开
-            resultList = selectAboutStrengthByUnitShow(UnitList, EquipList, year)
+            resultList = selectAboutStrengthByUnitShow(UnitList, EquipList, year, '')
         else:
-            resultList = selectAboutStrengthByUnitListAndEquipList(UnitList, EquipList, year)
+            resultList = selectAboutStrengthByUnitListAndEquipList(UnitList, EquipList, year, '')
 
         if self.cb_showLast.isChecked():
-            resultListEquip = selectAboutStrengthByEquipShow(UnitList, EquipList, year)
-            resultListUnit = selectAboutStrengthByUnitShow(UnitList, EquipList, year)
+            resultListEquip = selectAboutStrengthByEquipShow(UnitList, EquipList, year, '')
+            resultListUnit = selectAboutStrengthByUnitShow(UnitList, EquipList, year, '')
             resultList = resultListEquip + resultListUnit
             self.rb_unitShow.setCheckable(False)
             self.rb_equipShow.setCheckable(False)

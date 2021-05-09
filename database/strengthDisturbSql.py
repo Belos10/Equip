@@ -306,6 +306,24 @@ def selectAllDataAboutEquip():
 
     return result
 
+#查询所有出厂年份
+def selectAllDataAboutFactoryYear():
+    conn, cur = connectMySql()
+
+    sql = "select * from factoryyear order By year"
+
+    cur.execute(sql)
+    result = cur.fetchall()
+
+    disconnectMySql(conn, cur)
+
+    # 测试结果
+    # print(result)
+
+    return result
+
+
+
 
 # 查找所有的编制年份
 def selectAllDataAboutWeaveYear():
@@ -347,14 +365,14 @@ def addDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper):
 
     equipInfoTuple = selectAllDataAboutEquip()
     strengthYearInfoTuple = selectAllDataAboutStrengthYear()
-    weaveYearInfoTuple = selectAllDataAboutWeaveYear()
+    factoryYearInfoTuple = selectAllDataAboutFactoryYear()
     disturbplanYearInfoTuple = selectAllDataAboutDisturbPlan()
 
     for equipInfo in equipInfoTuple:
-        sql = "INSERT INTO strength (Equip_ID, Unit_ID, Equip_Name, Unit_Name, Strength, Work, Now, Error, Retire, Delay, Pre, NonObject," \
-              "NonStrength, Single, Arrive, year) VALUES" \
-              + "('" + equipInfo[0] + "','" + Unit_ID + "','" + equipInfo[1] + "','" + Unit_Name + "', '0'," \
-                                                                                                   " '0', '0', '0','0', '0', '0', '0', '0', '0', '0', '')"
+        sql = "INSERT INTO weave (Unit_ID, Equip_ID, Unit_Name, Equip_Name, Strength, Work, Now, " \
+              "year) VALUES" \
+              + "('" + Unit_ID + "','" + equipInfo[0] + "','" + Unit_Name + "','" + equipInfo[
+                  1] + "','0', '0', '0', '')"
         cur.execute(sql)
 
         sql = "INSERT INTO weave (Unit_ID, Equip_ID, Unit_Name, Equip_Name, Strength, Work, Now, " \
@@ -364,18 +382,25 @@ def addDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper):
         cur.execute(sql)
 
         for strengthYearInfo in strengthYearInfoTuple:
-            sql = "INSERT INTO strength (Equip_ID, Unit_ID, Equip_Name, Unit_Name, Strength, Work, Now, Error, Retire, Delay, Pre, NonObject," \
-                  "NonStrength, Single, Arrive, year) VALUES" \
-                  + "('" + equipInfo[0] + "','" + Unit_ID + "','" + equipInfo[1] + "','" + Unit_Name + "', '0'," \
-                                                                                                       " '0', '0', '0','0', '0', '0', '0', '0', '0', '0'," + "'" + \
-                  strengthYearInfo[1] + "')"
-            cur.execute(sql)
+            for factoryYearInfo in factoryYearInfoTuple:
+                sql = "INSERT INTO strength (Equip_ID, Unit_ID, Equip_Name, Unit_Name, Strength, Work, Now, Error, Retire, Delay, Pre, NonObject," \
+                      "NonStrength, Single, Arrive, year, equipYear) VALUES" \
+                      + "('" + equipInfo[0] + "','" + Unit_ID + "','" + equipInfo[1] + "','" + Unit_Name + "', '0'," \
+                                                                                                           " '0', '0', '0','0', '0', '0', '0', '0', '0', '0'," + "'" + \
+                      strengthYearInfo[1] + "', '" + factoryYearInfo[1] + "')"
+                cur.execute(sql)
 
-        for weaveYearInfo in weaveYearInfoTuple:
             sql = "INSERT INTO weave (Unit_ID, Equip_ID, Unit_Name, Equip_Name, Strength, Work, Now, year) VALUES" \
                   + "('" + Unit_ID + "','" + equipInfo[0] + "','" + Unit_Name + "','" + equipInfo[
-                      1] + "', '0', '0', '0', '" + weaveYearInfo[1] + "')"
+                      1] + "', '0', '0', '0', '" + strengthYearInfo[1] + "')"
 
+            cur.execute(sql)
+
+            sql = "INSERT INTO strength (Equip_ID, Unit_ID, Equip_Name, Unit_Name, Strength, Work, Now, Error, Retire, Delay, Pre, NonObject," \
+                  "NonStrength, Single, Arrive, year, equipYear) VALUES" \
+                  + "('" + equipInfo[0] + "','" + Unit_ID + "','" + equipInfo[1] + "','" + Unit_Name + "', '0'," \
+                                                                                                       " '0', '0', '0','0', '0', '0', '0', '0', '0', '0'," + "'" + \
+                  strengthYearInfo[1] + "', '" + "" + "')"
             cur.execute(sql)
         for disturbplanYearInfo in disturbplanYearInfoTuple:
             sql = "insert into disturbplan (Equip_Id,Equip_Name,Unit_Id,Unit_Name,Year,DisturbNum) values " \
@@ -392,25 +417,19 @@ def addDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper):
 def addDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type):
     conn, cur = connectMySql()
     # 插入的sql语句
-    sql = "INSERT INTO equip (Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type,unit) VALUES" \
-          + "('" + Equip_ID + "','" + Equip_Name + "','" + Equip_Uper + "','" + Input_Type + "','" + Equip_Type + "','') "
+    sql = "INSERT INTO equip (Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type, unit) VALUES" \
+          + "('" + Equip_ID + "','" + Equip_Name + "','" + Equip_Uper + "','" + Input_Type + "','" + Equip_Type + "', '')"
     # print(sql)
     # 执行sql语句，并发送给数据库
     cur.execute(sql)
 
     strengthYearInfoTuple = selectAllDataAboutStrengthYear()
     unitInfoTuple = selectAllDataAboutUnit()
-    weaveYearInfoTuple = selectAllDataAboutWeaveYear()
+    factoryYearInfoTuple = selectAllDataAboutFactoryYear()
     disturbplanYearInfoTuple = selectAllDataAboutDisturbPlan()
 
     # print(unitInfoTuple)
     for unitInfo in unitInfoTuple:
-        sql = "INSERT INTO strength (Equip_ID, Unit_ID, Equip_Name, Unit_Name, Strength, Work, Now, Error, Retire, Delay, Pre, NonObject," \
-              "NonStrength, Single, Arrive, year) VALUES" \
-              + "('" + Equip_ID + "','" + unitInfo[0] + "','" + Equip_Name + "','" + unitInfo[1] + "', '0'," \
-                                                                                                   " '0', '0', '0','0', '0', '0', '0', '0', '0', '0', '')"
-        # print(sql)
-        cur.execute(sql)
 
         sql = "INSERT INTO weave (Unit_ID, Equip_ID, Unit_Name, Equip_Name, Strength, Work, Now, " \
               "year) VALUES" \
@@ -420,18 +439,27 @@ def addDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type):
         cur.execute(sql)
 
         for strengthYearInfo in strengthYearInfoTuple:
-            sql = "INSERT INTO strength (Equip_ID, Unit_ID, Equip_Name, Unit_Name, Strength, Work, Now, Error, Retire, Delay, Pre, NonObject," \
-                  "NonStrength, Single, Arrive, year) VALUES" \
-                  + "('" + Equip_ID + "','" + unitInfo[0] + "','" + Equip_Name + "','" + unitInfo[1] + "', '0'," \
-                                                                                                       " '0', '0', '0','0', '0', '0', '0', '0', '0', '0'" + ",'" + \
-                  strengthYearInfo[1] + "')"
-            cur.execute(sql)
 
-        for weaveYearInfo in weaveYearInfoTuple:
+            for factoryYearInfo in factoryYearInfoTuple:
+                sql = "INSERT INTO strength (Equip_ID, Unit_ID, Equip_Name, Unit_Name, Strength, Work, Now, Error, Retire, Delay, Pre, NonObject," \
+                      "NonStrength, Single, Arrive, year, equipYear) VALUES" \
+                      + "('" + Equip_ID + "','" + unitInfo[0] + "','" + Equip_Name + "','" + unitInfo[1] + "', '0'," \
+                      + " '0', '0', '0','0', '0', '0', '0', '0', '0', '0'" + ",'" + strengthYearInfo[1] + "', '" + \
+                      factoryYearInfo[1] + "')"
+                cur.execute(sql)
+
             sql = "INSERT INTO weave (Unit_ID, Equip_ID, Unit_Name, Equip_Name, Strength, Work, Now, year) VALUES" \
                   + "('" + unitInfo[0] + "','" + Equip_ID + "','" + unitInfo[
                       1] + "','" + Equip_Name + "', '0', '0', '0', '" + \
-                  weaveYearInfo[1] + "')"
+                  strengthYearInfo[1] + "')"
+            cur.execute(sql)
+
+            sql = "INSERT INTO strength (Equip_ID, Unit_ID, Equip_Name, Unit_Name, Strength, Work, Now, Error, Retire, Delay, Pre, NonObject," \
+                  "NonStrength, Single, Arrive, year, equipYear) VALUES" \
+                  + "('" + Equip_ID + "','" + unitInfo[0] + "','" + Equip_Name + "','" + unitInfo[1] + "', '0'," \
+                  + " '0', '0', '0','0', '0', '0', '0', '0', '0', '0'" + ",'" + strengthYearInfo[1] + "', '" + \
+                  "" + "')"
+
             # print(sql)
             cur.execute(sql)
 
@@ -593,7 +621,7 @@ def delDataInEquip(Equip_ID):
 def selectAllDataAboutStrengthYear():
     conn, cur = connectMySql()
 
-    sql = "select * from strengthyear"
+    sql = "select * from strengthyear order by year"
 
     cur.execute(sql)
     result = cur.fetchall()
@@ -605,13 +633,13 @@ def selectAllDataAboutStrengthYear():
 
     return result
 
-
-# 按照单位编号，装备编号以及出厂年份查找录入信息
-def selectInfoAboutInput(Unit_ID, Equip_ID):
+#按照单位编号，装备编号以及录入年份查找录入信息
+def selectInfoAboutInput(Unit_ID, Equip_ID, inputYear):
     conn, cur = connectMySql()
 
     resultList = []
-    sql = "select * from inputinfo where Unit_ID = '" + Unit_ID + "' and Equip_ID = '" + Equip_ID + "'"
+    sql = "select * from inputinfo where Unit_ID = '" + Unit_ID + "' and Equip_ID = '"\
+          + Equip_ID + "' and inputYear = '" + inputYear + "'"
     cur.execute(sql)
     result = cur.fetchall()
     for resultInfo in result:
@@ -644,32 +672,18 @@ def selectAboutWeaveByEquipShow(UnitList, EquipList, yearList):
             '0', '0', '0', '0', '0']
     tempList = []
     resultList = []
-    if yearList == '全部':
-        for Unit_ID in UnitList:
-            for Equip_ID in EquipList:
-                # 查询当前装备ID的孩子序列
-                EquipIDChildList = []
-                findChildEquip(Equip_ID, EquipIDChildList, cur)
-                for childEquipID in EquipIDChildList:
-                    sql = "select * from weave where Unit_ID = '" + Unit_ID + "' and Equip_ID = '" + childEquipID + "' and year = ''"
-                    cur.execute(sql)
-                    result = cur.fetchall()
-                    for resultInfo in result:
-                        resultList.append(resultInfo)
-    # 如果查询某一年的
-    else:
-        for Unit_ID in UnitList:
-            for Equip_ID in EquipList:
-                # 查询当前装备ID的孩子序列
-                EquipIDChildList = []
-                findChildEquip(Equip_ID, EquipIDChildList, cur)
-                for childEquipID in EquipIDChildList:
-                    sql = "select * from weave where Unit_ID = '" + Unit_ID + \
-                          "' and Equip_ID = '" + childEquipID + "' and year = '" + yearList + "'"
-                    cur.execute(sql)
-                    result = cur.fetchall()
-                    for resultInfo in result:
-                        resultList.append(resultInfo)
+    for Unit_ID in UnitList:
+        for Equip_ID in EquipList:
+            # 查询当前装备ID的孩子序列
+            EquipIDChildList = []
+            findChildEquip(Equip_ID, EquipIDChildList, cur)
+            for childEquipID in EquipIDChildList:
+                sql = "select * from weave where Unit_ID = '" + Unit_ID + \
+                        "' and Equip_ID = '" + childEquipID + "' and year = '" + yearList + "'"
+                cur.execute(sql)
+                result = cur.fetchall()
+                for resultInfo in result:
+                    resultList.append(resultInfo)
     disconnectMySql(conn, cur)
     return resultList
 
@@ -681,66 +695,18 @@ def selectAboutStrengthByEquipShow(UnitList, EquipList, yearList):
             '0', '0', '0', '0', '0']
     tempList = []
     resultList = []
-    # 如果只查询某年的
-    if yearList == '全部':
-        for Unit_ID in UnitList:
-            for Equip_ID in EquipList:
-                # 查询当前装备ID的孩子序列
-                EquipIDChildList = []
-                findChildEquip(Equip_ID, EquipIDChildList, cur)
-                for childEquipID in EquipIDChildList:
-                    sql = "select * from strength where Unit_ID = '" + Unit_ID + "' and Equip_ID = '" + childEquipID + "' and year = ''"
-                    cur.execute(sql)
-                    result = cur.fetchall()
-                    for resultInfo in result:
-                        resultList.append(resultInfo)
-    # 如果查询某一年的
-    else:
-        for Unit_ID in UnitList:
-            for Equip_ID in EquipList:
-                # 查询当前装备ID的孩子序列
-                EquipIDChildList = []
-                findChildEquip(Equip_ID, EquipIDChildList, cur)
-                for childEquipID in EquipIDChildList:
-                    sql = "select * from strength where Unit_ID = '" + Unit_ID + \
-                          "' and Equip_ID = '" + childEquipID + "' and year = '" + yearList + "'"
-                    cur.execute(sql)
-                    result = cur.fetchall()
-                    for resultInfo in result:
-                        resultList.append(resultInfo)
-    '''
-    # 如果查询多年的
-    else:
-        for Unit_ID in UnitList:
-            for Equip_ID in EquipList:
-                EquipIDChildList = []
-                findChildEquip(Equip_ID, EquipIDChildList, cur)
-                for childEquipID in EquipIDChildList:
-                    for year in yearList:
-                        sql = "select * from strength where Unit_ID = '" + Unit_ID + "' and Equip_ID = '" + childEquipID + "', and year = '" + year + "'"
-                        cur.execute(sql)
-                        result = cur.fetchall()
-                        tempList.append(result)
-
-                    for tempInfo in tempList:
-                        temp[0] = tempInfo[0]
-                        temp[1] = tempInfo[1]
-                        temp[2] = tempInfo[2]
-                        temp[3] = tempInfo[3]
-                        temp[4] = str(int(temp[4]) + int(tempInfo[4]))
-                        temp[5] = str(int(temp[5]) + int(tempInfo[5]))
-                        temp[6] = str(int(temp[6]) + int(tempInfo[6]))
-                        temp[7] = str(int(temp[7]) + int(tempInfo[7]))
-                        temp[8] = str(int(temp[8]) + int(tempInfo[8]))
-                        temp[9] = str(int(temp[9]) + int(tempInfo[9]))
-                        temp[10] = str(int(temp[10]) + int(tempInfo[10]))
-                        temp[11] = str(int(temp[11]) + int(tempInfo[11]))
-                        temp[12] = str(int(temp[12]) + int(tempInfo[12]))
-                        temp[13] = str(int(temp[13]) + int(tempInfo[13]))
-                        temp[14] = str(int(temp[14]) + int(tempInfo[14]))
-
-                    resultList.append(temp)
-    '''
+    for Unit_ID in UnitList:
+        for Equip_ID in EquipList:
+            # 查询当前装备ID的孩子序列
+            EquipIDChildList = []
+            findChildEquip(Equip_ID, EquipIDChildList, cur)
+            for childEquipID in EquipIDChildList:
+                sql = "select * from strength where Unit_ID = '" + Unit_ID + \
+                        "' and Equip_ID = '" + childEquipID + "' and year = '" + yearList + "' and equipYear = '" + equipYear + "'"
+                cur.execute(sql)
+                result = cur.fetchall()
+                for resultInfo in result:
+                    resultList.append(resultInfo)
     disconnectMySql(conn, cur)
     return resultList
 
@@ -792,7 +758,7 @@ def selectAboutWeaveByUnitShow(UnitList, EquipList, yearList):
                 findChildUnitByWeave(Unit_ID, UnitIDChildList, cur)
                 for childUnitID in UnitIDChildList:
                     sql = "select * from weave where Unit_ID = '" + childUnitID + \
-                          "' and Equip_ID = '" + Equip_ID + "' and year = '" + yearList + "'"
+                            "' and Equip_ID = '" + Equip_ID + "' and year = '" + yearList + "'"
                     cur.execute(sql)
                     result = cur.fetchall()
                     for resultInfo in result:
@@ -801,77 +767,29 @@ def selectAboutWeaveByUnitShow(UnitList, EquipList, yearList):
     disconnectMySql(conn, cur)
     return resultList
 
-
-# 按单位展开时根据单位列表、装备列表以及年份查询实力表
-def selectAboutStrengthByUnitShow(UnitList, EquipList, yearList):
+#按单位展开时根据单位列表、装备列表以及年份查询实力表
+def selectAboutStrengthByUnitShow(UnitList, EquipList, yearList, equipYear):
     conn, cur = connectMySql()
     temp = ['Equip_ID', 'Unit_ID', 'Equip_Name', 'Unit_Name', '0', '0', '0', '0', '0', '0',
             '0', '0', '0', '0', '0']
     tempList = []
     resultList = []
     # 如果只查询某年的
-    # if len(yearList) == 1:
-    # 如果查询全部年的
-    if yearList == '全部':
-        for Equip_ID in EquipList:
-            for Unit_ID in UnitList:
-                # 查询当前单位ID的孩子序列
-                UnitIDChildList = []
-                findChildUnit(Unit_ID, UnitIDChildList, cur)
-                for childUnitID in UnitIDChildList:
-                    sql = "select * from strength where Unit_ID = '" + childUnitID + "' and Equip_ID = '" + Equip_ID + "' and year = ''"
-                    cur.execute(sql)
-                    result = cur.fetchall()
-                    for resultInfo in result:
-                        resultList.append(resultInfo)
-    # 如果查询某一年的
-    else:
-        for Equip_ID in EquipList:
-            for Unit_ID in UnitList:
-                # 查询当前单位ID的孩子序列
-                UnitIDChildList = []
-                findChildUnit(Unit_ID, UnitIDChildList, cur)
-                for childUnitID in UnitIDChildList:
-                    sql = "select * from strength where Unit_ID = '" + childUnitID + \
-                          "' and Equip_ID = '" + Equip_ID + "' and year = '" + yearList + "'"
-                    cur.execute(sql)
-                    result = cur.fetchall()
-                    for resultInfo in result:
-                        resultList.append(resultInfo)
-    '''
-    # 如果查询多年的
-    else:
-        for Equip_ID in EquipList:
-            for Unit_ID in UnitList:
-                # 查询当前单位ID的孩子序列
-                UnitIDChildList = []
-                findChildUnit(Unit_ID, UnitIDChildList, cur)
-                for childUnitID in UnitIDChildList:
-                    for year in yearList:
-                        sql = "select * from strength where Unit_ID = '" + childUnitID + "' and Equip_ID = '" + Equip_ID + "', and year = '" + year + "'"
-                        cur.execute(sql)
-                        result = cur.fetchall()
-                        tempList.append(result)
-
-                    for tempInfo in tempList:
-                        temp[0] = tempInfo[0]
-                        temp[1] = tempInfo[1]
-                        temp[2] = tempInfo[2]
-                        temp[3] = tempInfo[3]
-                        temp[4] = str(int(temp[4]) + int(tempInfo[4]))
-                        temp[5] = str(int(temp[5]) + int(tempInfo[5]))
-                        temp[6] = str(int(temp[6]) + int(tempInfo[6]))
-                        temp[7] = str(int(temp[7]) + int(tempInfo[7]))
-                        temp[8] = str(int(temp[8]) + int(tempInfo[8]))
-                        temp[9] = str(int(temp[9]) + int(tempInfo[9]))
-                        temp[10] = str(int(temp[10]) + int(tempInfo[10]))
-                        temp[11] = str(int(temp[11]) + int(tempInfo[11]))
-                        temp[12] = str(int(temp[12]) + int(tempInfo[12]))
-                        temp[13] = str(int(temp[13]) + int(tempInfo[13]))
-                        temp[14] = str(int(temp[14]) + int(tempInfo[14]))
-
-                    resultList.append(temp)
-    '''
+    #if len(yearList) == 1:
+        # 如果查询全部年的
+    for Equip_ID in EquipList:
+        for Unit_ID in UnitList:
+                #查询当前单位ID的孩子序列
+            UnitIDChildList = []
+            findChildUnit(Unit_ID, UnitIDChildList, cur)
+            for childUnitID in UnitIDChildList:
+                sql = "select * from strength where Unit_ID = '" + childUnitID + \
+                            "' and Equip_ID = '" + Equip_ID + "' and year = '" + yearList + "' and equipYear = '" + equipYear + "'"
+                cur.execute(sql)
+                print(sql)
+                result = cur.fetchall()
+                for resultInfo in result:
+                    resultList.append(resultInfo)
     disconnectMySql(conn, cur)
     return resultList
 
@@ -880,6 +798,45 @@ def selectAboutStrengthByUnitShow(UnitList, EquipList, yearList):
 
     return result
 
+def insertIntoStrengthYear(year):
+    conn, cur = connectMySql()
+    year = str(year)
+    result = selectAllStrengthYearInfo()
+    sql = "insert into strengthyear(ID, year) values ('" + str(len(result) + 1) + "', '" + year + "')"
+    print(sql)
+    cur.execute(sql)
+
+    equipList = selectAllDataAboutEquip()
+    unitList = selectAllDataAboutUnit()
+    factoryYearInfo = selectAllDataAboutFactoryYear()
+
+    for equipInfo in equipList:
+        for unitInfo in unitList:
+            sql = "INSERT INTO strength (Equip_ID, Unit_ID, Equip_Name, Unit_Name, Strength, Work, Now, Error, Retire, Delay, Pre, NonObject," \
+                  "NonStrength, Single, Arrive, year, equipYear) VALUES" \
+                  + "('" + equipInfo[0] + "','" + unitInfo[0] + "','" + equipInfo[1] + "','" + unitInfo[
+                      1] + "', '0'," \
+                           " '0', '0', '0','0', '0', '0', '0', '0', '0', '0'," + "'" + \
+                  year + "', '" + '' + "')"
+            cur.execute(sql)
+
+            sql = "INSERT INTO weave (Unit_ID, Equip_ID, Unit_Name, Equip_Name, Strength, Work, Now, year) VALUES" \
+                  + "('" + unitInfo[0] + "','" + equipInfo[0] + "','" + unitInfo[1] + "','" + equipInfo[
+                      1] + "', '0', '0', '0', '" + year + "')"
+            print(sql)
+            cur.execute(sql)
+
+            for factoryYear in factoryYearInfo:
+                sql = "INSERT INTO strength (Equip_ID, Unit_ID, Equip_Name, Unit_Name, Strength, Work, Now, Error, Retire, Delay, Pre, NonObject," \
+                      "NonStrength, Single, Arrive, year, equipYear) VALUES" \
+                      + "('" + equipInfo[0] + "','" + unitInfo[0] + "','" + equipInfo[1] + "','" + unitInfo[
+                          1] + "', '0'," \
+                               " '0', '0', '0','0', '0', '0', '0', '0', '0', '0'," + "'" + \
+                      year + "', '" + factoryYear[1] + "')"
+                cur.execute(sql)
+
+    conn.commit()
+    disconnectMySql(conn, cur)
 
 # 没有展开时根据单位列表、装备列表以及年份查询编制表
 def selectAboutWeaveByUnitListAndEquipList(UnitList, EquipList, yearList):
@@ -891,88 +848,38 @@ def selectAboutWeaveByUnitListAndEquipList(UnitList, EquipList, yearList):
     # 如果只查询某年的
     # if len(yearList) == 1:
     # 如果查询全部年的
-    if yearList == '全部':
-        for Unit_ID in UnitList:
-            for Equip_ID in EquipList:
-                sql = "select * from weave where Unit_ID = '" + Unit_ID + "' and Equip_ID = '" + Equip_ID + "' and year = ''"
-                cur.execute(sql)
-                result = cur.fetchall()
-                for resultInfo in result:
-                    resultList.append(resultInfo)
-        # 如果查询某一年的
-    else:
-        for Unit_ID in UnitList:
-            for Equip_ID in EquipList:
-                sql = "select * from weave where Unit_ID = '" + Unit_ID + \
+    for Unit_ID in UnitList:
+        for Equip_ID in EquipList:
+            sql = "select * from weave where Unit_ID = '" + Unit_ID + \
                       "' and Equip_ID = '" + Equip_ID + "' and year = '" + yearList + "'"
-                cur.execute(sql)
-                result = cur.fetchall()
-                for resultInfo in result:
-                    resultList.append(resultInfo)
+            print(sql)
+            cur.execute(sql)
+            result = cur.fetchall()
+            for resultInfo in result:
+                resultList.append(resultInfo)
     disconnectMySql(conn, cur)
     return resultList
 
-
-# 没有展开时根据单位列表、装备列表以及年份查询实力表
-def selectAboutStrengthByUnitListAndEquipList(UnitList, EquipList, yearList):
+#没有展开时根据单位列表、装备列表以及年份查询实力表
+def selectAboutStrengthByUnitListAndEquipList(UnitList, EquipList, yearList, equipYear):
     conn, cur = connectMySql()
     # print(UnitList, EquipList)
     temp = ['Equip_ID', 'Unit_ID', 'Equip_Name', 'Unit_Name', '0', '0', '0', '0', '0', '0',
             '0', '0', '0', '0', '0']
     tempList = []
     resultList = []
-    # 如果只查询某年的
-    # if len(yearList) == 1:
-    # 如果查询全部年的
-    if yearList == '全部':
-        for Unit_ID in UnitList:
-            for Equip_ID in EquipList:
-                sql = "select * from strength where Unit_ID = '" + Unit_ID + "' and Equip_ID = '" + Equip_ID + "' and year = ''"
-                cur.execute(sql)
-                result = cur.fetchall()
-                for resultInfo in result:
-                    resultList.append(resultInfo)
-        # 如果查询某一年的
-    else:
-        for Unit_ID in UnitList:
-            for Equip_ID in EquipList:
-                sql = "select * from strength where Unit_ID = '" + Unit_ID + \
-                      "' and Equip_ID = '" + Equip_ID + "' and year = '" + yearList + "'"
-                # print(sql)
-                cur.execute(sql)
-                result = cur.fetchall()
-                for resultInfo in result:
-                    resultList.append(resultInfo)
-    '''
-    #如果查询多年的
-    else:
-        for Unit_ID in UnitList:
-            for Equip_ID in EquipList:
-                for year in yearList:
-                    sql = "select * from strength where Unit_ID = '" + Unit_ID + "' and Equip_ID = '" + Equip_ID + "', and year = '" + year + "'"
-                    cur.execute(sql)
-                    result = cur.fetchall()
-                    tempList.append(result)
+    #如果只查询某年的
+    #if len(yearList) == 1:
+    for Unit_ID in UnitList:
+        for Equip_ID in EquipList:
+            sql = "select * from strength where Unit_ID = '" + Unit_ID + \
+                          "' and Equip_ID = '" + Equip_ID + "' and year = '" + yearList + "' and equipYear ='" + equipYear + "'"
+            print(sql)
+            cur.execute(sql)
+            result = cur.fetchall()
+            for resultInfo in result:
+                resultList.append(resultInfo)
 
-                for tempInfo in tempList:
-                    temp[0] = tempInfo[0]
-                    temp[1] = tempInfo[1]
-                    temp[2] = tempInfo[2]
-                    temp[3] = tempInfo[3]
-                    temp[4] = str(int(temp[4]) + int(tempInfo[4]))
-                    temp[5] = str(int(temp[5]) + int(tempInfo[5]))
-                    temp[6] = str(int(temp[6]) + int(tempInfo[6]))
-                    temp[7] = str(int(temp[7]) + int(tempInfo[7]))
-                    temp[8] = str(int(temp[8]) + int(tempInfo[8]))
-                    temp[9] = str(int(temp[9]) + int(tempInfo[9]))
-                    temp[10] = str(int(temp[10]) + int(tempInfo[10]))
-                    temp[11] = str(int(temp[11]) + int(tempInfo[11]))
-                    temp[12] = str(int(temp[12]) + int(tempInfo[12]))
-                    temp[13] = str(int(temp[13]) + int(tempInfo[13]))
-                    temp[14] = str(int(temp[14]) + int(tempInfo[14]))
-
-                resultList.append(temp)
-    '''
     disconnectMySql(conn, cur)
     # print(resultList)
     return resultList
@@ -1052,11 +959,11 @@ def findEquipUperIDList(Equip_ID, EquipIDList):
             findEquipUperIDList(uperIDInfo[0], EquipIDList)
     disconnectMySql(conn, cur)
 
-
-# 通过单位号和装备号查找strength某条记录的实力数，现有数
-def seletNumAboutStrength(Unit_ID, Equip_ID, year):
+#通过单位号和装备号查找strength某条记录的实力数，现有数
+def seletNumAboutStrength(Unit_ID, Equip_ID, year, equipYear):
     conn, cur = connectMySql()
-    sql = "select Strength, Now from strength where Equip_ID = '" + Equip_ID + "' and Unit_ID = '" + Unit_ID + "' and year = '" + year + "'"
+    sql = "select Strength, Now from strength where Equip_ID = '" + Equip_ID \
+          + "' and Unit_ID = '" + Unit_ID + "' and year = '" + year + "' and equipYear = '" + equipYear + "'"
     cur.execute(sql)
     nowNumTuple = cur.fetchall()
     disconnectMySql(conn, cur)
@@ -1099,8 +1006,8 @@ def delWeaveYearByYear(year):
     conn.commit()
     disconnectMySql(conn, cur)
 
-# 删除某条录入信息
-def delFromInputInfo(Unit_ID, Equip_ID, ID, num, year):
+#删除某条录入信息
+def delFromInputInfo(Unit_ID, Equip_ID, ID, num, year, inputYear):
     conn, cur = connectMySql()
     EquipIDList = []
     UnitIDList = []
@@ -1110,33 +1017,29 @@ def delFromInputInfo(Unit_ID, Equip_ID, ID, num, year):
 
     for UnitID in UnitIDList:
         for EquipID in EquipIDList:
-            strengthYearNum, nowYearNum = seletNumAboutStrength(UnitID, EquipID, year)
+            strengthYearNum, nowYearNum = seletNumAboutStrength(UnitID, EquipID, inputYear, year)
             changeYearNowNum = int(nowYearNum) - delNum
             changeYearErrorNum = int(strengthYearNum) - changeYearNowNum
-            strengthAllNum, nowAllNum = seletNumAboutStrength(UnitID, EquipID, '')
+            strengthAllNum, nowAllNum = seletNumAboutStrength(UnitID, EquipID, '', year)
             changeAllNowNum = int(nowAllNum) - delNum
             changeAllErrorNum = int(strengthAllNum) - changeAllNowNum
             sql = "Update strength set Now = '" + str(changeYearNowNum) + "', Error = '" + str(
                 changeYearErrorNum) + "' where Equip_ID = '" + \
-                  EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + year + "'"
+                  EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + inputYear + "' and equipYear = '" + year + "'"
 
             cur.execute(sql)
 
-            sql = "Update weave set Now = '" + str(changeYearNowNum) + "' where Equip_ID = '" + \
-                  EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + year + "'"
-
-            cur.execute(sql)
             sql = "update strength set Now = '" + str(changeAllNowNum) + "', Error = '" + str(
                 changeAllErrorNum) + "' where Unit_ID = '" \
-                  + UnitID + "' and Equip_ID = '" + EquipID + "' and year = ''"
+                  + UnitID + "' and Equip_ID = '" + EquipID + "' and year = '" + inputYear + "' and equipYear = '" + year + "'"
             # print(sql)
             cur.execute(sql)
 
             sql = "update weave set Now = '" + str(changeAllNowNum) + "' where Unit_ID = '" \
-                  + UnitID + "' and Equip_ID = '" + EquipID + "' and year = ''"
+                  + UnitID + "' and Equip_ID = '" + EquipID + "' and year = '" + inputYear + "'"
             # print(sql)
             cur.execute(sql)
-    sql = "delete from inputinfo where Unit_ID = '" + Unit_ID + "' and Equip_ID = '" + \
+    sql = "delete from inputinfo where Unit_ID = '" + Unit_ID + "' and Equip_ID = '" +\
           Equip_ID + "' and ID = '" + ID + "' and year = '" + year + "' and ID = '" + ID + "'"
     cur.execute(sql)
     # print(sql)
@@ -1144,9 +1047,8 @@ def delFromInputInfo(Unit_ID, Equip_ID, ID, num, year):
     conn.commit()
     disconnectMySql(conn, cur)
 
-
-# 修改批量录入某条数据的数量
-def updateNumMutilInput(Unit_ID, Equip_ID, ID, num, orginNum, year):
+#修改批量录入某条数据的数量
+def updateNumMutilInput(Unit_ID, Equip_ID, ID, num, orginNum, year, strengthYear):
     conn, cur = connectMySql()
     EquipIDList = []
     UnitIDList = []
@@ -1156,32 +1058,29 @@ def updateNumMutilInput(Unit_ID, Equip_ID, ID, num, orginNum, year):
 
     for UnitID in UnitIDList:
         for EquipID in EquipIDList:
-            strengthYearNum, nowYearNum = seletNumAboutStrength(UnitID, EquipID, year)
+            strengthYearNum, nowYearNum = seletNumAboutStrength(UnitID, EquipID, strengthYear, year)
             changeYearNowNum = int(nowYearNum) - int(orginNum) + updateNum
             changeYearErrorNum = int(strengthYearNum) - changeYearNowNum
-            strengthAllNum, nowAllNum = seletNumAboutStrength(UnitID, EquipID, '')
+            strengthAllNum, nowAllNum = seletNumAboutStrength(UnitID, EquipID, strengthYear, '')
             changeAllNowNum = int(nowAllNum) - int(orginNum) + updateNum
             changeAllErrorNum = int(strengthAllNum) - changeAllNowNum
             sql = "Update strength set Now = '" + str(changeYearNowNum) + "', Error = '" + str(
                 changeYearErrorNum) + "' where Equip_ID = '" + \
-                  EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + year + "'"
+                  EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + strengthYear \
+                  + "' and equipYear = '" + year + "'"
 
             cur.execute(sql)
 
-            sql = "Update weave set Now = '" + str(changeYearNowNum) + "' where Equip_ID = '" + \
-                  EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + year + "'"
+            sql = "Update weave set Now = '" + str(changeAllNowNum) + "' where Equip_ID = '" + \
+                  EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + strengthYear + "'"
 
             cur.execute(sql)
             sql = "update strength set Now = '" + str(changeAllNowNum) + "', Error = '" + str(
                 changeAllErrorNum) + "' where Unit_ID = '" \
-                  + UnitID + "' and Equip_ID = '" + EquipID + "' and year = ''"
+                  + UnitID + "' and Equip_ID = '" + EquipID + "' and year = '" + strengthYear + "' and equipYear = ''"
             # print(sql)
             cur.execute(sql)
 
-            sql = "update weave set Now = '" + str(changeAllNowNum) + "' where Unit_ID = '" \
-                  + UnitID + "' and Equip_ID = '" + EquipID + "' and year = ''"
-            # print(sql)
-            cur.execute(sql)
     sql = "update inputinfo set num = '" + num + "' where Unit_ID = '" + Unit_ID + \
           "' and Equip_ID = '" + Equip_ID + "' and ID = '" + ID + "' and year = '" + year + "'"
     cur.execute(sql)
@@ -1190,50 +1089,84 @@ def updateNumMutilInput(Unit_ID, Equip_ID, ID, num, orginNum, year):
     conn.commit()
     disconnectMySql(conn, cur)
 
+#判断是否有当前出厂年份
+def isHaveFactoryYear(year):
+    conn, cur = connectMySql()
+    sql = "select * from factoryyear where year = '" + year + "'"
+    cur.execute(sql)
+    result = cur.fetchall()
+    if result:
+        return True
+    else:
+        return False
 
-# 往录入表inputinfo中插入一条数据
-def addDataIntoInputInfo(Unit_ID, Equip_ID, ID, num, year, shop, state, arrive, confirm, other):
+def addNewFactoryYear(year):
+    conn, cur = connectMySql()
+    result = selectAllDataAboutFactoryYear()
+    sql = "insert into factoryyear(ID, year) values ('" + str(len(result) + 1) + "', '" + year + "')"
+    print(sql)
+    cur.execute(sql)
+
+    equipList = selectAllDataAboutEquip()
+    unitList = selectAllDataAboutUnit()
+    strengthYearInfo = selectAllDataAboutStrengthYear()
+
+    for equipInfo in equipList:
+        for unitInfo in unitList:
+            for strengthYear in strengthYearInfo:
+                sql = "INSERT INTO strength (Equip_ID, Unit_ID, Equip_Name, Unit_Name, Strength, Work, Now, Error, Retire, Delay, Pre, NonObject," \
+                  "NonStrength, Single, Arrive, year, equipYear) VALUES" \
+                  + "('" + equipInfo[0] + "','" + unitInfo[0] + "','" + equipInfo[1] + "','" + unitInfo[1] + "', '0'," \
+                                                                                                       " '0', '0', '0','0', '0', '0', '0', '0', '0', '0'," + "'" + \
+                    strengthYear[1] + "', '" + year + "')"
+                cur.execute(sql)
+
+    conn.commit()
+    disconnectMySql(conn, cur)
+
+#往录入表inputinfo中插入一条数据
+def addDataIntoInputInfo(Unit_ID, Equip_ID, ID, num, year, shop, state, arrive, confirm, other, strengthYear):
     conn, cur = connectMySql()
     EquipIDList = []
     UnitIDList = []
     addNum = int(num)
     findUnitUperIDList(Unit_ID, UnitIDList)
     findEquipUperIDList(Equip_ID, EquipIDList)
+
+    haveFactory = isHaveFactoryYear(year)
+    if haveFactory:
+        pass
+    else:
+        print("'''''''''''")
+        addNewFactoryYear(year)
     # 插入的sql语句
-    sql = "INSERT INTO inputinfo (Unit_ID, Equip_ID, ID, num, year, shop, state, arrive, confirm, other) VALUES" \
-          + "('" + Unit_ID + "','" + Equip_ID + "','" + ID + "', '" + num + "', '" + year + "', '" + shop + "', '" + state + \
-          "', '" + arrive + "', '" + confirm + "', '" + other + "')"
+    sql = "INSERT INTO inputinfo (Unit_ID, Equip_ID, ID, num, year, shop, state, arrive, confirm, other, inputYear) VALUES" \
+          + "('" + Unit_ID + "','" + Equip_ID + "','" + ID + "', '" + num + "', '" + year + "', '" + shop + "', '" + state +\
+          "', '" + arrive + "', '" + confirm + "', '" + other + "', '" + strengthYear +  "')"
     cur.execute(sql)
     # print(sql)
     # 执行sql语句，并发送给数据库
 
     for UnitID in UnitIDList:
         for EquipID in EquipIDList:
-            strengthYearNum, nowYearNum = seletNumAboutStrength(UnitID, EquipID, year)
+            strengthYearNum, nowYearNum = seletNumAboutStrength(UnitID, EquipID,strengthYear, year)
             changeYearNowNum = int(nowYearNum) + addNum
             changeYearErrorNum = int(strengthYearNum) - changeYearNowNum
-            strengthAllNum, nowAllNum = seletNumAboutStrength(UnitID, EquipID, '')
+            strengthAllNum, nowAllNum = seletNumAboutStrength(UnitID, EquipID, strengthYear, '')
             changeAllNowNum = int(nowAllNum) + addNum
             changeAllErrorNum = int(strengthAllNum) - changeAllNowNum
-            sql = "Update strength set Now = '" + str(changeYearNowNum) + "', Error = '" + str(
-                changeYearErrorNum) + "' where Equip_ID = '" + \
-                  EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + year + "'"
+            sql = "Update strength set Now = '" + str(changeYearNowNum) + "', Error = '" + str(changeYearErrorNum) + "' where Equip_ID = '" + \
+                  EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + strengthYear + "' and equipYear = '" + year + "'"
 
             cur.execute(sql)
 
-            sql = "Update weave set Now = '" + str(changeYearNowNum) + "' where Equip_ID = '" + \
-                  EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + year + "'"
-
-            cur.execute(sql)
-            sql = "update strength set Now = '" + str(changeAllNowNum) + "', Error = '" + str(
-                changeAllErrorNum) + "' where Unit_ID = '" \
-                  + UnitID + "' and Equip_ID = '" + EquipID + "' and year = ''"
-            # print(sql)
+            sql = "update strength set Now = '"  + str(changeAllNowNum) + "', Error = '" + str(changeAllErrorNum) +  "' where Unit_ID = '" \
+                  + UnitID + "' and Equip_ID = '" + EquipID + "' and year = '" +  strengthYear + "' and equipYear = ''"
             cur.execute(sql)
 
-            sql = "update weave set Now = '" + str(changeAllNowNum) + "' where Unit_ID = '" \
-                  + UnitID + "' and Equip_ID = '" + EquipID + "' and year = ''"
-            # print(sql)
+            sql = "Update weave set Now = '" + str(changeAllNowNum) + "' where Equip_ID = '" + \
+                  EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + strengthYear + "'"
+
             cur.execute(sql)
 
     conn.commit()
@@ -1252,7 +1185,7 @@ def selectNowNumAndStrengthNum(Unit_ID, Equip_ID):
 
 # 修改当前编制数
 def updateWeaveNum(Unit_ID, Equip_ID, weaveNum, orginWeave, year):
-    print("weavechange:", Unit_ID, Equip_ID, weaveNum, orginWeave, year)
+    #print("weavechange:", Unit_ID, Equip_ID, weaveNum, orginWeave, year)
     conn, cur = connectMySql()
     if selectIsPublicEquip(Unit_ID):
         Group_ID = selectEquipIDByPublicEquip(Unit_ID)
@@ -1261,11 +1194,11 @@ def updateWeaveNum(Unit_ID, Equip_ID, weaveNum, orginWeave, year):
         EquipIDList = []
         findUnitUperIDList(Group_ID, UnitIDList)
         findEquipUperIDList(Equip_ID, EquipIDList)
-        print("unit and equip:", UnitIDList, EquipIDList)
+        #print("unit and equip:", UnitIDList, EquipIDList)
         for UnitID in UnitIDList:
             for EquipID in EquipIDList:
                 orginYearWorkNum = seletNumAboutWork(UnitID, EquipID, year)  # 获取原有的实力数以及现有数
-                print("orginYearWorkNum:", orginYearWorkNum)
+                #print("orginYearWorkNum:", orginYearWorkNum)
                 changeYearStrengthNum = int(orginYearWorkNum) - int(orginWeave) + int(weaveNum)
                 orginAllWorkNum = seletNumAboutWork(UnitID, EquipID, '')
                 changeAllStrengthNum = int(orginAllWorkNum) - int(orginWeave) + int(weaveNum)
@@ -1292,8 +1225,8 @@ def updateWeaveNum(Unit_ID, Equip_ID, weaveNum, orginWeave, year):
             for EquipID in EquipIDList:
                 orginYearWorkNum = seletNumAboutWork(UnitID, EquipID, year)  # 获取原有的实力数以及现有数
                 changeYearStrengthNum = int(orginYearWorkNum) - int(orginWeave) + int(weaveNum)
-                orginAllWorkNum = seletNumAboutWork(UnitID, EquipID, '')
-                changeAllStrengthNum = int(orginAllWorkNum) - int(orginWeave) + int(weaveNum)
+                #orginAllWorkNum = seletNumAboutWork(UnitID, EquipID, '')
+                #changeAllStrengthNum = int(orginAllWorkNum) - int(orginWeave) + int(weaveNum)
                 sql = "Update strength set Work = '" + str(changeYearStrengthNum) + "' where Equip_ID = '" + \
                       EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + year + "'"
                 cur.execute(sql)
@@ -1301,18 +1234,17 @@ def updateWeaveNum(Unit_ID, Equip_ID, weaveNum, orginWeave, year):
                 sql = "Update weave set Work = '" + str(changeYearStrengthNum) + "' where Equip_ID = '" + \
                       EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + year + "'"
                 cur.execute(sql)
-                sql = "update strength set Work = '" + str(changeAllStrengthNum) + "' where Unit_ID = '" \
-                      + UnitID + "' and Equip_ID = '" + EquipID + "' and year = ''"
-                cur.execute(sql)
-                sql = "update weave set Work = '" + str(changeAllStrengthNum) + "' where Unit_ID = '" \
-                      + UnitID + "' and Equip_ID = '" + EquipID + "' and year = ''"
-                cur.execute(sql)
+                #sql = "update strength set Work = '" + str(changeAllStrengthNum) + "' where Unit_ID = '" \
+                      #+ UnitID + "' and Equip_ID = '" + EquipID + "' and year = ''"
+                #cur.execute(sql)
+                #sql = "update weave set Work = '" + str(changeAllStrengthNum) + "' where Unit_ID = '" \
+                      #+ UnitID + "' and Equip_ID = '" + EquipID + "' and year = ''"
+                #cur.execute(sql)
 
     conn.commit()
     disconnectMySql(conn, cur)
 
-
-# 根据单位号，装备号修改某年的实力数，strengthNum为修改后的实力数，orginStrengthNum为原来的实力数
+#根据单位号，装备号修改某年的实力数，strengthNum为修改后的实力数，orginStrengthNum为原来的实力数
 def updateStrengthAboutStrengrh(Unit_ID, Equip_ID, year, strengthNum, orginStrengthNum):
     conn, cur = connectMySql()
 
@@ -1323,12 +1255,12 @@ def updateStrengthAboutStrengrh(Unit_ID, Equip_ID, year, strengthNum, orginStren
 
     for UnitID in UnitIDList:
         for EquipID in EquipIDList:
-            orginYearStrengthNum, YearNowNum = seletNumAboutStrength(UnitID, EquipID, year)  # 获取原有的实力数以及现有数
+            orginYearStrengthNum,  YearNowNum= seletNumAboutStrength(UnitID, EquipID, year, '') #获取原有的实力数以及现有数
             changeYearStrengthNum = int(orginYearStrengthNum) - int(orginStrengthNum) + int(strengthNum)
             changeYearErrorNum = int(changeYearStrengthNum) - int(YearNowNum)
-            orginAllStrengthNum, nowAllNum = seletNumAboutStrength(UnitID, EquipID, '')
-            changeAllStrengthNum = int(orginAllStrengthNum) - int(orginStrengthNum) + int(strengthNum)
-            changeAllErrorNum = int(changeAllStrengthNum) - int(nowAllNum)
+            #orginAllStrengthNum, nowAllNum = seletNumAboutStrength(UnitID, EquipID, '', '')
+            #changeAllStrengthNum = int(orginAllStrengthNum) - int(orginStrengthNum) + int(strengthNum)
+            #changeAllErrorNum = int(changeAllStrengthNum) - int(nowAllNum)
             sql = "Update strength set Strength = '" + str(changeYearStrengthNum) + "', Error = '" + str(
                 changeYearErrorNum) + "' where Equip_ID = '" + \
                   EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + year + "'"
@@ -1338,13 +1270,6 @@ def updateStrengthAboutStrengrh(Unit_ID, Equip_ID, year, strengthNum, orginStren
             sql = "Update weave set Strength = '" + str(changeYearStrengthNum) + "' where Equip_ID = '" + \
                   EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + year + "'"
 
-            cur.execute(sql)
-            sql = "update strength set Strength = '" + str(changeAllStrengthNum) + "', Error = '" + str(
-                changeAllErrorNum) + "' where Unit_ID = '" \
-                  + UnitID + "' and Equip_ID = '" + EquipID + "' and year = ''"
-            cur.execute(sql)
-            sql = "update weave set Strength = '" + str(changeAllStrengthNum) + "' where Unit_ID = '" \
-                  + UnitID + "' and Equip_ID = '" + EquipID + "' and year = ''"
             cur.execute(sql)
 
     conn.commit()
@@ -1417,7 +1342,7 @@ def updateUnitIsGroupFromUnit(Unit_ID, Is_Group):
         findUnitUperIDList(Unit_ID, uperUnitList)
         equipInfoList = selectAllDataAboutEquip()
         publicEquipID = selectGroupIDByPublicEquip(Unit_ID)
-        weaveYearList = selectAllDataAboutWeaveYear()
+        strengthYearList = selectAllDataAboutWeaveYear()
         sql = "update unit set Is_Group = '" + Is_Group + "' where Unit_ID = '" + Unit_ID + "'"
         cur.execute(sql)
         for uperUnitID in uperUnitList:
@@ -1429,7 +1354,7 @@ def updateUnitIsGroupFromUnit(Unit_ID, Is_Group):
                       "' and Unit_ID = '" + uperUnitID + "' and year = ''"
                 cur.execute(sql)
 
-                for weaveYearInfo in weaveYearList:
+                for weaveYearInfo in strengthYearList:
                     orginYearWorkNum = selectWorkNumFromWeave(uperUnitID, equipInfo[0], weaveYearInfo[1])
                     delWorkYearNum = selectWorkNumFromWeave(publicEquipID, equipInfo[0], weaveYearInfo[1])
                     nowYearWorkNum = str(int(orginYearWorkNum) - int(delWorkYearNum))
@@ -1447,16 +1372,15 @@ def updateUnitIsGroupFromUnit(Unit_ID, Is_Group):
         currentNum = len(result)
         sql = "update unit set Is_Group = '" + Is_Group + "' where Unit_ID = '" + Unit_ID + "'"
         cur.execute(sql)
-        sql = "insert into pubilcequip (Equip_ID, Group_ID, work_Num) VALUES" \
-              + "('" + "gyzb" + Unit_ID + "', '" + Unit_ID + "', '0')"
+        sql = "insert into pubilcequip (Equip_ID, Group_ID, work_Num) VALUES"\
+              + "('"  + "gyzb" +  Unit_ID  + "', '" + Unit_ID + "', '0')"
         cur.execute(sql)
         # print(sql)
         equipInfoList = selectAllDataAboutEquip()
-        weaveYearList = selectAllDataAboutWeaveYear()
+        weaveYearList = selectAllStrengthYearInfo()
         for equipInfo in equipInfoList:
             sql = "INSERT INTO weave (Unit_ID, Equip_ID, Unit_Name, Equip_Name, Strength, Work, Now, year) VALUES" \
-                  + "('" + "gyzb" + Unit_ID + "','" + equipInfo[0] + "','公用装备','" + equipInfo[
-                      1] + "', '0', '0', '0', '" + \
+                  + "('" + "gyzb" + Unit_ID + "','" + equipInfo[0] + "','公用装备','" + equipInfo[1] + "', '0', '0', '0', '" + \
                   "')"
             cur.execute(sql)
             for weaveYearInfo in weaveYearList:
@@ -1910,7 +1834,24 @@ def updateEquipUnit(unit, Equip_ID):
     conn.commit()
     disconnectMySql(conn, cur)
 
+def delStrengthYearByYear(year):
+    conn, cur = connectMySql()
 
+    sql = "delete from weave where year = '" + year + "'"
+    print(sql)
+    cur.execute(sql)
+
+    sql = "delete from strength where year = '" + year + "'"
+    cur.execute(sql)
+
+    sql = "delete from inputinfo where inputYear = '" + year + "'"
+    cur.execute(sql)
+
+    sql = "delete from strengthyear where year = '" + year + "'"
+    cur.execute(sql)
+
+    conn.commit()
+    disconnectMySql(conn, cur)
 
 if __name__ == '__main__':
     pass
