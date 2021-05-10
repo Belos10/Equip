@@ -1,5 +1,7 @@
 import sys
 from PyQt5.QtWidgets import *
+
+from database.SD_EquipmentBanlanceSql import initEquipmentBalance
 from widgets.alocatMange.yearListForm import yearList_Form
 from database.strengthDisturbSql import *
 from PyQt5.Qt import Qt
@@ -63,6 +65,7 @@ class DisturbPlan(QWidget, yearList_Form):
         year, ok = QInputDialog.getInt(self, "Get year", "year:", 0, 0, 100000, 1)
         if year:
             insertIntoDisturbPlanYear(year)
+            initEquipmentBalance(year)
             self._initYearWidget_()
 
 

@@ -58,7 +58,6 @@ class Equip_Balance_Main(QWidget, EquipmentBalanceMainUI):
                         pass
                     else:
                         deleteYear(year)
-                        print('成功删除%drow,%dcolumn,%s'%(row,column,text))
                 self._initYear()
 
 

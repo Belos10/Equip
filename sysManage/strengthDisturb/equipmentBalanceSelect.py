@@ -41,6 +41,8 @@ class Equip_Balance_Select(QWidget, EquipmentBalanceSelectUI):
         #
         self.pb_firstSelect.clicked.connect(self.slotClickedInqury)
         self.pb_secondSelect.clicked.connect(self.slotClickedInqury)
+        self.pb_alter.clicked.connect(self.slotClickedAlter)
+        self.pb_sava.clicked.connect(self.slotClickedSave)
 
     # 信号与槽连接的断开
     def signalDisconnectSlot(self):
@@ -74,6 +76,7 @@ class Equip_Balance_Select(QWidget, EquipmentBalanceSelectUI):
         self._initTableHeader()
 
 
+
     def slotClickedInqury(self):
         self.first_treeWidget_dict = {}
         self.second_treeWidget_dict = {}
@@ -91,10 +94,6 @@ class Equip_Balance_Select(QWidget, EquipmentBalanceSelectUI):
         self._initUnitTreeWidget("", self.tw_first)
         self._initEquipTreeWidget("", self.tw_second)
 
-
-
-
-    # def slotSaveUpdate(self):
 
 
     '''
@@ -161,152 +160,148 @@ class Equip_Balance_Select(QWidget, EquipmentBalanceSelectUI):
     # 初始化tableWidget
     def _initTableWidgetByUnitListAndEquipList(self, EquipList, year):
         self.tb_result.clear()
-        self._initTableHeader()
         self.tb_result.setRowCount(3)
         self.equipList = EquipList
         self.currentInquiryResult.clear()
         self.lenOfColumn = 66
         self.tb_result.setColumnCount(self.lenOfColumn)
+        self._initTableHeader()
         resultList = getResultByYearAndEquip(year,self.equipList)
-        print(resultList)
         if resultList is not None and len(resultList) is not 0:
-            self.tb_result.setRowCount(len(resultList) + 3)
+            self.tb_result.setRowCount(len(EquipList) + 3)
             for row in range(len(resultList)):
-                print(row)
-
-                print(resultList[row]['Equip_Name'])
                 self.tb_result.setItem(row + 3, 0,
-                                       QTableWidgetItem(resultList[row]['Equip_Name']))
+                                       QTableWidgetItem(resultList[row].get('Equip_Name')))
                 self.tb_result.setItem(row + 3,  1,
-                                       QTableWidgetItem(resultList[row]['original_authorized_value']))
+                                       QTableWidgetItem(resultList[row].get('original_authorized_value', 0)))
                 self.tb_result.setItem(row + 3,  2,
-                                       QTableWidgetItem(resultList[row]['authorized_value']))
+                                       QTableWidgetItem(resultList[row].get('authorized_value', 0)))
                 self.tb_result.setItem(row + 3,  3,
-                                       QTableWidgetItem(resultList[row]['authorized_value_change']))
+                                       QTableWidgetItem(resultList[row].get('authorized_value_change', )))
                 self.tb_result.setItem(row + 3,  4,
-                                       QTableWidgetItem(resultList[row]['original_value']))
+                                       QTableWidgetItem(resultList[row].get('original_value', 0)))
                 self.tb_result.setItem(row + 3,  5,
-                                       QTableWidgetItem(resultList[row]['issue_new_product']))
+                                       QTableWidgetItem(resultList[row].get('issue_new_product', 0)))
                 self.tb_result.setItem(row + 3,  6,
-                                       QTableWidgetItem(resultList[row]['issue_inferior_product']))
+                                       QTableWidgetItem(resultList[row].get('issue_inferior_product', 0)))
                 self.tb_result.setItem(row + 3,  7,
-                                       QTableWidgetItem(resultList[row]['issue_need_repaired']))
+                                       QTableWidgetItem(resultList[row].get('issue_need_repaired', 0)))
                 self.tb_result.setItem(row + 3,  8,
-                                       QTableWidgetItem(resultList[row]['issue_need_retire']))
+                                       QTableWidgetItem(resultList[row].get('issue_need_retire', 0)))
                 self.tb_result.setItem(row + 3, 9,
-                                       QTableWidgetItem(resultList[row]['report_new_product']))
+                                       QTableWidgetItem(resultList[row].get('report_new_product', 0)))
                 self.tb_result.setItem(row + 3, 10,
-                                       QTableWidgetItem(resultList[row]['report_inferior_product']))
+                                       QTableWidgetItem(resultList[row].get('report_inferior_product', 0)))
                 self.tb_result.setItem(row + 3, 11,
-                                       QTableWidgetItem(resultList[row]['report_need_repaired']))
+                                       QTableWidgetItem(resultList[row].get('report_need_repaired',0)))
                 self.tb_result.setItem(row + 3, 12,
-                                       QTableWidgetItem(resultList[row]['report_need_retire']))
+                                       QTableWidgetItem(resultList[row].get('report_need_retire', 0)))
                 self.tb_result.setItem(row + 3, 13,
-                                       QTableWidgetItem(resultList[row]['change_value']))
+                                       QTableWidgetItem(resultList[row].get('change_value', 0)))
                 self.tb_result.setItem(row + 3, 14,
-                                       QTableWidgetItem(resultList[row]['existing_value']))
+                                       QTableWidgetItem(resultList[row].get('existing_value', 0)))
                 self.tb_result.setItem(row + 3, 15,
-                                       QTableWidgetItem(resultList[row]['increase_count']))
+                                       QTableWidgetItem(resultList[row].get('increase_count', 0)))
                 self.tb_result.setItem(row + 3, 16,
-                                       QTableWidgetItem(resultList[row]['increase_superior_supplement']))
+                                       QTableWidgetItem(resultList[row].get('increase_superior_supplement', 0)))
                 self.tb_result.setItem(row + 3, 17,
-                                       QTableWidgetItem(resultList[row]['increase_model_change']))
+                                       QTableWidgetItem(resultList[row].get('increase_model_change', 0)))
                 self.tb_result.setItem(row + 3, 18,
-                                       QTableWidgetItem(resultList[row]['increase_missing_reports']))
+                                       QTableWidgetItem(resultList[row].get('increase_missing_reports', 0)))
                 self.tb_result.setItem(row + 3, 19,
-                                       QTableWidgetItem(resultList[row]['increase_self_purchase']))
+                                       QTableWidgetItem(resultList[row].get('increase_self_purchase', 0)))
                 self.tb_result.setItem(row + 3, 20,
-                                       QTableWidgetItem(resultList[row]['increase_transfer_in']))
+                                       QTableWidgetItem(resultList[row].get('increase_transfer_in', 0)))
                 self.tb_result.setItem(row + 3, 21,
-                                       QTableWidgetItem(resultList[row]['increase_other']))
+                                       QTableWidgetItem(resultList[row].get('increase_other', 0)))
                 self.tb_result.setItem(row + 3, 22,
-                                       QTableWidgetItem(resultList[row]['reduce_count']))
+                                       QTableWidgetItem(resultList[row].get('reduce_count', 0)))
                 self.tb_result.setItem(row + 3, 23,
-                                       QTableWidgetItem(resultList[row]['reduce_model_change']))
+                                       QTableWidgetItem(resultList[row].get('reduce_model_change', 0)))
                 self.tb_result.setItem(row + 3, 24,
-                                       QTableWidgetItem(resultList[row]['reduce_callout']))
+                                       QTableWidgetItem(resultList[row].get('reduce_callout', 0)))
                 self.tb_result.setItem(row + 3, 25,
-                                       QTableWidgetItem(resultList[row]['reduce_train_consumption']))
+                                       QTableWidgetItem(resultList[row].get('reduce_train_consumption', 0)))
                 self.tb_result.setItem(row + 3, 26,
-                                       QTableWidgetItem(resultList[row]['reduce_restatement']))
+                                       QTableWidgetItem(resultList[row].get('reduce_restatement', 0)))
                 self.tb_result.setItem(row + 3, 27,
-                                       QTableWidgetItem(resultList[row]['reduce_retire']))
+                                       QTableWidgetItem(resultList[row].get('reduce_retire', 0)))
                 self.tb_result.setItem(row + 3, 28,
-                                       QTableWidgetItem(resultList[row]['reduce_scrap']))
+                                       QTableWidgetItem(resultList[row].get('reduce_scrap', 0)))
                 self.tb_result.setItem(row + 3, 29,
-                                       QTableWidgetItem(resultList[row]['reduce_other']))
+                                       QTableWidgetItem(resultList[row].get('reduce_other', 0)))
                 self.tb_result.setItem(row + 3, 30,
-                                       QTableWidgetItem(resultList[row]['unprepared_value']))
+                                       QTableWidgetItem(resultList[row].get('unprepared_value', 0)))
                 self.tb_result.setItem(row + 3, 31,
-                                       QTableWidgetItem(resultList[row]['unmatched_value']))
+                                       QTableWidgetItem(resultList[row].get('unmatched_value', 0)))
                 self.tb_result.setItem(row + 3, 32,
-                                       QTableWidgetItem(resultList[row]['uncutdown_value']))
+                                       QTableWidgetItem(resultList[row].get('uncutdown_value', 0)))
                 self.tb_result.setItem(row + 3, 33,
-                                       QTableWidgetItem(resultList[row]['carry_count']))
+                                       QTableWidgetItem(resultList[row].get('carry_count', 0)))
                 self.tb_result.setItem(row + 3, 34,
-                                       QTableWidgetItem(resultList[row]['carry_new_product']))
+                                       QTableWidgetItem(resultList[row].get('carry_new_product', 0)))
                 self.tb_result.setItem(row + 3, 35,
-                                       QTableWidgetItem(resultList[row]['carry_inferior_product']))
+                                       QTableWidgetItem(resultList[row].get('carry_inferior_product', 0)))
                 self.tb_result.setItem(row + 3, 36,
-                                       QTableWidgetItem(resultList[row]['carry_need_repaired']))
+                                       QTableWidgetItem(resultList[row].get('carry_need_repaired', 0)))
                 self.tb_result.setItem(row + 3, 37,
-                                       QTableWidgetItem(resultList[row]['carry_need_retire']))
+                                       QTableWidgetItem(resultList[row].get('carry_need_retire', 0)))
                 self.tb_result.setItem(row + 3, 38,
-                                       QTableWidgetItem(resultList[row]['carry_unprepared_value']))
+                                       QTableWidgetItem(resultList[row].get('carry_unprepared_value', 0)))
                 self.tb_result.setItem(row + 3, 39,
-                                       QTableWidgetItem(resultList[row]['carryUn_cutdown_value']))
+                                       QTableWidgetItem(resultList[row].get('carryUn_cutdown_value', 0)))
                 self.tb_result.setItem(row + 3, 40,
-                                       QTableWidgetItem(resultList[row]['stock_count']))
+                                       QTableWidgetItem(resultList[row].get('stock_count', 0)))
                 self.tb_result.setItem(row + 3, 41,
-                                       QTableWidgetItem(resultList[row]['stock_new_product']))
+                                       QTableWidgetItem(resultList[row].get('stock_new_product', 0)))
                 self.tb_result.setItem(row + 3, 42,
-                                       QTableWidgetItem(resultList[row]['stock_inferior_product']))
+                                       QTableWidgetItem(resultList[row].get('stock_inferior_product', 0)))
                 self.tb_result.setItem(row + 3, 43,
-                                       QTableWidgetItem(resultList[row]['stock_need_repaired']))
+                                       QTableWidgetItem(resultList[row].get('stock_need_repaired', 0)))
                 self.tb_result.setItem(row + 3, 44,
-                                       QTableWidgetItem(resultList[row]['stock_need_retire']))
+                                       QTableWidgetItem(resultList[row].get('stock_need_retire', 0)))
                 self.tb_result.setItem(row + 3, 45,
-                                       QTableWidgetItem(resultList[row]['stock_unprepared_value']))
+                                       QTableWidgetItem(resultList[row].get('stock_unprepared_value', 0)))
                 self.tb_result.setItem(row + 3, 46,
-                                       QTableWidgetItem(resultList[row]['stockUn_cutdown_value']))
+                                       QTableWidgetItem(resultList[row].get('stockUn_cutdown_value', 0)))
                 self.tb_result.setItem(row + 3, 47,
-                                       QTableWidgetItem(resultList[row]['authorized_rate']))
+                                       QTableWidgetItem(resultList[row].get('authorized_rate', 0)))
                 self.tb_result.setItem(row + 3, 48,
-                                       QTableWidgetItem(resultList[row]['matched_rate']))
+                                       QTableWidgetItem(resultList[row].get('matched_rate', 0)))
                 self.tb_result.setItem(row + 3, 49,
-                                       QTableWidgetItem(resultList[row]['instock_rate']))
+                                       QTableWidgetItem(resultList[row].get('instock_rate', 0)))
                 self.tb_result.setItem(row + 3, 50,
-                                       QTableWidgetItem(resultList[row]['prepared_rate']))
+                                       QTableWidgetItem(resultList[row].get('prepared_rate', 0)))
                 self.tb_result.setItem(row + 3, 51,
-                                       QTableWidgetItem(resultList[row]['intact_rate']))
+                                       QTableWidgetItem(resultList[row].get('intact_rate', 0)))
                 self.tb_result.setItem(row + 3, 52,
-                                       QTableWidgetItem(resultList[row]['never_repair']))
+                                       QTableWidgetItem(resultList[row].get('never_repair', 0)))
                 self.tb_result.setItem(row + 3, 53,
-                                       QTableWidgetItem(resultList[row]['once']))
+                                       QTableWidgetItem(resultList[row].get('once', 0)))
                 self.tb_result.setItem(row + 3, 54,
-                                       QTableWidgetItem(resultList[row]['twice']))
+                                       QTableWidgetItem(resultList[row].get('twice', 0)))
                 self.tb_result.setItem(row + 3, 55,
-                                       QTableWidgetItem(resultList[row]['three_times']))
+                                       QTableWidgetItem(resultList[row].get('three_times', 0)))
                 self.tb_result.setItem(row + 3, 56,
-                                       QTableWidgetItem(resultList[row]['More_than_three']))
+                                       QTableWidgetItem(resultList[row].get('More_than_three', 0)))
                 self.tb_result.setItem(row + 3, 57,
-                                       QTableWidgetItem(resultList[row]['before1970']))
+                                       QTableWidgetItem(resultList[row].get('before1970', 0)))
                 self.tb_result.setItem(row + 3, 58,
-                                       QTableWidgetItem(resultList[row]['between1971and1975']))
+                                       QTableWidgetItem(resultList[row].get('between1971and1975', 0)))
                 self.tb_result.setItem(row + 3, 59,
-                                       QTableWidgetItem(resultList[row]['between1976and1980']))
+                                       QTableWidgetItem(resultList[row].get('between1976and1980', 0)))
                 self.tb_result.setItem(row + 3, 60,
-                                       QTableWidgetItem(resultList[row]['between1981and1985']))
+                                       QTableWidgetItem(resultList[row].get('between1981and1985', 0)))
                 self.tb_result.setItem(row + 3, 61,
-                                       QTableWidgetItem(resultList[row]['between1986and1990']))
+                                       QTableWidgetItem(resultList[row].get('between1986and1990', 0)))
                 self.tb_result.setItem(row + 3, 62,
-                                       QTableWidgetItem(resultList[row]['between1991and1995']))
+                                       QTableWidgetItem(resultList[row].get('between1991and1995', 0)))
                 self.tb_result.setItem(row + 3, 63,
-                                       QTableWidgetItem(resultList[row]['between1996and2000']))
+                                       QTableWidgetItem(resultList[row].get('between1996and2000',0)))
                 self.tb_result.setItem(row + 3, 64,
-                                       QTableWidgetItem(resultList[row]['between2001and2005']))
+                                       QTableWidgetItem(resultList[row].get('between2001and2005', 0)))
                 self.tb_result.setItem(row + 3, 65,
-                                       QTableWidgetItem(resultList[row]['after2006']))
+                                       QTableWidgetItem(resultList[row].get('after2006', 0)))
         else:
             pass
 
@@ -618,6 +613,49 @@ class Equip_Balance_Select(QWidget, EquipmentBalanceSelectUI):
         item = QTableWidgetItem("2006年以后")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.tb_result.setItem(2, 65, item)
+
+
+    #定义修改表格内容
+    def slotClickedAlter(self):
+        self.tb_result.setEditTriggers(QTableWidget.DoubleClicked)
+        columnCount = self.tb_result.columnCount()
+        for i in range(columnCount):
+            for j in range(3):
+                item = self.tb_result.item(j, i)
+                if item is not None:
+                    item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+
+        rowCount = self.tb_result.rowCount()
+        for column in range(5):
+            for row in range(3,rowCount):
+                item = self.tb_result.item(row, column)
+                if item is not None:
+                    item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+        pass
+
+    #保存修改内容
+    def slotClickedSave(self):
+        itemList =[]
+        for row in range(3,len(self.equipList) + 3):
+            for column in range(self.lenOfColumn):
+                item = self.tb_result.item(row,column)
+                if item is None:
+                    itemList.append(' ')
+                else:
+                    if len(item.text()) == 0:
+                        itemList.append('')
+                    else:
+                        itemList.append(item.text())
+            saveEquipmentBalanceByRow(itemList, self.currentYear)
+            itemList.clear()
+        self._initTableWidgetByUnitListAndEquipList(self.equipList,self.currentYear)
+
+
+
+
+
+
+
 
 
 
