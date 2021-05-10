@@ -129,43 +129,141 @@ def _dateSaveToList(dataDict):
 
 
 
-def getResultByYearAndEquip(year,equipList):
+def getResultByYearAndEquipAndUnit(year,equipList,unitList):
     resultList = []
-    if equipList is None:
+    item = {}
+    if equipList is None or unitList is None:
         return resultList
     else:
         for equip in equipList:
-            item = {}
-            sql = "select equip_balance_id,Equip_ID from equipment_balance where year=%s and Equip_ID=%s"%(year,equip)
-            result = selectOne(sql)
-            if result is None:
-                item['Equip_ID'] = equip
-                item['Equip_Name'] = getEquipmentNameByID(equip)
-                resultList.append(item.copy())
-                item.clear()
-                continue
-            else:
-                sql = "select Equip_Name from equip where Equip_ID=%s" % result['Equip_ID']
-                item.update(selectOne(sql))
-                sql = "select * from equipment_balance where equip_balance_id=%s" % result['equip_balance_id']
-                item.update(selectOne(sql))
-                sql = "select * from eb_quality_status where equip_balance_id=%s" % result['equip_balance_id']
-                item.update(selectOne(sql))
-                sql = "select * from eb_change_project where equip_balance_id=%s" % result['equip_balance_id']
-                item.update(selectOne(sql))
-                sql = "select * from eb_carry where equip_balance_id=%s" % result['equip_balance_id']
-                item.update(selectOne(sql))
-                sql = "select * from eb_stock where equip_balance_id=%s" % result['equip_balance_id']
-                item.update(selectOne(sql))
-                sql = "select * from eb_management where equip_balance_id=%s" % result['equip_balance_id']
-                item.update(selectOne(sql))
-                sql = "select * from eb_repair_time where equip_balance_id=%s" % result['equip_balance_id']
-                item.update(selectOne(sql))
-                sql = "select * from eb_production_year where equip_balance_id=%s" % result['equip_balance_id']
-                item.update(selectOne(sql))
-                resultList.append(item.copy())
-                item.clear()
-        return resultList
+            for unit in unitList:
+                sql = "select equip_balance_id,Equip_ID from equipment_balance where year=%s and Equip_ID=%s and Unit_ID=%s"%(year,equip,unit)
+                result = selectOne(sql)
+                if result is None:
+                    item['Equip_ID'] = equip
+                    item['Unit_ID'] = unit
+                    item['Equip_Name'] = getEquipmentNameByID(equip)
+                    resultList.append(item.copy())
+                    item.clear()
+                    continue
+                else:
+                    sql = "select Equip_Name from equip where Equip_ID=%s" % result['Equip_ID']
+                    item.update(selectOne(sql))
+                    sql = "select * from equipment_balance where equip_balance_id=%s" % result['equip_balance_id']
+                    item.update(selectOne(sql))
+                    sql = "select * from eb_quality_status where equip_balance_id=%s" % result['equip_balance_id']
+                    item.update(selectOne(sql))
+                    sql = "select * from eb_change_project where equip_balance_id=%s" % result['equip_balance_id']
+                    item.update(selectOne(sql))
+                    sql = "select * from eb_carry where equip_balance_id=%s" % result['equip_balance_id']
+                    item.update(selectOne(sql))
+                    sql = "select * from eb_stock where equip_balance_id=%s" % result['equip_balance_id']
+                    item.update(selectOne(sql))
+                    sql = "select * from eb_management where equip_balance_id=%s" % result['equip_balance_id']
+                    item.update(selectOne(sql))
+                    sql = "select * from eb_repair_time where equip_balance_id=%s" % result['equip_balance_id']
+                    item.update(selectOne(sql))
+                    sql = "select * from eb_production_year where equip_balance_id=%s" % result['equip_balance_id']
+                    item.update(selectOne(sql))
+                    resultList.append(item.copy())
+                    item.clear()
+        return sorted(resultList, key=operator.itemgetter('Equip_ID'))
+            # sorted(resultList, key=operator.itemgetter('Equip_ID'))
+
+#根据分配调整计划更新装备平衡表
+def updateOneEquipmentBalanceData(year,equipmentId,unitId):
+    item = {}
+    item['Equip_ID'] = equipmentId
+    item['Unit_ID'] = unitId
+    item['OrignalAuthorizedValue'] = 0
+    item['authorizedValue'] = 0
+    item['authorizedValueChange'] = 0
+    item['originalValue'] = 0
+    item['equipmentBalanceKey'] = str(year) + item['Equip_ID'] + item['Unit_ID']
+    item['year'] = str(year)
+
+    sql = "select Equip_ID,Unit_ID,Work from strength where year=%s and Equip_ID =%s and Unit_ID=%s and equipYear='' " % (str(year), equipmentId,unitId)
+    workEquipment = selectOne(sql)
+    if workEquipment is not None:
+        OrignalAuthorizedValue = int(workEquipment.get('Work', 0))
+        item['OrignalAuthorizedValue'] = OrignalAuthorizedValue
+    sql = "select Equip_ID,Unit_ID,Strength from strength where year=%s and Equip_ID=%s and Unit_ID=%s and equipYear='' " % (str(int(year) - 1), equipmentId, unitId)
+    StrengthEquipment =selectOne(sql)
+    if StrengthEquipment is not None:
+        originalValue = int(StrengthEquipment.get('Strength', 0))
+        item['originalValue'] = originalValue
+    sql = "select Equip_Id,Unit_Id,DisturbNum from disturbplan where Year=%s and Equip_Id=%s and Unit_Id=%s"%(str(year), equipmentId, unitId)
+    disturbEquipment =selectOne(sql)
+    if disturbEquipment is not None:
+        if (disturbEquipment.get('DisturbNum', 0) == 0 or disturbEquipment['DisturbNum'] is None or len(
+                disturbEquipment['DisturbNum']) <= 1):
+            disturbValue = 0
+        else:
+            disturbValue = int(disturbEquipment['DisturbNum'])
+        item['authorizedValueChange'] = disturbValue
+        item['authorizedValue'] = item.get('OrignalAuthorizedValue') + disturbValue
+
+    sql = "select equip_balance_id from  equipment_balance where equip_balance_id=%s"%item['equipmentBalanceKey']
+    equipmentBalance = selectOne(sql)
+    if equipmentBalance is None or equipmentBalance['equip_balance_id'] is None:
+        insertOneEquipmentBalanceData(item)
+    else:
+        alterOneEquipmentBalanceData(item)
+
+
+def alterOneEquipmentBalanceData(item):
+    sql = "update equipment_balance set original_authorized_value=%d, authorized_value=%d,authorized_value_change=%d,original_value=%d where equip_balance_id=%s"\
+          %(item['OrignalAuthorizedValue'],item['authorizedValue'],item['authorizedValueChange'],item['originalValue'],item['equipmentBalanceKey'])
+    executeCommit(sql)
+
+
+def deleteOneEquipmentBalanceData(year, equipmentId, unitId):
+    sqls = []
+    equipKey = str(year) + equipmentId + unitId
+    sql = "delete from equipment_balance where equip_balance_id=%s"%equipKey
+    sqls.append(sql)
+    sql = "delete from eb_carry where equip_balance_id=%s"%equipKey
+    sqls.append(sql)
+    sql = "delete from eb_change_project where equip_balance_id=%s" % equipKey
+    sqls.append(sql)
+    sql = "delete from eb_management where equip_balance_id=%s" % equipKey
+    sqls.append(sql)
+    sql = "delete from eb_production_year where equip_balance_id=%s" % equipKey
+    sqls.append(sql)
+    sql = "delete from eb_quality_status where equip_balance_id=%s" % equipKey
+    sqls.append(sql)
+    sql = "delete from eb_repair_time where equip_balance_id=%s" % equipKey
+    sqls.append(sql)
+    sql = "delete from eb_stock where equip_balance_id=%s" % equipKey
+    sqls.append(sql)
+    excuteupdata(sqls)
+
+
+def insertOneEquipmentBalanceData(tempItem):
+    sqls = []
+    equipKey = tempItem['equipmentBalanceKey']
+    year = tempItem['year']
+    sql = "insert into equipment_balance(equip_balance_id,Equip_ID,Unit_ID,year,original_authorized_value," \
+          "authorized_value,authorized_value_change,original_value) values (%s,%s,%s,%s,%d,%d,%d,%d)" % (
+              equipKey, tempItem['Equip_ID'], tempItem['Unit_ID'], str(year), tempItem['OrignalAuthorizedValue'],
+              tempItem['authorizedValue'], tempItem['authorizedValueChange'], tempItem['originalValue'],)
+    sqls.append(sql)
+    sql1 = "insert into eb_carry(equip_balance_id) value(%s)" % equipKey
+    sqls.append(sql1)
+    sql2 = "insert into eb_change_project(equip_balance_id) value(%s)" % equipKey
+    sqls.append(sql2)
+    sql3 = "insert into eb_management(equip_balance_id) value(%s)" % equipKey
+    sqls.append(sql3)
+    sql4 = "insert into eb_production_year(equip_balance_id) value(%s)" % equipKey
+    sqls.append(sql4)
+    sql5 = "insert into eb_quality_status(equip_balance_id) value(%s)" % equipKey
+    sqls.append(sql5)
+    sql6 = "insert into eb_repair_time(equip_balance_id) value(%s)" % equipKey
+    sqls.append(sql6)
+    sql7 = "insert into eb_stock(equip_balance_id) value(%s)" % equipKey
+    sqls.append(sql7)
+    excuteupdata(sqls)
+
 
 
  #实力表中的内容初始化装备平衡表
@@ -232,7 +330,7 @@ def initEquipmentBalance(year):
             equip = itemDict.get(key)
             if (equip is not None):
                 equip['authorizedValueChange'] = disturbValue
-                equip['authorizedValue'] = equip.get('authorizedValue') + disturbValue
+                equip['authorizedValue'] = equip.get('OrignalAuthorizedValue') + disturbValue
             else:
                 itemDict[key] = item.copy()
             item.clear()
@@ -367,6 +465,7 @@ def saveEquipmentBalanceByRow(dataList,year):
 
 
 if __name__ == "__main__":
-    getEquipmentIdByName('装备')
+    updateOneEquipmentBalanceData('2001','1','1')
+    # deleteOneEquipmentBalanceData('2008','2','5')
 
 

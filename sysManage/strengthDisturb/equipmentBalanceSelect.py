@@ -34,7 +34,7 @@ class Equip_Balance_Select(QWidget, EquipmentBalanceSelectUI):
     # 信号与槽的连接
     def signalConnectSlot(self):
         # 当前单位目录被点击
-        # self.tw_first.itemChanged.connect(self.slotSelectedResult)
+        self.tw_first.itemChanged.connect(self.slotSelectedResult)
 
         # 当前装备目录被点击
         self.tw_second.itemChanged.connect(self.slotSelectedResult)
@@ -52,18 +52,19 @@ class Equip_Balance_Select(QWidget, EquipmentBalanceSelectUI):
 
 
     def _initEquipmentBlanceSelect(self):
+
         self.tw_first.clear()
         self.tw_second.clear()
         self.tw_first.header().setVisible(False)
         self.tw_second.header().setVisible(False)
         self.le_first.setDisabled(False)
         self.le_second.setDisabled(False)
-        self.tw_first.setDisabled(True)
-        self.tw_first.setVisible(False)
+        self.tw_first.setDisabled(False)
+        self.tw_first.setVisible(True)
         self.pb_firstSelect.setVisible(False)
-        self.pb_firstSelect.setDisabled(True)
+        self.pb_firstSelect.setDisabled(False)
         self.le_first.setVisible(False)
-        self.le_first.setDisabled(True)
+        self.le_second.setVisible(False)
         self.tw_second.setDisabled(False)
         self.tb_result.setDisabled(False)
         self.first_treeWidget_dict = {}
@@ -71,10 +72,24 @@ class Equip_Balance_Select(QWidget, EquipmentBalanceSelectUI):
         # 当前选中的单位列表和装备列表
         self.currentCheckedUnitList = []
         self.currentCheckedEquipList = []
-        # self._initUnitTreeWidget("", self.tw_first)
+        self._initUnitTreeWidget("", self.tw_first)
         self._initEquipTreeWidget("", self.tw_second)
         self._initTableHeader()
 
+    def _initUnitTreeWidget(self, root, mother):
+        if root == '':
+            result = selectDisturbPlanUnitInfoByDeptUper('')
+        else:
+            result = selectDisturbPlanUnitInfoByDeptUper(root)
+
+        # rowData: (单位编号，单位名称，上级单位编号)
+        for rowData in result:
+            item = QTreeWidgetItem(mother)
+            item.setText(0, rowData[1])
+            item.setCheckState(0, Qt.Unchecked)
+            self.first_treeWidget_dict[rowData[0]] = item
+            if rowData[0] != '':
+                self._initUnitTreeWidget(rowData[0], item)
 
 
     def slotClickedInqury(self):
@@ -82,7 +97,7 @@ class Equip_Balance_Select(QWidget, EquipmentBalanceSelectUI):
         self.second_treeWidget_dict = {}
         self.tw_first.clear()
         self.tw_second.clear()
-        self.tw_first.setVisible(False)
+        self.tw_first.setVisible(True)
         self.tw_first.header().setVisible(False)
         self.tw_second.header().setVisible(False)
         self.le_first.setDisabled(False)
@@ -150,25 +165,39 @@ class Equip_Balance_Select(QWidget, EquipmentBalanceSelectUI):
             查询实力结果
     '''
     def slotSelectedResult(self):
+
         self.currentCheckedEquipList = []
+        self.currentCheckedUnitList = []
         for equipID, equipItem in self.second_treeWidget_dict.items():
             if equipItem.checkState(0) == Qt.Checked:
                 self.currentCheckedEquipList.append(equipID)
+
+        for unitID, unitItem in self.first_treeWidget_dict.items():
+            if unitItem.checkState(0) == Qt.Checked:
+                self.currentCheckedUnitList.append(unitID)
         #初始化单位和装备目录
-        self._initTableWidgetByUnitListAndEquipList(self.currentCheckedEquipList, self.currentYear)
+        self._initTableWidgetByUnitListAndEquipList(self.currentCheckedEquipList,self.currentCheckedUnitList,self.currentYear)
+
+
+
+
+
+
 
     # 初始化tableWidget
-    def _initTableWidgetByUnitListAndEquipList(self, EquipList, year):
+    def _initTableWidgetByUnitListAndEquipList(self, EquipList,UnitList, year):
         self.tb_result.clear()
         self.tb_result.setRowCount(3)
         self.equipList = EquipList
+        self.unitList = UnitList
         self.currentInquiryResult.clear()
         self.lenOfColumn = 66
         self.tb_result.setColumnCount(self.lenOfColumn)
         self._initTableHeader()
-        resultList = getResultByYearAndEquip(year,self.equipList)
+        resultList = getResultByYearAndEquipAndUnit(year,self.equipList,self.unitList)
         if resultList is not None and len(resultList) is not 0:
-            self.tb_result.setRowCount(len(EquipList) + 3)
+            self.tb_result.setRowCount(len(resultList) + 3)
+            print(resultList)
             for row in range(len(resultList)):
                 self.tb_result.setItem(row + 3, 0,
                                        QTableWidgetItem(resultList[row].get('Equip_Name')))
