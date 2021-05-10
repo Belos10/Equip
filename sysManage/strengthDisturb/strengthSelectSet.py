@@ -1,8 +1,8 @@
 from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, \
     QAbstractItemView, QMessageBox,QInputDialog,QLineEdit
 from database.strengthDisturbSql import selectUnitInfoByDeptUper, selectAllDataAboutUnit, selectEquipInfoByEquipUper, \
-    selectAllDataAboutEquip, addDataIntoUnit, addDataIntoEquip, updateDataIntoUnit,\
-    updateDataIntoEquip, delDataInEquip, delDataInUnit,updateEquipUnit
+    selectAllDataAboutEquip, addDataIntoUnit, addDataIntoEquip, updateDataIntoUnit, \
+    updateDataIntoEquip, delDataInEquip, delDataInUnit, updateEquipUnit, updateUnitAlias
 from widgets.strengthDisturb.select_set import Widget_Select_Set
 from sysManage.strengthDisturb.equipUnitSet import equipUnitSet
 from PyQt5.Qt import Qt
@@ -43,6 +43,17 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
         self.pb_setEquip.clicked.connect(self.slotEquipDictInit)  # 设置装备目录
 
         self.pb_setEquipUnit.clicked.connect(self.slotSetEquipUnit)
+        self.pb_setUnitAlias.clicked.connect(self.slotSetUnitAlias)
+
+    def slotSetUnitAlias(self):
+        if self.tb_result.currentRow() == -1:
+            return
+        text, okPressed = QInputDialog.getText(self, "设置别名", "该单位别名为:", QLineEdit.Normal, "")
+        if okPressed:
+            print(text)
+            updateUnitAlias(text, self.le_unitID.text())
+        self.slotUnitDictInit()
+
 
     def slotSetEquipUnit(self):
         if self.tb_result.currentRow() == -1:
@@ -110,6 +121,7 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
         self.pb_setEquip.setDisabled(False)
         self.pb_setUnit.setDisabled(True)
         self.pb_setEquipUnit.setDisabled(True)
+        self.pb_setUnitAlias.setDisabled(0)
 
         #从数据库中单位表中获取数据初始化单位目录，tableWidget显示所有的单位表
         self._initUnitTreeWidget("", self.tw_first)
@@ -142,6 +154,7 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
         self.pb_setEquip.setDisabled(True)
         self.pb_setUnit.setDisabled(False)
         self.pb_setEquipUnit.setDisabled(False)
+        self.pb_setUnitAlias.setDisabled(1)
 
         # 从数据库中单位表中获取数据初始化单位目录，tableWidget显示所有的单位表
         self._initEquipTreeWidget("", self.tw_second)

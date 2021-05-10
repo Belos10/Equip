@@ -63,6 +63,13 @@
          </spacer>
         </item>
         <item>
+         <widget class="QPushButton" name="pb_setUnitAlias">
+          <property name="text">
+           <string>设置单位别名</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QPushButton" name="pb_setEquipUnit">
           <property name="text">
            <string>设置当前装备单位</string>

@@ -2,9 +2,7 @@ from widgets.alocatMange.select_set import Widget_Dict_Set
 import sys
 from PyQt5.QtWidgets import QApplication,QWidget, QListWidgetItem, QComboBox, QTableWidgetItem, QDateEdit, \
     QInputDialog,QMessageBox,QAbstractItemView,QTreeWidgetItem
-from database.strengthDisturbSql import selectUnitInfoByDeptUper,selectAllDataAboutUnit,selectEquipInfoByEquipUper\
-    ,addDataIntoUnit,selectAllDataAboutEquip,addDataIntoEquip,updateDataIntoUnit,updateDataIntoEquip,delDataInEquip\
-    ,delDataInUnit
+from database.strengthDisturbSql import *
 from sysManage.alocatMange.config import ArmyTransferReceiveUnit, ArmyTransferSendUnit
 from PyQt5.Qt import Qt
 #new
@@ -57,7 +55,7 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
 
         self.tb_result.itemClicked.disconnect(self.slotClickedRow)  # 选中当前tablewidget的某行
 
-        #self.pb_setUnit.clicked.disconnect(self.slotUnitDictInit)  # 设置单元目录
+        self.pb_setUnit.clicked.disconnect(self.slotUnitDictInit)  # 设置单元目录
 
         self.pb_setEquip.clicked.disconnect(self.slotEquipDictInit)  # 设置装备目录
 
@@ -96,11 +94,13 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
         self.le_uperID.setDisabled(True)
         self.cb_equipType.setDisabled(True)
         self.cb_inputType.setDisabled(True)
-        self.le_unitUper.setDisabled(False)
+        self.le_otherName.setDisabled(False)
         self.le_unitName.setDisabled(False)
         self.le_unitID.setDisabled(False)
         self.pb_setEquip.setDisabled(False)
         self.pb_setUnit.setDisabled(True)
+        self.pb_add.setDisabled(1)
+        self.pb_update.setDisabled(1)
 
         #从数据库中单位表中获取数据初始化单位目录，tableWidget显示所有的单位表
         self._initUnitTreeWidget("", self.tw_first)
@@ -132,6 +132,8 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
         self.pb_setEquip.setDisabled(True)
         self.pb_setUnit.setDisabled(False)
         self.le_otherName.setDisabled(True)
+        self.pb_add.setDisabled(0)
+        self.pb_update.setDisabled(0)
 
         # 从数据库中单位表中获取数据初始化单位目录，tableWidget显示所有的单位表
         self._initEquipTreeWidget("", self.tw_second)
@@ -146,9 +148,9 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
     '''
     def _initUnitTreeWidget(self, root, mother):
         if root == '':
-            result = selectUnitInfoByDeptUper('')
+            result = selectDisturbPlanUnitInfoByDeptUper('')
         else:
-            result = selectUnitInfoByDeptUper(root)
+            result = selectDisturbPlanUnitInfoByDeptUper(root)
 
         #rowData: (单位编号，单位名称，上级单位编号)
         for rowData in result:
@@ -163,7 +165,7 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
             设置单元时的初始化tableWidget，显示整个单位表
     '''
     def _initUnitTableWidget(self):
-        result = selectAllDataAboutUnit()
+        result = selectAllDataAboutDisturbPlanUnit()
 
         header = ['单位编号', '单位名称', '上级单位编号']
         self.tb_result.setColumnCount(len(header))
@@ -235,7 +237,7 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
         if self.changeUnit:
             self.le_unitID.setText(self.tb_result.item(currentRow, 0).text())
             self.le_unitName.setText(self.tb_result.item(currentRow, 1).text())
-            self.le_unitUper.setText(self.tb_result.item(currentRow, 2).text())
+            self.le_otherName.setText(self.tb_result.item(currentRow, 2).text())
         else:
             self.le_equipID.setText((self.tb_result.item(currentRow,0).text()))
             self.le_equipName.setText((self.tb_result.item(currentRow, 1).text()))
@@ -264,36 +266,37 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
     def slotAddDict(self):
         # 单位目录
         if self.changeUnit:
-            if self.le_unitID.text() == "" or self.le_unitName.text() == "":
-                reply = QMessageBox.question(self, '新增失败', '单位ID或单位名字为空，拒绝增加，请重新填写', QMessageBox.Yes,
-                                             QMessageBox.Cancel)
-            else:
-                Unit_ID = self.le_unitID.text()
-                Unit_Name = self.le_unitName.text()
-                Unit_Uper = self.le_unitUper.text()
-                unitInfoTuple = selectAllDataAboutUnit()
-
-                haveID = False
-                haveUperID = False
-                if Unit_Uper == '':
-                    haveUperID = True
-
-                for unitInfo in unitInfoTuple:
-                    if Unit_ID == unitInfo[0]:
-                        reply = QMessageBox.question(self, '新增失败', '单位ID已存在, 请重新填写', QMessageBox.Yes,
-                                                     QMessageBox.Cancel)
-                        haveID = True
-                        break
-                    elif Unit_Uper == unitInfo[0]:
-                        haveUperID = True
-
-                if haveUperID == False:
-                    reply = QMessageBox.question(self, '新增失败', '上级单位ID不存在, 请重新填写', QMessageBox.Yes,
-                                                 QMessageBox.Cancel)
-                elif haveUperID == True and haveID == False:
-                    addDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper)
-
-                self.slotUnitDictInit()
+            pass
+        #     if self.le_unitID.text() == "" or self.le_unitName.text() == "":
+        #         reply = QMessageBox.question(self, '新增失败', '单位ID或单位名字为空，拒绝增加，请重新填写', QMessageBox.Yes,
+        #                                      QMessageBox.Cancel)
+        #     else:
+        #         Unit_ID = self.le_unitID.text()
+        #         Unit_Name = self.le_unitName.text()
+        #         Unit_Uper = self.le_unitUper.text()
+        #         unitInfoTuple = selectAllDataAboutDisturbPlanUnit()
+        #
+        #         haveID = False
+        #         haveUperID = False
+        #         if Unit_Uper == '':
+        #             haveUperID = True
+        #
+        #         for unitInfo in unitInfoTuple:
+        #             if Unit_ID == unitInfo[0]:
+        #                 reply = QMessageBox.question(self, '新增失败', '单位ID已存在, 请重新填写', QMessageBox.Yes,
+        #                                              QMessageBox.Cancel)
+        #                 haveID = True
+        #                 break
+        #             elif Unit_Uper == unitInfo[0]:
+        #                 haveUperID = True
+        #
+        #         if haveUperID == False:
+        #             reply = QMessageBox.question(self, '新增失败', '上级单位ID不存在, 请重新填写', QMessageBox.Yes,
+        #                                          QMessageBox.Cancel)
+        #         elif haveUperID == True and haveID == False:
+        #             addDataIntoDisturbPlanUnit(Unit_ID, Unit_Name, Unit_Uper)
+        #
+        #         self.slotUnitDictInit()
         # 装备目录
         else:
             if self.le_equipID.text() == "" or self.le_equipName.text() == "":
@@ -335,30 +338,31 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
     def slotUpdate(self):
         # 单位目录
         if self.changeUnit:
-            if (self.tb_result.item(self.tb_result.currentRow(),
-                                    0).text() != self.le_unitID.text()) or self.le_unitName.text() == "":
-                reply = QMessageBox.question(self, '修改失败', '单位ID不能修改或单位名字为空，拒绝修改，请重新填写', QMessageBox.Yes,
-                                             QMessageBox.Cancel)
-            else:
-                Unit_ID = self.le_unitID.text()
-                Unit_Name = self.le_unitName.text()
-                Unit_Uper = self.le_unitUper.text()
-                unitInfoTuple = selectAllDataAboutUnit()
-                haveUperID = False
-
-                if Unit_Uper == '':
-                    haveUperID = True
-
-                for unitInfo in unitInfoTuple:
-                    if Unit_Uper == unitInfo[0]:
-                        haveUperID = True
-
-                if haveUperID == False:
-                    reply = QMessageBox.question(self, '修改失败', '上级单位ID在单位列表中不存在，拒绝修改，请重新填写', QMessageBox.Yes,
-                                                 QMessageBox.Cancel)
-                else:
-                    updateDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper)
-                    self.slotUnitDictInit()
+            pass
+            # if (self.tb_result.item(self.tb_result.currentRow(),
+            #                         0).text() != self.le_unitID.text()) or self.le_unitName.text() == "":
+            #     reply = QMessageBox.question(self, '修改失败', '单位ID不能修改或单位名字为空，拒绝修改，请重新填写', QMessageBox.Yes,
+            #                                  QMessageBox.Cancel)
+            # else:
+            #     Unit_ID = self.le_unitID.text()
+            #     Unit_Name = self.le_unitName.text()
+            #     Unit_Uper = self.le_unitUper.text()
+            #     unitInfoTuple = selectAllDataAboutDisturbPlanUnit()
+            #     haveUperID = False
+            #
+            #     if Unit_Uper == '':
+            #         haveUperID = True
+            #
+            #     for unitInfo in unitInfoTuple:
+            #         if Unit_Uper == unitInfo[0]:
+            #             haveUperID = True
+            #
+            #     if haveUperID == False:
+            #         reply = QMessageBox.question(self, '修改失败', '上级单位ID在单位列表中不存在，拒绝修改，请重新填写', QMessageBox.Yes,
+            #                                      QMessageBox.Cancel)
+            #     else:
+            #         updateDataIntoDisturbPlanUnit(Unit_ID, Unit_Name, Unit_Uper)
+            #         self.slotUnitDictInit()
         # 装备目录
         else:
             if (self.tb_result.item(self.tb_result.currentRow(),
@@ -395,7 +399,7 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
             reply = QMessageBox.question(self, '删除', '是否将下级单位以及所涉及的其他表关于该单位的信息一起删除？', QMessageBox.Yes,
                                              QMessageBox.Cancel)
             if reply == QMessageBox.Yes:
-                delDataInUnit(self.le_unitID.text())
+                delDataInDisturbPlanUnit(self.le_unitID.text())
                 reply = QMessageBox.question(self, '删除', '删除成功', QMessageBox.Yes)
                 self.slotUnitDictInit()
 

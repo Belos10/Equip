@@ -29,6 +29,9 @@ class Widget_Select_Set(object):
         self.horizontalLayout.setObjectName("horizontalLayout")
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem)
+        self.pb_setUnitAlias = QtWidgets.QPushButton(self.chooseWidget)
+        self.pb_setUnitAlias.setObjectName("pb_setUnitAlias")
+        self.horizontalLayout.addWidget(self.pb_setUnitAlias)
         self.pb_setEquipUnit = QtWidgets.QPushButton(self.chooseWidget)
         self.pb_setEquipUnit.setObjectName("pb_setEquipUnit")
         self.horizontalLayout.addWidget(self.pb_setEquipUnit)
@@ -227,6 +230,7 @@ class Widget_Select_Set(object):
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "Form"))
+        self.pb_setUnitAlias.setText(_translate("Form", "设置单位别名"))
         self.pb_setEquipUnit.setText(_translate("Form", "设置当前装备单位"))
         self.pb_setUnit.setText(_translate("Form", "设置单位目录"))
         self.pb_setEquip.setText(_translate("Form", "设置装备目录"))

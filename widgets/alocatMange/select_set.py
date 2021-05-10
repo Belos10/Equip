@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Widget_Dict_Set(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(1272, 743)
+        Form.resize(1018, 668)
         self.gridLayout_5 = QtWidgets.QGridLayout(Form)
         self.gridLayout_5.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_5.setSpacing(0)
@@ -29,6 +29,9 @@ class Widget_Dict_Set(object):
         self.horizontalLayout.setObjectName("horizontalLayout")
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem)
+        self.pb_setEquipUnit = QtWidgets.QPushButton(self.chooseWidget)
+        self.pb_setEquipUnit.setObjectName("pb_setEquipUnit")
+        self.horizontalLayout.addWidget(self.pb_setEquipUnit)
         self.pb_setUnit = QtWidgets.QPushButton(self.chooseWidget)
         self.pb_setUnit.setObjectName("pb_setUnit")
         self.horizontalLayout.addWidget(self.pb_setUnit)
@@ -168,9 +171,9 @@ class Widget_Dict_Set(object):
         self.le_equipName.setMaximumSize(QtCore.QSize(150, 16777215))
         self.le_equipName.setObjectName("le_equipName")
         self.gridLayout_2.addWidget(self.le_equipName, 1, 3, 1, 1)
-        self.lb_unitUper = QtWidgets.QLabel(self.inputWidget)
-        self.lb_unitUper.setObjectName("lb_unitUper")
-        self.gridLayout_2.addWidget(self.lb_unitUper, 1, 0, 1, 1)
+        self.lb_otherName = QtWidgets.QLabel(self.inputWidget)
+        self.lb_otherName.setObjectName("lb_otherName")
+        self.gridLayout_2.addWidget(self.lb_otherName, 1, 0, 1, 1)
         self.lb_equipName = QtWidgets.QLabel(self.inputWidget)
         self.lb_equipName.setObjectName("lb_equipName")
         self.gridLayout_2.addWidget(self.lb_equipName, 1, 2, 1, 1)
@@ -224,6 +227,7 @@ class Widget_Dict_Set(object):
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "Form"))
+        self.pb_setEquipUnit.setText(_translate("Form", "设置当前装备单位"))
         self.pb_setUnit.setText(_translate("Form", "设置单位目录"))
         self.pb_setEquip.setText(_translate("Form", "设置装备目录"))
         self.pb_firstSelect.setText(_translate("Form", "查询"))
@@ -237,7 +241,7 @@ class Widget_Dict_Set(object):
         self.lb_inputType.setText(_translate("Form", "装备录入类型："))
         self.pb_add.setText(_translate("Form", "增加"))
         self.pb_update.setText(_translate("Form", "修改"))
-        self.lb_unitUper.setText(_translate("Form", "别名"))
+        self.lb_otherName.setText(_translate("Form", "别名"))
         self.lb_equipName.setText(_translate("Form", "装备名字："))
         self.lb_equipUper.setText(_translate("Form", "上级装备号："))
         self.cb_equipType.setItemText(0, _translate("Form", "空"))

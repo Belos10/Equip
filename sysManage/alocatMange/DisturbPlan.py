@@ -110,9 +110,9 @@ class DisturbPlan(QWidget, yearList_Form):
 
     def _initUnitTreeWidget(self, root, mother):
         if root == '':
-            result = selectUnitInfoByDeptUper('')
+            result = selectDisturbPlanUnitInfoByDeptUper('')
         else:
-            result = selectUnitInfoByDeptUper(root)
+            result = selectDisturbPlanUnitInfoByDeptUper(root)
 
         # rowData: (单位编号，单位名称，上级单位编号)
         for rowData in result:
@@ -153,7 +153,7 @@ class DisturbPlan(QWidget, yearList_Form):
         j = 0
         for unitID, unitItem in self.first_treeWidget_dict.items():
             if unitItem.checkState(0) == Qt.Checked:
-                result = findUnitChildInfo(unitID)
+                result = findDisturbPlanUnitChildInfo(unitID)
                 for resultInfo in result:
                     self.currentUnitChilddict[j] = resultInfo
                     j=j+1
