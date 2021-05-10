@@ -205,7 +205,7 @@ class DisturbPlan(QWidget, yearList_Form):
         #self.disturbResult.setRowCount(n)
         self.initDisturbPlanNum()
         self.initDisturbPlanNote()
-
+        self.initDisturbPlanOther()
 
 
     # 读取初始分配计划数
@@ -333,3 +333,17 @@ class DisturbPlan(QWidget, yearList_Form):
                 item = QTableWidgetItem("")
             self.disturbResult.setItem(i,self.lenHeaderList-1,item)
 
+    # 读取军委计划数与装备单位
+    def initDisturbPlanOther(self):
+        self.unitDisturbPlanOtherList = selectDisturbPlanOther(self.currentEquipdict, self.currentYear)
+
+        for i in range(0, len(self.unitDisturbPlanOtherList)):
+            # if self.unitDisturbPlanOtherList[i] is not None:
+            #     item = QTableWidgetItem(str(self.unitDisturbPlanOtherList[i]))
+            # else:
+            #     item = QTableWidgetItem("")
+            # self.disturbResult.setItem(i, self.lenHeaderList - 1, item)
+            for j in range(1,3):
+                item=QTableWidgetItem(str(self.unitDisturbPlanOtherList[i][j-1]))
+                item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                self.disturbResult.setItem(i,j,item)

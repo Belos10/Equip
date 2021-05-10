@@ -1829,6 +1829,23 @@ def selectDisturbPlanNote(EquipList, YearList):
     return resultList
 
 
+# 读取分配计划军委计划数与装备单位
+def selectDisturbPlanOther(EquipList, YearList):
+    conn, cur = connectMySql()
+    resultList = []
+    for Equip_ID in EquipList.values():
+        sql = "select Equip_Unit,Equip_Num from armytransfer where Equip_Id = '" + Equip_ID[0] + "' and year = '" + YearList + "'"
+        cur.execute(sql)
+        result = cur.fetchall()
+        print("other result",result)
+        for resultInfo in result:
+            resultList.append(resultInfo)
+    print("Other", resultList)
+    disconnectMySql(conn, cur)
+    return resultList
+
+
+
 # 更新分配计划备注
 def updateDisturbPlanNote(Equip_Id,Year,Note):
     conn,cur=connectMySql()

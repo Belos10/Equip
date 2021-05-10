@@ -16,13 +16,13 @@ class alocatMange(QMainWindow, Widget_Alocat_Mange):
         self.setupUi(self)
 
         self.disturbPlan = DisturbPlan()            #分配调整计划
-        self.disturbSchedule = QWidget(self)        #调拨进度
+        self.allotSchedule = QWidget(self)        #调拨进度
         self.transferManage = transferManage(self)  #调拨单管理
         self.alocatSet = alocatManageSet(self)              #调配管理设置
 
         #添加页面
         self.stackedWidget.addWidget(self.disturbPlan)
-        self.stackedWidget.addWidget(self.disturbSchedule)
+        self.stackedWidget.addWidget(self.allotSchedule)
         self.stackedWidget.addWidget(self.transferManage)
         self.stackedWidget.addWidget(self.alocatSet)
 
