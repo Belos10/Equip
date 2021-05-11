@@ -219,7 +219,7 @@ class Apply_Retirement_Select(QWidget, ApplyRetirementSelectUI):
             self.tb_result.clearContents()
             return
         self.resultRowLength = len(self.equipList) + 3
-        self.resultColumnLength = len(self.unitList) * 5 + 2
+        self.resultColumnLength = len(self.unitList) * 6 + 2
         self.tb_result.setColumnCount(self.resultColumnLength)
         self.tb_result.setRowCount(self.resultRowLength)
         self.tb_result.horizontalHeader().setVisible(False)
@@ -253,12 +253,12 @@ class Apply_Retirement_Select(QWidget, ApplyRetirementSelectUI):
             self.tb_result.setItem(rowIndex, 1, item)
             for j in range(len(self.unitList)):
                 data = getDataByUnitIdAndEquipmentId(self.currentYear, self.unitList[j], self.equipList[i])
-                columnIndex = 2 + 5 * j
+                columnIndex = 2 + 6 * j
                 if(data is not None):
                     item = QTableWidgetItem(data['Unit_Name'])
                     item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
                     self.tb_result.setItem(1, columnIndex, item)
-                    self.tb_result.setSpan(1, columnIndex, 1, 5)
+                    self.tb_result.setSpan(1, columnIndex, 1, 6)
                     item = QTableWidgetItem('编制数')
                     item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
                     self.tb_result.setItem(2,columnIndex, item)
@@ -289,6 +289,16 @@ class Apply_Retirement_Select(QWidget, ApplyRetirementSelectUI):
                     item = QTableWidgetItem(data['note'])
                     item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
                     self.tb_result.setItem(rowIndex, columnIndex + 4, item)
+                    item = QTableWidgetItem('超/缺编数')
+                    item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                    self.tb_result.setItem(2, columnIndex + 5, item)
+                    changeValue = int(data['authorized_value']) - int(data['existing_value'])
+                    item = QTableWidgetItem('超/缺编数')
+                    item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                    self.tb_result.setItem(2, columnIndex + 5, item)
+
+
+
                 else:
                     item = QTableWidgetItem(getUnitNameByID(self.unitList[j]))
                     item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)

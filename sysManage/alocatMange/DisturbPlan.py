@@ -1,5 +1,7 @@
 import sys
 from PyQt5.QtWidgets import *
+
+from database.SD_EquipmentBanlanceSql import initEquipmentBalance, updateOneEquipmentBalanceData
 from widgets.alocatMange.yearListForm import yearList_Form
 from database.strengthDisturbSql import *
 from PyQt5.Qt import Qt
@@ -168,7 +170,7 @@ class DisturbPlan(QWidget, yearList_Form):
                 equipInfo = findEquipInfo(equipID)
                 self.currentEquipdict[j] = equipInfo[0]
             j=j+1
-        print("self.currentEquipdict",self.currentEquipdict)
+        # print("self.currentEquipdict",self.currentEquipdict)
 
         self._initDisturbPlanByUnitListAndEquipList()
 
@@ -323,6 +325,7 @@ class DisturbPlan(QWidget, yearList_Form):
         if 4 <= self.currentColumn <= self.lenHeaderList-2:
             updateDisturbPlanNum(self.currentEquipdict[self.currentRow][0],self.currentUnitChilddict[self.currentColumn-4][0],
                                  self.currentYear,self.disturbResult.item(self.currentRow,self.currentColumn).text())
+            updateOneEquipmentBalanceData(self.currentYear,self.currentEquipdict[self.currentRow][0],self.currentUnitChilddict[self.currentColumn-4][0])
         if self.currentColumn == self.lenHeaderList-1:
             updateDisturbPlanNote(self.currentEquipdict[self.currentRow][0],self.currentYear,self.disturbResult.item(self.currentRow,self.currentColumn).text())
 
