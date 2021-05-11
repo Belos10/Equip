@@ -284,6 +284,13 @@
         </spacer>
        </item>
        <item>
+        <widget class="QPushButton" name="pb_schedule">
+         <property name="text">
+          <string>调拨进度</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="pb_issueOrderForm">
          <property name="text">
           <string>开具调拨单</string>

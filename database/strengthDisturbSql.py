@@ -648,15 +648,16 @@ def delDataInUnit(Unit_ID):
         cur.execute(sql)
 
         publicInfo = findChildUnitForPublic(UnitID)
-        sql = "Delete from pubilcequip where Equip_ID = '" + publicInfo[0][0] + "'"
-        # print(sql)
-        cur.execute(sql)
-        sql = "Delete from weave where Unit_ID = '" + UnitID + "'"
-        # print(sql)
-        cur.execute(sql)
-        sql = "Delete from weave where Unit_ID = '" + publicInfo + "'"
-        # print(sql)
-        cur.execute(sql)
+        for public in publicInfo:
+            sql = "Delete from pubilcequip where Equip_ID = '" + public[0] + "'"
+            # print(sql)
+            cur.execute(sql)
+            sql = "Delete from weave where Unit_ID = '" + UnitID + "'"
+            # print(sql)
+            cur.execute(sql)
+            sql = "Delete from weave where Unit_ID = '" + public[0] + "'"
+            # print(sql)
+            cur.execute(sql)
 
         sql = "Delete from disturbplan where Unit_ID = '" + UnitID + "'"
         # print(sql)

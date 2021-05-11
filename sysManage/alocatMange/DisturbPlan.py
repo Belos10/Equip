@@ -36,12 +36,12 @@ class DisturbPlan(QWidget, yearList_Form):
         self.lw_yearChoose.itemDoubleClicked.connect(self.setDisturbPlanTitle)
 
         # 点击第一目录结果
-        self.tw_first.itemChanged.connect(self.slotDisturbStrengthResult)
+        self.tw_first.itemClicked.connect(self.slotDisturbStrengthResult)
 
         self.tw_second.itemChanged.connect(self.slotCheckedChange)
 
         # 点击第二目录结果
-        self.tw_second.itemChanged.connect(self.slotDisturbStrengthResult)
+        self.tw_second.itemClicked.connect(self.slotDisturbStrengthResult)
         # 新增年份
         self.tb_add.clicked.connect(self.slotAddNewYear)
         # 删除年份
@@ -194,18 +194,37 @@ class DisturbPlan(QWidget, yearList_Form):
         self.disturbResult.setHorizontalHeaderLabels(headerlist)
         self.currentDisturbPlan.clear()
         self.disturbResult.setColumnWidth(0, 200)
-        #print("self.currentCheckedEquipNameList", self.currentCheckedEquipNameList)
         i = 0
         for LineInfo in self.currentEquipdict.values():
             item = QTableWidgetItem(LineInfo[1])
-            item.setFlags(Qt.ItemIsEnabled|Qt.ItemIsSelectable)
+            item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
             self.disturbResult.setItem(i, 0, item)
+            item = QTableWidgetItem("")
+            item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+            self.disturbResult.setItem(i, 1, item)
+            item = QTableWidgetItem("")
+            item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+            self.disturbResult.setItem(i, 2, item)
+            item = QTableWidgetItem("")
+            item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+            self.disturbResult.setItem(i, 3, item)
+            for x in range(0, self.lenCurrentUnitChilddict):
+                item = QTableWidgetItem("")
+                item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                self.disturbResult.setItem(i, x + 4, item)
+            item = QTableWidgetItem("")
+            item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+            self.disturbResult.setItem(i, 4 + self.lenCurrentUnitChilddict, item)
+
+
             i = i + 1
             self.currentDisturbPlan[i] = LineInfo
+
         #self.disturbResult.setRowCount(n)
         self.initDisturbPlanNum()
         self.initDisturbPlanNote()
         self.initDisturbPlanOther()
+        self.ifEquipHaveChild()
 
 
     # 读取初始分配计划数
@@ -217,15 +236,10 @@ class DisturbPlan(QWidget, yearList_Form):
         num=0
         for i in range(0,len(self.currentUnitChilddict)):
             for j in range(0,len(self.currentEquipdict)):
-
+                item = self.disturbResult.item(j, 4 + i)
                 if self.unitDisturbPlanList[num]!='-1':
-                    item = QTableWidgetItem(self.unitDisturbPlanList[num])
-                    self.disturbResult.setItem(j, 4 + i, item)
-                else:
-                    item = QTableWidgetItem("")
-                    item.setFlags(Qt.ItemIsEnabled|Qt.ItemIsSelectable)
-                    #item.setBackground(QBrush(QColor(240,240,240)))
-                    self.disturbResult.setItem(j, 4 + i, item)
+                    item.setText(self.unitDisturbPlanList[num])
+                item.setFlags(Qt.ItemIsEnabled|Qt.ItemIsSelectable|Qt.ItemIsEditable)
                 num=num+1
         # 显示此次分配计划数
         sum = 0
@@ -236,18 +250,18 @@ class DisturbPlan(QWidget, yearList_Form):
                     sum = sum + 0
                 else:
                     sum = sum + int(num)
-            item = QTableWidgetItem(str(sum))
-            item.setFlags(Qt.ItemIsEnabled|Qt.ItemIsSelectable)
-            self.disturbResult.setItem(i, 3, item)
+            self.disturbResult.item(i,3).setText(str(sum))
             sum = 0
+
+    def ifEquipHaveChild(self):
         # 若装备含子装备，则该行不可选中
         for i in self.currentEquipdict:
             if selectEquipIsHaveChild(self.currentEquipdict[i][0]):
                 for j in range(1,self.disturbResult.columnCount()):
-                    item = QTableWidgetItem("")
+                    item = self.disturbResult.item(i,j)
+                    item.setText("")
+                    # item.setBackground(QBrush(QColor(240, 240, 240)))
                     item.setFlags(Qt.ItemIsEnabled|Qt.ItemIsSelectable)
-                    #item.setBackground(QBrush(QColor(240, 240, 240)))
-                    self.disturbResult.setItem(i,j,item)
 
 
 
@@ -327,23 +341,18 @@ class DisturbPlan(QWidget, yearList_Form):
         self.unitDisturbPlanNoteList = selectDisturbPlanNote(self.currentEquipdict, self.currentYear)
         #print("self.unitDisturbPlanNoteList", self.unitDisturbPlanNoteList)
         for i in range(0,len(self.unitDisturbPlanNoteList)):
+            item=self.disturbResult.item(i,self.lenHeaderList-1)
             if self.unitDisturbPlanNoteList[i] is not None:
-                item=QTableWidgetItem(str(self.unitDisturbPlanNoteList[i]))
-            else:
-                item = QTableWidgetItem("")
-            self.disturbResult.setItem(i,self.lenHeaderList-1,item)
+                item.setText(str(self.unitDisturbPlanNoteList[i]))
+            item.setFlags(Qt.ItemIsEnabled|Qt.ItemIsSelectable|Qt.ItemIsEditable)
+
 
     # 读取军委计划数与装备单位
     def initDisturbPlanOther(self):
         self.unitDisturbPlanOtherList = selectDisturbPlanOther(self.currentEquipdict, self.currentYear)
 
         for i in range(0, len(self.unitDisturbPlanOtherList)):
-            # if self.unitDisturbPlanOtherList[i] is not None:
-            #     item = QTableWidgetItem(str(self.unitDisturbPlanOtherList[i]))
-            # else:
-            #     item = QTableWidgetItem("")
-            # self.disturbResult.setItem(i, self.lenHeaderList - 1, item)
             for j in range(1,3):
-                item=QTableWidgetItem(str(self.unitDisturbPlanOtherList[i][j-1]))
-                item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-                self.disturbResult.setItem(i,j,item)
+                item=self.disturbResult.item(i,j)
+                item.setText(str(self.unitDisturbPlanOtherList[i][j-1]))
+
