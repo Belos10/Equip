@@ -86,7 +86,7 @@ class Equip_Balance_Select(QWidget, EquipmentBalanceSelectUI):
         for rowData in result:
             item = QTreeWidgetItem(mother)
             item.setText(0, rowData[1])
-            item.setCheckState(0, Qt.Unchecked)
+            # item.setCheckState(0, Qt.Unchecked)
             self.first_treeWidget_dict[rowData[0]] = item
             if rowData[0] != '':
                 self._initUnitTreeWidget(rowData[0], item)
@@ -165,7 +165,6 @@ class Equip_Balance_Select(QWidget, EquipmentBalanceSelectUI):
             查询实力结果
     '''
     def slotSelectedResult(self):
-
         self.currentCheckedEquipList = []
         self.currentCheckedUnitList = []
         for equipID, equipItem in self.second_treeWidget_dict.items():
@@ -173,8 +172,9 @@ class Equip_Balance_Select(QWidget, EquipmentBalanceSelectUI):
                 self.currentCheckedEquipList.append(equipID)
 
         for unitID, unitItem in self.first_treeWidget_dict.items():
-            if unitItem.checkState(0) == Qt.Checked:
+            if self.tw_first.currentItem() == unitItem:
                 self.currentCheckedUnitList.append(unitID)
+                break
         #初始化单位和装备目录
         self._initTableWidgetByUnitListAndEquipList(self.currentCheckedEquipList,self.currentCheckedUnitList,self.currentYear)
 
@@ -197,7 +197,6 @@ class Equip_Balance_Select(QWidget, EquipmentBalanceSelectUI):
         resultList = getResultByYearAndEquipAndUnit(year,self.equipList,self.unitList)
         if resultList is not None and len(resultList) is not 0:
             self.tb_result.setRowCount(len(resultList) + 3)
-            print(resultList)
             for row in range(len(resultList)):
                 self.tb_result.setItem(row + 3, 0,
                                        QTableWidgetItem(resultList[row].get('Equip_Name')))
@@ -669,15 +668,15 @@ class Equip_Balance_Select(QWidget, EquipmentBalanceSelectUI):
             for column in range(self.lenOfColumn):
                 item = self.tb_result.item(row,column)
                 if item is None:
-                    itemList.append(' ')
+                    itemList.append('')
                 else:
                     if len(item.text()) == 0:
                         itemList.append('')
                     else:
                         itemList.append(item.text())
-            saveEquipmentBalanceByRow(itemList, self.currentYear)
+            saveEquipmentBalanceByRow(itemList, self.currentYear,self.unitList[0])
             itemList.clear()
-        self._initTableWidgetByUnitListAndEquipList(self.equipList,self.currentYear)
+        self.slotSelectedResult()
 
 
 
