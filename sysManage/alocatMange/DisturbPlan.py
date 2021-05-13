@@ -61,7 +61,7 @@ class DisturbPlan(QWidget, yearList_Form):
 
     # 新增年份
     def slotAddNewYear(self):
-        year = 0
+        #year = 0
         year, ok = QInputDialog.getInt(self, "Get year", "year:", 0, 0, 100000, 1)
         if year:
             insertIntoDisturbPlanYear(year)
