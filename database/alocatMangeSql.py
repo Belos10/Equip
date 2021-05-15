@@ -1,5 +1,4 @@
-import pymysql
-from database.connectAndDisSql  import connectMySql, disconnectMySql
+from database.strengthDisturbSql import *
 
 #查询陆军调拨单所有年份表, 返回全部年份列表
 def selectYearListAboutArmy():
@@ -165,6 +164,204 @@ def insertIntoRocketTransferYear(year):
     sql = "insert into rockettransferyear (ID, year) VALUES" \
           + "('" + str(len(result) + 1) + "', '" + str(year) + "')"
     #print(sql)
+    cur.execute(sql)
+    conn.commit()
+    disconnectMySql(conn, cur)
+
+
+
+# 读取分配计划数
+def selectDisturbPlanNum(UnitList, EquipList, YearList):
+    conn, cur = connectMySql()
+    resultList = []
+    for Unit_ID in UnitList.values():
+        for Equip_ID in EquipList.values():
+            sql = "select DisturbNum from disturbplan where Unit_Id = '" + Unit_ID[0] + \
+                  "' and Equip_Id = '" + Equip_ID[0] + "' and Year = '" + YearList + "'"
+            cur.execute(sql)
+            result = cur.fetchall()
+            if len(result)!=0:
+                for resultInfo in result:
+                    resultList.append(resultInfo[0])
+            else:
+                resultList.append('-1')
+    disconnectMySql(conn, cur)
+    return resultList
+
+
+# 更新分配计划数
+def updateDisturbPlanNum(Equip_Id,Unit_Id,Year,DisturbNum):
+    conn,cur=connectMySql()
+    sql="update disturbplan set DisturbNum='"+ DisturbNum + "'where Equip_Id='" + Equip_Id + "'and Unit_Id ='" \
+        + Unit_Id + "' and Year = '" + Year + "'"
+    cur.execute(sql)
+    conn.commit()
+    disconnectMySql(conn,cur)
+
+
+# 读取分配计划年份
+def selectYearListAboutDisturbPlan():
+    conn, cur = connectMySql()
+    yearList = []
+    sql = "select * from disturbplanyear"
+
+    cur.execute(sql)
+    result = cur.fetchall()
+
+    disconnectMySql(conn, cur)
+    for yearInfo in result:
+        yearList.append(yearInfo[1])
+    return yearList
+
+
+# 新增分配计划年份
+def insertIntoDisturbPlanYear(year):
+    conn, cur = connectMySql()
+    EquipList=selectAllDataAboutEquip()
+    UnitList=selectAllDataAboutUnit()
+    # print("所有装备",EquipList)
+    # print("所有单位",UnitList)
+    result = selectYearListAboutDisturbPlan()
+    sql = "insert into disturbplanyear (num, year) VALUES" \
+          + "('" + str(len(result) + 1) + "', '" + str(year) + "')"
+    #print(sql)
+    cur.execute(sql)
+    for EquipInfo in EquipList:
+        sql = "insert into disturbplannote(Equip_id,Equip_Name,Year,Note) values " +\
+                  "('" + EquipInfo[0] + "','" + EquipInfo[1] + "','" + str(year) +"', '' )"
+        cur.execute(sql)
+        sql = "insert into allotschedule (Equip_Id,Equip_Name,army,allotcondition,rocket,finish,year) values " \
+              + "('" + EquipInfo[0] + "','" + EquipInfo[1] + "', '0','0','0','0','" + str(year) + "' )"
+        cur.execute(sql)
+        for UnitInfo in UnitList:
+            sql = "insert into disturbplan(Equip_id,Equip_Name,Unit_Id,Unit_Name,Year,DisturbNum) values " +\
+                  "('" + EquipInfo[0] + "','" + EquipInfo[1] + "','" + UnitInfo[0] +\
+                    "','" + UnitInfo[1] + "','"+ str(year) +"', '' )"
+            cur.execute(sql)
+
+    conn.commit()
+    disconnectMySql(conn, cur)
+
+
+# 删除分配计划年份
+def deleteDisturbPlanYear(year):
+    conn, cur = connectMySql()
+    sql = "delete from disturbplanyear where year= '" + year + "'"
+    cur.execute(sql)
+    sql = "delete from disturbplannote where year= '" + year + "'"
+    cur.execute(sql)
+    sql = "delete from disturbplan where year= '" + year + "'"
+    cur.execute(sql)
+    sql = "delete from allotschedule where year= '" + year + "'"
+    conn.commit()
+    disconnectMySql(conn, cur)
+
+
+# 读取分配计划备注
+def selectDisturbPlanNote(EquipList, YearList):
+    conn, cur = connectMySql()
+    resultList = []
+    for Equip_ID in EquipList.values():
+        sql = "select Note from disturbplannote where Equip_Id = '" + Equip_ID[0] + "' and Year = '" + YearList + "'"
+        cur.execute(sql)
+        result = cur.fetchall()
+        for resultInfo in result:
+            resultList.append(resultInfo[0])
+
+    disconnectMySql(conn, cur)
+    return resultList
+
+
+# 读取分配计划军委计划数与装备单位
+def selectDisturbPlanOther(EquipList, YearList):
+    conn, cur = connectMySql()
+    resultList = []
+    for Equip_ID in EquipList.values():
+        sql = "select Equip_Unit,Equip_Num from armytransfer where Equip_Id = '" + Equip_ID[0] + "' and year = '" + YearList + "'"
+        cur.execute(sql)
+        result = cur.fetchall()
+        print("other result",result)
+        for resultInfo in result:
+            resultList.append(resultInfo)
+    print("Other", resultList)
+    disconnectMySql(conn, cur)
+    return resultList
+
+
+
+# 更新分配计划备注
+def updateDisturbPlanNote(Equip_Id,Year,Note):
+    conn,cur=connectMySql()
+    sql="update disturbplannote set Note='"+ Note + "'where Equip_Id='" + Equip_Id + "' and Year = '" + Year + "'"
+    cur.execute(sql)
+    conn.commit()
+    disconnectMySql(conn,cur)
+
+
+def selectArmySchedule(Equip_Id,Year):
+    conn, cur = connectMySql()
+    sql = "select army from allotschedule where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
+    cur.execute(sql)
+    result = cur.fetchall()
+    conn.commit()
+    disconnectMySql(conn, cur)
+    return result
+
+
+def selectAllotCondition(Equip_Id,Year):
+    conn, cur = connectMySql()
+    sql = "select allotcondition from allotschedule where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
+    cur.execute(sql)
+    result = cur.fetchall()
+    conn.commit()
+    disconnectMySql(conn, cur)
+    return result
+
+
+def selectRocketSchedule(Equip_Id,Year):
+    conn, cur = connectMySql()
+    sql = "select rocket from allotschedule where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
+    cur.execute(sql)
+    result = cur.fetchall()
+    conn.commit()
+    disconnectMySql(conn, cur)
+    return result
+
+
+def selectIfScheduleFinish(Equip_Id,Year):
+    conn, cur = connectMySql()
+    sql = "select finishi from allotschedule where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
+    cur.execute(sql)
+    result = cur.fetchall()
+    conn.commit()
+    disconnectMySql(conn, cur)
+    return result
+
+def updateArmySchedule(Equip_Id,Year):
+    conn, cur = connectMySql()
+    sql = "update allotschedule set army = '1' where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
+    cur.execute(sql)
+    conn.commit()
+    disconnectMySql(conn, cur)
+
+def updateAllotCondition(Equip_Id, Year):
+    conn, cur = connectMySql()
+    sql = "update allotschedule set allotcondition = '1' where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
+    print(sql)
+    cur.execute(sql)
+    conn.commit()
+    disconnectMySql(conn, cur)
+
+def updateRocketSchedule(Equip_Id,Year):
+    conn, cur = connectMySql()
+    sql = "update allotschedule set rocket = '1' where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
+    cur.execute(sql)
+    conn.commit()
+    disconnectMySql(conn, cur)
+
+def updateScheduleFinish(Equip_Id,Year):
+    conn, cur = connectMySql()
+    sql = "update allotschedule set finishi = '1' where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
     cur.execute(sql)
     conn.commit()
     disconnectMySql(conn, cur)

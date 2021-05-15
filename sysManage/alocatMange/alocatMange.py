@@ -5,6 +5,7 @@ from widgets.alocatMange.alocatMange import Widget_Alocat_Mange
 from sysManage.alocatMange.transferManage import transferManage
 from sysManage.alocatMange.DisturbPlan import DisturbPlan
 from sysManage.alocatMange.alocatManageSet import alocatManageSet
+from sysManage.alocatMange.AllotSchedule import AllotSchedule
 
 '''
     功能：
@@ -16,7 +17,7 @@ class alocatMange(QMainWindow, Widget_Alocat_Mange):
         self.setupUi(self)
 
         self.disturbPlan = DisturbPlan()            #分配调整计划
-        self.allotSchedule = QWidget(self)        #调拨进度
+        self.allotSchedule = AllotSchedule()        #调拨进度
         self.transferManage = transferManage(self)  #调拨单管理
         self.alocatSet = alocatManageSet(self)              #调配管理设置
 
@@ -70,7 +71,11 @@ class alocatMange(QMainWindow, Widget_Alocat_Mange):
             点击调拨进度按钮
     '''
     def slotDisturbSchedule(self):
-        pass
+        self.stackedWidget.setCurrentIndex(1)
+        self.tb_disturbPlan.setDisabled(0)
+        self.tb_disturbSchedule.setDisabled(1)
+        self.tb_disturbManage.setDisabled(0)
+        self.tb_alocatSet.setDisabled(False)
 
     '''
         功能：

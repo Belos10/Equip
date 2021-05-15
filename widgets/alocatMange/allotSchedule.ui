@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1031</width>
+    <width>1026</width>
     <height>701</height>
    </rect>
   </property>
@@ -54,27 +54,6 @@
           <width>80</width>
           <height>16777215</height>
          </size>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QToolButton" name="tb_add">
-        <property name="text">
-         <string>新增</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QToolButton" name="tb_del">
-        <property name="text">
-         <string>删除</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QToolButton" name="tb_input">
-        <property name="text">
-         <string>导入</string>
         </property>
        </widget>
       </item>

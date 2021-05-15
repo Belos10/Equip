@@ -1,11 +1,12 @@
 from widgets.alocatMange.armyTransfer import Widget_Army_Transfer
 import sys
-from PyQt5.QtWidgets import QApplication,QWidget, QListWidgetItem, QComboBox, QTableWidgetItem, QDateEdit, QInputDialog,QMessageBox
+from PyQt5.QtWidgets import QApplication,QWidget, QListWidgetItem, QComboBox, QTableWidgetItem, QDateEdit, QInputDialog,QMessageBox,QPushButton
 from database.alocatMangeSql import selectYearListAboutArmy, selectArmyTransferByYear, insertIntoArmyTransferYear, \
     insertIntoArmyTransfer, selectIDFromArmyByYear, delArmyTransferByIDAndYear, delArmyTransferYearByYear
 from database.strengthDisturbSql import selectAllEndEquip
 from sysManage.alocatMange.config import ArmyTransferReceiveUnit, ArmyTransferSendUnit
 from PyQt5.Qt import Qt
+
 #new
 '''
     功能：

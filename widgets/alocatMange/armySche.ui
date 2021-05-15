@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Dialog</class>
+ <widget class="QDialog" name="Dialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>974</width>
+    <height>588</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout">
+   <item>
+    <widget class="QTableWidget" name="tw_result">
+     <property name="layoutDirection">
+      <enum>Qt::LeftToRight</enum>
+     </property>
+     <row>
+      <property name="text">
+       <string>New Row</string>
+      </property>
+     </row>
+     <row>
+      <property name="text">
+       <string>New Row</string>
+      </property>
+     </row>
+     <column>
+      <property name="text">
+       <string>New Column</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>New Column</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>New Column</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>New Column</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>New Column</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>New Column</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>New Column</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>New Column</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>New Column</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>New Column</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>New Column</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>New Column</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>New Column</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>New Column</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>New Column</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>New Column</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>New Column</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>New Column</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>New Column</string>
+      </property>
+     </column>
+     <item row="0" column="0">
+      <property name="text">
+       <string>序号</string>
+      </property>
+     </item>
+     <item row="0" column="1">
+      <property name="text">
+       <string>调拨单信息</string>
+      </property>
+     </item>
+     <item row="0" column="2">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="0" column="8">
+      <property name="text">
+       <string>交装单位</string>
+      </property>
+     </item>
+     <item row="0" column="9">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="0" column="11">
+      <property name="text">
+       <string>接装单位</string>
+      </property>
+     </item>
+     <item row="0" column="12">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="0" column="14">
+      <property name="text">
+       <string>装备名称</string>
+      </property>
+     </item>
+     <item row="0" column="15">
+      <property name="text">
+       <string>计量单位</string>
+      </property>
+     </item>
+     <item row="0" column="16">
+      <property name="text">
+       <string>应发数</string>
+      </property>
+     </item>
+     <item row="0" column="17">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="0" column="18">
+      <property name="text">
+       <string>备注</string>
+      </property>
+     </item>
+     <item row="1" column="1">
+      <property name="text">
+       <string>调拨单号</string>
+      </property>
+     </item>
+     <item row="1" column="2">
+      <property name="text">
+       <string>调拨日期</string>
+      </property>
+     </item>
+     <item row="1" column="3">
+      <property name="text">
+       <string>调拨依据</string>
+      </property>
+     </item>
+     <item row="1" column="4">
+      <property name="text">
+       <string>调拨</string>
+      </property>
+     </item>
+     <item row="1" column="5">
+      <property name="text">
+       <string>调拨方式</string>
+      </property>
+     </item>
+     <item row="1" column="6">
+      <property name="text">
+       <string>运输方式</string>
+      </property>
+     </item>
+     <item row="1" column="7">
+      <property name="text">
+       <string>有效日期</string>
+      </property>
+     </item>
+     <item row="1" column="8">
+      <property name="text">
+       <string>单位名称</string>
+      </property>
+     </item>
+     <item row="1" column="9">
+      <property name="text">
+       <string>联系人</string>
+      </property>
+     </item>
+     <item row="1" column="10">
+      <property name="text">
+       <string>联系电话</string>
+      </property>
+     </item>
+     <item row="1" column="11">
+      <property name="text">
+       <string>单位名称</string>
+      </property>
+     </item>
+     <item row="1" column="12">
+      <property name="text">
+       <string>联系人</string>
+      </property>
+     </item>
+     <item row="1" column="13">
+      <property name="text">
+       <string>联系电话</string>
+      </property>
+     </item>
+     <item row="1" column="14">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="1" column="15">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+     <item row="1" column="16">
+      <property name="text">
+       <string>质量</string>
+      </property>
+     </item>
+     <item row="1" column="17">
+      <property name="text">
+       <string>数量</string>
+      </property>
+     </item>
+     <item row="1" column="18">
+      <property name="text">
+       <string/>
+      </property>
+     </item>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
