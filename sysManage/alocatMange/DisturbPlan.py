@@ -36,6 +36,7 @@ class DisturbPlan(QWidget, yearList_Form):
         # 点击选择年份后刷新页面 初始化
         self.lw_yearChoose.itemDoubleClicked.connect(self.slotClickedInqury)
         self.lw_yearChoose.itemDoubleClicked.connect(self.setDisturbPlanTitle)
+        self.lw_yearChoose.itemDoubleClicked.connect(self.initDisturbPlanProof)
 
         # 点击第一目录结果
         self.tw_first.itemClicked.connect(self.slotDisturbStrengthResult)
@@ -122,7 +123,7 @@ class DisturbPlan(QWidget, yearList_Form):
         for rowData in result:
             item = QTreeWidgetItem(mother)
             item.setText(0, rowData[1])
-            item.setCheckState(0, Qt.Unchecked)
+            #item.setCheckState(0, Qt.Unchecked)
             self.first_treeWidget_dict[rowData[0]] = item
             if rowData[0] != '':
                 self._initUnitTreeWidget(rowData[0], item)
@@ -156,7 +157,7 @@ class DisturbPlan(QWidget, yearList_Form):
         # 获取子单位名
         j = 0
         for unitID, unitItem in self.first_treeWidget_dict.items():
-            if unitItem.checkState(0) == Qt.Checked:
+            if unitItem == self.tw_first.currentItem():
                 result = findDisturbPlanUnitChildInfo(unitID)
                 for resultInfo in result:
                     self.currentUnitChilddict[j] = resultInfo
@@ -223,19 +224,22 @@ class DisturbPlan(QWidget, yearList_Form):
             self.currentDisturbPlan[i] = LineInfo
 
         #self.disturbResult.setRowCount(n)
-        self.initDisturbPlanProof()
         self.initDisturbPlanNum()
         self.initDisturbPlanNote()
         self.initDisturbPlanOther()
         self.ifEquipHaveChild()
 
+    # 初始化调拨依据
     def initDisturbPlanProof(self):
         proof = selectDisturbPlanProof(self.currentYear)
         print(proof)
         self.te_proof.setText(proof[0][0])
+        if proof[0][0] == "":
+            self.te_proof.setPlaceholderText("请输入调拨依据")
 
+    # 改变调拨依据
     def slotProofChange(self):
-        print("self.te_proof.toPlainText()",self.te_proof.toPlainText())
+        #print("self.te_proof.toPlainText()",self.te_proof.toPlainText())
         updateDisturbPlanProof(self.currentYear,self.te_proof.toPlainText())
 
     # 读取初始分配计划数

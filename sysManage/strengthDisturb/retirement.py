@@ -104,7 +104,7 @@ class retirement(QWidget, Widget_Retirement):
         self._initUnitTreeWidget("", self.tw_first)
         self._initEquipTreeWidget("", self.tw_second)
 
-        # 查看当前被选中的单位和装备并初试化
+        # 查看当前被选中的单位和装备并初始化
     def slotInquryStrengthResult(self):
         self.currentCheckedUnitList = []
         self.currentCheckedEquipList = []
