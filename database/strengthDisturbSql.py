@@ -194,6 +194,68 @@ def selectUnitDictByUper(Unit_Uper):
     return data
 
 
+'''
+    功能：
+        增加装备目录
+'''
+def add_UnitDictEquip(Equip_ID, Equip_Name, Equip_Uper):
+    # print("''''''''''")
+    conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="test")
+    cur = conn.cursor()
+    # 插入的sql语句
+    sql = "INSERT INTO equip (Equip_ID, Equip_Name, Equip_Uper) VALUES" \
+          + "('" + Equip_ID + "','" + Equip_Name + "','" + Equip_Uper + "')"
+    # print(sql)
+    # print(sql)
+    # 执行sql语句，并发送给数据库
+    cur.execute(sql)
+    conn.commit()
+    cur.close()
+    conn.close()
+
+
+# 更改装备目录
+def update_Equip_Dict(Equip_ID, Equip_Name, Equip_Uper):
+    conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="test")
+    cur = conn.cursor()
+    # 插入的sql语句
+    sql = "Update equip set Equip_Name = '" + Equip_Name + "', Equip_Uper = '" + Equip_Uper \
+          + "' where Equip_ID = '" + Equip_ID + "'"
+    # print(sql)
+    # 执行sql语句，并发送给数据库
+    cur.execute(sql)
+    conn.commit()
+    cur.close()
+    conn.close()
+
+
+# 删除装备及子目录
+def del_Equip_And_Child(Equip_ID, Equip_Uper):
+    conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="test")
+    cur = conn.cursor()
+    # 插入的sql语句
+    sql = "delete from equip where Equip_ID = '" + Equip_ID + "'" + "and Equip_Uper = '" + Equip_Uper + "'"
+    # print(sql)
+    # 执行sql语句，并发送给数据库
+    cur.execute(sql)
+    conn.commit()
+    cur.close()
+    conn.close()
+
+
+# 删除装备目录
+def del_Equip_Dict(Equip_ID):
+    conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="test")
+    cur = conn.cursor()
+    # 插入的sql语句
+    sql = "delete from equip where Equip_ID = '" + Equip_ID + "'"
+    # print(sql)
+    # 执行sql语句，并发送给数据库
+    cur.execute(sql)
+    conn.commit()
+    cur.close()
+    conn.close()
+
 #根据Dept_Uper查询单位信息,并返回
 def selectUnitInfoByDeptUper(Unit_Uper):
     conn, cur = connectMySql()

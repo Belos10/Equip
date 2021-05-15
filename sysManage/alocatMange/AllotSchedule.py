@@ -31,21 +31,17 @@ class AllotSchedule(QWidget,AllotSchedule):
         self._initYearWidget_()
         self.armySchedule = ArmySchedule(self)
         self.scheduleFinish = ScheduleFisish(self)
-
+        self.fileName=""
 
     def signalConnect(self):
         # 点击选择年份后刷新页面 初始化
         self.lw_yearChoose.itemDoubleClicked.connect(self.slotClickedInqury)
         self.lw_yearChoose.itemDoubleClicked.connect(self.setDisturbPlanTitle)
-
         # 点击第一目录结果
         self.tw_first.itemClicked.connect(self.slotDisturbStrengthResult)
-
-        self.tw_second.itemChanged.connect(self.slotCheckedChange)
-
         # 点击第二目录结果
         self.tw_second.itemClicked.connect(self.slotDisturbStrengthResult)
-
+        self.tw_second.itemChanged.connect(self.slotCheckedChange)
 
 
 
@@ -162,7 +158,7 @@ class AllotSchedule(QWidget,AllotSchedule):
         self.lenCurrentUnitChilddict=len(self.currentUnitChilddict)
         self.lenCurrentEquipdict=len(self.currentEquipdict)
 
-        headerlist = ['装备名称及规格型号', '单位', '军委分配计划数', '此次分配合计数']
+        headerlist = ['装备名称及规格型号', '单位', '机关分配计划数', '此次分配合计数']
         if len(self.currentUnitChilddict):
             for i in self.currentUnitChilddict.values():
                 headerlist.append(i[1])
@@ -206,7 +202,6 @@ class AllotSchedule(QWidget,AllotSchedule):
         self.initDisturbPlanNote()
         self.initDisturbPlanOther()
         self.ifEquipHaveChild()
-        #self.setButton()
 
 
 
@@ -217,13 +212,15 @@ class AllotSchedule(QWidget,AllotSchedule):
         for i in self.currentEquipdict:
             if not selectEquipIsHaveChild(self.currentEquipdict[i][0]):
                 # 陆军调拨单进度
+                flag1 = selectArmySchedule(self.currentEquipdict[i][0],self.currentYear)
                 item = QPushButton("设置进度")
-                self.disturbResult.setCellWidget(i, 4 + self.lenCurrentUnitChilddict, item)
                 item.clicked.connect(self.setArmySchedule)
+                if flag1[0][0] != '0':
+                    item = QPushButton("已完成")
+                self.disturbResult.setCellWidget(i, 4 + self.lenCurrentUnitChilddict, item)
 
                 # 是否具备接装条件
                 flag2 = selectAllotCondition(self.currentEquipdict[i][0],self.currentYear)
-                print(flag2)
                 item = QPushButton("设置进度")
                 item.clicked.connect(self.setCondition)
                 if int(flag2[0][0]):
@@ -235,9 +232,14 @@ class AllotSchedule(QWidget,AllotSchedule):
                 self.disturbResult.setCellWidget(i, 6 + self.lenCurrentUnitChilddict, item)
 
                 # 是否完成接装
+                flag4 = selectIfScheduleFinish(self.currentEquipdict[i][0], self.currentYear)
+                print("flag4",flag4)
                 item = QPushButton("设置进度")
-                self.disturbResult.setCellWidget(i, 7 + self.lenCurrentUnitChilddict, item)
                 item.clicked.connect(self.setScheduleFinish)
+                if flag4[0][0] != '0':
+                    item = QPushButton("已完成")
+                self.disturbResult.setCellWidget(i, 7 + self.lenCurrentUnitChilddict, item)
+
 
 
     # 读取初始分配计划数
@@ -293,7 +295,6 @@ class AllotSchedule(QWidget,AllotSchedule):
                 parent_item.setCheckState(num, 2)
             else:
                 parent_item.setCheckState(num, 1)
-
             # 中间层需要全面考虑
         if item.parent() and item.childCount():
             if item.checkState(num) == 0:  # 规定点击根节点只有两态切换，没有中间态
@@ -344,18 +345,19 @@ class AllotSchedule(QWidget,AllotSchedule):
                 item=self.disturbResult.item(i,j)
                 item.setText(str(self.unitDisturbPlanOtherList[i][j-1]))
 
-    # # 设置按钮
-    # def setButton(self):
-    #     self.currentRow = self.disturbResult.currentRow()
-    #     self.currentColumn = self.disturbResult.currentColumn()
-    #     if self.currentColumn==4 + self.lenCurrentUnitChilddict:
-    #
-    #         self.disturbResult.cellClicked.connect(self.setArmySchedule())
-
 
     def setArmySchedule(self):
         self.armySchedule.setYear(self.currentYear)
+        self.armySchedule._initSelf_()
         self.armySchedule.show()
+        self.armySchedule.signal.connect(self.updateArmy)
+
+    def updateArmy(self):
+        currentRow = self.disturbResult.currentRow()
+        item = QPushButton("已完成")
+        self.disturbResult.setCellWidget(currentRow, 4 + self.lenCurrentUnitChilddict, item)
+        updateArmySchedule(self.currentEquipdict[currentRow][0], self.currentYear)
+
 
     def setCondition(self):
         currentRow=self.disturbResult.currentRow()
@@ -366,5 +368,15 @@ class AllotSchedule(QWidget,AllotSchedule):
             updateAllotCondition(self.currentEquipdict[currentRow][0],self.currentYear)
 
     def setScheduleFinish(self):
-        #self.setScheduleFinish.setYear(self.currentYear)
         self.scheduleFinish.show()
+        self.scheduleFinish.signal.connect(self.updateFinish)
+
+
+    def updateFinish(self):
+        currentRow = self.disturbResult.currentRow()
+        fileName = self.scheduleFinish.returnFileName()
+        print("fileName", fileName)
+        if fileName != "":
+            item = QPushButton("已完成")
+            self.disturbResult.setCellWidget(currentRow, 7 + self.lenCurrentUnitChilddict, item)
+            updateScheduleFinish(self.currentEquipdict[currentRow][0], self.currentYear,fileName)

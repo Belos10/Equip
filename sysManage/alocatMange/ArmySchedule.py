@@ -5,25 +5,33 @@ from widgets.alocatMange.armySche import widget_armySchedule
 from database.strengthDisturbSql import *
 from PyQt5.Qt import Qt
 from database.alocatMangeSql import *
-
+from PyQt5 import QtCore
+from PyQt5.QtCore import QCoreApplication
 
 class ArmySchedule(QDialog, widget_armySchedule ):
+    signal=QtCore.pyqtSignal(str)
     def __init__(self, parent=None):
         super(ArmySchedule, self).__init__(parent)
         self.setupUi(self)
         # 设置tablewidget左侧栏以及头部不显示
         self.tw_result.horizontalHeader().setVisible(False)
         self.tw_result.verticalHeader().setVisible(False)
-
-        ###################################################################################
         self.currentYear = '2001'
         # 初始化当前界面
         self._initSelf_()
         # 存储当前结果，结构为：{i（行数）：一行数据}
         self.currentResult = {}
+        self.pb_selectArmy.clicked.connect(self.selectArmy)
+
+    def selectArmy(self):
+        #print("self.tw_result.currentRow()",self.tw_result.currentRow())
+        if self.tw_result.currentRow() != 0 and self.tw_result.currentRow()!= 1:
+            self.signal.emit('1')
+            self.close()
 
     def setYear(self, year):
         self.currentYear = year
+        print(self.currentYear)
 
 
 
@@ -134,7 +142,6 @@ class ArmySchedule(QDialog, widget_armySchedule ):
         item.setText('数量')
         item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)  # 设置当前item不能被修改
         self.tw_result.setItem(1, 17, item)
-
         self.tw_result.setSpan(0, 0, 2, 1)
         self.tw_result.setSpan(0, 1, 1, 7)
         self.tw_result.setSpan(0, 8, 1, 3)
@@ -143,7 +150,6 @@ class ArmySchedule(QDialog, widget_armySchedule ):
         self.tw_result.setSpan(0, 14, 2, 1)
         self.tw_result.setSpan(0, 15, 2, 1)
         self.tw_result.setSpan(0, 18, 2, 1)
-        self.equipTuple = selectAllEndEquip()
 
 
     '''
@@ -151,14 +157,9 @@ class ArmySchedule(QDialog, widget_armySchedule ):
     '''
     def slotSelectResult(self):
         self.currentResult = {}
-        #self.groupBox_2.setDisabled(False)
         self._initResultHeader_()
-        self.orginRowCount = 0  # 当前结果界面的查询个数
-        #row = self.lw_yearChoose.currentRow()
-        # self.currentYear = self.lw_yearChoose.item(row).text()  # 当前选中的年份
         resultList = selectArmyTransferByYear(self.currentYear)
         self.tw_result.setRowCount(len(resultList) + 2)
-        self.orginRowCount = len(resultList)
         print(resultList)
         for i, armyTransferInfo in enumerate(resultList):
             item = QTableWidgetItem()
@@ -237,4 +238,4 @@ class ArmySchedule(QDialog, widget_armySchedule ):
             item.setText(armyTransferInfo[20])
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.tw_result.setItem(i + 2, 18, item)
-            self.currentResult[i] = armyTransferInfo
+

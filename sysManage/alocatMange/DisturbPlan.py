@@ -50,6 +50,8 @@ class DisturbPlan(QWidget, yearList_Form):
         self.tb_del.clicked.connect(self.slotDelYear)
         # 修改分配数与备注
         self.disturbResult.itemChanged.connect(self.slotItemChange)
+        # 修改调拨依据
+        self.te_proof.textChanged.connect(self.slotProofChange)
 
 
 
@@ -185,7 +187,7 @@ class DisturbPlan(QWidget, yearList_Form):
         self.lenCurrentUnitChilddict=len(self.currentUnitChilddict)
         self.lenCurrentEquipdict=len(self.currentEquipdict)
 
-        headerlist = ['装备名称及规格型号', '单位', '军委分配计划数', '此次分配合计数']
+        headerlist = ['装备名称及规格型号', '单位', '机关分配计划数', '此次分配合计数']
         if len(self.currentUnitChilddict):
             for i in self.currentUnitChilddict.values():
                 headerlist.append(i[1])
@@ -221,11 +223,20 @@ class DisturbPlan(QWidget, yearList_Form):
             self.currentDisturbPlan[i] = LineInfo
 
         #self.disturbResult.setRowCount(n)
+        self.initDisturbPlanProof()
         self.initDisturbPlanNum()
         self.initDisturbPlanNote()
         self.initDisturbPlanOther()
         self.ifEquipHaveChild()
 
+    def initDisturbPlanProof(self):
+        proof = selectDisturbPlanProof(self.currentYear)
+        print(proof)
+        self.te_proof.setText(proof[0][0])
+
+    def slotProofChange(self):
+        print("self.te_proof.toPlainText()",self.te_proof.toPlainText())
+        updateDisturbPlanProof(self.currentYear,self.te_proof.toPlainText())
 
     # 读取初始分配计划数
     def initDisturbPlanNum(self):
