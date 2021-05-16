@@ -8,17 +8,24 @@ from PyQt5.Qt import Qt
 from PyQt5.QtGui import QColor, QBrush,QFont
 from database.alocatMangeSql import *
 
-
+'''
+    分配调整计划
+'''
 class DisturbPlan(QWidget, yearList_Form):
     def __init__(self, parent=None):
         super(DisturbPlan, self).__init__(parent)
         # Stren_Inquiry._initUnitTreeWidget()
+        self.setupUi(self)
+        self.initAll()
+        # initDisturbPlanDatabase()
+
+
+    def initAll(self):
         self.first_treeWidget_dict = {}
         self.second_treeWidget_dict = {}
         self.currentDisturbPlan = {}
         self.currentUnitDisturbPlanNum = {}
         self.unitDisturbPlanList = {}
-        self.setupUi(self)
         self.signalConnect()
         self.signalDisconnectSlot()
         self.tw_first.header().setVisible(False)
@@ -28,9 +35,6 @@ class DisturbPlan(QWidget, yearList_Form):
         self.tw_first.setDisabled(1)
         self.tw_second.setDisabled(1)
         self._initYearWidget_()
-        # initDisturbPlanDatabase()
-
-
 
     def signalConnect(self):
         # 点击选择年份后刷新页面 初始化
@@ -54,6 +58,23 @@ class DisturbPlan(QWidget, yearList_Form):
         # 修改调拨依据
         self.te_proof.textChanged.connect(self.slotProofChange)
 
+        self.pb_firstSelect.clicked.connect(self.slotSelectUnit)
+
+        self.pb_secondSelect.clicked.connect(self.slotSelectEquip)
+
+    def slotSelectUnit(self):
+        findText = self.le_first.text()
+        for i, item in self.first_treeWidget_dict.items():
+            if item.text(0) == findText:
+                self.tw_first.setCurrentItem(item)
+                break
+
+    def slotSelectEquip(self):
+        findText = self.le_second.text()
+        for i, item in self.second_treeWidget_dict.items():
+            if item.text(0) == findText:
+                self.tw_second.setCurrentItem(item)
+                break
 
 
     # 信号与槽连接的断开

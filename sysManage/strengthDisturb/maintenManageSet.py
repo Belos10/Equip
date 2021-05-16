@@ -1,7 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, QAbstractItemView, QMessageBox
 from widgets.strengthDisturb.maintenManageSet import Widget_Mainten_Manage_Set
-from database.strengthDisturbSql import selectAllStrengthYearInfo, selectAllDataAboutUnit, \
-    updateUnitIsGroupFromUnit, selectAllFromPulicEquip, selectUnitInfoByDeptUper
+from database.strengthDisturbSql import *
 from PyQt5.Qt import Qt
 
 '''
@@ -17,13 +16,11 @@ class maintenManageSet(QWidget, Widget_Mainten_Manage_Set):
         # 设置整行选中
         self.tw_publicEquip.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        #初始化
-        self._initAll_()
         self.signalConnect()
+        self.result = []
 
     def _initAll_(self):
-        # 初始化单元表
-        self._initUnitTableWidget()
+        self.unitDictInfo = []
 
         # 初始化公用装备表
         self._initPublicEquipTableWidget_()
@@ -34,7 +31,15 @@ class maintenManageSet(QWidget, Widget_Mainten_Manage_Set):
         self.first_treeWidget_dict = {}
         self.tw_first.clear()
         self.tw_first.header().setVisible(False)
-        self._initUnitTreeWidget("", self.tw_first)
+
+        # 初始化单元表
+        self.startName = selectUnitNameByUnitID(self.userInfo[0][4])
+        item = QTreeWidgetItem(self.tw_first)
+        item.setText(0, self.startName)
+        self.first_treeWidget_dict[self.userInfo[0][4]] = item
+        self._initUnitTreeWidget(self.userInfo[0][4], item)
+        self._initUnitTableWidget()
+
 
     def signalConnect(self):
         #当前单位结果界面某行被选中
@@ -42,8 +47,19 @@ class maintenManageSet(QWidget, Widget_Mainten_Manage_Set):
 
         #更新当前单位是否为旅团
         self.pb_update.clicked.connect(self.slotUpdateIsGroup)
-        # 导入和导出
+        self.pb_firstSelect.clicked.connect(self.slotSelectUnit)
 
+    def getUserInfo(self, userInfo):
+        self.userInfo = userInfo
+        self._initAll_()
+
+
+    def slotSelectUnit(self):
+        findText = self.le_first.text()
+        for i, item in self.first_treeWidget_dict.items():
+            if item.text(0) == findText:
+                self.tw_first.setCurrentItem(item)
+                break
 
     '''
        当前单位被选中
@@ -58,20 +74,35 @@ class maintenManageSet(QWidget, Widget_Mainten_Manage_Set):
         else:
             self.cb_isGroup.setCurrentIndex(1)
 
+    def getTableUnitInfo(self, root):
+        if root[0] == '':
+            result = selectUnitInfoByDeptUper('')
+        else:
+            result = selectUnitInfoByDeptUper(root[0])
+
+            # rowData: (单位编号，单位名称，上级单位编号)
+        for rowData in result:
+            self.unitDictInfo.append(rowData)
+            if rowData[0] != '':
+                self.getTableUnitInfo(rowData[0])
     '''
         初始化界面
     '''
     def _initUnitTableWidget(self):
         self.orignUnitResult = {}
         self.tw_unit.clear()
-        result = selectAllDataAboutUnit()
+        self.unitDictInfo = []
+        self.startInfo = selectUnitInfoByUnitID(self.userInfo[0][4])
+        self.unitDictInfo.append(self.startInfo)
+        self.getTableUnitInfo(self.userInfo[0][4])
+        self.result = self.unitDictInfo
         header = ['单位编号', '单位名字', '是否为旅团']
         self.tw_unit.setColumnCount(len(header))
         self.tw_unit.setHorizontalHeaderLabels(header)
 
-        self.tw_unit.setRowCount(len(result))
+        self.tw_unit.setRowCount(len(self.result))
 
-        for i, unitInfo in enumerate(result):
+        for i, unitInfo in enumerate(self.result):
             item = QTableWidgetItem()
             item.setText(unitInfo[0])
             self.tw_unit.setItem(i, 0, item)
@@ -92,7 +123,8 @@ class maintenManageSet(QWidget, Widget_Mainten_Manage_Set):
         self.tw_publicEquip.setColumnCount(len(header))
         self.tw_publicEquip.setHorizontalHeaderLabels(header)
 
-        result = selectAllFromPulicEquip()
+        print("unitInfo:  ", self.result)
+        result = selectAllFromPulicEquipByUnit(self.result)
         self.tw_publicEquip.setRowCount(len(result))
         for i, publicEquipInfo in enumerate(result):
             item = QTableWidgetItem()
@@ -119,6 +151,7 @@ class maintenManageSet(QWidget, Widget_Mainten_Manage_Set):
             item = QTreeWidgetItem(mother)
             item.setText(0, rowData[1])
             self.first_treeWidget_dict[rowData[0]] = item
+
             if rowData[4] == '是':
                 publicItem = QTreeWidgetItem(item)
                 publicItem.setText(0, "公用装备")
@@ -135,4 +168,4 @@ class maintenManageSet(QWidget, Widget_Mainten_Manage_Set):
             self._initUnitTableWidget()
             self.first_treeWidget_dict = {}
             self.tw_first.clear()
-            self._initUnitTreeWidget("", self.tw_first)
+            self._initAll_()

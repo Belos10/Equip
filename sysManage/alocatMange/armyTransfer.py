@@ -3,7 +3,7 @@ import sys
 from PyQt5.QtWidgets import QApplication,QWidget, QListWidgetItem, QComboBox, QTableWidgetItem, QDateEdit, QInputDialog,QMessageBox,QPushButton
 from database.alocatMangeSql import selectYearListAboutArmy, selectArmyTransferByYear, insertIntoArmyTransferYear, \
     insertIntoArmyTransfer, selectIDFromArmyByYear, delArmyTransferByIDAndYear, delArmyTransferYearByYear
-from database.strengthDisturbSql import selectAllEndEquip
+from database.strengthDisturbSql import selectAllEndEquip,findUperEquipIDByName,selectEquipInfoByEquipUper,EquipNotHaveChild
 from sysManage.alocatMange.config import ArmyTransferReceiveUnit, ArmyTransferSendUnit
 from PyQt5.Qt import Qt
 
@@ -301,7 +301,6 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
         self.tw_result.setSpan(0, 14, 2, 1)
         self.tw_result.setSpan(0, 15, 2, 1)
         self.tw_result.setSpan(0, 18, 2, 1)
-        self.equipTuple = selectAllEndEquip()
 
     '''
         查找当前要显示的数据并显示到tablewidget上
@@ -396,10 +395,28 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
             self.tw_result.setItem(i + 2, 18, item)
             self.currentResult[i] = armyTransferInfo
 
+    def _initEquipInfoList_(self, root):
+        if root[0] == '':
+            result = selectEquipInfoByEquipUper('')
+        else:
+            result = selectEquipInfoByEquipUper(root[0])
+        # rowData: (单位编号，单位名称，上级单位编号)
+        for rowData in result:
+            self.equipInfoList.append(rowData)
+            if rowData[0] != '':
+                self._initEquipInfoList_(rowData)
+
     '''
         增加新行等待用户输入
     '''
     def addNewRow(self):
+        startEquipIDInfo = findUperEquipIDByName("通用装备")
+        self.equipInfoList = []
+        for startEquipInfo in startEquipIDInfo:
+            self.equipInfoList.append(startEquipInfo)
+            self._initEquipInfoList_(startEquipInfo)
+            break
+        print(self.equipInfoList)
         if self.currentYear == '全部' or self.currentYear == None:
             reply = QMessageBox.question(self, '新增', '只能对某年的数据进行新增，请重新选择', QMessageBox.Yes)
             return
@@ -409,8 +426,9 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
         for i in range(19):
             if i == 14:
                 equipCombo = QComboBox()
-                for equipInfo in self.equipTuple:
-                    equipCombo.addItem(equipInfo[1])
+                for equipInfo in self.equipInfoList:
+                    if EquipNotHaveChild(equipInfo[0]):
+                        equipCombo.addItem(equipInfo[1])
                 self.tw_result.setCellWidget(currentRow, i, equipCombo)
             elif i == 2:
                 dateEdit = QDateEdit()

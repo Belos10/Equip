@@ -1,13 +1,10 @@
 from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, \
-    QAbstractItemView, QMessageBox, QInputDialog, QLineEdit, QFileDialog
-from database.strengthDisturbSql import selectUnitInfoByDeptUper, selectAllDataAboutUnit, selectEquipInfoByEquipUper, \
-    selectAllDataAboutEquip, addDataIntoUnit, addDataIntoEquip, updateDataIntoUnit, \
-    updateDataIntoEquip, delDataInEquip, delDataInUnit, updateEquipUnit, updateUnitAlias, findUnitNameFromID, \
-    findEquipInfo
-from utills.importAndOutput import getExcelDocumentData
+    QAbstractItemView, QMessageBox,QInputDialog,QLineEdit,QFileDialog
+from database.strengthDisturbSql import *
 from widgets.strengthDisturb.select_set import Widget_Select_Set
 from sysManage.strengthDisturb.equipUnitSet import equipUnitSet
 from PyQt5.Qt import Qt
+import xlrd
 
 #new
 class strengthSelectSet(QWidget, Widget_Select_Set):
@@ -29,6 +26,8 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
         self.second_treeWidget_dict = {}  # 当前装备目录列表对象，结构为：{'行号':对应的item}
         self.signalConnect()
 
+    def getUserInfo(self, userInfo):
+        self.userInfo = userInfo
     '''
         功能：
             所有信号的连接
@@ -46,7 +45,41 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
 
         self.pb_setEquipUnit.clicked.connect(self.slotSetEquipUnit)
         self.pb_setUnitAlias.clicked.connect(self.slotSetUnitAlias)
-        self.pb_input.clicked.connect(self.slotInput)
+        self.pb_firstSelect.clicked.connect(self.slotSelectUnit)
+
+        self.pb_secondSelect.clicked.connect(self.slotSelectEquip)
+
+        self.pb_input.clicked.connect(self.slotInputDataByExcel)
+
+    def slotSelectUnit(self):
+        findText = self.le_first.text()
+        for i, item in self.first_treeWidget_dict.items():
+            if item.text(0) == findText:
+                self.tw_first.setCurrentItem(item)
+                break
+
+
+
+    def slotInputDataByExcel(self):
+        if self.changeUnit:
+            filename, _ = QFileDialog.getOpenFileName(self, "选中文件", '', "Excel files(*.xlsx, *.xls)")
+            print(filename)
+            try:
+                self.rdfile = xlrd.open_workbook(filename)
+                self.tablename = self.rdfile.sheet_names()
+                print(self.tablename)
+            except BaseException as e:
+                print(e)
+                QMessageBox.about(self, "打开失败", "打开文件失败，请检查文件")
+        else:
+            pass
+
+    def slotSelectEquip(self):
+        findText = self.le_second.text()
+        for i, item in self.second_treeWidget_dict.items():
+            if item.text(0) == findText:
+                self.tw_second.setCurrentItem(item)
+                break
 
     def slotSetUnitAlias(self):
         if self.tb_result.currentRow() == -1:
@@ -81,7 +114,6 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
         self.pb_setUnit.clicked.disconnect(self.slotUnitDictInit)  # 设置单元目录
 
         self.pb_setEquip.clicked.disconnect(self.slotEquipDictInit)  # 设置装备目录
-        self.pb_input.clicked.connect(self.slotInput)
 
 
 
@@ -128,9 +160,15 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
         self.pb_setUnit.setDisabled(True)
         self.pb_setEquipUnit.setDisabled(True)
         self.pb_setUnitAlias.setDisabled(0)
+        print("userInfo :   ", self.userInfo)
+
+        self.startName = selectUnitNameByUnitID(self.userInfo[0][4])
+        item = QTreeWidgetItem(self.tw_first)
+        item.setText(0, self.startName)
+        self.first_treeWidget_dict[self.userInfo[0][4]] = item
 
         #从数据库中单位表中获取数据初始化单位目录，tableWidget显示所有的单位表
-        self._initUnitTreeWidget("", self.tw_first)
+        self._initUnitTreeWidget(self.userInfo[0][4], item)
         self._initUnitTableWidget()
 
         self.changeUnit = True              #设置当前为修改单位状态
@@ -187,12 +225,27 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
             if rowData[0] != '':
                 self._initUnitTreeWidget(rowData[0], item)
 
+    def getTableUnitInfo(self, root):
+        if root[0] == '':
+            result = selectUnitInfoByDeptUper('')
+        else:
+            result = selectUnitInfoByDeptUper(root[0])
+
+            # rowData: (单位编号，单位名称，上级单位编号)
+        for rowData in result:
+            self.unitDictInfo.append(rowData)
+            if rowData[0] != '':
+                self.getTableUnitInfo(rowData[0])
     '''
         功能：
             设置单元时的初始化tableWidget，显示整个单位表
     '''
     def _initUnitTableWidget(self):
-        result = selectAllDataAboutUnit()
+        self.unitDictInfo = []
+        self.startInfo = selectUnitInfoByUnitID(self.userInfo[0][4])
+        self.unitDictInfo.append(self.startInfo)
+        self.getTableUnitInfo(self.userInfo[0][4])
+        result = self.unitDictInfo
 
         header = ['单位编号', '单位名称', '上级单位编号']
         self.tb_result.setColumnCount(len(header))
@@ -443,79 +496,9 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
             else:
                 reply = QMessageBox.question(self, '删除', '删除失败', QMessageBox.Yes)
 
-    '''
-        功能：
-            导入外部excel表格数据到数据库中
-        
-    '''
-    def slotInput(self):
-        if self.changeUnit is True :#设置单位
-            self.inputDataIntoUnit()
-        else:
-            self.inputDataIntoEquip()
-
-
-
-    '''
-        功能：
-            从excel表格导入单位表数据
-    '''
-    def inputDataIntoUnit(self):
-        fileName, fileType = QFileDialog.getOpenFileName(self, "选取文件", "./",
-                                                         "All Files (*);;Microsoft Excel 工作表(*.xls , *.xlsx)")  # 注意空格不能删除
-        if 'xls' or 'xlsx' in fileType:
-            from utills.importAndOutput import getUnitExcelDocumentData
-            data = getExcelDocumentData(fileName)
-            if data is not None and len(data) != 0:
-                for i in range(1, len(data)):
-                    Unit_ID = str(int(data[i][0]))
-                    Unit_Name = data[i][1]
-                    Unit_Uper = str(int(data[i][2]))
-                    if Unit_ID is None:
-                        continue
-                    if len(findUnitNameFromID(Unit_ID)) != 0:
-                        updateDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper)
-                    else:
-                        addDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper)
-                QMessageBox.information(self, '导入成功', '导入单位目录成功！', QMessageBox.Yes)
-            else:
-                print('数据为空')
-            self.slotUnitDictInit()
-    '''
-        功能：
-            从excel表格导入装备表数据
-    '''
-    def inputDataIntoEquip(self):
-        fileName, fileType = QFileDialog.getOpenFileName(self, "选取文件", "./",
-                                                         "All Files (*);;Microsoft Excel 工作表(*.xls , *.xlsx)")  # 注意空格不能删除
-        if 'xls' or 'xlsx' in fileType:
-            data = getExcelDocumentData(fileName)
-            if data is not None and len(data) != 0:
-                for i in range(1, len(data)):
-                    Equip_ID = str(int(data[i][0]))
-                    Equip_Name = data[i][1]
-                    Equip_Uper = str(int(data[i][2]))
-                    Input_Type = data[i][3]
-                    Equip_Type = data[i][4]
-                    if Equip_ID is None:
-                        continue
-                    if len(findEquipInfo(Equip_ID)) != 0:
-                        updateDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper,Input_Type,Equip_Type)
-                    else:
-                        addDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper,Input_Type,Equip_Type)
-                QMessageBox.information(self, '导入成功', '导入装备目录成功！')
-            else:
-                print('数据为空')
-            self.slotEquipDictInit()
-
-
-
-
-    '''
-        功能：
-                单元测试
-    '''
-
-
+'''
+    功能：
+        单元测试
+'''
 if __name__ == '__main__':
     pass

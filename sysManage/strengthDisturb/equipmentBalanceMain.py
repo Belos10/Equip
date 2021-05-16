@@ -3,9 +3,9 @@ import sys
 from PyQt5 import QtCore, QtWidgets, QtCore
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QWidget, QApplication, QTreeWidgetItem, QTreeWidgetItemIterator, QMessageBox, \
-    QTableWidgetItem, QStackedWidget, QHBoxLayout, QTableWidget, QHeaderView
-from database.SD_EquipmentBanlanceSql import *
+    QTableWidgetItem, QStackedWidget, QHBoxLayout
 from widgets.strengthDisturb.equipmentBalance.equipmentBalanceMainUI import EquipmentBalanceMainUI
+from database.SD_EquipmentBanlanceSql import *
 
 
 class Equip_Balance_Main(QWidget, EquipmentBalanceMainUI):
@@ -27,20 +27,6 @@ class Equip_Balance_Main(QWidget, EquipmentBalanceMainUI):
     '''
     def _initYear(self):
         self.years = findYear()
-        self.tb_year.clear()
-        self.tb_year.verticalHeader().setVisible(False)
-        self.tb_year.horizontalHeader().setVisible(False)
-        self.tb_year.setRowCount(2)
-        self.tb_year.setColumnCount(5)
-        self.tb_year.setEditTriggers(QTableWidget.NoEditTriggers)
-        # self.tb_year.verticalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.tb_year.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.tb_year.resizeColumnsToContents()
-        self.tb_year.resizeRowsToContents()
-        newItem = QTableWidgetItem('装备年度平衡表总览')
-        newItem.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tb_year.setItem(0, 0, newItem)
-        self.tb_year.setSpan(0, 0, 1, 5)
         for i in range(len(self.years)):
             newItem = QTableWidgetItem('%s年度平衡表' % self.years[i])
             newItem.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
@@ -48,10 +34,13 @@ class Equip_Balance_Main(QWidget, EquipmentBalanceMainUI):
             need_row = int(len(self.years) / 5) + 2
             if current_row < need_row:
                 self.tb_year.insertRow(current_row)
-            self.tb_year.setItem(i/5 + 1, i%5, newItem)
+            self.tb_year.setItem(i/5 + 1,i%5,newItem)
 
 
-    #删除某年的装备平衡表
+
+
+
+    #删除某年的装备表
     def soltDeleteYear(self):
 
         tableItems = self.tb_year.selectedItems()
@@ -76,12 +65,12 @@ class Equip_Balance_Main(QWidget, EquipmentBalanceMainUI):
 
 
 
-    # '''
-    # 功能：
-    #     新增某年装备平衡表
-    # '''
-    # def addEquipmentBalance(self):
-    #     print("新增某年装备平衡表")
+    '''
+    功能：
+        新增某年装备平衡表
+    '''
+    def addEquipmentBalance(self):
+        print("新增某年装备平衡表")
 
     '''
     功能：
@@ -114,7 +103,7 @@ class Equip_Balance_Main(QWidget, EquipmentBalanceMainUI):
         #定义单元格的双击事件
         #self.tb_year.itemDoubleClicked.connect(self.displayResult)
         #定义新增按钮单击事件
-        # self.pb_add.clicked.connect(self.addEquipmentBalance)
+        self.pb_add.clicked.connect(self.addEquipmentBalance)
         #导入按钮单击事件
         self.pb_input.clicked.connect(self.inputEquipmentBalance)
         #导出按钮单击事件

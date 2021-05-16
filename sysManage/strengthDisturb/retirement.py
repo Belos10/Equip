@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, QAbstrac
 from widgets.strengthDisturb.retirement import Widget_Retirement
 from database.strengthDisturbSql import selectEquipInfoByEquipUper,selectUnitInfoByDeptUper,\
     selectAllRetirementYearInfo,selectAboutWeaveByEquipShow,selectAboutWeaveByEquipShow,\
-    selectAboutRetireByEquipShow, isSecondDict,updateRetireAboutRetire,insertIntoRetireYear,delRetireYearByYear
+    selectAboutRetireByEquipShow, isSecondDict,updateRetireAboutRetire,insertIntoRetireYear,delRetireYearByYear, selectEquipIsHaveChild
 from PyQt5.Qt import Qt
 
 '''
@@ -54,6 +54,23 @@ class retirement(QWidget, Widget_Retirement):
         self.pb_save.clicked.connect(self.slotSaveRetire)
         self.tb_add.clicked.connect(self.slotAddNewYear)
         self.tb_del.clicked.connect(self.slotDelYear)
+        self.pb_firstSelect.clicked.connect(self.slotSelectUnit)
+
+        self.pb_secondSelect.clicked.connect(self.slotSelectEquip)
+
+    def slotSelectUnit(self):
+        findText = self.le_first.text()
+        for i, item in self.first_treeWidget_dict.items():
+            if item.text(0) == findText:
+                self.tw_first.setCurrentItem(item)
+                break
+
+    def slotSelectEquip(self):
+        findText = self.le_second.text()
+        for i, item in self.second_treeWidget_dict.items():
+            if item.text(0) == findText:
+                self.tw_second.setCurrentItem(item)
+                break
 
     def slotDelYear(self):
         currentRow = self.lw_year.currentRow()
@@ -325,8 +342,12 @@ class retirement(QWidget, Widget_Retirement):
                 ID = chinese[currentClass]
                 classID = 1
             else:
-                ID = str(classID)
-                classID = classID + 1
+                if selectEquipIsHaveChild(LineInfo[2]):
+                    ID = ""
+                else:
+                    ID = str(classID)
+                    classID = classID + 1
+
             item = QTableWidgetItem(ID)
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.tw_result.setItem(i + 2, 0, item)

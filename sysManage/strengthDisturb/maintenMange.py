@@ -1,11 +1,7 @@
 from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, QAbstractItemView, \
     QMessageBox, QListWidgetItem,QInputDialog
 from widgets.strengthDisturb.maintenMange import Widget_Mainten_Manage
-from database.strengthDisturbSql import selectAllStrengthYearInfo, selectAllDataAboutUnit, \
-    updateUnitIsGroupFromUnit, selectAllFromPulicEquip, selectUnitInfoByDeptUper, selectGroupIDByPublicEquip,\
-    selectAllDataAboutWeaveYear, selectEquipInfoByEquipUper, selectAboutWeaveByUnitListAndEquipList, \
-    selectAboutWeaveByEquipShow, selectAboutWeaveByUnitShow, selectUnitIsHaveChild, selectEquipIsHaveChild,\
-    updateWeaveNum,insertIntoWeaveYear,delWeaveYearByYear,selectAllDataAboutStrengthYear
+from database.strengthDisturbSql import *
 from PyQt5.Qt import Qt
 
 '''
@@ -21,14 +17,30 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
         self.tw_first.header().setVisible(False)
         self.tw_second.header().setVisible(False)
 
-        self._initAll_()
         self.signalConnect()
+        self.userInfo = None
+        self.currentInquiryResult = {}
+        self.resultList = []
+        self.unitList = []
+        self.equipList = []
+        self.year = '全部'
+        self.currentYear = None
+
+
+    def getUserInfo(self, userInfo):
+        self.userInfo = userInfo
+        self._initAll_()
 
     #初始化编制数维护界面
     def _initAll_(self):
         self.first_treeWidget_dict = {}
         self.tw_first.clear()
-        self._initUnitTreeWidget('', self.tw_first)
+        self.startName = selectUnitNameByUnitID(self.userInfo[0][4])
+        item = QTreeWidgetItem(self.tw_first)
+        item.setText(0, self.startName)
+        item.setCheckState(0, Qt.Unchecked)
+        self.first_treeWidget_dict[self.userInfo[0][4]] = item
+        self._initUnitTreeWidget(self.userInfo[0][4], item)
         self._initStrenInquiry()
         self.currentYear = None
         self.currentInquiryResult = {}
@@ -66,6 +78,24 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
         #当点击展开到末级的时候
         self.cb_showLast.clicked.connect(self.slotClickedRB)
 
+        self.pb_firstSelect.clicked.connect(self.slotSelectUnit)
+
+        self.pb_secondSelect.clicked.connect(self.slotSelectEquip)
+
+    def slotSelectUnit(self):
+        findText = self.le_first.text()
+        for i, item in self.first_treeWidget_dict.items():
+            if item.text(0) == findText:
+                self.tw_first.setCurrentItem(item)
+                break
+
+    def slotSelectEquip(self):
+        findText = self.le_second.text()
+        for i, item in self.second_treeWidget_dict.items():
+            if item.text(0) == findText:
+                self.tw_second.setCurrentItem(item)
+                break
+
     #当前结果的值被修改
     def slotResultItemChange(self):
         self.currentRow = self.tw_result.currentRow()
@@ -83,6 +113,7 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
                         reply = QMessageBox.question(self, '修改', '是否修改当前装备、单位的编制数?', QMessageBox.Yes, QMessageBox.Cancel)
                         if reply == QMessageBox.Yes:
                             updateWeaveNum(resultRowInfo[0], resultRowInfo[1], self.tw_result.item(self.currentRow, 3).text(), resultRowInfo[5], self.year)
+                            self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
                         else:
                             self.tw_result.item(self.currentRow, 3).setText(resultRowInfo[5])
                     break
@@ -161,7 +192,12 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
         #        self.tb_rechoose.setDisabled(False)
 
         self.currentYear = self.lw_year.currentItem().text()
-        self._initUnitTreeWidget("", self.tw_first)
+        self.startName = selectUnitNameByUnitID(self.userInfo[0][4])
+        item = QTreeWidgetItem(self.tw_first)
+        item.setText(0, self.startName)
+        item.setCheckState(0, Qt.Unchecked)
+        self.first_treeWidget_dict[self.userInfo[0][4]] = item
+        self._initUnitTreeWidget(self.userInfo[0][4], item)
         self._initEquipTreeWidget("", self.tw_second)
 
     #查看当前被选中的单位和装备并初试化

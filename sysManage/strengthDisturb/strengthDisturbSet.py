@@ -23,6 +23,11 @@ class strengthDisturbSet(QMainWindow, Widget_Strength_Disturb_Set):
         self.tb_selectSet.clicked.connect(self.slotSelectSet)
         self.tb_maintenManageSet.clicked.connect(self.slotMaintenManageSet)
 
+    def getUserInfo(self, userInfo):
+        self.userInfo = userInfo
+        self.strengthSelectSet.getUserInfo(self.userInfo)
+        self.maintenManageSet.getUserInfo(self.userInfo)
+
     def disconnectSlot(self):
         self.tb_selectSet.clicked.disconnect(self.slotSelectSet)
 
