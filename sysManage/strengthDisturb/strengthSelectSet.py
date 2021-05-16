@@ -247,7 +247,7 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
         self.getTableUnitInfo(self.userInfo[0][4])
         result = self.unitDictInfo
 
-        header = ['单位编号', '单位名称', '上级单位编号']
+        header = ['单位编号', '单位名称', '上级单位编号','单位别名']
         self.tb_result.setColumnCount(len(header))
         self.tb_result.setRowCount(len(result))
         self.tb_result.setHorizontalHeaderLabels(header)
@@ -259,6 +259,9 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
             self.tb_result.setItem(i, 1, item)
             item = QTableWidgetItem(data[2])
             self.tb_result.setItem(i, 2, item)
+            item = QTableWidgetItem(data[3])
+            self.tb_result.setItem(i, 3, item)
+
 
         # print(result)   #测试查找到的数据
 

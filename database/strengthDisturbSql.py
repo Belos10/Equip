@@ -690,6 +690,10 @@ def delDataInUnit(Unit_ID):
         # print(sql)
         cur.execute(sql)
 
+        sql = "Delete from retire where Unit_ID = '" + UnitID + "'"
+        # print(sql)
+        cur.execute(sql)
+
     conn.commit()
     disconnectMySql(conn, cur)
 
@@ -729,6 +733,10 @@ def delDataInEquip(Equip_ID):
         cur.execute(sql)
 
         sql = "Delete from allotschedule where Equip_ID = '" + EquipID + "'"
+        # print(sql)
+        cur.execute(sql)
+
+        sql = "Delete from retire where Equip_ID = '" + EquipID + "'"
         # print(sql)
         cur.execute(sql)
     conn.commit()

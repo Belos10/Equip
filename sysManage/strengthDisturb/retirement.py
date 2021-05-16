@@ -120,6 +120,7 @@ class retirement(QWidget, Widget_Retirement):
         self.currentYear = self.lw_year.currentItem().text()
         self._initUnitTreeWidget("", self.tw_first)
         self._initEquipTreeWidget("", self.tw_second)
+        print("重中之重", self.second_treeWidget_dict)
 
         # 查看当前被选中的单位和装备并初始化
     def slotInquryStrengthResult(self):
@@ -138,6 +139,7 @@ class retirement(QWidget, Widget_Retirement):
             return
         else:
             self.pb_save.setDisabled(False)
+            print("装备：", self.currentCheckedEquipList)
             self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList,
                                                         self.currentYear)
     '''
