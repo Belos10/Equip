@@ -244,7 +244,7 @@ def updateOneEquipmentBalanceData(year,equipmentId,unitId):
     item['equipmentBalanceKey'] = str(year) + item['Equip_ID'] + item['Unit_ID']
     item['year'] = str(year)
 
-    sql = "select Equip_ID,Unit_ID,Work from strength where year=%s and Equip_ID =%s and Unit_ID=%s and equipYear='' " % (str(year), equipmentId,unitId)
+    sql = "select Equip_ID,Unit_ID,Work from strength where year=%s and Equip_ID =%s and Unit_ID=%s and equipYear='' " % (str(int(year) - 1), equipmentId,unitId)
     workEquipment = selectOne(sql)
     if workEquipment is not None:
         OrignalAuthorizedValue = int(workEquipment.get('Work', 0))
@@ -423,9 +423,7 @@ def initEquipmentBalance(year):
             excuteupdata(sqls)
             sqls.clear()
 
-
-
- #根据年份、单位列表和装备列表定位申请退役表
+#根据年份、单位列表和装备列表定位申请退役表
 def getDataByUnitIdAndEquipmentId(year,unitId,equipmentId):
     sql = "select apply_retirement_id,Equip_ID,Unit_ID,year,authorized_value,plan_to_retire,existing_value,apply_demand,note " \
           "from apply_retirement where year=%s and Unit_ID=%s and Equip_ID=%s"%(year, unitId, equipmentId)
@@ -437,16 +435,6 @@ def getDataByUnitIdAndEquipmentId(year,unitId,equipmentId):
         item['Unit_Name'] = getUnitNameByID(unitId)
         return item
 
-def getEquipmentNameByID(equipmentId):
-    if equipmentId is None:
-        return None
-    else:
-        sql = "select Equip_Name from equip where Equip_ID=%s"%equipmentId
-        data = selectOne(sql)
-        if(data is not None):
-            return data['Equip_Name']
-        else:
-            return None
 
 def getEquipmentTypeByID(equipmentId):
     if equipmentId is None:
@@ -463,6 +451,7 @@ def getEquipmentTypeByID(equipmentId):
                 return '辆'
             else:
                 return ''
+            
 
 def getUnitNameByID(unitId):
     if unitId is None:
@@ -494,26 +483,71 @@ def updateOnedata(index,fieldVlaue,equipmentBalanceId):
         sql = "update %s set %s=%s where equip_balance_id=%s"%(insertTableInformation['tableName'],insertTableInformation['fieldName'],fieldVlaue,equipmentBalanceId)
         executeCommit(sql)
 
+def getEquipmentNameByID(equipmentId):
+    if equipmentId is None:
+        return None
+    else:
+        sql = "select Equip_Name from equip where Equip_ID=%s"%equipmentId
+        data = selectOne(sql)
+        if(data is not None):
+            return data['Equip_Name']
+        else:
+            return None
 
-def saveEquipmentBalanceByRow(dataList,year,unitId):
-    equipmentBalanceId = getEquipmentBalanceIdByEquipmentIdAndUnitAndYear(getEquipmentIdByName(dataList[0]),unitId,year)
+
+
+
+def getEquipmentBalanceIdByEquipmentId(equipmentId,year):
+    sql = "select equip_balance_id from equipment_balance where Equip_ID=%s and year=%s"%(equipmentId,year)
+    data = selectOne(sql)
+    if data is None:
+        return None
+    else:
+        return data['equip_balance_id']
+
+def update(tableName,fieldName,fieldVlaue,equipmentBalanceId):
+    sql = "update %s set %s=%s where equip_balance_id=%s"%(tableName,fieldName,fieldVlaue,equipmentBalanceId)
+    executeCommit(sql)
+
+
+
+
+def saveEquipmentBalanceByRow(dataList,year):
+    equipmentBalanceId = getEquipmentBalanceIdByEquipmentId(getEquipmentIdByName(dataList[0]),year)
     if equipmentBalanceId is not None:
-        for i in range(len(dataList)):
-            if len(dataList[i]) !=0:
-                updateOnedata(i,dataList[i],equipmentBalanceId)
-
-
+        print(dataList)
+        executeCommit("update eb_quality_status set issue_new_product=%s,issue_inferior_product=%s, issue_need_repaired=%s,"
+                 "issue_need_retire=%s,report_new_product=%s,report_inferior_product=%s,report_need_repaired=%s,"
+                 "report_need_retire=%s where equip_balance_id=%s " % (dataList[5],dataList[6],dataList[7],dataList[8],
+                                                                       dataList[9],dataList[10],dataList[11],dataList[12],equipmentBalanceId))
+        executeCommit("update equipment_balance set change_value=%s,existing_value=%s where equip_balance_id=%s " % (
+        dataList[13], dataList[14],equipmentBalanceId))
+        executeCommit("update eb_change_project set increase_count=%s,increase_superior_supplement=%s,increase_model_change=%s,"
+                 "increase_missing_reports=%s,increase_self_purchase=%s,increase_transfer_in=%s,increase_other=%s,reduce_count=%s,"
+                 "reduce_model_change=%s,reduce_callout=%s,reduce_train_consumption=%s,reduce_restatement=%s,reduce_retire=%s,"
+                 "reduce_scrap=%s,reduce_other=%s where equip_balance_id=%s " % (
+        dataList[15],dataList[16],dataList[17],dataList[18],dataList[19],dataList[20],dataList[21],dataList[22],dataList[23],dataList[24],
+        dataList[25],dataList[26],dataList[27],dataList[28],dataList[29],equipmentBalanceId))
+        executeCommit("update equipment_balance set unprepared_value=%s,unmatched_value=%s,uncutdown_value=%s where equip_balance_id=%s " % (
+        dataList[30],dataList[31],dataList[32], equipmentBalanceId))
+        executeCommit("update eb_carry set carry_count=%s,carry_new_product=%s,carry_inferior_product=%s,carry_need_repaired=%s,"
+                 "carry_need_retire=%s,carry_unprepared_value=%s,carryUn_cutdown_value=%s where equip_balance_id=%s " % (
+        dataList[33],dataList[34],dataList[35],dataList[36],dataList[37],dataList[38],dataList[39], equipmentBalanceId))
+        executeCommit("update eb_stock set stock_count=%s,stock_new_product=%s,stock_inferior_product=%s,stock_need_repaired=%s,stock_need_retire=%s,"
+                 "stock_unprepared_value=%s,stockUn_cutdown_value=%s where equip_balance_id=%s " % (
+        dataList[40],dataList[41],dataList[42],dataList[43],dataList[44],dataList[45],dataList[46], equipmentBalanceId))
+        executeCommit("update eb_management set authorized_rate=%s,instock_rate=%s,matched_rate=%s,prepared_rate=%s,intact_rate=%s where equip_balance_id=%s " % (
+        dataList[47], dataList[48], dataList[49], dataList[50],dataList[51], equipmentBalanceId))
+        executeCommit("update eb_repair_time set never_repair=%s,once=%s,twice=%s,three_times=%s,More_than_three=%s where equip_balance_id=%s " % (
+        dataList[52],dataList[53],dataList[54],dataList[55],dataList[56], equipmentBalanceId))
+        executeCommit(
+        "update eb_production_year set before1970=%s,between1971and1975=%s,between1976and1980=%s,between1981and1985=%s,"
+        "between1986and1990=%s,between1991and1995=%s,between1996and2000=%s,between2001and2005=%s,after2006=%s where equip_balance_id=%s " % (
+           dataList[57], dataList[58], dataList[59], dataList[60], dataList[61],dataList[62],dataList[63],dataList[64],dataList[65], equipmentBalanceId))
 
 
 if __name__ == "__main__":
-    initEquipmentBalance('2001')
-    initEquipmentBalance('2002')
-    initEquipmentBalance('2003')
-    initEquipmentBalance('2004')
-    initEquipmentBalance('2005')
-    initEquipmentBalance('2006')
-    initEquipmentBalance('2007')
-    initEquipmentBalance('2008')
-    initEquipmentBalance('2009')
+    updateOneEquipmentBalanceData('2001','1','1')
+    # deleteOneEquipmentBalanceData('2008','2','5')
 
 

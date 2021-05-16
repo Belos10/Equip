@@ -276,13 +276,6 @@
          </spacer>
         </item>
         <item>
-         <widget class="QPushButton" name="pb_delState">
-          <property name="text">
-           <string>删除展开状态</string>
-          </property>
-         </widget>
-        </item>
-        <item>
          <widget class="QPushButton" name="pb_clearCheck">
           <property name="text">
            <string>清除选中装备</string>

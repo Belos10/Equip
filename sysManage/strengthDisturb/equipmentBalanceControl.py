@@ -6,6 +6,8 @@ from sysManage.strengthDisturb.equipmentBalanceMain import Equip_Balance_Main
 from sysManage.strengthDisturb.equipmentBalanceResult import Equip_Balance_Result
 from sysManage.strengthDisturb.equipmentBalanceSelect import Equip_Balance_Select
 from widgets.strengthDisturb.equipmentBalance.equipmentBalanceControlUI import EquipmentBalanceControlUI
+from database.strengthDisturbSql import selectAllDataAboutUnit, selectAllDataAboutEquip
+from database.SD_EquipmentBanlanceSql import updateOneEquipmentBalanceData
 
 
 class Equip_Balance_Control(QWidget, EquipmentBalanceControlUI):
@@ -13,7 +15,7 @@ class Equip_Balance_Control(QWidget, EquipmentBalanceControlUI):
     def __init__(self, parent=None):
         super(Equip_Balance_Control,self).__init__(parent)
         self.setupUi(self)
-        self.stack = self.stack = QStackedWidget(self)
+        self.stack = QStackedWidget(self)
         self.main = Equip_Balance_Main()
         self.select = Equip_Balance_Select()
         self.result = Equip_Balance_Result()
@@ -37,7 +39,7 @@ class Equip_Balance_Control(QWidget, EquipmentBalanceControlUI):
 
      # 双击单元格元素展示某年度某单位某装备选择界面
     def soltDisplaySelect(self,index):
-
+        self.select._initEquipmentBlanceSelect()
         row = index.row()
         column = index.column()
         item = self.main.tb_year.item(row,column)
@@ -49,9 +51,8 @@ class Equip_Balance_Control(QWidget, EquipmentBalanceControlUI):
             year = re.sub("\D","",text) # 提取字符串中的数字
             self.select.currentYear = year
             self.stack.setCurrentIndex(1)
-        self.select._initEquipmentBlanceSelect
-
-
+            unitTuple = selectAllDataAboutUnit()
+            equipTuple = selectAllDataAboutEquip()
 
 
     #双击select界面结果表，展示某年某单位某装备具体的结果

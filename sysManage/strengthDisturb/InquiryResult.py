@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QTableWidgetItem, QAbstractIt
 from widgets.strengthDisturb.inquiry_result import Widget_Inquiry_Result
 from database.strengthDisturbSql import selectAboutStrengthByUnitListAndEquipList, selectUnitIsHaveChild, selectEquipIsHaveChild,\
     selectAboutStrengthByEquipShow,selectAboutStrengthByUnitShow, updateStrengthAboutStrengrh,updateStrengthAboutStrengrh
+from sysManage.strengthDisturb.chooseFactoryYear import chooseFactoryYear
 from PyQt5.Qt import Qt
 #new
 '''
@@ -20,6 +21,9 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         self.equipList = []
         self.year = None
         self.result = []
+        self.chooseFactoryYear = chooseFactoryYear(self)
+        self.chooseFactoryYear.hide()
+        self.currentFactoryYear = ''
         #信号和槽连接
         self.signalConnect()
 
@@ -48,8 +52,12 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         #清除当前页面全部装备实力数
         self.pb_clearAll.clicked.connect(self.slotClearCurrentPage)
 
-        #清除选中状态
-        self.pb_delState.clicked.connect(self.slotChangeCheckState)
+        #选择展示的出厂年份
+        self.pb_factoryYear.clicked.connect(self.slotChooseFactoryYear)
+
+        self.chooseFactoryYear.tb_yes.clicked.connect(self.changeCurrentFactoryYear)
+
+        self.chooseFactoryYear.tb_cancel.clicked.connect(self.slotCancelChooseFactoryYear)
     '''
         信号和槽连接断开
     '''
@@ -57,17 +65,17 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         pass
 
     '''
-        功能：
-            清除单选按钮选中状态
-    '''
-    def slotChangeCheckState(self):
-        if self.rb_unitShow.isChecked():
-            self.rb_unitShow.setChecked(False)
-
-    '''
        清除当前结果页面所有的实力数
     '''
+
+    def slotChooseFactoryYear(self):
+        self.chooseFactoryYear.initComBoxAboutYear()
+        self.chooseFactoryYear.show()
+
     def slotClearCurrentPage(self):
+        if self.currentFactoryYear != "":
+            reply = QMessageBox.question(self, '清除', '清除失败,请将出厂年份设置为全部', QMessageBox.Yes)
+            return
         if self.year == '全部':
             reply = QMessageBox.question(self, '清除', '只能某一年，清除失败', QMessageBox.Yes)
             return
@@ -90,6 +98,21 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                 updateStrengthAboutStrengrh(Unit_ID, Equip_ID, year, "0", orginNum)
                 self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
 
+    def changeCurrentFactoryYear(self):
+        self.currentFactoryYear = self.chooseFactoryYear.cb_factoryYear.currentText()
+
+        text = "当前显示的出厂年份：" + self.currentFactoryYear
+        self.lb_factoryYear.setText(text)
+
+        if self.currentFactoryYear == "全部":
+            self.currentFactoryYear = ''
+        self.chooseFactoryYear.hide()
+
+        self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
+
+
+    def slotCancelChooseFactoryYear(self):
+        self.chooseFactoryYear.hide()
     '''
         清除当前行的实力数
     '''
@@ -130,6 +153,10 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                     Equip_ID = resultInfo[0]
                     unitHaveChild = selectUnitIsHaveChild(Unit_ID)
                     equipHaveChild = selectEquipIsHaveChild(Equip_ID)
+                    if self.currentFactoryYear != "":
+                        reply = QMessageBox.question(self, '清除', '清除失败,请将出厂年份设置为全部', QMessageBox.Yes)
+                        self.tw_inquiryResult.item(currentRow, currentColumn).setText(resultInfo[4])
+                        return
                     if unitHaveChild or equipHaveChild:
                         reply = QMessageBox.question(self, '修改', '只能修改末级实力数，修改失败', QMessageBox.Yes)
                         self.tw_inquiryResult.item(currentRow, currentColumn).setText(resultInfo[4])
@@ -179,16 +206,16 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
 
         if self.rb_equipShow.isChecked():
             #按装备展开
-            resultList = selectAboutStrengthByEquipShow(UnitList, EquipList, year, '')
+            resultList = selectAboutStrengthByEquipShow(UnitList, EquipList, year, self.currentFactoryYear)
         elif self.rb_unitShow.isChecked():
             #按单位展开
-            resultList = selectAboutStrengthByUnitShow(UnitList, EquipList, year, '')
+            resultList = selectAboutStrengthByUnitShow(UnitList, EquipList, year, self.currentFactoryYear)
         else:
-            resultList = selectAboutStrengthByUnitListAndEquipList(UnitList, EquipList, year, '')
+            resultList = selectAboutStrengthByUnitListAndEquipList(UnitList, EquipList, year, self.currentFactoryYear)
 
         if self.cb_showLast.isChecked():
-            resultListEquip = selectAboutStrengthByEquipShow(UnitList, EquipList, year, '')
-            resultListUnit = selectAboutStrengthByUnitShow(UnitList, EquipList, year, '')
+            resultListEquip = selectAboutStrengthByEquipShow(UnitList, EquipList, year, self.currentFactoryYear)
+            resultListUnit = selectAboutStrengthByUnitShow(UnitList, EquipList, year, self.currentFactoryYear)
             resultList = resultListEquip + resultListUnit
             self.rb_unitShow.setCheckable(False)
             self.rb_equipShow.setCheckable(False)

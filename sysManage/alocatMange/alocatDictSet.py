@@ -1,7 +1,7 @@
 from widgets.alocatMange.select_set import Widget_Dict_Set
 import sys
 from PyQt5.QtWidgets import QApplication,QWidget, QListWidgetItem, QComboBox, QTableWidgetItem, QDateEdit, \
-    QInputDialog,QMessageBox,QAbstractItemView,QTreeWidgetItem
+    QInputDialog,QMessageBox,QAbstractItemView,QTreeWidgetItem,QLineEdit
 from database.strengthDisturbSql import *
 from sysManage.alocatMange.config import ArmyTransferReceiveUnit, ArmyTransferSendUnit
 from PyQt5.Qt import Qt
@@ -43,6 +43,33 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
         self.pb_setUnit.clicked.connect(self.slotUnitDictInit)  # 设置单元目录
 
         self.pb_setEquip.clicked.connect(self.slotEquipDictInit)  # 设置装备目录
+        self.pb_firstSelect.clicked.connect(self.slotSelectUnit)
+
+        # self.pb_secondSelect.clicked.connect(self.slotSelectEquip)
+        # self.pb_setEquipUnit.clicked.connect(self.slotSetEquipUnit)
+
+    # def slotSetEquipUnit(self):
+    #     if self.tb_result.currentRow() == -1:
+    #         return
+    #     text, okPressed = QInputDialog.getText(self, "Get text", "装备单位为:", QLineEdit.Normal, "")
+    #     if okPressed:
+    #         print(text)
+    #         updateEquipUnit(text, self.le_equipID.text())
+    #     self.slotEquipDictInit()
+    #
+    def slotSelectUnit(self):
+        findText = self.le_first.text()
+        for i, item in self.first_treeWidget_dict.items():
+            if item.text(0) == findText:
+                self.tw_first.setCurrentItem(item)
+                break
+
+    # def slotSelectEquip(self):
+    #     findText = self.le_second.text()
+    #     for i, item in self.second_treeWidget_dict.items():
+    #         if item.text(0) == findText:
+    #             self.tw_second.setCurrentItem(item)
+    #             break
 
     '''
             功能：
@@ -58,6 +85,8 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
         self.pb_setUnit.clicked.disconnect(self.slotUnitDictInit)  # 设置单元目录
 
         self.pb_setEquip.clicked.disconnect(self.slotEquipDictInit)  # 设置装备目录
+
+
 
     '''
         功能：

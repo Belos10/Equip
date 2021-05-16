@@ -9,12 +9,14 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QHeaderView, QAbstractItemView, QTableWidgetItem
 
 
 class EquipmentBalanceMainUI(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(1160, 842)
+        Form.resize(1428, 762)
         self.gridLayout_3 = QtWidgets.QGridLayout(Form)
         self.gridLayout_3.setContentsMargins(-1, 0, -1, 0)
         self.gridLayout_3.setObjectName("gridLayout_3")
@@ -28,28 +30,43 @@ class EquipmentBalanceMainUI(object):
         self.horizontalLayout_5.addLayout(self.horizontalLayout_3)
         self.verticalLayout_2 = QtWidgets.QVBoxLayout()
         self.verticalLayout_2.setObjectName("verticalLayout_2")
+
+
+        #设置界面年份表
         self.tb_year = QtWidgets.QTableWidget(Form)
         self.tb_year.setObjectName("tb_year")
-        self.tb_year.setColumnCount(0)
-        self.tb_year.setRowCount(0)
+        self.tb_year.setColumnCount(5)
+        self.tb_year.setRowCount(2)
+        item =QTableWidgetItem('装备平衡表总览')
+        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        self.tb_year.setItem(0,0,item)
+        self.tb_year.setSpan(0,0,1,5)
+        self.tb_year.horizontalHeader().setVisible(False)
+        self.tb_year.verticalHeader().setVisible(False)
+        self.tb_year.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.tb_year.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.tb_year.setSelectionBehavior(0)
+        self.tb_year.resizeColumnsToContents()
+        self.tb_year.resizeRowsToContents()
+
+
+
+
         self.verticalLayout_2.addWidget(self.tb_year)
         self.gridLayout_2 = QtWidgets.QGridLayout()
         self.gridLayout_2.setObjectName("gridLayout_2")
-        self.pb_output = QtWidgets.QPushButton(Form)
-        self.pb_output.setMinimumSize(QtCore.QSize(50, 25))
-        self.pb_output.setMaximumSize(QtCore.QSize(100, 25))
-        self.pb_output.setObjectName("pb_output")
-        self.gridLayout_2.addWidget(self.pb_output, 1, 2, 1, 1)
+        self.pb_add = QtWidgets.QPushButton(Form)
+        self.pb_add.setObjectName("pb_add")
+        self.gridLayout_2.addWidget(self.pb_add, 0, 0, 1, 1)
         self.pb_input = QtWidgets.QPushButton(Form)
-        self.pb_input.setMinimumSize(QtCore.QSize(50, 25))
-        self.pb_input.setMaximumSize(QtCore.QSize(100, 25))
         self.pb_input.setObjectName("pb_input")
         self.gridLayout_2.addWidget(self.pb_input, 1, 0, 1, 1)
+        self.pb_output = QtWidgets.QPushButton(Form)
+        self.pb_output.setObjectName("pb_output")
+        self.gridLayout_2.addWidget(self.pb_output, 1, 1, 1, 1)
         self.pb_delete = QtWidgets.QPushButton(Form)
-        self.pb_delete.setMinimumSize(QtCore.QSize(50, 25))
-        self.pb_delete.setMaximumSize(QtCore.QSize(100, 25))
         self.pb_delete.setObjectName("pb_delete")
-        self.gridLayout_2.addWidget(self.pb_delete, 1, 3, 1, 1)
+        self.gridLayout_2.addWidget(self.pb_delete, 0, 1, 1, 1)
         self.verticalLayout_2.addLayout(self.gridLayout_2)
         self.horizontalLayout_5.addLayout(self.verticalLayout_2)
         self.gridLayout_3.addLayout(self.horizontalLayout_5, 0, 0, 1, 1)
@@ -63,7 +80,8 @@ class EquipmentBalanceMainUI(object):
 
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
-        Form.setWindowTitle(_translate("Form", "Form"))
-        self.pb_output.setText(_translate("Form", "导出"))
+        Form.setWindowTitle(_translate("Form", "装备平衡"))
+        self.pb_add.setText(_translate("Form", "增加"))
         self.pb_input.setText(_translate("Form", "导入"))
+        self.pb_output.setText(_translate("Form", "导出"))
         self.pb_delete.setText(_translate("Form", "删除"))

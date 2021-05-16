@@ -20,6 +20,7 @@ class alocatMange(QMainWindow, Widget_Alocat_Mange):
         self.allotSchedule = AllotSchedule()        #调拨进度
         self.transferManage = transferManage(self)  #调拨单管理
         self.alocatSet = alocatManageSet(self)              #调配管理设置
+        self.userInfo = None
 
         #添加页面
         self.stackedWidget.addWidget(self.disturbPlan)
@@ -35,6 +36,8 @@ class alocatMange(QMainWindow, Widget_Alocat_Mange):
         self.tb_alocatSet.setDisabled(False)
         self.connectSignal()
 
+    def initUserInfo(self, userInfo):
+        self.userInfo = userInfo
     '''
         功能：
             信号连接
@@ -65,7 +68,7 @@ class alocatMange(QMainWindow, Widget_Alocat_Mange):
         self.tb_disturbSchedule.setDisabled(False)
         self.tb_disturbManage.setDisabled(0)
         self.tb_alocatSet.setDisabled(False)
-
+        self.disturbPlan.initAll()
     '''
         功能：
             点击调拨进度按钮
@@ -87,6 +90,7 @@ class alocatMange(QMainWindow, Widget_Alocat_Mange):
         self.tb_disturbSchedule.setDisabled(False)
         self.tb_disturbManage.setDisabled(True)
         self.tb_alocatSet.setDisabled(False)
+        self.transferManage.slotArmyTransfer()
 
     def slotAlocatSet(self):
         self.stackedWidget.setCurrentIndex(3)

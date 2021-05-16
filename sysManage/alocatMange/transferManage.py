@@ -30,6 +30,7 @@ class transferManage(QMainWindow, Widget_Transfer_Manage):
         self.tb_armyTransfer.setDisabled(True)
         self.tb_rocketTransfer.setDisabled(False)
         self.sw_manageWIdget.setCurrentIndex(0)
+        self.armyTransfer._initSelf_()
 
     def slotRocketTransfer(self):
         self.tb_armyTransfer.setDisabled(False)

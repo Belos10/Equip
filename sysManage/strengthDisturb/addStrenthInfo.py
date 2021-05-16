@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QWidget, QTableWidgetItem, QComboBox, QMessageBox
 from widgets.strengthDisturb.add_strenth_info import Add_Strenth_Info
 from database.strengthDisturbSql import selectEquipInputType, selectInfoAboutInput, selectNowNumAndStrengthNum, \
-    selectAllStrengthYear, updateInputInfo, updateNumMutilInput, delFromInputInfo
+    selectAllStrengthYear, updateInputInfo, updateNumMutilInput, delFromInputInfo,findEquipUnitByEquipID
 
 '''
     类功能：
@@ -125,6 +125,12 @@ class AddStrenthInfo(QWidget, Add_Strenth_Info):
         self.slotDisconnect()
         self.unitID = RowData[1]
         self.equipID = RowData[0]
+        if findEquipUnitByEquipID(self.equipID):
+            self.equipUnit = findEquipUnitByEquipID(self.equipID)[0][0]
+        else:
+            self.equipUnit = ""
+        self.label_MeasureUnit.setText(self.equipUnit)
+
         print(self.unitID, self.equipID)
         self.allYear = selectAllStrengthYear()
         self.yearList = yearList
@@ -141,7 +147,7 @@ class AddStrenthInfo(QWidget, Add_Strenth_Info):
             self.header = ['批次号', '数量', '出厂年份', '生产厂家', '装备状态', '是否到位', '文件凭证', '备注']
             self.tableWidget.setColumnCount(len(self.header))
             self.tableWidget.setHorizontalHeaderLabels(self.header)
-            self.currentResult = selectInfoAboutInput(RowData[1], RowData[0], self.yearList[0])
+            self.currentResult = selectInfoAboutInput(RowData[1], RowData[0], self.yearList)
             self.tableWidget.setRowCount(len(self.currentResult))
             self.orginRowNum = len(self.currentResult)
             for i, data in enumerate(self.currentResult):
@@ -167,7 +173,7 @@ class AddStrenthInfo(QWidget, Add_Strenth_Info):
             self.header = ['批次号', '出厂年份', '生产厂家', '装备状态', '是否到位', '文件凭证', '备注']
             self.tableWidget.setColumnCount(len(self.header))
             self.tableWidget.setHorizontalHeaderLabels(self.header)
-            self.currentResult = selectInfoAboutInput(RowData[1], RowData[0], self.yearList[0])
+            self.currentResult = selectInfoAboutInput(RowData[1], RowData[0], self.yearList)
             self.tableWidget.setRowCount(len(self.currentResult))
             self.orginRowNum = len(self.currentResult)
             #print("结果为：", self.currentResult)
@@ -192,7 +198,7 @@ class AddStrenthInfo(QWidget, Add_Strenth_Info):
 
     # 信息录入界面新增按钮
     def slotAddSingle(self):
-        yearList = selectAllStrengthYear()
+        #yearList = selectAllStrengthYear()
         if self.isMutilInput:
             row = self.tableWidget.rowCount()
             item = QTableWidgetItem("")

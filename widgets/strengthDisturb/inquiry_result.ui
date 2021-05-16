@@ -94,16 +94,16 @@
          </spacer>
         </item>
         <item>
-         <widget class="QPushButton" name="pb_factoryYear">
+         <widget class="QLabel" name="lb_factoryYear">
           <property name="text">
-           <string>选择显示出厂年份</string>
+           <string>当前显示的出厂年份：全部</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pb_delState">
+         <widget class="QPushButton" name="pb_factoryYear">
           <property name="text">
-           <string>删除展开状态</string>
+           <string>选择显示出厂年份</string>
           </property>
          </widget>
         </item>

@@ -3,6 +3,7 @@ import sys
 from PyQt5.QtWidgets import QApplication,QWidget, QListWidgetItem, QComboBox, QTableWidgetItem, QDateEdit, QInputDialog
 from database.alocatMangeSql import selectYearListAboutArmy, selectArmyTransferByYear, insertIntoArmyTransferYear, \
     insertIntoRocketTransferYear, selectYearListAboutRocket, selectRocketTransferByYear
+from database.alocatMangeSql import selectYearListAboutDisturbPlan
 from database.strengthDisturbSql import selectAllEndEquip
 from sysManage.alocatMange.config import ArmyTransferReceiveUnit, ArmyTransferSendUnit
 
@@ -31,8 +32,9 @@ class rocketTransfer(QWidget, Widget_Rocket_Transfer):
         self.yearList = []
         self.currentYear = ''
         self.lw_yearChoose.clear()
-        self.yearList = ['全部']
-        allYear = selectYearListAboutRocket()
+        self.yearList = []
+        allYear = selectYearListAboutDisturbPlan()
+        print(allYear)
         for year in allYear:
             self.yearList.append(year)
 
