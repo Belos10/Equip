@@ -94,7 +94,7 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
         self.le_uperID.setDisabled(True)
         self.cb_equipType.setDisabled(True)
         self.cb_inputType.setDisabled(True)
-        self.le_otherName.setDisabled(False)
+        self.le_UnitUper.setDisabled(False)
         self.le_unitName.setDisabled(False)
         self.le_unitID.setDisabled(False)
         self.pb_setEquip.setDisabled(False)
@@ -131,7 +131,7 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
         self.le_unitID.setDisabled(True)
         self.pb_setEquip.setDisabled(True)
         self.pb_setUnit.setDisabled(False)
-        self.le_otherName.setDisabled(True)
+        self.le_UnitUper.setDisabled(True)
         self.pb_add.setDisabled(0)
         self.pb_update.setDisabled(0)
 
@@ -167,7 +167,7 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
     def _initUnitTableWidget(self):
         result = selectAllDataAboutDisturbPlanUnit()
 
-        header = ['单位编号', '单位名称', '上级单位编号']
+        header = ['单位编号', '单位名称', '上级单位编号','单位别名']
         self.tb_result.setColumnCount(len(header))
         self.tb_result.setRowCount(len(result))
         self.tb_result.setHorizontalHeaderLabels(header)
@@ -179,6 +179,8 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
             self.tb_result.setItem(i, 1, item)
             item = QTableWidgetItem(data[2])
             self.tb_result.setItem(i, 2, item)
+            item = QTableWidgetItem(data[3])
+            self.tb_result.setItem(i, 3, item)
 
         # print(result)   #测试查找到的数据
 
@@ -237,7 +239,7 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
         if self.changeUnit:
             self.le_unitID.setText(self.tb_result.item(currentRow, 0).text())
             self.le_unitName.setText(self.tb_result.item(currentRow, 1).text())
-            self.le_otherName.setText(self.tb_result.item(currentRow, 2).text())
+            self.le_UnitUper.setText(self.tb_result.item(currentRow, 2).text())
         else:
             self.le_equipID.setText((self.tb_result.item(currentRow,0).text()))
             self.le_equipName.setText((self.tb_result.item(currentRow, 1).text()))

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'yearListForm.ui'
+# Form implementation generated from reading ui file 'allotSchedule.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.2
 #
@@ -11,10 +11,10 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class yearList_Form(object):
+class AllotSchedule(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(1031, 701)
+        Form.resize(1026, 701)
         self.horizontalLayout_8 = QtWidgets.QHBoxLayout(Form)
         self.horizontalLayout_8.setObjectName("horizontalLayout_8")
         self.groupBox = QtWidgets.QGroupBox(Form)
@@ -33,15 +33,6 @@ class yearList_Form(object):
         self.lw_yearChoose.setMaximumSize(QtCore.QSize(80, 16777215))
         self.lw_yearChoose.setObjectName("lw_yearChoose")
         self.verticalLayout.addWidget(self.lw_yearChoose)
-        self.tb_add = QtWidgets.QToolButton(self.groupBox)
-        self.tb_add.setObjectName("tb_add")
-        self.verticalLayout.addWidget(self.tb_add)
-        self.tb_del = QtWidgets.QToolButton(self.groupBox)
-        self.tb_del.setObjectName("tb_del")
-        self.verticalLayout.addWidget(self.tb_del)
-        self.tb_input = QtWidgets.QToolButton(self.groupBox)
-        self.tb_input.setObjectName("tb_input")
-        self.verticalLayout.addWidget(self.tb_input)
         self.horizontalLayout_8.addWidget(self.groupBox)
         self.groupBox_2 = QtWidgets.QGroupBox(Form)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Preferred)
@@ -149,16 +140,6 @@ class yearList_Form(object):
         self.txt_disturbPlanYear.setMaximumSize(QtCore.QSize(16777215, 40))
         self.txt_disturbPlanYear.setObjectName("txt_disturbPlanYear")
         self.verticalLayout_4.addWidget(self.txt_disturbPlanYear)
-        self.te_proof = QtWidgets.QTextEdit(Form)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.te_proof.sizePolicy().hasHeightForWidth())
-        self.te_proof.setSizePolicy(sizePolicy)
-        self.te_proof.setMinimumSize(QtCore.QSize(0, 20))
-        self.te_proof.setMaximumSize(QtCore.QSize(16777215, 30))
-        self.te_proof.setObjectName("te_proof")
-        self.verticalLayout_4.addWidget(self.te_proof)
         self.disturbResult = QtWidgets.QTableWidget(Form)
         self.disturbResult.setObjectName("disturbResult")
         self.disturbResult.setColumnCount(0)
@@ -173,9 +154,6 @@ class yearList_Form(object):
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "Form"))
         self.groupBox.setTitle(_translate("Form", "年份筛选"))
-        self.tb_add.setText(_translate("Form", "新增"))
-        self.tb_del.setText(_translate("Form", "删除"))
-        self.tb_input.setText(_translate("Form", "导入"))
         self.groupBox_2.setTitle(_translate("Form", "目录查询"))
         self.pb_firstSelect.setText(_translate("Form", "查询"))
         self.pb_secondSelect.setText(_translate("Form", "查询"))
