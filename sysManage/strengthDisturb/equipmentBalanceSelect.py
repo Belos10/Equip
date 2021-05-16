@@ -76,38 +76,43 @@ class Equip_Balance_Select(QWidget, EquipmentBalanceSelectUI):
         self._initEquipTreeWidget("", self.tw_second)
         self._initTableHeader()
 
+    '''
+          功能：
+              单位目录的初始化，显示整个单位表
+              参数表：root为上级单位名字，mother为上级节点对象
+      '''
+
     def _initUnitTreeWidget(self, root, mother):
         if root == '':
-            result = selectDisturbPlanUnitInfoByDeptUper('')
+            result = selectUnitInfoByDeptUper('')
         else:
-            result = selectDisturbPlanUnitInfoByDeptUper(root)
+            result = selectUnitInfoByDeptUper(root)
 
         # rowData: (单位编号，单位名称，上级单位编号)
         for rowData in result:
             item = QTreeWidgetItem(mother)
             item.setText(0, rowData[1])
-            # item.setCheckState(0, Qt.Unchecked)
             self.first_treeWidget_dict[rowData[0]] = item
             if rowData[0] != '':
                 self._initUnitTreeWidget(rowData[0], item)
 
 
     def slotClickedInqury(self):
-        self.first_treeWidget_dict = {}
-        self.second_treeWidget_dict = {}
-        self.tw_first.clear()
-        self.tw_second.clear()
-        self.tw_first.setVisible(True)
-        self.tw_first.header().setVisible(False)
-        self.tw_second.header().setVisible(False)
-        self.le_first.setDisabled(False)
-        self.le_second.setDisabled(False)
-        self.tw_first.setDisabled(False)
-        self.tw_second.setDisabled(False)
-        self.tb_result.setDisabled(False)
+            self.first_treeWidget_dict = {}
+            self.second_treeWidget_dict = {}
+            self.tw_first.clear()
+            self.tw_second.clear()
+            self.tw_first.setVisible(True)
+            self.tw_first.header().setVisible(False)
+            self.tw_second.header().setVisible(False)
+            self.le_first.setDisabled(False)
+            self.le_second.setDisabled(False)
+            self.tw_first.setDisabled(False)
+            self.tw_second.setDisabled(False)
+            self.tb_result.setDisabled(False)
 
-        self._initUnitTreeWidget("", self.tw_first)
-        self._initEquipTreeWidget("", self.tw_second)
+            self._initUnitTreeWidget("", self.tw_first)
+            self._initEquipTreeWidget("", self.tw_second)
 
 
 
