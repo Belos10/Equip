@@ -295,7 +295,21 @@ def selectAllDataAboutDisturbPlanUnit():
 
     return result
 
+# 返回disturbplanunit单位表除机关外的所有数据
+def selectAllDataAboutDisturbPlanUnitExceptFirst():
+    conn, cur = connectMySql()
 
+    sql = "select * from disturbplanunit where Unit_Uper != ''"
+
+    cur.execute(sql)
+    result = cur.fetchall()
+
+    disconnectMySql(conn, cur)
+
+    # 测试结果
+    # print(result)
+
+    return result
 
 
 # 返回unit单位表的所有数据
@@ -310,7 +324,7 @@ def selectAllDataAboutUnit():
     disconnectMySql(conn, cur)
 
     # 测试结果
-    print("单位表所有数据result",result)
+    #print("单位表所有数据result",result)
 
     return result
 

@@ -159,7 +159,7 @@ class DisturbPlan(QWidget, yearList_Form):
         for unitID, unitItem in self.first_treeWidget_dict.items():
             if unitItem == self.tw_first.currentItem():
                 if selectUnitIfUppermost(unitID):
-                    result = selectAllDataAboutUnit()
+                    result = selectAllDataAboutDisturbPlanUnitExceptFirst()
                 else:
                     result = findDisturbPlanUnitChildInfo(unitID)
                 for resultInfo in result:
@@ -259,22 +259,28 @@ class DisturbPlan(QWidget, yearList_Form):
                     item.setText(self.unitDisturbPlanList[num])
                 item.setFlags(Qt.ItemIsEnabled|Qt.ItemIsSelectable|Qt.ItemIsEditable)
                 num=num+1
+        self.initDisturbPlanSum()
+
+
+    # 初始化此次分配数
+    def initDisturbPlanSum(self):
         # 显示此次分配计划数
         sum = 0
-        for i in range(0, len(self.currentEquipdict)):
-            for j in range(0, len(self.currentUnitChilddict)):
-                num = self.disturbResult.item(i, 4 + j).text()
-                if num == '-1' or num == '':
-                    sum = sum + 0
-                else:
-                    sum = sum + int(num)
-            self.disturbResult.item(i,3).setText(str(sum))
+        for i in self.currentEquipdict:
+            if not selectEquipIsHaveChild(self.currentEquipdict[i][0]):
+                for j in range(0, len(self.currentUnitChilddict)):
+                    num = self.disturbResult.item(i, 4 + j).text()
+                    if num == '-1' or num == '':
+                        sum = sum + 0
+                    else:
+                        sum = sum + int(num)
+                self.disturbResult.item(i,3).setText(str(sum))
             sum = 0
 
 
+    # 若装备含子装备，则该行不可选中
     def ifEquipHaveChild(self):
         print("self.currentEquipdict",self.currentEquipdict)
-        # 若装备含子装备，则该行不可选中
         for i in self.currentEquipdict:
             if selectEquipIsHaveChild(self.currentEquipdict[i][0]):
                 for j in range(1,self.disturbResult.columnCount()):
@@ -342,6 +348,7 @@ class DisturbPlan(QWidget, yearList_Form):
             updateDisturbPlanNum(self.currentEquipdict[self.currentRow][0],self.currentUnitChilddict[self.currentColumn-4][0],
                                  self.currentYear,self.disturbResult.item(self.currentRow,self.currentColumn).text())
             updateOneEquipmentBalanceData(self.currentYear,self.currentEquipdict[self.currentRow][0],self.currentUnitChilddict[self.currentColumn-4][0])
+            self.initDisturbPlanSum()
         if self.currentColumn == self.lenHeaderList-1:
             updateDisturbPlanNote(self.currentEquipdict[self.currentRow][0],self.currentYear,self.disturbResult.item(self.currentRow,self.currentColumn).text())
 

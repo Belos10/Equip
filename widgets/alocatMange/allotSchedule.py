@@ -124,11 +124,6 @@ class AllotSchedule(object):
         self.verticalLayout_4.setObjectName("verticalLayout_4")
         self.horizontalLayout_6 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_6.setObjectName("horizontalLayout_6")
-        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_6.addItem(spacerItem)
-        self.pb_issueOrderForm = QtWidgets.QPushButton(Form)
-        self.pb_issueOrderForm.setObjectName("pb_issueOrderForm")
-        self.horizontalLayout_6.addWidget(self.pb_issueOrderForm)
         self.verticalLayout_4.addLayout(self.horizontalLayout_6)
         self.txt_disturbPlanYear = QtWidgets.QTextBrowser(Form)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Fixed)
@@ -167,7 +162,6 @@ class AllotSchedule(object):
         self.groupBox_2.setTitle(_translate("Form", "目录查询"))
         self.pb_firstSelect.setText(_translate("Form", "查询"))
         self.pb_secondSelect.setText(_translate("Form", "查询"))
-        self.pb_issueOrderForm.setText(_translate("Form", "开具调拨单"))
         self.txt_disturbPlanYear.setHtml(_translate("Form", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
