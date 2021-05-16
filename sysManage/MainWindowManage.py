@@ -15,8 +15,10 @@ class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
         self.mantanSupport = QWidget()
         self.warStorage = QWidget()
         self.contractMange = QWidget()
-        self.dangerGoods = QWidget()
-        self.PosEngin = QWidget()
+        from sysManage.dangerGoods.dangerGoods import DangerGoods
+        self.dangerGoods = DangerGoods()
+        from sysManage.positionEngineer.positionEngineerMain import PositionEngineerMain
+        self.PosEngin = PositionEngineerMain()
         self.dictSelect = dictSelect()
         self.sysConfig = QWidget()
 

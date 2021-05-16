@@ -1895,4 +1895,5 @@ def selectUnitIfUppermost(Unit_Id):
         return False
 
 if __name__ == '__main__':
+    print(len(findUnitNameFromID('10')))
     pass

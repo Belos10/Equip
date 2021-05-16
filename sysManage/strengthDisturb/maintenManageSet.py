@@ -42,6 +42,8 @@ class maintenManageSet(QWidget, Widget_Mainten_Manage_Set):
 
         #更新当前单位是否为旅团
         self.pb_update.clicked.connect(self.slotUpdateIsGroup)
+        # 导入和导出
+
 
     '''
        当前单位被选中

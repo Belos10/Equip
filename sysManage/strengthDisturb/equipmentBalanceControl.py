@@ -49,6 +49,8 @@ class Equip_Balance_Control(QWidget, EquipmentBalanceControlUI):
             year = re.sub("\D","",text) # 提取字符串中的数字
             self.select.currentYear = year
             self.stack.setCurrentIndex(1)
+        self.select._initEquipmentBlanceSelect
+
 
 
 
