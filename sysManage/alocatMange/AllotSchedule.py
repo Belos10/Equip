@@ -10,6 +10,7 @@ from database.alocatMangeSql import *
 from sysManage.alocatMange.ArmySchedule import ArmySchedule
 from sysManage.alocatMange.armyTransfer import armyTransfer
 from sysManage.alocatMange.ScheduleFinish import ScheduleFisish
+from sysManage.alocatMange.transferModel import transferModel
 
 class AllotSchedule(QWidget,AllotSchedule):
     def __init__(self,parent=None):
@@ -32,6 +33,7 @@ class AllotSchedule(QWidget,AllotSchedule):
         self.armySchedule = ArmySchedule(self)
         self.scheduleFinish = ScheduleFisish(self)
         self.fileName=""
+        self.rocketSchedule = transferModel(self)
 
     def signalConnect(self):
         # 点击选择年份后刷新页面 初始化
@@ -228,8 +230,13 @@ class AllotSchedule(QWidget,AllotSchedule):
                 self.disturbResult.setCellWidget(i, 5 + self.lenCurrentUnitChilddict, item)
 
                 # 火箭军调拨单进度
+                flag3 = selectRocketSchedule(self.currentEquipdict[i][0], self.currentYear)
                 item = QPushButton("设置进度")
+                item.clicked.connect(self.setRocketSchedule)
+                if int(flag3[0][0]):
+                    item = QPushButton("已完成")
                 self.disturbResult.setCellWidget(i, 6 + self.lenCurrentUnitChilddict, item)
+
 
                 # 是否完成接装
                 flag4 = selectIfScheduleFinish(self.currentEquipdict[i][0], self.currentYear)
@@ -351,6 +358,32 @@ class AllotSchedule(QWidget,AllotSchedule):
         self.armySchedule._initSelf_()
         self.armySchedule.show()
         self.armySchedule.signal.connect(self.updateArmy)
+
+    def setRocketSchedule(self):
+        row = self.disturbResult.currentRow()
+        print("row",row)
+        currentUnit=[]
+        for i in self.currentUnitChilddict.values():
+            currentUnit.append(i)
+        if row != -1:
+            # 存放质量和陆军单号
+            result1 = selectQuaAndID(self.currentEquipdict[row][0],self.currentYear)
+            if result1:
+                info1=[result1[0][0],self.disturbResult.item(row,3).text()]
+                for i in range(0,self.lenCurrentUnitChilddict):
+                    info1.append(self.disturbResult.item(row,4+i).text())
+                info1.append(self.te_proof.toPlainText())
+                info1.append(result1[0][1])
+                self.rocketSchedule.getUnitIDList(currentUnit,self.currentEquipdict[self.disturbResult.currentRow()],self.currentYear,info1)
+        self.rocketSchedule.show()
+        self.rocketSchedule.signal.connect(self.updateRocket)
+
+    def updateRocket(self):
+        currentRow = self.disturbResult.currentRow()
+        item = QPushButton("已完成")
+        self.disturbResult.setCellWidget(currentRow, 6 + self.lenCurrentUnitChilddict, item)
+        updateRocketSchedule(self.currentEquipdict[currentRow][0], self.currentYear)
+
 
     def updateArmy(self):
         currentRow = self.disturbResult.currentRow()

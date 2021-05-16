@@ -107,6 +107,27 @@ def insertIntoArmyTransfer(ID, Trans_ID, Trans_Date, Trans_Reason, Trans, Trans_
     conn.commit()
     disconnectMySql(conn, cur)
 
+#向火箭军调拨单中添加新数据
+def insertIntoRocketTransfer(ID, Trans_ID, Trans_Date, Trans_Reason, Trans, Trans_Way,
+                           Port_Way, Effic_Date, Send_UnitID, Send_UnitName, Send_Connect,
+                           Send_Tel, Recive_Name, Recive_Connect, Recive_Tel, Equip_ID,
+                           Equip_Name, Equip_Unit, Equip_Quity, Equip_Num, Equip_Other, year):
+    conn, cur = connectMySql()
+    sql = "INSERT INTO rockettransfer(ID, Trans_ID, Trans_Date, Trans_Reason, Trans, Trans_Way," \
+          "Port_Way, Effic_Date, Send_UnitID, Send_UnitName, Send_Connect, Send_Tel, Recive_Name," \
+          "Recive_Connect, Recive_Tel, Equip_ID, Equip_Name, Equip_Unit, Equip_Quity, Equip_Num," \
+          "Equip_Other, year) VALUES ('" + ID + "', '"  + Trans_ID + "', '"  + Trans_Date + "', '"  + Trans_Reason + \
+          "', '"  + Trans + "', '" + Trans_Way + "', '" + Port_Way + "', '" + Effic_Date + "', '" \
+          + Send_UnitID + "', '" + Send_UnitName + "', '" + Send_Connect + "', '" + Send_Tel\
+          + "', '" + Recive_Name + "', '" + Recive_Connect + "', '" + Recive_Tel + "', '" + Equip_ID + \
+          "', '" + Equip_Name + "', '" + Equip_Unit + "', '" + Equip_Quity + "', '" + Equip_Num + "', '" + Equip_Other\
+          + "', '" + year + "')"
+
+    print("insertIntoRocketTransfersql",sql)
+    cur.execute(sql)
+    conn.commit()
+    disconnectMySql(conn, cur)
+
 #返回当前年份中陆军调拨单序号
 def selectIDFromArmyByYear(year):
     conn, cur = connectMySql()
@@ -385,3 +406,13 @@ def updateScheduleFinish(Equip_Id,Year,fileName):
     cur.execute(sql)
     conn.commit()
     disconnectMySql(conn, cur)
+
+def selectQuaAndID(Equip_ID, year):
+    conn, cur = connectMySql()
+    sql = "select Equip_Quity,Trans_ID from armytransfer where Equip_ID = '" + Equip_ID + "'and year = '" + year + "'"
+    cur.execute(sql)
+    result = cur.fetchall()
+    print("找质量和陆军单号result", result)
+    conn.commit()
+    disconnectMySql(conn, cur)
+    return result
