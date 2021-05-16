@@ -1,8 +1,10 @@
 from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, \
-    QAbstractItemView, QMessageBox,QInputDialog,QLineEdit
+    QAbstractItemView, QMessageBox, QInputDialog, QLineEdit, QFileDialog
 from database.strengthDisturbSql import selectUnitInfoByDeptUper, selectAllDataAboutUnit, selectEquipInfoByEquipUper, \
     selectAllDataAboutEquip, addDataIntoUnit, addDataIntoEquip, updateDataIntoUnit, \
-    updateDataIntoEquip, delDataInEquip, delDataInUnit, updateEquipUnit, updateUnitAlias
+    updateDataIntoEquip, delDataInEquip, delDataInUnit, updateEquipUnit, updateUnitAlias, findUnitNameFromID, \
+    findEquipInfo
+from utills.importAndOutput import getExcelDocumentData
 from widgets.strengthDisturb.select_set import Widget_Select_Set
 from sysManage.strengthDisturb.equipUnitSet import equipUnitSet
 from PyQt5.Qt import Qt
@@ -44,6 +46,7 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
 
         self.pb_setEquipUnit.clicked.connect(self.slotSetEquipUnit)
         self.pb_setUnitAlias.clicked.connect(self.slotSetUnitAlias)
+        self.pb_input.clicked.connect(self.slotInput)
 
     def slotSetUnitAlias(self):
         if self.tb_result.currentRow() == -1:
@@ -78,6 +81,9 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
         self.pb_setUnit.clicked.disconnect(self.slotUnitDictInit)  # 设置单元目录
 
         self.pb_setEquip.clicked.disconnect(self.slotEquipDictInit)  # 设置装备目录
+        self.pb_input.clicked.connect(self.slotInput)
+
+
 
     '''
         功能：
@@ -437,9 +443,79 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
             else:
                 reply = QMessageBox.question(self, '删除', '删除失败', QMessageBox.Yes)
 
-'''
-    功能：
-        单元测试
-'''
+    '''
+        功能：
+            导入外部excel表格数据到数据库中
+        
+    '''
+    def slotInput(self):
+        if self.changeUnit is True :#设置单位
+            self.inputDataIntoUnit()
+        else:
+            self.inputDataIntoEquip()
+
+
+
+    '''
+        功能：
+            从excel表格导入单位表数据
+    '''
+    def inputDataIntoUnit(self):
+        fileName, fileType = QFileDialog.getOpenFileName(self, "选取文件", "./",
+                                                         "All Files (*);;Microsoft Excel 工作表(*.xls , *.xlsx)")  # 注意空格不能删除
+        if 'xls' or 'xlsx' in fileType:
+            from utills.importAndOutput import getUnitExcelDocumentData
+            data = getExcelDocumentData(fileName)
+            if data is not None and len(data) != 0:
+                for i in range(1, len(data)):
+                    Unit_ID = str(int(data[i][0]))
+                    Unit_Name = data[i][1]
+                    Unit_Uper = str(int(data[i][2]))
+                    if Unit_ID is None:
+                        continue
+                    if len(findUnitNameFromID(Unit_ID)) != 0:
+                        updateDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper)
+                    else:
+                        addDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper)
+                QMessageBox.information(self, '导入成功', '导入单位目录成功！', QMessageBox.Yes)
+            else:
+                print('数据为空')
+            self.slotUnitDictInit()
+    '''
+        功能：
+            从excel表格导入装备表数据
+    '''
+    def inputDataIntoEquip(self):
+        fileName, fileType = QFileDialog.getOpenFileName(self, "选取文件", "./",
+                                                         "All Files (*);;Microsoft Excel 工作表(*.xls , *.xlsx)")  # 注意空格不能删除
+        if 'xls' or 'xlsx' in fileType:
+            data = getExcelDocumentData(fileName)
+            if data is not None and len(data) != 0:
+                for i in range(1, len(data)):
+                    Equip_ID = str(int(data[i][0]))
+                    Equip_Name = data[i][1]
+                    Equip_Uper = str(int(data[i][2]))
+                    Input_Type = data[i][3]
+                    Equip_Type = data[i][4]
+                    if Equip_ID is None:
+                        continue
+                    if len(findEquipInfo(Equip_ID)) != 0:
+                        updateDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper,Input_Type,Equip_Type)
+                    else:
+                        addDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper,Input_Type,Equip_Type)
+                QMessageBox.information(self, '导入成功', '导入装备目录成功！')
+            else:
+                print('数据为空')
+            self.slotEquipDictInit()
+
+
+
+
+    '''
+        功能：
+                单元测试
+    '''
+
+
 if __name__ == '__main__':
     pass

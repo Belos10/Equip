@@ -6,7 +6,6 @@
     <file>equip.png</file>
     <file>wave.png</file>
     <file>select.png</file>
-    <file>system.png</file>
     <file>manage.png</file>
     <file>schedule.png</file>
     <file>plan.png</file>
@@ -16,5 +15,8 @@
     <file>regular.png</file>
     <file>army.png</file>
     <file>rocket.png</file>
+    <file>statistics.png</file>
+    <file>install.png</file>
+    <file>dangerGoodsStatistics.png</file>
   </qresource>
 </RCC>

@@ -506,7 +506,14 @@ def saveEquipmentBalanceByRow(dataList,year,unitId):
 
 
 if __name__ == "__main__":
-    updateOneEquipmentBalanceData('2001','1','1')
-    # deleteOneEquipmentBalanceData('2008','2','5')
+    initEquipmentBalance('2001')
+    initEquipmentBalance('2002')
+    initEquipmentBalance('2003')
+    initEquipmentBalance('2004')
+    initEquipmentBalance('2005')
+    initEquipmentBalance('2006')
+    initEquipmentBalance('2007')
+    initEquipmentBalance('2008')
+    initEquipmentBalance('2009')
 
 
