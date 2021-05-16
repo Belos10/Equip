@@ -310,7 +310,7 @@ def selectAllDataAboutUnit():
     disconnectMySql(conn, cur)
 
     # 测试结果
-    # print(result)
+    print("单位表所有数据result",result)
 
     return result
 
@@ -1882,6 +1882,17 @@ def delStrengthYearByYear(year):
 
     conn.commit()
     disconnectMySql(conn, cur)
+
+def selectUnitIfUppermost(Unit_Id):
+    conn, cur = connectMySql()
+    sql = "select Unit_Uper from unit where Unit_ID = '" + Unit_Id + "'"
+    cur.execute(sql)
+    result = cur.fetchall()
+    disconnectMySql(conn, cur)
+    if result[0][0]== '':
+        return True
+    else:
+        return False
 
 if __name__ == '__main__':
     pass

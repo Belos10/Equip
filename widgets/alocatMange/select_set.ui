@@ -63,13 +63,6 @@
          </spacer>
         </item>
         <item>
-         <widget class="QPushButton" name="pb_setEquipUnit">
-          <property name="text">
-           <string>设置当前装备单位</string>
-          </property>
-         </widget>
-        </item>
-        <item>
          <widget class="QPushButton" name="pb_setUnit">
           <property name="text">
            <string>设置单位目录</string>
@@ -355,9 +348,9 @@
          </widget>
         </item>
         <item row="1" column="0">
-         <widget class="QLabel" name="lb_otherName">
+         <widget class="QLabel" name="lb_UnitUper">
           <property name="text">
-           <string>别名</string>
+           <string>上级单位号：</string>
           </property>
          </widget>
         </item>
@@ -448,7 +441,7 @@
          </spacer>
         </item>
         <item row="1" column="1">
-         <widget class="QLineEdit" name="le_otherName">
+         <widget class="QLineEdit" name="le_UnitUper">
           <property name="maximumSize">
            <size>
             <width>150</width>

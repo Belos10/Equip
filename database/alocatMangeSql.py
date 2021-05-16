@@ -169,7 +169,7 @@ def insertIntoRocketTransferYear(year):
 
 
 
-# 读取分配计划数
+# 按list读取批量分配计划数
 def selectDisturbPlanNum(UnitList, EquipList, YearList):
     conn, cur = connectMySql()
     resultList = []
