@@ -1,6 +1,8 @@
 
 import sys
 from PyQt5.QtWidgets import QMainWindow,QApplication,QWidget
+
+from sysManage.positionEngineer.installationSituation import InstallationSituation
 from sysManage.strengthDisturb.Stren_Inquiry import Stren_Inquiry
 from sysManage.strengthDisturb.strengthDisturbSet import strengthDisturbSet
 from sysManage.strengthDisturb.maintenMange import maintenManage
@@ -15,7 +17,7 @@ class PositionEngineerMain(QMainWindow, Position_Engineer_Widget):
         super(PositionEngineerMain, self).__init__(parent)
         self.setupUi(self)
 
-        self.installationSituation = QWidget(self)
+        self.installationSituation = InstallationSituation(self)
         self.equipmentStatistics = QWidget(self)
         self.directoryMaintenance = QWidget(self)
 
@@ -24,9 +26,9 @@ class PositionEngineerMain(QMainWindow, Position_Engineer_Widget):
         self.stackedWidget.addWidget(self.directoryMaintenance)
 
         self.stackedWidget.setCurrentIndex(0)
-        self.installationSituation.setDisabled(True)
-        self.equipmentStatistics.setDisabled(False)
-        self.directoryMaintenance.setDisabled(False)
+        self.installationSituation.setDisabled(False)
+        self.equipmentStatistics.setDisabled(True)
+        self.directoryMaintenance.setDisabled(True)
         self.connectSignal()
 
 
