@@ -3,7 +3,9 @@ import sys
 from PyQt5 import QtCore, QtWidgets, QtCore
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QWidget, QApplication, QTreeWidgetItem, QTreeWidgetItemIterator, QMessageBox, \
-    QTableWidgetItem, QStackedWidget, QHBoxLayout
+    QTableWidgetItem, QStackedWidget, QHBoxLayout, QListWidgetItem
+
+from database.alocatMangeSql import selectYearListAboutDisturbPlan
 from widgets.strengthDisturb.equipmentBalance.equipmentBalanceMainUI import EquipmentBalanceMainUI
 from database.SD_EquipmentBanlanceSql import *
 
@@ -26,7 +28,7 @@ class Equip_Balance_Main(QWidget, EquipmentBalanceMainUI):
         展示某年的装备平衡表
     '''
     def _initYear(self):
-        self.years = findYear()
+        self.years = selectYearListAboutDisturbPlan()
         for i in range(len(self.years)):
             newItem = QTableWidgetItem('%s年度平衡表' % self.years[i])
             newItem.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)

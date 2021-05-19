@@ -79,6 +79,7 @@ class alocatMange(QMainWindow, Widget_Alocat_Mange):
         self.tb_disturbSchedule.setDisabled(1)
         self.tb_disturbManage.setDisabled(0)
         self.tb_alocatSet.setDisabled(False)
+        self.allotSchedule.initAll()
 
     '''
         功能：

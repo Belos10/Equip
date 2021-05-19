@@ -15,14 +15,21 @@ from sysManage.alocatMange.transferModel import transferModel
 class AllotSchedule(QWidget,AllotSchedule):
     def __init__(self,parent=None):
         super(AllotSchedule, self).__init__(parent)
+        self.setupUi(self)
+        self.initAll()
         self.first_treeWidget_dict = {}
         self.second_treeWidget_dict = {}
         self.currentDisturbPlan = {}
         self.currentUnitDisturbPlanNum = {}
         self.unitDisturbPlanList = {}
-        self.setupUi(self)
+        self.armySchedule = ArmySchedule(self)
+        self.scheduleFinish = ScheduleFisish(self)
+        self.fileName = ""
+        self.rocketSchedule = transferModel(self)
         self.signalConnect()
-        self.signalDisconnectSlot()
+
+
+    def initAll(self):
         self.tw_first.header().setVisible(False)
         self.tw_second.header().setVisible(False)
         self.le_first.setDisabled(1)
@@ -30,10 +37,8 @@ class AllotSchedule(QWidget,AllotSchedule):
         self.tw_first.setDisabled(1)
         self.tw_second.setDisabled(1)
         self._initYearWidget_()
-        self.armySchedule = ArmySchedule(self)
-        self.scheduleFinish = ScheduleFisish(self)
-        self.fileName=""
-        self.rocketSchedule = transferModel(self)
+
+
 
     def signalConnect(self):
         # 点击选择年份后刷新页面 初始化
