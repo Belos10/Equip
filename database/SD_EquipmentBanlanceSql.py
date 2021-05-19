@@ -147,6 +147,11 @@ def findYear():
     sql = "select year from equipment_balance group by year "
     data = selectData(sql)
     year = []
+    print("data",data)
+    if data[0][0]:
+        pass
+    else:
+        return year
     for key in range(len(data)):
         if(len(data[key][0]) <= 1):
             continue
@@ -256,6 +261,7 @@ def updateOneEquipmentBalanceData(year,equipmentId,unitId):
         item['originalValue'] = originalValue
     sql = "select Equip_Id,Unit_Id,DisturbNum from disturbplan where Year=%s and Equip_Id=%s and Unit_Id=%s"%(str(year), equipmentId, unitId)
     disturbEquipment =selectOne(sql)
+    print("ceshi11111111111111111")
     if disturbEquipment is not None:
         if (disturbEquipment.get('DisturbNum', 0) == 0 or disturbEquipment['DisturbNum'] is None or len(
                 disturbEquipment['DisturbNum']) <= 1):
@@ -271,7 +277,7 @@ def updateOneEquipmentBalanceData(year,equipmentId,unitId):
         insertOneEquipmentBalanceData(item)
     else:
         alterOneEquipmentBalanceData(item)
-
+    print("ceshi2222222222222222222222222")
 
 def alterOneEquipmentBalanceData(item):
     sql = "update equipment_balance set original_authorized_value=%d, authorized_value=%d,authorized_value_change=%d,original_value=%d where equip_balance_id=%s"\

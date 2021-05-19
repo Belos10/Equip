@@ -18,6 +18,8 @@ class DisturbPlan(QWidget, yearList_Form):
         self.setupUi(self)
         self.initAll()
         # initDisturbPlanDatabase()
+        self.signalConnect()
+
 
 
     def initAll(self):
@@ -26,8 +28,6 @@ class DisturbPlan(QWidget, yearList_Form):
         self.currentDisturbPlan = {}
         self.currentUnitDisturbPlanNum = {}
         self.unitDisturbPlanList = {}
-        self.signalConnect()
-        self.signalDisconnectSlot()
         self.tw_first.header().setVisible(False)
         self.tw_second.header().setVisible(False)
         self.le_first.setDisabled(1)
@@ -79,23 +79,48 @@ class DisturbPlan(QWidget, yearList_Form):
 
     # 信号与槽连接的断开
     def signalDisconnectSlot(self):
-        pass
+        # 点击选择年份后刷新页面 初始化
+        self.lw_yearChoose.itemDoubleClicked.disconnect(self.slotClickedInqury)
+        self.lw_yearChoose.itemDoubleClicked.disconnect(self.setDisturbPlanTitle)
+        self.lw_yearChoose.itemDoubleClicked.disconnect(self.initDisturbPlanProof)
+
+        # 点击第一目录结果
+        self.tw_first.itemClicked.disconnect(self.slotDisturbStrengthResult)
+
+        self.tw_second.itemChanged.disconnect(self.slotCheckedChange)
+
+        # 点击第二目录结果
+        self.tw_second.itemClicked.disconnect(self.slotDisturbStrengthResult)
+        # 新增年份
+        self.tb_add.clicked.disconnect(self.slotAddNewYear)
+        # 删除年份
+        self.tb_del.clicked.disconnect(self.slotDelYear)
+        # 修改分配数与备注
+        self.disturbResult.itemChanged.disconnect(self.slotItemChange)
+        # 修改调拨依据
+        self.te_proof.textChanged.disconnect(self.slotProofChange)
+
+        self.pb_firstSelect.clicked.disconnect(self.slotSelectUnit)
+
+        self.pb_secondSelect.clicked.disconnect(self.slotSelectEquip)
 
 
 
     # 新增年份
     def slotAddNewYear(self):
-        #year = 0
+        year = 0
         year, ok = QInputDialog.getInt(self, "Get year", "year:", 0, 0, 100000, 1)
-        if year:
+        if ok:
             insertIntoDisturbPlanYear(year)
             self._initYearWidget_()
+            return
 
 
     # 删除年份
     def slotDelYear(self):
+        #print("''''''''''''''", self.lw_yearChoose.currentRow())
         currentYear=self.lw_yearChoose.currentItem()
-        #print(currentYear.text())
+        #print("currentYear.text()",currentYear.text())
         deleteDisturbPlanYear(currentYear.text())
         self._initYearWidget_()
 

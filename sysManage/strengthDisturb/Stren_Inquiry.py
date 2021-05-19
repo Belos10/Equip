@@ -185,13 +185,21 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
     def slotAddNewYear(self):
         year = 0
         year, ok = QInputDialog.getInt(self, "Get year", "year:", 0, 0, 100000, 1)
-        if year:
+        if ok:
             reply = QMessageBox.question(self, '新增', '是否将去年的数据同时导入今年？', QMessageBox.Yes, QMessageBox.Cancel)
             if reply == QMessageBox.Cancel:
                 insertIntoStrengthYear(year)
                 self._initSelectYear_()
             else:
-                insertBeforYearIntoStrength(year)
+                allyearInfo = selectAllStrengthYear()
+                haveBefore = False
+                for yearInfo in allyearInfo:
+                    if int(yearInfo[1]) - 1 == year:
+                        haveBefore = True
+                if haveBefore:
+                    insertBeforYearIntoStrength(year)
+                else:
+                    insertIntoStrengthYear(year)
                 self._initSelectYear_()
 
 

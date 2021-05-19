@@ -268,11 +268,12 @@ def deleteDisturbPlanYear(year):
     conn, cur = connectMySql()
     sql = "delete from disturbplanyear where year= '" + year + "'"
     cur.execute(sql)
-    sql = "delete from disturbplannote where year= '" + year + "'"
+    sql = "delete from disturbplannote where Year= '" + year + "'"
     cur.execute(sql)
-    sql = "delete from disturbplan where year= '" + year + "'"
+    sql = "delete from disturbplan where Year= '" + year + "'"
     cur.execute(sql)
     sql = "delete from allotschedule where year= '" + year + "'"
+    cur.execute(sql)
     conn.commit()
     disconnectMySql(conn, cur)
 
@@ -407,6 +408,7 @@ def updateScheduleFinish(Equip_Id,Year,fileName):
     conn.commit()
     disconnectMySql(conn, cur)
 
+# 陆军调拨号与装备质量
 def selectQuaAndID(Equip_ID, year):
     conn, cur = connectMySql()
     sql = "select Equip_Quity,Trans_ID from armytransfer where Equip_ID = '" + Equip_ID + "'and year = '" + year + "'"

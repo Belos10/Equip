@@ -138,6 +138,7 @@ class retirement(QWidget, Widget_Retirement):
             return
         else:
             self.pb_save.setDisabled(False)
+            print("装备：", self.currentCheckedEquipList)
             self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList,
                                                         self.currentYear)
     '''
