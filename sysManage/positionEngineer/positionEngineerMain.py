@@ -3,11 +3,7 @@ import sys
 from PyQt5.QtWidgets import QMainWindow,QApplication,QWidget
 
 from sysManage.positionEngineer.installationSituation import InstallationSituation
-from sysManage.strengthDisturb.Stren_Inquiry import Stren_Inquiry
-from sysManage.strengthDisturb.strengthDisturbSet import strengthDisturbSet
-from sysManage.strengthDisturb.maintenMange import maintenManage
-from sysManage.strengthDisturb.equipmentBalanceControl import Equip_Balance_Control
-from sysManage.strengthDisturb.retirement import retirement
+
 #new
 from widgets.positionEngineer.positionEngineerWidget import Position_Engineer_Widget
 
