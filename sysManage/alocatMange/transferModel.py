@@ -1,7 +1,9 @@
+from PyQt5.QAxContainer import QAxObject
+
 from widgets.alocatMange.transferModel import Widget_Transfer_Model
 from sysManage.alocatMange.rocketTransfer import rocketTransfer
 import sys
-from PyQt5.QtWidgets import QDialog,QApplication,QWidget, QMessageBox
+from PyQt5.QtWidgets import QDialog,QApplication,QWidget, QMessageBox,QFileDialog
 from sysManage.alocatMange.armyTransfer import armyTransfer
 from sysManage.alocatMange.totalModel import totalModel
 from sysManage.alocatMange.singleModel import singleModel
@@ -10,6 +12,7 @@ from PyQt5 import QtCore
 '''
    调拨单管理界面
 '''
+
 class transferModel(QDialog, Widget_Transfer_Model):
     signal=QtCore.pyqtSignal(str)
     def __init__(self, parent=None):
@@ -26,6 +29,11 @@ class transferModel(QDialog, Widget_Transfer_Model):
         self.pb_confirm.clicked.connect(self.slotClickedConfim)
 
         self.pb_saveTotal.clicked.connect(self.slotClickedSaveTotal)
+
+        self.pb_output.clicked.connect(self.slotClickedOutput)
+
+    def slotClickedOutput(self):
+        pass
 
     def slotClickedSaveTotal(self):
         print("curent, ", self.currentSingelUnitPage)

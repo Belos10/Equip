@@ -29,6 +29,12 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
 
         #存储当前结果，结构为：{i（行数）：一行数据}
         self.currentResult = {}
+        startEquipIDInfo = findUperEquipIDByName("通用装备")
+        self.equipInfoList = []
+        for startEquipInfo in startEquipIDInfo:
+            self.equipInfoList.append(startEquipInfo)
+            self._initEquipInfoList_(startEquipInfo)
+            break
 
     '''
         信号连接
@@ -105,16 +111,21 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
             haveID = False
             ID = self.tw_result.item(i + addRow, 0).text()
             if ID == "":
-                reply = QMessageBox.question(self, '新增', '第' + str(i + addRow) + '添加失败，序号不能为空', QMessageBox.Yes)
+                reply = QMessageBox.question(self, '新增', '第' + str(i + addRow - 1) + '添加失败，序号不能为空', QMessageBox.Yes)
                 continue
             for id in IDList:
                 if ID == id:
                     haveID = True
 
             if haveID:
-                reply = QMessageBox.question(self, '新增', '第' + str(i + addRow) + '添加失败，当前年份当前序号已存在', QMessageBox.Yes)
+                reply = QMessageBox.question(self, '新增', '第' + str(i + addRow- 1) + '添加失败，当前年份当前序号已存在', QMessageBox.Yes)
                 continue
-
+            Equip_Num = self.tw_result.item(i + addRow, 17).text()
+            if Equip_Num.isdigit():
+                pass
+            else:
+                reply = QMessageBox.question(self, '新增', '第' + str(i + addRow-1) + '添加失败，数量必须为整数', QMessageBox.Yes)
+                continue
             Trans_ID = self.tw_result.item(i + addRow, 1).text()
             Trans_Date = self.tw_result.cellWidget(i + addRow, 2).text()
             Trans_Date = self.currentYear + "/" + Trans_Date
@@ -132,11 +143,11 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
             Receive_Connect = self.tw_result.item(i + addRow, 12).text()
             Receive_Tel = self.tw_result.item(i + addRow, 13).text()
             index = self.tw_result.cellWidget(i + addRow, 14).currentIndex()
-            Equip_ID = self.equipTuple[index][0]
+            Equip_ID = self.currentEquipInfo[index][0]
             Equip_Name = self.tw_result.cellWidget(i + addRow, 14).currentText()
             Equip_Unit = self.tw_result.item(i + addRow, 15).text()
             Equip_Quity = self.tw_result.item(i + addRow, 16).text()
-            Equip_Num = self.tw_result.item(i + addRow, 17).text()
+
             Equip_Other = self.tw_result.item(i + addRow, 18).text()
             insertIntoArmyTransfer(ID, Trans_ID, Trans_Date, Trans_Reason, Trans, Trans_Way,
                                    Port_Way, Effic_Date, Send_UintID, Send_UnitName, Send_Connect,
@@ -181,7 +192,7 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
         self.yearList = []
         self.currentYear = ''
         self.lw_yearChoose.clear()
-        self.yearList = ['全部']
+        self.yearList = []
         allYear = selectYearListAboutArmy()
         for year in allYear:
             self.yearList.append(year)
@@ -406,6 +417,12 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
             if rowData[0] != '':
                 self._initEquipInfoList_(rowData)
 
+    def slotCurrentIndexChanged(self):
+        row = self.tw_result.currentRow()
+        index = self.tw_result.cellWidget(row, 14).currentIndex()
+        if index >= 0:
+            unit = self.currentEquipInfo[index][5]
+            self.tw_result.item(row, 15).setText(unit)
     '''
         增加新行等待用户输入
     '''
@@ -425,11 +442,21 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
 
         for i in range(19):
             if i == 14:
+                self.currentEquipInfo = []
                 equipCombo = QComboBox()
                 for equipInfo in self.equipInfoList:
                     if EquipNotHaveChild(equipInfo[0]):
                         equipCombo.addItem(equipInfo[1])
+                        self.currentEquipInfo.append(equipInfo)
                 self.tw_result.setCellWidget(currentRow, i, equipCombo)
+                equipCombo.currentIndexChanged.connect(self.slotCurrentIndexChanged)
+                if self.currentEquipInfo:
+                    item = QTableWidgetItem()
+                    item.setText(self.currentEquipInfo[0][5])
+                    self.tw_result.setItem(currentRow, i+1, item)
+
+            elif i == 15:
+                pass
             elif i == 2:
                 dateEdit = QDateEdit()
                 dateEdit.setDisplayFormat("MM/dd")

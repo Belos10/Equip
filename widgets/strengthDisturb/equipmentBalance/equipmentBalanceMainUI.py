@@ -55,18 +55,14 @@ class EquipmentBalanceMainUI(object):
         self.verticalLayout_2.addWidget(self.tb_year)
         self.gridLayout_2 = QtWidgets.QGridLayout()
         self.gridLayout_2.setObjectName("gridLayout_2")
-        self.pb_add = QtWidgets.QPushButton(Form)
-        self.pb_add.setObjectName("pb_add")
-        self.gridLayout_2.addWidget(self.pb_add, 0, 0, 1, 1)
+
         self.pb_input = QtWidgets.QPushButton(Form)
         self.pb_input.setObjectName("pb_input")
         self.gridLayout_2.addWidget(self.pb_input, 1, 0, 1, 1)
         self.pb_output = QtWidgets.QPushButton(Form)
         self.pb_output.setObjectName("pb_output")
         self.gridLayout_2.addWidget(self.pb_output, 1, 1, 1, 1)
-        self.pb_delete = QtWidgets.QPushButton(Form)
-        self.pb_delete.setObjectName("pb_delete")
-        self.gridLayout_2.addWidget(self.pb_delete, 0, 1, 1, 1)
+
         self.verticalLayout_2.addLayout(self.gridLayout_2)
         self.horizontalLayout_5.addLayout(self.verticalLayout_2)
         self.gridLayout_3.addLayout(self.horizontalLayout_5, 0, 0, 1, 1)
@@ -81,7 +77,7 @@ class EquipmentBalanceMainUI(object):
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "装备平衡"))
-        self.pb_add.setText(_translate("Form", "增加"))
+
         self.pb_input.setText(_translate("Form", "导入"))
         self.pb_output.setText(_translate("Form", "导出"))
-        self.pb_delete.setText(_translate("Form", "删除"))
+

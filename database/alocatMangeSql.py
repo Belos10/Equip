@@ -319,6 +319,10 @@ def selectDisturbPlanOther(EquipList, YearList):
         cur.execute(sql)
         result = cur.fetchall()
         print("other result",result)
+        if result:
+            pass
+        else:
+            resultList.append([])
         for resultInfo in result:
             resultList.append(resultInfo)
     print("Other", resultList)

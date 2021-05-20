@@ -167,14 +167,23 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                         return
                     else:
                         if self.tw_inquiryResult.item(currentRow, currentColumn).text() != resultInfo[4]:
-                            reply = QMessageBox.question(self, '修改', '是否修改当前实力数？', QMessageBox.Yes,
+                            try:
+                                strength = int(self.tw_inquiryResult.item(currentRow, currentColumn).text())
+                                reply = QMessageBox.question(self, '修改', '是否修改当前实力数？', QMessageBox.Yes,
                                                          QMessageBox.Cancel)
-                            if reply == QMessageBox.Yes:
-                                updateStrengthAboutStrengrh(Unit_ID, Equip_ID, self.year, self.tw_inquiryResult.item(currentRow, currentColumn).text(),resultInfo[4])
-                                self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
-                            else:
+                                if reply == QMessageBox.Yes:
+                                    updateStrengthAboutStrengrh(Unit_ID, Equip_ID, self.year,
+                                                            self.tw_inquiryResult.item(currentRow,
+                                                                                       currentColumn).text(),
+                                                            resultInfo[4])
+                                    self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
+                                else:
+                                    self.tw_inquiryResult.item(currentRow, currentColumn).setText(resultInfo[4])
+                                    return
+                            except ValueError:
+                                reply = QMessageBox.question(self, '修改失败', '只能修改为整数', QMessageBox.Yes)
                                 self.tw_inquiryResult.item(currentRow, currentColumn).setText(resultInfo[4])
-                        return
+                                return
         elif currentColumn == 0:
             for i, resultInfo in self.currentInquiryResult.items():
                 if i == currentRow:

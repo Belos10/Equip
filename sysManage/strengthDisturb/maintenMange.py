@@ -55,10 +55,10 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
         self.lw_year.clicked.connect(self.slotClickedInqury)
 
         # 当前单位目录被点击
-        self.tw_first.itemChanged.connect(self.slotInquryStrengthResult)
+        self.tw_first.itemClicked.connect(self.slotInquryStrengthResult)
 
         # 当前装备目录被点击
-        self.tw_second.itemChanged.connect(self.slotInquryStrengthResult)
+        self.tw_second.itemClicked.connect(self.slotInquryStrengthResult)
 
         # 当点击按装备展开时
         self.rb_equipShow.clicked.connect(self.slotClickedRB)
@@ -67,7 +67,7 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
         self.rb_unitShow.clicked.connect(self.slotClickedRB)
 
         #当前查询结果要修改时
-        self.tw_result.itemChanged.connect(self.slotResultItemChange)
+        self.tw_result.itemChanged.connect(self.slotResultItemChange,Qt.UniqueConnection)
 
         #清除当前选中行的编制数
         self.pb_clearCheck.clicked.connect(self.slotClearCurrentRow)
@@ -109,14 +109,23 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
                     if unitHaveChild or equipHaveChild:
                         reply = QMessageBox.question(self, '录入', '该单位或装备不是末级，无法修改', QMessageBox.Yes)
                         self.tw_result.item(self.currentRow, 3).setText(resultRowInfo[5])
+                        return
                     else:
-                        reply = QMessageBox.question(self, '修改', '是否修改当前装备、单位的编制数?', QMessageBox.Yes, QMessageBox.Cancel)
-                        if reply == QMessageBox.Yes:
-                            updateWeaveNum(resultRowInfo[0], resultRowInfo[1], self.tw_result.item(self.currentRow, 3).text(), resultRowInfo[5], self.year)
-                            self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
-                        else:
+                        try:
+                            weave = self.tw_result.item(self.currentRow, 3).text()
+                            reply = QMessageBox.question(self, '修改', '是否修改当前装备、单位的编制数?', QMessageBox.Yes, QMessageBox.Cancel)
+                            if reply == QMessageBox.Yes:
+                                updateWeaveNum(resultRowInfo[0], resultRowInfo[1], self.tw_result.item(self.currentRow, 3).text(), resultRowInfo[5], self.year)
+                                self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
+                                return
+                            else:
+                                self.tw_result.item(self.currentRow, 3).setText(resultRowInfo[5])
+                                return
+                        except ValueError:
+                            reply = QMessageBox.question(self, '修改', '编制数只能修改为整数?', QMessageBox.Yes)
                             self.tw_result.item(self.currentRow, 3).setText(resultRowInfo[5])
-                    break
+                            return
+
         else:
             pass
 

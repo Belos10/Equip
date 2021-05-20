@@ -6,8 +6,8 @@ from sysManage.dictSelect.dictSelect import dictSelect
 from sysManage.login.login import login
 from database.loginSql import selectUserInfoByAccont
 from sysManage.login.loginSet import loginSet
-from sysManage.dangerGoods.dangerGoods import DangerGoods
-from sysManage.positionEngineer.positionEngineerMain import PositionEngineerMain
+from widgets.dangerGoods.dangerGoods import DangerGoods
+from widgets.positionEngineer.positionEngineerMain import PositionEngineerMain
 #new
 class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
     def __init__(self, parent=None):
@@ -88,11 +88,13 @@ class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
 
         self.strengthDisturb.initUserInfo(self.userInfo)
         self.alocatMange.initUserInfo(self.userInfo)
+        self.PosEngin.slotInstallation()
         self.login.close()
         self.show()
 
     def slotCurrentChange(self):
         if self.tb_ManageWidget.currentIndex() == 1:
             self.strengthDisturb.strenSelect._initAllDict()
+
 
 

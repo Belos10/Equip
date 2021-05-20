@@ -252,6 +252,9 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
                 haveYear = False
                 # 添加新增的数据
                 year = self.add_strenth_info.tableWidget.item(i + orginRowNum, 2).text()
+                if year.isdigit() == False:
+                    reply = QMessageBox.question(self, '增加', '第' + str(i + orginRowNum + 1) + "行年份不是整数，添加失败",QMessageBox.Yes)
+                    continue
                 for y in allYear:
                     if y == year:
                         haveYear = True
@@ -277,6 +280,9 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
             # 添加新增的数据
             for i in range(currentRowNum - orginRowNum):
                 year = self.add_strenth_info.tableWidget.item(i + orginRowNum, 1).text()
+                if year.isdigit() == False:
+                    reply = QMessageBox.question(self, '增加', '第' + str(i + orginRowNum + 1) + "行年份不是整数，添加失败",QMessageBox.Yes)
+                    continue
                 for y in allYear:
                     if y == year:
                         haveYear = True

@@ -2091,6 +2091,25 @@ def selectUnitIfUppermost(Unit_Id):
     else:
         return False
 
+def findUperInfoList(EquipID, UperList):
+    if EquipID == "":
+        return
+    else:
+        conn, cur = connectMySql()
+        sql = "select Equip_Uper from equip where Equip_ID = '" + EquipID + "'"
+        cur.execute(sql)
+        result = cur.fetchall()
+        for resultInfo in result:
+            UperList.append(resultInfo)
+            if resultInfo:
+                findUperInfoList(resultInfo[0], UperList)
+        disconnectMySql(conn, cur)
+
+def selectUperInfoByEquipID(EquipID):
+    UperList = []
+    findUperInfoList(EquipID, UperList)
+    return UperList
+
 if __name__ == '__main__':
     print(len(findUnitNameFromID('10')))
     pass

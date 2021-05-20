@@ -47,7 +47,7 @@ class PositionEngineerMain(QMainWindow, Position_Engineer_Widget):
 
         self.slotDisconnect()
         self.stackedWidget.setCurrentIndex(0)
-        # self.strenSelect._initStrenInquiry() 初始化函数
+        #self.strenSelect._initStrenInquiry() #初始化函数
         self.connectSignal()
 
     def slotEquipmentStatistics(self):

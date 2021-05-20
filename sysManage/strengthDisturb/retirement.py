@@ -48,7 +48,7 @@ class retirement(QWidget, Widget_Retirement):
         self.tw_first.clicked.connect(self.slotInquryStrengthResult)
 
         # 当前装备目录被点击
-        self.tw_second.itemChanged.connect(self.slotInquryStrengthResult)
+        self.tw_second.clicked.connect(self.slotInquryStrengthResult)
         self.tw_second.itemChanged.connect(self.slotCheckedChange)
 
         self.pb_save.clicked.connect(self.slotSaveRetire)
@@ -134,12 +134,10 @@ class retirement(QWidget, Widget_Retirement):
             if equipItem.checkState(0) == Qt.Checked or equipItem.checkState(0) == Qt.PartiallyChecked:
                 self.currentCheckedEquipList.append(equipID)
 
-        if self.currentCheckedUnitList == [] or self.currentCheckedEquipList == []:
-            return
-        else:
-            self.pb_save.setDisabled(False)
-            print("装备：", self.currentCheckedEquipList)
-            self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList,
+
+        self.pb_save.setDisabled(False)
+        print("装备：", self.currentCheckedEquipList)
+        self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList,
                                                         self.currentYear)
     '''
             功能：
