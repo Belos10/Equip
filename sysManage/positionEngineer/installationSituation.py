@@ -281,20 +281,17 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
                     rowData.append(1)
                 else:
                     rowData.append(0)
-            elif i == 10:
+            elif i == 10 :
                 item = self.tw_result.cellWidget(row, i)
                 rowData.append(item.currentText())
+            elif i == 1:
+                item = self.tw_result.cellWidget(row, i)
+                if item != None:
+                    rowData.append(getUnitIdbyName(item.currentText()))
             else:
                 item = self.tw_result.item(row, i)
                 if item != None and len(item.text()) > 0:
-                    if i == 1:
-                        if getUnitIdbyName(item.text()) != None:
-                            rowData.append(getUnitIdbyName(item.text()))
-                        else:
-                            QMessageBox.warning(self, "注意", "该基地名称尚未加入基地目录！", QMessageBox.Yes, QMessageBox.Yes)
-                            break
-                    else:
-                        rowData.append(item.text())
+                    rowData.append(item.text())
                 else:
                     break
         if len(rowData) < self.tw_result.columnCount() - 1:
@@ -322,6 +319,13 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
                     rowData.append(item.currentText())
                 else:
                     return
+            elif i == 1:
+                item = self.tw_result.cellWidget(row, i)
+                if item != None:
+                    rowData.append(getUnitIdbyName(item.currentText()))
+                else:
+                    return
+
             else:
                 item = self.tw_result.item(row, i)
                 if item != None and len(item.text()) > 0:
@@ -363,6 +367,10 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
         self.tw_result.insertRow(rowCount)
 
         comboBox = QComboBox()
+        comboBox.addItems(getUnits())
+        self.tw_result.setCellWidget(rowCount, 1, comboBox)
+
+        comboBox = QComboBox()
         comboBox.addItems(['是', '否'])
         self.tw_result.setCellWidget(rowCount, 5, comboBox)
 
@@ -372,16 +380,22 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
         pass
 
     def slotDelete(self):
-        selectedRow = self.tw_result.selectedItems()[0].row()
-        selectedColumn = self.tw_result.selectedItems()[0].column()
 
-        if selectedRow <= 3:
+        selectedRow = self.tw_result.selectedItems()
+        if selectedRow != None:
+            if len(selectedRow) > 0:
+                rowCount = selectedRow[0].row()
+            else:
+                rowCount = 0
+
+
+        if rowCount <= 2:
             QMessageBox.warning(self, "注意", "请选中有效单元格！", QMessageBox.Yes, QMessageBox.Yes)
         else:
-            item = self.tw_result.item(selectedRow,0)
+            item = self.tw_result.item(rowCount,0)
             if item != None and int(item.text()) > 0:
                 deleteDataByInstallationId(item.text())
-                self.tw_result.removeRow(selectedRow)
+                self.tw_result.removeRow(rowCount)
         pass
 
 
