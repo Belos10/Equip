@@ -137,53 +137,6 @@ class EquipmentStatistics(QWidget, PosEngneerStatisticsUI):
                 self.tw_second.setCurrentItem(item)
                 break
 
-    # '''
-    #        功能：
-    #            设置级目录联选中状态
-    #    '''
-    #
-    # def slotCheckedChange(self, item, num):
-    #     # 如果是顶部节点，只考虑Child：
-    #     if item.childCount() and not item.parent():  # 判断是顶部节点，也就是根节点
-    #         if item.checkState(num) == 0:  # 规定点击根节点只有两态切换，没有中间态
-    #             for i in range(item.childCount()):  # 遍历子节点进行状态切换
-    #                 item.child(i).setCheckState(num, 0)
-    #         elif item.checkState(num) == 2:
-    #             for i in range(item.childCount()):
-    #                 item.child(i).setCheckState(num, 2)
-    #     # 如果是底部节点，只考虑Parent
-    #     if item.parent() and not item.childCount():
-    #         parent_item = item.parent()  # 获得父节点
-    #         brother_item_num = parent_item.childCount()  # 获得兄弟节点的数目，包括自身在内
-    #         checked_num = 0  # 设置计数器
-    #         for i in range(brother_item_num):  # 根据三态不同状态值进行数值累计
-    #             checked_num += parent_item.child(i).checkState(num)
-    #         if checked_num == 0:  # 最终结果进行比较，决定父节点的三态
-    #             parent_item.setCheckState(num, 0)
-    #         elif checked_num / 2 == brother_item_num:
-    #             parent_item.setCheckState(num, 2)
-    #         else:
-    #             parent_item.setCheckState(num, 1)
-    #
-    #         # 中间层需要全面考虑
-    #     if item.parent() and item.childCount():
-    #         if item.checkState(num) == 0:  # 规定点击根节点只有两态切换，没有中间态
-    #             for i in range(item.childCount()):  # 遍历子节点进行状态切换
-    #                 item.child(i).setCheckState(num, 0)
-    #         elif item.checkState(num) == 2:
-    #             for i in range(item.childCount()):
-    #                 item.child(i).setCheckState(num, 2)
-    #         parent_item = item.parent()  # 获得父节点
-    #         brother_item_num = parent_item.childCount()  # 获得兄弟节点的数目，包括自身在内
-    #         checked_num = 0  # 设置计数器
-    #         for i in range(brother_item_num):  # 根据三态不同状态值进行数值累计
-    #             checked_num += parent_item.child(i).checkState(num)
-    #         if checked_num == 0:  # 最终结果进行比较，决定父节点的三态
-    #             parent_item.setCheckState(num, 0)
-    #         elif checked_num / 2 == brother_item_num:
-    #             parent_item.setCheckState(num, 2)
-    #         else:
-    #             parent_item.setCheckState(num, 1)
 
     '''
         功能：
@@ -192,13 +145,13 @@ class EquipmentStatistics(QWidget, PosEngneerStatisticsUI):
     def slotEquipmentStatisticsResult(self):
         self.currentCheckedUnitList = []
         self.currentCheckedEquipList = []
-        for unitID, unitItem in self.first_treeWidget_dict.items():
-            if unitItem.checkState(0) == Qt.Checked:
-                self.currentCheckedUnitList.append(unitID)
-
         for equipID, equipItem in self.second_treeWidget_dict.items():
             if equipItem.checkState(0) == Qt.Checked:
                 self.currentCheckedEquipList.append(equipID)
+
+        for unitID, unitItem in self.first_treeWidget_dict.items():
+            if unitItem == self.tw_first.currentItem():
+                self.currentCheckedUnitList.append(unitID)
 
         self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList,self.currentCheckedEquipList)
 
@@ -207,21 +160,7 @@ class EquipmentStatistics(QWidget, PosEngneerStatisticsUI):
             根据单位目录和装备目录初始化结果表格
     '''
     def _initTableWidgetByUnitListAndEquipList(self,unitList,equipList):
-        # if unitList != None and equipList != None:
-        #     result = getEquipmentStatisticsResultByUnitAndEquip(unitList,equipList)
-        #     if result != None:
-        #         self.rowCount = 4 + len(result)
-        #         self.columnCount = 3 + 2 * len(result)
-        #         self.tw_result.setRowCount(self.rowCount)
-        #         self.tw_result.setColumnCount(self.columnCount)
-        #         self.initHeader()
-        #         for item in result:
-        #             pass
-        #     else:
-        #         self.rowCount = 4
-        #         self.columnCount = 4
-        #         self.initHeader()
-        #         pass
+
         pass
 
 
