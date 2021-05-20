@@ -1685,6 +1685,13 @@ def selectGroupIDByPublicEquip(Group_ID):
     else:
         return "0"
 
+def selectPubilcEquipInfoByGroupID(Group_ID):
+    conn, cur = connectMySql()
+    sql = "select * from pubilcequip where Group_ID = '" + Group_ID + "'"
+    cur.execute(sql)
+    result = cur.fetchall()
+    for resultInfo in result:
+        return resultInfo
 
 # 查找某个公用装备编号所属的旅团编号
 def selectEquipIDByPublicEquip(Equip_ID):

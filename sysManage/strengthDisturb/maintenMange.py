@@ -202,13 +202,54 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
         #        self.tb_rechoose.setDisabled(False)
 
         self.currentYear = self.lw_year.currentItem().text()
-        self.startName = selectUnitNameByUnitID(self.userInfo[0][4])
-        item = QTreeWidgetItem(self.tw_first)
-        item.setText(0, self.startName)
-        item.setCheckState(0, Qt.Unchecked)
-        self.first_treeWidget_dict[self.userInfo[0][4]] = item
-        self._initUnitTreeWidget(self.userInfo[0][4], item)
-        self._initEquipTreeWidget("", self.tw_second)
+        self.startInfo = selectUnitInfoByUnitID(self.userInfo[0][4])
+        stack = []
+        root = []
+        if self.startInfo:
+            stack.append(self.startInfo)
+            root.append(self.tw_first)
+            self.initUnitTreeWidget(stack, root)
+
+        equipInfo = None
+        equipInfo = selectEquipInfoByEquipUper("")
+        stack = []
+        root = []
+        if equipInfo:
+            stack.append(equipInfo[0])
+            root.append(self.tw_second)
+            self.initEquipTreeWidget(stack, root)
+            # 从数据库中单位表中获取数据初始化单位目录，tableWidget显示所有的单位表
+            # self._initUnitTreeWidget("", self.tw_first)
+
+    def initEquipTreeWidget(self, stack, root):
+        while stack:
+            EquipInfo = stack.pop(0)
+            item = QTreeWidgetItem(root.pop(0))
+            item.setText(0, EquipInfo[1])
+            item.setCheckState(0, Qt.Unchecked)
+            self.second_treeWidget_dict[EquipInfo[0]] = item
+            result = selectEquipInfoByEquipUper(EquipInfo[0])
+            for resultInfo in result:
+                stack.append(resultInfo)
+                root.append(item)
+
+    '''
+                功能：
+                    单位目录的初始化，显示整个单位表
+                    参数表：root为上级单位名字，mother为上级节点对象
+        '''
+
+    def initUnitTreeWidget(self, stack, root):
+        while stack:
+            UnitInfo = stack.pop(0)
+            item = QTreeWidgetItem(root.pop(0))
+            item.setText(0, UnitInfo[1])
+            item.setCheckState(0, Qt.Unchecked)
+            self.first_treeWidget_dict[UnitInfo[0]] = item
+            result = selectUnitInfoByDeptUper(UnitInfo[0])
+            for resultInfo in result:
+                stack.append(resultInfo)
+                root.append(item)
 
     #查看当前被选中的单位和装备并初试化
     def slotInquryStrengthResult(self):

@@ -20,29 +20,56 @@ class maintenManageSet(QWidget, Widget_Mainten_Manage_Set):
 
         self.signalConnect()
         self.result = []
+        self.startInfo = None
+        self.currentUnitTableResult = []
+        self.orignUnitResult = {}
 
     def _initAll_(self):
-        self.getUserInfo()
-        self.unitDictInfo = []
-
-        # 初始化公用装备表
-        self._initPublicEquipTableWidget_()
-
         self.orignUnitResult = {}
+        self.getUserInfo()
+        self.currentUnitTableResult = []
 
         self.currentRow = None
         self.first_treeWidget_dict = {}
         self.tw_first.clear()
         self.tw_first.header().setVisible(False)
+        self.currentPublicInfo = []
 
         # 初始化单元表
-        self.startName = selectUnitNameByUnitID(self.userInfo[0][4])
-        item = QTreeWidgetItem(self.tw_first)
-        item.setText(0, self.startName)
-        self.first_treeWidget_dict[self.userInfo[0][4]] = item
-        self._initUnitTreeWidget(self.userInfo[0][4], item)
-        self._initUnitTableWidget()
+        self.startInfo = selectUnitInfoByUnitID(self.userInfo[0][4])
+        stack = []
+        root = []
+        if self.startInfo:
+            stack.append(self.startInfo)
+            root.append(self.tw_first)
+            self.initUnitTreeWidget(stack, root)
+            # 从数据库中单位表中获取数据初始化单位目录，tableWidget显示所有的单位表
+            self._initUnitTableWidget()
+            self._initPublicEquipTableWidget_()
 
+    '''
+               功能：
+                   单位目录的初始化，显示整个单位表
+                   参数表：root为上级单位名字，mother为上级节点对象
+       '''
+
+    def initUnitTreeWidget(self, stack, root):
+        while stack:
+            UnitInfo = stack.pop(0)
+            self.currentUnitTableResult.append(UnitInfo)
+            item = QTreeWidgetItem(root.pop(0))
+            item.setText(0, UnitInfo[1])
+            self.first_treeWidget_dict[UnitInfo[0]] = item
+            result = selectUnitInfoByDeptUper(UnitInfo[0])
+            for resultInfo in result:
+                stack.append(resultInfo)
+                root.append(item)
+            if UnitInfo[4] == "是":
+                pulicEquipInfo = selectPubilcEquipInfoByGroupID(UnitInfo[0])
+                publicItem = QTreeWidgetItem(item)
+                publicItem.setText(0, UnitInfo[1])
+                self.first_treeWidget_dict[pulicEquipInfo[0]] = publicItem
+                self.currentPublicInfo.append(pulicEquipInfo)
 
     def signalConnect(self):
         #当前单位结果界面某行被选中
@@ -93,20 +120,14 @@ class maintenManageSet(QWidget, Widget_Mainten_Manage_Set):
         初始化界面
     '''
     def _initUnitTableWidget(self):
-        self.orignUnitResult = {}
         self.tw_unit.clear()
-        self.unitDictInfo = []
-        #self.startInfo = selectUnitInfoByUnitID(self.userInfo[0][4])
-        #self.unitDictInfo.append(self.startInfo)
-        #self.getTableUnitInfo(self.userInfo[0][4])
-        self.result = selectAllDataAboutUnit()
         header = ['单位编号', '单位名字', '是否为旅团']
         self.tw_unit.setColumnCount(len(header))
         self.tw_unit.setHorizontalHeaderLabels(header)
 
-        self.tw_unit.setRowCount(len(self.result))
+        self.tw_unit.setRowCount(len(self.currentUnitTableResult))
 
-        for i, unitInfo in enumerate(self.result):
+        for i, unitInfo in enumerate(self.currentUnitTableResult):
             item = QTableWidgetItem()
             item.setText(unitInfo[0])
             self.tw_unit.setItem(i, 0, item)
@@ -127,10 +148,9 @@ class maintenManageSet(QWidget, Widget_Mainten_Manage_Set):
         self.tw_publicEquip.setColumnCount(len(header))
         self.tw_publicEquip.setHorizontalHeaderLabels(header)
 
-        print("unitInfo:  ", self.result)
-        result = selectAllFromPulicEquip()
-        self.tw_publicEquip.setRowCount(len(result))
-        for i, publicEquipInfo in enumerate(result):
+        self.tw_publicEquip.setRowCount(len(self.currentPublicInfo))
+        #print("================== currentPublicInfo ======================", self.currentPublicInfo)
+        for i, publicEquipInfo in enumerate(self.currentPublicInfo):
             item = QTableWidgetItem()
             item.setText(publicEquipInfo[0])
             self.tw_publicEquip.setItem(i, 0, item)
@@ -141,31 +161,13 @@ class maintenManageSet(QWidget, Widget_Mainten_Manage_Set):
             item.setText(publicEquipInfo[2])
             self.tw_publicEquip.setItem(i, 2, item)
 
-    '''
-            初始化单位目录
-    '''
-    def _initUnitTreeWidget(self, root, mother):
-        if root == '':
-            result = selectUnitInfoByDeptUper('')
-        else:
-            result = selectUnitInfoByDeptUper(root)
-
-        # rowData: (单位编号，单位名称，上级单位编号)
-        for rowData in result:
-            item = QTreeWidgetItem(mother)
-            item.setText(0, rowData[1])
-            self.first_treeWidget_dict[rowData[0]] = item
-
-            if rowData[4] == '是':
-                publicItem = QTreeWidgetItem(item)
-                publicItem.setText(0, "公用装备")
-            if rowData[0] != '':
-                self._initUnitTreeWidget(rowData[0], item)
 
     '''
         更新当前是否为旅团
     '''
     def slotUpdateIsGroup(self):
+        if self.currentRow < 0:
+            return
         if self.tw_unit.item(self.currentRow, 2).text() != self.cb_isGroup.currentText():
             updateUnitIsGroupFromUnit(self.lb_unitID.text(), self.cb_isGroup.currentText())
             self._initPublicEquipTableWidget_()

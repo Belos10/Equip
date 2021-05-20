@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(['main.py'],
-             pathex=['database', 'icons', 'utills', 'venv', 'widgets', 'G:\\pythonProject\\Equip-master'],
+             pathex=['database', 'icons', 'sysManage', 'widgets', 'utills', 'venv', 'G:\\pythonProject\\EquipManage'],
              binaries=[],
              datas=[],
              hiddenimports=[],
