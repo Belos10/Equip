@@ -17,6 +17,7 @@ class EquipmentStatistics(QWidget, PosEngneerStatisticsUI):
         self.currentCheckedUnitList = []
         self.currentCheckedEquipList = []
         self.countOfPosition= 0
+        self.rowAndCountIndex = {}
         self.signalConnectSlot()
         self._initEquipmentStatistics()
 
@@ -58,8 +59,8 @@ class EquipmentStatistics(QWidget, PosEngneerStatisticsUI):
         self.pb_firstSelect.setDisabled(False)
         self.le_first.setVisible(False)
         self.le_second.setVisible(False)
-        self.tw_second.setDisabled(False)
-        self.tw_second.setVisible(True)
+        # self.tw_second.setDisabled(False)
+        # self.tw_second.setVisible(True)
         self.first_treeWidget_dict = {}
         self.second_treeWidget_dict = {}
         # 当前选中的单位列表和装备列表
@@ -160,6 +161,132 @@ class EquipmentStatistics(QWidget, PosEngneerStatisticsUI):
             根据单位目录和装备目录初始化结果表格
     '''
     def _initTableWidgetByUnitListAndEquipList(self,unitList,equipList):
+        info = []
+        self.tw_result.clear()
+
+
+
+        if len(unitList) > 0 and len(equipList) > 0:
+            baseId = findBase(unitList[0]) #基地
+            if baseId != None:
+                brigades = findChildUnit(baseId) # 旅团
+                if brigades != None:
+
+                    lastEquipments = []
+
+                    countOfPositions = 0
+                    countOFEquipment = 0
+                    for brigade in brigades:
+                        temp = {}
+                        positions = findChildUnit(brigade)
+                        if positions != None :
+                            countOfPositions = countOfPositions + len(positions)
+                            temp[brigade] = positions
+                            info.append(temp.copy())
+
+                    for equip in equipList:
+                        if isLastLevelEquipment(equip) == True:
+                            lastEquipments.append(equip)
+                    countOFEquipment = len(lastEquipments)
+
+                    #画表头
+                    self.tw_result.verticalHeader().setVisible(False)
+                    self.tw_result.horizontalHeader().setVisible(False)
+                    # self.tw_result.setEditTriggers(QTableWidget.NoEditTriggers)
+                    self.tw_result.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+                    self.tw_result.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+                    self.tw_result.resizeColumnsToContents()
+                    self.tw_result.resizeRowsToContents()
+                    rowCount = countOFEquipment + 4
+                    columnCount = 2 * countOfPositions + 4
+                    self.tw_result.setRowCount(rowCount)
+                    self.tw_result.setColumnCount(columnCount)
+
+                    item = QTableWidgetItem('%s阵地工程X生化防护装备统计表'%getUnitNameById(baseId))
+                    item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                    self.tw_result.setItem(0, 0, item)
+                    self.tw_result.setSpan(0, 0, 1, columnCount)
+
+                    item = QTableWidgetItem('序号')
+                    item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                    self.tw_result.setItem(1, 0, item)
+                    self.tw_result.setSpan(1, 0, 3, 1)
+
+                    item = QTableWidgetItem('名称')
+                    item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                    self.tw_result.setItem(1, 1, item)
+                    self.tw_result.setSpan(1, 1, 3, 1)
+
+                    item = QTableWidgetItem('单位')
+                    item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                    self.tw_result.setItem(1, 2, item)
+                    self.tw_result.setSpan(1, 2, 3, 1)
+
+                    item = QTableWidgetItem('合计')
+                    item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                    self.tw_result.setItem(1, 3, item)
+                    self.tw_result.setSpan(1, 3, 3, 1)
+
+                    fisrtPositionIndex = 4
+                    for i in range(len(info)):
+                        brigades = list(info[i].keys())  #旅团列表
+                        for brigade in brigades:
+                            brigadeSubPositions = info[i].get(brigade)
+                            item = QTableWidgetItem(getUnitNameById(brigade))
+                            item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                            self.tw_result.setItem(1, fisrtPositionIndex, item)
+                            self.tw_result.setSpan(1, fisrtPositionIndex, 1, 2 * len(brigadeSubPositions) )
+                            for j in range(len(lastEquipments)):
+                                rowIndex = 4 + j
+
+                                item = QTableWidgetItem(str(j))
+                                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                                self.tw_result.setItem(rowIndex, 0, item)
+
+                                item = QTableWidgetItem(getEquipmentNameById(lastEquipments[j]))
+                                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                                self.tw_result.setItem(rowIndex, 1, item)
+
+
+                                unit = getEquipmentUnitName(lastEquipments[j])
+                                if unit != None:
+                                    item = QTableWidgetItem(getEquipmentNameById(lastEquipments[j]))
+                                    item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                                    self.tw_result.setItem(rowIndex , 2, item)
+
+
+
+                                for subPosition in brigadeSubPositions:
+                                    item = QTableWidgetItem(getUnitNameById(subPosition))
+                                    item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                                    self.tw_result.setItem(2, fisrtPositionIndex, item)
+                                    self.tw_result.setSpan(2, fisrtPositionIndex, 1, 2)
+
+                                    item = QTableWidgetItem('数量')
+                                    item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                                    self.tw_result.setItem(3, fisrtPositionIndex, item)
+
+                                    item = QTableWidgetItem('运行状态')
+                                    item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                                    self.tw_result.setItem(3, fisrtPositionIndex + 1, item)
+                                    result = getEquipmentStatisticsResultByUnitAndEquip(subPosition,lastEquipments[j])
+                                    if result != None:
+                                        item = QTableWidgetItem(str(result[0]))
+                                        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                                        self.tw_result.setItem(rowIndex, fisrtPositionIndex, item)
+                                        item = QTableWidgetItem(result[1])
+                                        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                                        self.tw_result.setItem(rowIndex, fisrtPositionIndex + 1, item)
+                                    fisrtPositionIndex = fisrtPositionIndex + 2
+                                fisrtPositionIndex = 4
+
+
+                else:
+                    pass
+
+
+
+
 
         pass
 
@@ -205,32 +332,6 @@ class EquipmentStatistics(QWidget, PosEngneerStatisticsUI):
             if rowData[0] != '':
                 self._initEquipTreeWidget(rowData[0], item)
 
-    '''
-        功能：
-            画表头
-    '''
-    def initHeader(self):
-        self.tw_result.verticalHeader().setVisible(False)
-        self.tw_result.horizontalHeader().setVisible(False)
-        # self.tw_result.setEditTriggers(QTableWidget.NoEditTriggers)
-        self.tw_result.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
-        self.tw_result.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.tw_result.resizeColumnsToContents()
-        self.tw_result.resizeRowsToContents()
-
-        if self.tw_result.columnCount() == 4:
-            item = QTableWidgetItem("阵地工程XXX防护装备安装情况")
-            item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-            self.tw_result.setItem(0, 0, item)
-            self.tw_result.setSpan(0, 0, 1, 13)
-            pass
-        else:
-            pass
-        # 绘制表头
-        item = QTableWidgetItem("阵地工程XXX防护装备安装情况")
-        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tw_result.setItem(0, 0, item)
-        self.tw_result.setSpan(0, 0, 1, 13)
 
     def slotAdd(self):
         pass

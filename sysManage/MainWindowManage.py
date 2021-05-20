@@ -6,8 +6,8 @@ from sysManage.dictSelect.dictSelect import dictSelect
 from sysManage.login.login import login
 from database.loginSql import selectUserInfoByAccont
 from sysManage.login.loginSet import loginSet
-from widgets.dangerGoods.dangerGoods import DangerGoods
-from widgets.positionEngineer.positionEngineerMain import PositionEngineerMain
+from sysManage.dangerGoods.dangerGoods import DangerGoods
+from sysManage.positionEngineer.positionEngineerMain import PositionEngineerMain
 from sysManage.userInfo import get_value,set_value
 #new
 class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):

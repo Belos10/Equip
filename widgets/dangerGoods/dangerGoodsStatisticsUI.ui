@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>阵地工程</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_5">
    <property name="spacing">
@@ -146,45 +146,6 @@
              <property name="spacing">
               <number>0</number>
              </property>
-             <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_2">
-               <property name="spacing">
-                <number>0</number>
-               </property>
-               <item>
-                <widget class="QLineEdit" name="le_second">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-                   <horstretch>70</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="pb_secondSelect">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="text">
-                  <string>查询</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <widget class="QTreeWidget" name="tw_second">
-               <column>
-                <property name="text">
-                 <string notr="true">1</string>
-                </property>
-               </column>
-              </widget>
-             </item>
             </layout>
            </item>
           </layout>
