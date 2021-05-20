@@ -19,15 +19,14 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
 
 
 
-
     #信号和槽连接
     def signalConnection(self):
 
         self.tb_input.clicked.connect(self.slotInput)
         self.tb_output.clicked.connect(self.slotOutput)
         self.tb_add.clicked.connect(self.slotAdd)
-        # self.tb_del.clicked.connect(self.slotDelete)
-        self.tw_result.cellDoubleClicked.connect(self.slotAlterAndSava)
+        self.tb_delete.clicked.connect(self.slotDelete)
+        self.tw_result.itemChanged.connect(self.slotAlterAndSava)
 
         self.tw_first.itemClicked.connect(self.displayData)
 
@@ -58,12 +57,14 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
                 self.currentCheckedUnitList.append(unitID)
         if len(self.currentCheckedUnitList) > 0:
             self._initTableWidgetByUnit(self.currentCheckedUnitList[0])
+            self.unit = self.currentCheckedUnitList[0]
 
     '''
         功能：
             根据单位id获取数据并展示
     '''
     def _initTableWidgetByUnit(self,unit):
+
         self.rowCount =  2 + getCountOfUnit(unit)
         self.columnCount = 12
         self.currentLastRow = self.rowCount - 1
@@ -99,7 +100,8 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
         item = QTableWidgetItem('%s'%type)
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.tw_result.setItem(starIndex, 1, item)
-        self.tw_result.setSpan(starIndex, 1, len(typeData), 1)
+        if len(typeData) != 1:
+            self.tw_result.setSpan(starIndex, 1, len(typeData), 1)
         for i in range(len(typeData)):
             index = starIndex + i
             self.info[index] = typeData[i][0]
@@ -235,55 +237,50 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
             功能：
                 新增一行的数据
         '''
-    def slotAlterAndSava(self,currentRow,currentColumn):
-        if currentRow == self.currentLastRow:
-            self.savaRowData(currentRow)
+    def slotAlterAndSava(self):
+        selectRow = self.tw_result.selectedItems()
+        if len(selectRow) == 0:
+            return
         else:
-            self.alterRowData(currentRow)
-        pass
+            currentRow = selectRow[0].row()
+            if currentRow == self.currentLastRow:
+                self.savaRowData(currentRow)
+            else:
+                self.alterRowData(currentRow)
+            pass
 
 
     def savaRowData(self,row):
         pass
-    #     rowData = []
-    #     for i in range(1,self.tw_result.columnCount()):
-    #         if i == 5:
-    #             item = self.tw_result.cellWidget(row, i)
-    #             if item.currentText() == '是':
-    #                 rowData.append(1)
-    #             else:
-    #                 rowData.append(0)
-    #         elif i == 10:
-    #             item = self.tw_result.cellWidget(row, i)
-    #             rowData.append(item.currentText())
-    #         else:
-
-
-
-
-    #             item = self.tw_result.item(row, i)
-    #             if item != None and len(item.text()) > 0:
-    #                 if i == 1:
-    #                     if getUnitIdbyName(item.text()) != None:
-    #                         rowData.append(getUnitIdbyName(item.text()))
-    #                     else:
-    #                         QMessageBox.warning(self, "注意", "该基地名称尚未加入基地目录！", QMessageBox.Yes, QMessageBox.Yes)
-    #                         break
-    #                 else:
-    #                     rowData.append(item.text())
-    #             else:
-    #                 break
-    #     if len(rowData) < self.tw_result.columnCount() - 1:
-    #         return False
-    #     else:
-    #         insertOneDataIntInstallation(rowData)
-    #         QMessageBox.warning(self, "注意", "插入成功！", QMessageBox.Yes, QMessageBox.Yes)
+        rowData = []
+        rowData.append(self.unit)
+        for i in range(1,self.tw_result.columnCount()):
+            if i == 3:
+                continue
+            if i == 1 or i == 2 :
+                item = self.tw_result.cellWidget(row,i)
+                if item != None:
+                    rowData.append(item.currentText())
+            else:
+                item = self.tw_result.item(row, i)
+                if item != None and len(item.text()) > 0:
+                    rowData.append(item.text())
+                else:
+                    break
+        print(rowData)
+        if len(rowData) < self.tw_result.columnCount() - 1:
+            return False
+        else:
+            print(rowData)
+            insertOneDataIntDangerGoods(rowData)
+            QMessageBox.warning(self, "注意", "插入成功！", QMessageBox.Yes, QMessageBox.Yes)
 
     def alterRowData(self,row):
 
         print(self.info)
         rowData = []
         rowData.append(self.info[row])
+        rowData.append(self.unit)
         for i in range(self.tw_result.columnCount()):
             if i == 0:
                 continue
@@ -299,8 +296,8 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
         if len(rowData) < self.tw_result.columnCount():
             return False
         else:
-            updataOneDataIntInstallation(rowData)
-            QMessageBox.warning(self, "注意", "修改成功！", QMessageBox.Yes, QMessageBox.Yes)
+            if updataOneDataInDangerGood(rowData) == True:
+                QMessageBox.warning(self, "注意", "修改成功！", QMessageBox.Yes, QMessageBox.Yes)
         pass
 
 
@@ -333,16 +330,15 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
         pass
 
     def slotDelete(self):
-        # selectedRow = self.tw_result.selectedItems()[0].row()
-        # selectedColumn = self.tw_result.selectedItems()[0].column()
-        #
-        # if selectedRow <= 3:
-        #     QMessageBox.warning(self, "注意", "请选中有效单元格！", QMessageBox.Yes, QMessageBox.Yes)
-        # else:
-        #     item = self.tw_result.item(selectedRow,0)
-        #     if item != None and int(item.text()) > 0:
-        #         deleteDataByInstallationId(item.text())
-        #         self.tw_result.removeRow(selectedRow)
+        selectedRow = self.tw_result.selectedItems()[0].row()
+        selectedColumn = self.tw_result.selectedItems()[0].column()
+
+        if selectedRow <= 2:
+            QMessageBox.warning(self, "注意", "请选中有效单元格！", QMessageBox.Yes, QMessageBox.Yes)
+        else:
+            goodsId = self.info[selectedRow]
+            if deleteByDangerGoodsId(goodsId) == True:
+                self.tw_result.removeRow(selectedRow)
         pass
 
 

@@ -165,12 +165,32 @@ def getCountOfUnit(unitId):
     功能：
         根据序号更新安装表数据
 '''
-def updataOneDataIntInstallation(rowData):
+def updataOneDataInDangerGood(rowData):
     sql = "update dangergoods set Unit_ID='%s',type='%s',unit='%s',count='%s'," \
-          "new_product=%d,waste_product='%s',delivery_time='%s',storage_time='%s',source=%s,radioactivity='%s'," \
-          "notes='%s' where installaction_Id='%s'"%(rowData[1],rowData[2],rowData[3],rowData[4],
-                                                                       rowData[5],rowData[6],rowData[7],rowData[8],rowData[9],rowData[10],rowData[0])
+          "new_product='%s',waste_product='%s',delivery_time='%s',storage_time='%s',source='%s',radioactivity='%s'," \
+          "notes='%s' where goods_Id='%d'"%(rowData[1],rowData[2],rowData[3],rowData[4],rowData[5],rowData[6],rowData[7],rowData[8],rowData[9],rowData[10],rowData[11],rowData[0])
     executeCommit(sql)
+    return True
+'''
+    功能：
+        向表中插入一条数据
+'''
+def insertOneDataIntDangerGoods(rowData):
+    sql = "insert into dangergoods(Unit_ID,type,unit,count," \
+          "new_product,waste_product,delivery_time,storage_time,source,radioactivity,notes) " \
+          "values('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')"%(rowData[0],rowData[1],rowData[2],rowData[3],rowData[4],
+                                                          rowData[5],rowData[6],rowData[7],rowData[8],rowData[9],
+                                                          rowData[10])
+    executeCommit(sql)
+    return True
+'''
+    功能：
+        删除表中一条数据
+'''
+def deleteByDangerGoodsId(dangerGoodsId):
+    sql = "delete from dangergoods where goods_Id='%s'"%dangerGoodsId
+    executeCommit(sql)
+    return True
 if __name__ == '__main__':
     print(type(getCountOfUnit('1')))
     pass

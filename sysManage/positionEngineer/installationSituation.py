@@ -26,7 +26,7 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
         self.tb_output.clicked.connect(self.slotOutput)
         self.tb_add.clicked.connect(self.slotAdd)
         self.tb_del.clicked.connect(self.slotDelete)
-        self.tw_result.cellDoubleClicked.connect(self.slotAlterAndSava)
+        self.tw_result.itemChanged.connect(self.slotAlterAndSava)
 
 
     #信号和槽断开
@@ -261,11 +261,14 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
         功能：
             新增一行的数据
     '''
-    def slotAlterAndSava(self,currentRow,currentColumn):
-        if currentRow == self.currentLastRow:
-            self.savaRowData(currentRow)
-        else:
-            self.alterRowData(currentRow)
+    def slotAlterAndSava(self):
+        selectRow = self.tw_result.selectedItems()
+        if len(selectRow) != 0:
+            currentRow = selectRow[0].row()
+            if currentRow == self.currentLastRow:
+                self.savaRowData(currentRow)
+            else:
+                self.alterRowData(currentRow)
 
 
     def savaRowData(self,row):
