@@ -330,15 +330,20 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
         pass
 
     def slotDelete(self):
-        selectedRow = self.tw_result.selectedItems()[0].row()
-        selectedColumn = self.tw_result.selectedItems()[0].column()
+        selectedRow = self.tw_result.selectedItems()
+        if selectedRow != None:
+            if len(selectedRow) > 0:
+                rowCount = selectedRow[0].row()
+            else:
+                rowCount = 0
 
-        if selectedRow <= 2:
+
+        if rowCount <= 2:
             QMessageBox.warning(self, "注意", "请选中有效单元格！", QMessageBox.Yes, QMessageBox.Yes)
         else:
             goodsId = self.info[selectedRow]
             if deleteByDangerGoodsId(goodsId) == True:
-                self.tw_result.removeRow(selectedRow)
+                self.tw_result.removeRow(rowCount)
         pass
 
 
