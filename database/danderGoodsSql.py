@@ -96,6 +96,8 @@ def insertOneDateIntoUnitDirectory(Unit_ID,Unit_Name,Unit_Uper):
         sql = "insert into dangergoods_unit_directory values (%s,'%s',%s)"%(Unit_ID,Unit_Name,Unit_Uper)
         executeCommit(sql)
 
+
+
 '''
     功能：
         判断某条数据是否存在在表中
