@@ -2,6 +2,7 @@
 import sys
 from PyQt5.QtWidgets import QMainWindow,QApplication,QWidget
 
+from sysManage.positionEngineer.equipmentStatistics import EquipmentStatistics
 from sysManage.positionEngineer.installationSituation import InstallationSituation
 
 #new
@@ -14,7 +15,7 @@ class PositionEngineerMain(QMainWindow, Position_Engineer_Widget):
         self.setupUi(self)
 
         self.installationSituation = InstallationSituation(self)
-        self.equipmentStatistics = QWidget(self)
+        self.equipmentStatistics = EquipmentStatistics(self)
         self.directoryMaintenance = QWidget(self)
 
         self.stackedWidget.addWidget(self.installationSituation)
@@ -56,6 +57,8 @@ class PositionEngineerMain(QMainWindow, Position_Engineer_Widget):
         self.tb_directoryMaintenance.setDisabled(False)
         self.slotDisconnect()
         self.stackedWidget.setCurrentIndex(1)
+        self.equipmentStatistics._initEquipmentStatistics()
+        self.stackedWidget.currentWidget().setDisabled(False)
         self.connectSignal()
         # self.maintenMange._initAll_() 初始化函数
 
