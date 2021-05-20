@@ -5,7 +5,7 @@ from widgets.strengthDisturb.select_set import Widget_Select_Set
 from sysManage.strengthDisturb.equipUnitSet import equipUnitSet
 from PyQt5.Qt import Qt
 import xlrd
-
+from sysManage.userInfo import get_value
 #new
 class strengthSelectSet(QWidget, Widget_Select_Set):
     def __init__(self, parent=None):
@@ -26,8 +26,8 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
         self.second_treeWidget_dict = {}  # 当前装备目录列表对象，结构为：{'行号':对应的item}
         self.signalConnect()
 
-    def getUserInfo(self, userInfo):
-        self.userInfo = userInfo
+    def getUserInfo(self):
+        self.userInfo = get_value("totleUserInfo")
     '''
         功能：
             所有信号的连接
@@ -139,6 +139,7 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
             点击设置单元目录按钮后的初始化
     '''
     def slotUnitDictInit(self):
+        self.getUserInfo()
         self.delAllData()
         self.tb_result.setEditTriggers(QAbstractItemView.NoEditTriggers)        #设置tablewidget不能修改
         #设置当前控件状态
@@ -162,13 +163,13 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
         self.pb_setUnitAlias.setDisabled(0)
         print("userInfo :   ", self.userInfo)
 
-        self.startName = selectUnitNameByUnitID(self.userInfo[0][4])
-        item = QTreeWidgetItem(self.tw_first)
-        item.setText(0, self.startName)
-        self.first_treeWidget_dict[self.userInfo[0][4]] = item
+        #self.startName = selectUnitNameByUnitID(self.userInfo[0][4])
+        #item = QTreeWidgetItem(self.tw_first)
+        #item.setText(0, self.startName)
+        #self.first_treeWidget_dict[self.userInfo[0][4]] = item
 
         #从数据库中单位表中获取数据初始化单位目录，tableWidget显示所有的单位表
-        self._initUnitTreeWidget(self.userInfo[0][4], item)
+        self._initUnitTreeWidget("", self.tw_first)
         self._initUnitTableWidget()
 
         self.changeUnit = True              #设置当前为修改单位状态
@@ -224,6 +225,8 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
             self.first_treeWidget_dict[rowData[0]] = item
             if rowData[0] != '':
                 self._initUnitTreeWidget(rowData[0], item)
+            else:
+                return None
 
     def getTableUnitInfo(self, root):
         if root[0] == '':
@@ -236,16 +239,18 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
             self.unitDictInfo.append(rowData)
             if rowData[0] != '':
                 self.getTableUnitInfo(rowData[0])
+            else:
+                return
     '''
         功能：
             设置单元时的初始化tableWidget，显示整个单位表
     '''
     def _initUnitTableWidget(self):
         self.unitDictInfo = []
-        self.startInfo = selectUnitInfoByUnitID(self.userInfo[0][4])
-        self.unitDictInfo.append(self.startInfo)
-        self.getTableUnitInfo(self.userInfo[0][4])
-        result = self.unitDictInfo
+        #self.startInfo = selectUnitInfoByUnitID(self.userInfo[0][4])
+        #self.unitDictInfo.append(self.startInfo)
+        #self.getTableUnitInfo(self.userInfo[0][4])
+        result = selectAllDataAboutUnit()
 
         header = ['单位编号', '单位名称', '上级单位编号','单位别名']
         self.tb_result.setColumnCount(len(header))
@@ -283,6 +288,8 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
             self.second_treeWidget_dict[rowData[0]] = item
             if rowData[0] != '':
                 self._initEquipTreeWidget(rowData[0], item)
+            else:
+                return
 
     '''
         功能：

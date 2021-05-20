@@ -2,7 +2,9 @@ from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, QAbstrac
 from widgets.strengthDisturb.maintenManageSet import Widget_Mainten_Manage_Set
 from database.strengthDisturbSql import *
 from PyQt5.Qt import Qt
-
+import sys
+from sysManage.userInfo import get_value
+sys.setrecursionlimit(100000)
 '''
    编制数维护目录设置
 '''
@@ -20,6 +22,7 @@ class maintenManageSet(QWidget, Widget_Mainten_Manage_Set):
         self.result = []
 
     def _initAll_(self):
+        self.getUserInfo()
         self.unitDictInfo = []
 
         # 初始化公用装备表
@@ -49,9 +52,8 @@ class maintenManageSet(QWidget, Widget_Mainten_Manage_Set):
         self.pb_update.clicked.connect(self.slotUpdateIsGroup)
         self.pb_firstSelect.clicked.connect(self.slotSelectUnit)
 
-    def getUserInfo(self, userInfo):
-        self.userInfo = userInfo
-        self._initAll_()
+    def getUserInfo(self):
+        self.userInfo = get_value("totleUserInfo")
 
 
     def slotSelectUnit(self):
@@ -85,6 +87,8 @@ class maintenManageSet(QWidget, Widget_Mainten_Manage_Set):
             self.unitDictInfo.append(rowData)
             if rowData[0] != '':
                 self.getTableUnitInfo(rowData[0])
+            else:
+                return None
     '''
         初始化界面
     '''
@@ -92,10 +96,10 @@ class maintenManageSet(QWidget, Widget_Mainten_Manage_Set):
         self.orignUnitResult = {}
         self.tw_unit.clear()
         self.unitDictInfo = []
-        self.startInfo = selectUnitInfoByUnitID(self.userInfo[0][4])
-        self.unitDictInfo.append(self.startInfo)
-        self.getTableUnitInfo(self.userInfo[0][4])
-        self.result = self.unitDictInfo
+        #self.startInfo = selectUnitInfoByUnitID(self.userInfo[0][4])
+        #self.unitDictInfo.append(self.startInfo)
+        #self.getTableUnitInfo(self.userInfo[0][4])
+        self.result = selectAllDataAboutUnit()
         header = ['单位编号', '单位名字', '是否为旅团']
         self.tw_unit.setColumnCount(len(header))
         self.tw_unit.setHorizontalHeaderLabels(header)
@@ -124,7 +128,7 @@ class maintenManageSet(QWidget, Widget_Mainten_Manage_Set):
         self.tw_publicEquip.setHorizontalHeaderLabels(header)
 
         print("unitInfo:  ", self.result)
-        result = selectAllFromPulicEquipByUnit(self.result)
+        result = selectAllFromPulicEquip()
         self.tw_publicEquip.setRowCount(len(result))
         for i, publicEquipInfo in enumerate(result):
             item = QTableWidgetItem()

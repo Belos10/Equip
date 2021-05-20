@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QMainWindow,QApplication
 from widgets.strengthDisturb.strengthDisturbSet import Widget_Strength_Disturb_Set
 from sysManage.strengthDisturb.strengthSelectSet import strengthSelectSet
 from sysManage.strengthDisturb.maintenManageSet import maintenManageSet
+from sysManage.userInfo import get_value
 #new
 class strengthDisturbSet(QMainWindow, Widget_Strength_Disturb_Set):
     def __init__(self, parent=None):
@@ -19,14 +20,11 @@ class strengthDisturbSet(QMainWindow, Widget_Strength_Disturb_Set):
         self.tb_selectSet.setDisabled(True)
         self.tb_maintenManageSet.setDisabled(False)
 
+
     def signalConnect(self):
         self.tb_selectSet.clicked.connect(self.slotSelectSet)
         self.tb_maintenManageSet.clicked.connect(self.slotMaintenManageSet)
 
-    def getUserInfo(self, userInfo):
-        self.userInfo = userInfo
-        self.strengthSelectSet.getUserInfo(self.userInfo)
-        self.maintenManageSet.getUserInfo(self.userInfo)
 
     def disconnectSlot(self):
         self.tb_selectSet.clicked.disconnect(self.slotSelectSet)

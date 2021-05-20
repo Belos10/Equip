@@ -11,6 +11,7 @@ from database.strengthDisturbSql import selectAllDataAboutStrengthYear, selectUn
     , selectEquipIsHaveChild, selectUnitIsHaveChild, addDataIntoInputInfo, selectAllStrengthYear,insertBeforYearIntoStrength\
     ,findUperIDByUnitID,selectUnitNameByUnitID
 from PyQt5.Qt import Qt
+from sysManage.userInfo import get_value
 
 '''
     类功能：
@@ -55,15 +56,17 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         # 信号连接
         self.signalConnectSlot()
 
-    def initUserInfo(self, userInfo):
-        self.userInfo = userInfo
-        self._initStrenInquiry()
+    def initUserInfo(self):
+        self.userInfo = get_value("totleUserInfo")
+        #print("ffffffffffffffffffffffffff", self.userInfo, totleUserInfo)
+        #self._initStrenInquiry()
     '''
         功能：
             当选择出厂年份时，设置当前可选项和不可选项,并初始化年份目录
     '''
 
     def _initStrenInquiry(self):
+        self.initUserInfo()
         self.tw_first.clear()
         self.tw_first.header().setVisible(False)
         self.tw_second.header().setVisible(False)
@@ -94,6 +97,7 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
     '''
 
     def slotClickedInqury(self):
+        self.initUserInfo()
         self.first_treeWidget_dict = {}
         self.second_treeWidget_dict = {}
         self.tw_first.clear()
@@ -429,6 +433,8 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
             self.first_treeWidget_dict[rowData[0]] = item
             if rowData[0] != '':
                 self._initUnitTreeWidget(rowData[0], item)
+            else:
+                return None
 
     '''
         功能：
@@ -448,3 +454,5 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
             self.second_treeWidget_dict[rowData[0]] = item
             if rowData[0] != '':
                 self._initEquipTreeWidget(rowData[0], item)
+            else:
+                return None
