@@ -112,7 +112,6 @@ class DisturbPlan(QWidget, yearList_Form):
         if ok:
             haveYear = False
             allyear = selectYearListAboutDisturbPlan()
-            #print("''''''''''''''''++++++++++", allyear)
             for yearInfo in allyear:
                 if str(year) == yearInfo:
                     haveYear = True
@@ -127,7 +126,6 @@ class DisturbPlan(QWidget, yearList_Form):
 
     # 删除年份
     def slotDelYear(self):
-        #print("''''''''''''''", self.lw_yearChoose.currentRow())
         reply = QMessageBox.question(self, "删除", "是否删除所有？", QMessageBox.Yes, QMessageBox.Cancel)
         if reply == QMessageBox.Yes:
             currentYear=self.lw_yearChoose.currentItem()

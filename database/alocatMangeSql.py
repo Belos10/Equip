@@ -422,3 +422,12 @@ def selectQuaAndID(Equip_ID, year):
     conn.commit()
     disconnectMySql(conn, cur)
     return result
+
+# 按装备ID列表从unit表复制数据至disturbplanunit表
+def insertIntoDistrubPlanUnitFromList(UnitList):
+    conn,cur = connectMySql()
+    for i in UnitList:
+        sql = "insert into disturbplanunit select * from unit where Unit_ID = '" + i + "'"
+        cur.execute(sql)
+    conn.commit()
+    disconnectMySql(conn,cur)
