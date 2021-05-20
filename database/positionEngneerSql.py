@@ -123,7 +123,7 @@ def initPosenginUnitDirectory():
 '''
 def initPosenginEquipmentDirectory():
     #一级目录
-    sql = "select Equip_ID,Equip_Name,Equip_Uper,Input_Type,Equip_Type,unit from equip where Equip_Name='专用装备'"
+    sql = "select Equip_ID,Equip_Name,Equip_Uper,Input_Type,Equip_Type,unit from equip where Equip_Uper=''"
     specialEquipment = selectOne(sql)
     print(specialEquipment)
     if specialEquipment != None:
@@ -158,7 +158,7 @@ def insertOneDateIntoUnitDirectory(Unit_ID,Unit_Name,Unit_Uper):
 '''
 def insertOneDateIntoEquipmentDirectory(Equip_ID,Equip_Name,Equip_Uper,Equip_Type,Unit_ID):
     if not exists('posengin_equipment_directory','Equip_ID',Equip_ID):
-        sql = "insert into posengin_equipment_directory values ('%s','%s','%s','%s','%s')"%(Equip_ID,Equip_Name,Equip_Uper,Equip_Type,Unit_ID)
+        sql = "insert into posengin_equipment_directory(Equip_ID,Equip_Name,Equip_Uper,Equip_Type,Unit_ID) values ('%s','%s','%s','%s','%s')"%(Equip_ID,Equip_Name,Equip_Uper,Equip_Type,Unit_ID)
         executeCommit(sql)
 '''
     功能：
@@ -288,15 +288,14 @@ def deleteDataByInstallationId(installationId):
     功能：
         根据装备id和单位id获取装备统计表中每条数据
 '''
-def getEquipmentStatisticsResultByUnitAndEquip(unitList,equipmentList):
-    result = []
-    for unit in unitList:
-        for equipment in equipmentList:
-            sql = "select statistics_Id,Unit_ID,Equip_ID,unit,count,status from posengin_statistics where Unit_ID='%s' and Equip_ID='%s'"%(unit,equipment)
-            data = executeSql(sql)
-            if data != None:
-                result.extend(data)
-    return result
+def getEquipmentStatisticsResultByUnitAndEquip(unit,equipment):
+    sql = "select count,status from posengin_statistics where Unit_ID='%s' and Equip_ID='%s'"%(unit,equipment)
+    data = executeSql(sql)
+    #print("''''''''''''''", data)
+    if data:
+        return data[0]
+    else:
+        return None
 
 
 #根据Dept_Uper查询单位信息,并返回
@@ -312,21 +311,149 @@ def selectUnitInfoByDeptUper(Unit_Uper):
 
 # 根据Equip_Uper查询单位信息,并返回
 def selectEquipInfoByEquipUper(Equip_Uper):
-    if Equip_Uper == '':
-        sql = "select * from posengin_equipment_directory where Equip_Name='1'"
+    conn, cur = connectMySql()
+    sql = "select * from posengin_equipment_directory where Equip_Uper = '" + Equip_Uper + "'"
+    cur.execute(sql)
+    result = cur.fetchall()
+    disconnectMySql(conn, cur)
+    return result
+
+#判断是否是基地
+def isBase(unitId):
+    sql = "select Unit_Name from posengin_unit_directory where Unit_ID='%s'"%unitId
+    data = selectOne(sql)
+    if data != None:
+        unitName = data['Unit_Name']
+        if '基地' in unitName:
+            return True
+        else:
+            return False
     else:
-        sql = "select * from posengin_equipment_directory where Equip_Uper='%s'"%Equip_Uper
-    print(sql)
-    selectOne(sql)
+        return False
 
+    # 判断是否是旅团
+def isBrigade(unitId):
+    sql = "select Unit_Name from posengin_unit_directory where Unit_ID='%s'" % unitId
+    data = selectOne(sql)
+    if data != None:
+        unitName = data['Unit_Name']
+        if '旅团' in unitName:
+            return True
+        else:
+            return False
+    else:
+        return False
 
+   # 判断是否是阵地
+def isPositions(unitId):
+    sql = "select Unit_Name from posengin_unit_directory where Unit_ID='%s'" % unitId
+    data = selectOne(sql)
+    if data != None:
+        unitName = data['Unit_Name']
+        if '阵地' in unitName:
+            return True
+        else:
+            return False
+    else:
+        return False
 
+'''
+    功能：
+        判断单位的为几级单位
+'''
+def gradeOfUnit(UnitId):
+    sql = "select Unit_Uper from posengin_unit_directory where Unit_ID='%s'"%UnitId
+    data = selectOne(sql)
+    if data != None:
+        return gradeOfUnit(data['Unit_Uper']) + 1
+    else:
+        return 0
 
+'''
+    功能：
+        找寻一个单位的上级单位
+'''
+def findUperUnit(unitId):
+    sql =  "select Unit_Uper from posengin_unit_directory where Unit_ID='%s'"%unitId
+    data = selectOne(sql)
+    if data != None:
+        return data['Unit_Uper']
+    else:
+        return None
+'''
+    功能：
+        找寻一个单位的基地
+'''
+def findBase(unitID):
+    if gradeOfUnit(unitID) < 3:
+        pass
+    elif gradeOfUnit(unitID) == 3 : #基地
+        return unitID
+    elif gradeOfUnit(unitID) == 4:  #旅团
+        return  findUperUnit(unitID)
+    elif gradeOfUnit(unitID) == 5:  #阵地
+        uperId = findUperUnit(unitID)
+        while gradeOfUnit(uperId) != 3:
+            newUperId = findUperUnit(uperId)
+            uperId = newUperId
+        return  uperId
+    elif gradeOfUnit(unitID) > 5:
+        return None
 
+'''
+    功能：
+        寻找一个单位的一级子单位
+'''
+def findChildUnit(unitId):
 
+    sql = "select Unit_ID from posengin_unit_directory where Unit_Uper=%s"%unitId
+    data = executeSql(sql)
+    if data != None:
+        result = []
+        for item in data:
+            result.append(item[0])
+        if len(result) > 0:
+            return result
+        else:
+            return None
+    else:
+        return None
+
+'''
+    功能：
+        判断武器是否为最末级武器
+'''
+
+def isLastLevelEquipment(equipmentId):
+    sql = "select Equip_ID from posengin_equipment_directory where Unit_ID='专用装备'  and Equip_Type='逐号录入' and Equip_ID=%s"%equipmentId
+    result = executeSql(sql)
+    if result != None:
+        return True
+    else:
+        False
+
+'''
+    功能：
+        根据装备Id获取装备名称
+'''
+def getEquipmentNameById(equipmentId):
+    sql = "select Equip_Name from posengin_equipment_directory where Equip_ID='%s'"%equipmentId
+    result = selectOne(sql)
+    if result != None:
+        return result['Equip_Name']
+
+'''
+    功能：
+        得到装备的单位型号
+'''
+def getEquipmentUnitName(equipment):
+    sql = "select unit from posengin_equipment_directory where Equip_ID='%s'"%equipment
+    result = selectOne(sql)
+    if result != None:
+        return result['unit']
 
 if __name__ == '__main__':
     data = ['3','003','钢铁雄心基地','xxxx',1,'准备到位','2020-06','2020-12',150,'未到位','未运行','无']
-    print(selectEquipInfoByEquipUper(''))
+    print(initPosenginEquipmentDirectory())
     pass
 
