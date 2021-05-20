@@ -1907,6 +1907,10 @@ def selectAboutRetireByEquipShow(UnitList, EquipList, year):
             equipInfo = selectEquipInfoByEquipID(EquipID)
             equipName = equipInfo[0][1]
             equipUnit = equipInfo[0][5]
+            if equipUnit:
+                pass
+            else:
+                equipUnit = ""
             if weaveInfo:
                 weave = weaveInfo[0][5]
             else:
@@ -1919,7 +1923,7 @@ def selectAboutRetireByEquipShow(UnitList, EquipList, year):
             super = str(int(now) - int(weave))
             apply = ''
             other = ''
-            print(ID, unitID, EquipID, equipName, equipUnit, weave, num, now, super, other, year)
+            print("'''''''''''''''''''", ID, unitID, EquipID, equipName, equipUnit, weave, num, now, super, other, year)
             haveChild = selectEquipIsHaveChild(EquipID)
             insertIntoRetire(ID, unitID, EquipID, equipName, equipUnit, weave, num, now, super, apply, other, year)
             currentResultInfo = [ID, unitID, EquipID, equipName, equipUnit, weave, num, now, super, apply, other, year]
