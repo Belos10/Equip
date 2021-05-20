@@ -1,15 +1,20 @@
 from widgets.alocatMange.select_set import Widget_Dict_Set
 import sys
-from PyQt5.QtWidgets import QApplication,QWidget, QListWidgetItem, QComboBox, QTableWidgetItem, QDateEdit, \
-    QInputDialog,QMessageBox,QAbstractItemView,QTreeWidgetItem,QLineEdit
+from PyQt5.QtWidgets import QApplication, QWidget, QListWidgetItem, QComboBox, QTableWidgetItem, QDateEdit, \
+    QInputDialog, QMessageBox, QAbstractItemView, QTreeWidgetItem, QLineEdit
 from database.strengthDisturbSql import *
 from sysManage.alocatMange.config import ArmyTransferReceiveUnit, ArmyTransferSendUnit
+from sysManage.alocatMange.AddUnitChoose import AddUnitChoose
 from PyQt5.Qt import Qt
-#new
+from database.alocatMangeSql import *
+
+# new
 '''
     功能：
-        陆军调拨单管理
+        目录管理
 '''
+
+
 class alocatDictSet(QWidget, Widget_Dict_Set):
     def __init__(self, parent=None):
         super(alocatDictSet, self).__init__(parent)
@@ -19,7 +24,7 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
         self.tw_second.clear()  # 删除装备目录所有数据显示
         self.tw_first.header().setVisible(False)  # 不显示树窗口的title
         self.tw_second.header().setVisible(False)  # 不显示树窗口的title
-        self.changeUnit = True  # 是否是修改单元的目录
+        self.changeUnit = '0'  # 是否是修改单元的目录
 
         # QTableWidget设置整行选中
         self.tb_result.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -28,11 +33,13 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
         self.first_treeWidget_dict = {}  # 当前单位目录列表对象，结构为：{'行号':对应的item}
         self.second_treeWidget_dict = {}  # 当前装备目录列表对象，结构为：{'行号':对应的item}
         self.signalConnect()
+        self.addUnitChoose = AddUnitChoose()
 
     '''
         功能：
             所有信号的连接
     '''
+
     def signalConnect(self):
         self.pb_add.clicked.connect(self.slotAddDict)  # 添加数据
         self.pb_update.clicked.connect(self.slotUpdate)  # 修改数据
@@ -75,6 +82,7 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
             功能：
                 所有信号的断开
     '''
+
     def slotDisconnect(self):
         self.pb_add.clicked.disconnect(self.slotAddDict)  # 添加数据
         self.pb_update.clicked.disconnect(self.slotUpdate)  # 修改数据
@@ -86,12 +94,11 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
 
         self.pb_setEquip.clicked.disconnect(self.slotEquipDictInit)  # 设置装备目录
 
-
-
     '''
         功能：
             清除所有数据
     '''
+
     def delAllData(self):
         self.tw_first.clear()  # 清除单元目录所有数据
         self.tw_second.clear()  # 清除装备目录所有数据
@@ -108,14 +115,15 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
         功能：
             点击设置单元目录按钮后的初始化
     '''
+
     def slotUnitDictInit(self):
         self.delAllData()
-        self.tb_result.setEditTriggers(QAbstractItemView.NoEditTriggers)        #设置tablewidget不能修改
-        #设置当前控件状态
-        self.tw_second.setDisabled(True)     #设置装备目录为灰色
+        self.tb_result.setEditTriggers(QAbstractItemView.NoEditTriggers)  # 设置tablewidget不能修改
+        # 设置当前控件状态
+        self.tw_second.setDisabled(True)  # 设置装备目录为灰色
         self.le_second.setDisabled(True)
-        self.pb_secondSelect.setDisabled(True)   #设置装备目录上面的查询为灰色
-        self.tw_first.setDisabled(False)    #设置单位目录为可选中
+        self.pb_secondSelect.setDisabled(True)  # 设置装备目录上面的查询为灰色
+        self.tw_first.setDisabled(False)  # 设置单位目录为可选中
         self.le_first.setDisabled(False)
         self.pb_firstSelect.setDisabled(False)
         self.le_equipID.setDisabled(True)
@@ -128,19 +136,20 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
         self.le_unitID.setDisabled(False)
         self.pb_setEquip.setDisabled(False)
         self.pb_setUnit.setDisabled(True)
-        self.pb_add.setDisabled(1)
+        # self.pb_add.setDisabled(1)
         self.pb_update.setDisabled(1)
 
-        #从数据库中单位表中获取数据初始化单位目录，tableWidget显示所有的单位表
+        # 从数据库中单位表中获取数据初始化单位目录，tableWidget显示所有的单位表
         self._initUnitTreeWidget("", self.tw_first)
         self._initUnitTableWidget()
 
-        self.changeUnit = True              #设置当前为修改单位状态
+        self.changeUnit = '1'  # 设置当前为修改单位状态
 
     '''
             功能：
                 点击设置装备目录按钮后的初始化
     '''
+
     def slotEquipDictInit(self):
         self.delAllData()
         self.tb_result.setEditTriggers(QAbstractItemView.NoEditTriggers)  # 设置tablewidget不能修改
@@ -168,20 +177,21 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
         self._initEquipTreeWidget("", self.tw_second)
         self._initEquipTableWidget()
 
-        self.changeUnit = False  # 设置当前为修改单位状态
+        self.changeUnit = '2'  # 设置当前为修改单位状态
 
     '''
         功能：
             单位目录的初始化，显示整个单位表
             参数表：root为上级单位名字，mother为上级节点对象
     '''
+
     def _initUnitTreeWidget(self, root, mother):
         if root == '':
             result = selectDisturbPlanUnitInfoByDeptUper('')
         else:
             result = selectDisturbPlanUnitInfoByDeptUper(root)
 
-        #rowData: (单位编号，单位名称，上级单位编号)
+        # rowData: (单位编号，单位名称，上级单位编号)
         for rowData in result:
             item = QTreeWidgetItem(mother)
             item.setText(0, rowData[1])
@@ -193,10 +203,11 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
         功能：
             设置单元时的初始化tableWidget，显示整个单位表
     '''
+
     def _initUnitTableWidget(self):
         result = selectAllDataAboutDisturbPlanUnit()
 
-        header = ['单位编号', '单位名称', '上级单位编号','单位别名']
+        header = ['单位编号', '单位名称', '上级单位编号', '单位别名']
         self.tb_result.setColumnCount(len(header))
         self.tb_result.setRowCount(len(result))
         self.tb_result.setHorizontalHeaderLabels(header)
@@ -218,13 +229,14 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
             装备目录的初始化，显示整个装备表
             参数表：root为上级装备名字，mother为上级节点对象
     '''
+
     def _initEquipTreeWidget(self, root, mother):
         if root == '':
             result = selectEquipInfoByEquipUper('')
         else:
             result = selectEquipInfoByEquipUper(root)
 
-        #rowData: (装备编号，装备名称，上级装备编号, 录入类型, 装备类型)
+        # rowData: (装备编号，装备名称，上级装备编号, 录入类型, 装备类型)
         for rowData in result:
             item = QTreeWidgetItem(mother)
             item.setText(0, rowData[1])
@@ -236,6 +248,7 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
         功能：
             设置装备时的初始化tableWidget，显示整个装备表
     '''
+
     def _initEquipTableWidget(self):
         result = selectAllDataAboutEquip()
 
@@ -262,15 +275,16 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
         功能：
             当选中tablewidget某行时，显示对应的lineedit
     '''
+
     def slotClickedRow(self):
 
         currentRow = self.tb_result.currentRow()
-        if self.changeUnit:
+        if self.changeUnit == '1':
             self.le_unitID.setText(self.tb_result.item(currentRow, 0).text())
             self.le_unitName.setText(self.tb_result.item(currentRow, 1).text())
             self.le_UnitUper.setText(self.tb_result.item(currentRow, 2).text())
-        else:
-            self.le_equipID.setText((self.tb_result.item(currentRow,0).text()))
+        elif self.changeUnit == '2':
+            self.le_equipID.setText((self.tb_result.item(currentRow, 0).text()))
             self.le_equipName.setText((self.tb_result.item(currentRow, 1).text()))
             self.le_uperID.setText((self.tb_result.item(currentRow, 2).text()))
             inputType = self.tb_result.item(currentRow, 3).text()
@@ -290,46 +304,20 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
             else:
                 self.cb_equipType.setCurrentIndex(2)
 
+
     '''
         功能：
             添加目录
     '''
+
     def slotAddDict(self):
         # 单位目录
-        if self.changeUnit:
-            pass
-        #     if self.le_unitID.text() == "" or self.le_unitName.text() == "":
-        #         reply = QMessageBox.question(self, '新增失败', '单位ID或单位名字为空，拒绝增加，请重新填写', QMessageBox.Yes,
-        #                                      QMessageBox.Cancel)
-        #     else:
-        #         Unit_ID = self.le_unitID.text()
-        #         Unit_Name = self.le_unitName.text()
-        #         Unit_Uper = self.le_unitUper.text()
-        #         unitInfoTuple = selectAllDataAboutDisturbPlanUnit()
-        #
-        #         haveID = False
-        #         haveUperID = False
-        #         if Unit_Uper == '':
-        #             haveUperID = True
-        #
-        #         for unitInfo in unitInfoTuple:
-        #             if Unit_ID == unitInfo[0]:
-        #                 reply = QMessageBox.question(self, '新增失败', '单位ID已存在, 请重新填写', QMessageBox.Yes,
-        #                                              QMessageBox.Cancel)
-        #                 haveID = True
-        #                 break
-        #             elif Unit_Uper == unitInfo[0]:
-        #                 haveUperID = True
-        #
-        #         if haveUperID == False:
-        #             reply = QMessageBox.question(self, '新增失败', '上级单位ID不存在, 请重新填写', QMessageBox.Yes,
-        #                                          QMessageBox.Cancel)
-        #         elif haveUperID == True and haveID == False:
-        #             addDataIntoDisturbPlanUnit(Unit_ID, Unit_Name, Unit_Uper)
-        #
-        #         self.slotUnitDictInit()
+        if self.changeUnit == '1':
+            self.addUnitChoose.initWidget()
+            self.addUnitChoose.show()
+            self.addUnitChoose.signal.connect(self.updateUnit)
         # 装备目录
-        else:
+        elif self.changeUnit == '2':
             if self.le_equipID.text() == "" or self.le_equipName.text() == "":
                 reply = QMessageBox.question(self, '新增失败', '装备ID或装备名字为空，拒绝增加，请重新填写', QMessageBox.Yes,
                                              QMessageBox.Cancel)
@@ -362,13 +350,18 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
                     addDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type)
                 self.slotEquipDictInit()
 
+    def updateUnit(self):
+        insertIntoDistrubPlanUnitFromList(self.addUnitChoose.currentUnitID)
+        self.slotUnitDictInit()
+
     '''
         功能：
             修改目录
     '''
+
     def slotUpdate(self):
         # 单位目录
-        if self.changeUnit:
+        if self.changeUnit == '1':
             pass
             # if (self.tb_result.item(self.tb_result.currentRow(),
             #                         0).text() != self.le_unitID.text()) or self.le_unitName.text() == "":
@@ -395,7 +388,7 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
             #         updateDataIntoDisturbPlanUnit(Unit_ID, Unit_Name, Unit_Uper)
             #         self.slotUnitDictInit()
         # 装备目录
-        else:
+        elif self.changeUnit == '2':
             if (self.tb_result.item(self.tb_result.currentRow(),
                                     0).text() != self.le_equipID.text()) or self.le_equipName.text() == "":
                 reply = QMessageBox.question(self, '修改失败', '装备ID不能修改或装备名字为空，拒绝修改，请重新填写', QMessageBox.Yes,
@@ -426,9 +419,9 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
 
     def slotDelDict(self):
         # 单位目录
-        if self.changeUnit:
+        if self.changeUnit == '1':
             reply = QMessageBox.question(self, '删除', '是否将下级单位以及所涉及的其他表关于该单位的信息一起删除？', QMessageBox.Yes,
-                                             QMessageBox.Cancel)
+                                         QMessageBox.Cancel)
             if reply == QMessageBox.Yes:
                 delDataInDisturbPlanUnit(self.le_unitID.text())
                 reply = QMessageBox.question(self, '删除', '删除成功', QMessageBox.Yes)
@@ -436,8 +429,8 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
 
             else:
                 reply = QMessageBox.question(self, '删除', '删除失败', QMessageBox.Yes)
-        #装备目录
-        else:
+        # 装备目录
+        elif self.changeUnit == '2':
             reply = QMessageBox.question(self, '删除', '是否将下级装备以及所涉及的其他表关于该装备的信息一起删除？', QMessageBox.Yes,
                                          QMessageBox.Cancel)
             if reply == QMessageBox.Yes:
@@ -446,6 +439,7 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
                 self.slotEquipDictInit()
             else:
                 reply = QMessageBox.question(self, '删除', '删除失败', QMessageBox.Yes)
+
 
 '''
     功能：

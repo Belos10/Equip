@@ -280,36 +280,28 @@ def selectDisturbPlanUnitInfoByDeptUper(Unit_Uper):
     # print(result)
     return result
 
+
 # 返回disturbplanunit单位表的所有数据
 def selectAllDataAboutDisturbPlanUnit():
     conn, cur = connectMySql()
-
-    sql = "select * from disturbplanunit"
-
+    sql = "select * from disturbplanunit order by Unit_ID"
     cur.execute(sql)
     result = cur.fetchall()
-
     disconnectMySql(conn, cur)
-
     # 测试结果
     # print(result)
-
     return result
+
 
 # 返回disturbplanunit单位表除机关外的所有数据
 def selectAllDataAboutDisturbPlanUnitExceptFirst():
     conn, cur = connectMySql()
-
     sql = "select * from disturbplanunit where Unit_Uper != ''"
-
     cur.execute(sql)
     result = cur.fetchall()
-
     disconnectMySql(conn, cur)
-
     # 测试结果
     # print(result)
-
     return result
 
 
@@ -317,7 +309,7 @@ def selectAllDataAboutDisturbPlanUnitExceptFirst():
 def selectAllDataAboutUnit():
     conn, cur = connectMySql()
 
-    sql = "select * from unit"
+    sql = "select * from unit order by Unit_ID"
 
     cur.execute(sql)
     result = cur.fetchall()
@@ -638,10 +630,16 @@ def delDataInDisturbPlanUnit(Unit_ID):
     for UnitID in UnitIDList:
         if UnitID != '':
             sql = "Delete from disturbplanunit where Unit_ID = '" + UnitID + "'"
+            cur.execute(sql)
+            sql = "Delete from disturbplan where Unit_ID = '" + UnitID + "'"
+            cur.execute(sql)
             # print(sql)
         else:
             sql = "Delete from disturbplanunit where Unit_ID is null"
-        cur.execute(sql)
+            cur.execute(sql)
+            sql="Delete from disturbplan where Unit_ID is null"
+            cur.execute(sql)
+
 
     conn.commit()
     disconnectMySql(conn, cur)
