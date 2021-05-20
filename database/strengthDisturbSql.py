@@ -760,12 +760,16 @@ def selectAllDataAboutStrengthYear():
     return result
 
 #按照单位编号，装备编号以及录入年份查找录入信息
-def selectInfoAboutInput(Unit_ID, Equip_ID, inputYear):
+def selectInfoAboutInput(Unit_ID, Equip_ID, inputYear, factoryYear):
     conn, cur = connectMySql()
 
     resultList = []
-    sql = "select * from inputinfo where Unit_ID = '" + Unit_ID + "' and Equip_ID = '"\
-          + Equip_ID + "' and inputYear = '" + inputYear + "'"
+    if factoryYear == "":
+        sql = "select * from inputinfo where Unit_ID = '" + Unit_ID + "' and Equip_ID = '" \
+              + Equip_ID + "' and inputYear = '" + inputYear + "'"
+    else:
+        sql = "select * from inputinfo where Unit_ID = '" + Unit_ID + "' and Equip_ID = '"\
+          + Equip_ID + "' and inputYear = '" + inputYear + "' and year = '" + factoryYear + "'"
     cur.execute(sql)
     result = cur.fetchall()
     for resultInfo in result:
@@ -1420,9 +1424,9 @@ def addDataIntoInputInfo(Unit_ID, Equip_ID, ID, num, year, shop, state, arrive, 
 
 
 # 根据单位号和装备号查询现有数和实力数
-def selectNowNumAndStrengthNum(Unit_ID, Equip_ID):
+def selectNowNumAndStrengthNum(Unit_ID, Equip_ID, year, factoryYear):
     conn, cur = connectMySql()
-    sql = "SELECT Now, Strength from strength where Unit_ID = '" + Unit_ID + "' and Equip_ID = '" + Equip_ID + "'"
+    sql = "SELECT Now, Strength from strength where Unit_ID = '" + Unit_ID + "' and Equip_ID = '" + Equip_ID + "' and year = '" + year + "' and equipYear = '" + factoryYear + "'"
     cur.execute(sql)
     result = cur.fetchall()
     for resultInfo in result:

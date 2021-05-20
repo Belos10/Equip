@@ -342,7 +342,7 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
                                                      QMessageBox.Cancel)
                     else:
                         self.sw_strenSelectMan.setCurrentIndex(1)
-                        self.add_strenth_info._initTableWidget_(resultRowInfo, self.currentYear)
+                        self.add_strenth_info._initTableWidget_(resultRowInfo, self.currentYear, self.inquiry_result.currentFactoryYear)
                         self.groupBox.setDisabled(True)
                         self.groupBox_2.setDisabled(True)
                     break

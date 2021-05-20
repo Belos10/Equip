@@ -120,11 +120,17 @@ class AddStrenthInfo(QWidget, Add_Strenth_Info):
         功能：
             初始化录入信息界面以及tablewidget
     '''
-    def _initTableWidget_(self, RowData, yearList):
+    def _initTableWidget_(self, RowData, yearList, factoryYear):
+        if factoryYear == "全部":
+            self.factoryYear = ""
+        else:
+            self.factoryYear = factoryYear
         self.RowData = RowData
+        print("test:                 ", self.RowData)
         self.slotDisconnect()
         self.unitID = RowData[1]
         self.equipID = RowData[0]
+        #self.factoryYear = factoryYear
         if findEquipUnitByEquipID(self.equipID):
             self.equipUnit = findEquipUnitByEquipID(self.equipID)[0][0]
         else:
@@ -136,7 +142,7 @@ class AddStrenthInfo(QWidget, Add_Strenth_Info):
         self.yearList = yearList
         self.tableWidget.setRowCount(0)
         self.strgenthInfo = RowData
-        self.now, self.strength= selectNowNumAndStrengthNum(RowData[1], RowData[0])
+        self.now, self.strength= selectNowNumAndStrengthNum(RowData[1], RowData[0], self.yearList, self.factoryYear)
         self.label_UnitName.setText(RowData[3])
         self.label_EquipName.setText(RowData[2])
         self.label_ExistNumber.setText(self.now)
@@ -147,7 +153,7 @@ class AddStrenthInfo(QWidget, Add_Strenth_Info):
             self.header = ['批次号', '数量', '出厂年份', '生产厂家', '装备状态', '是否到位', '文件凭证', '备注']
             self.tableWidget.setColumnCount(len(self.header))
             self.tableWidget.setHorizontalHeaderLabels(self.header)
-            self.currentResult = selectInfoAboutInput(RowData[1], RowData[0], self.yearList)
+            self.currentResult = selectInfoAboutInput(RowData[1], RowData[0], self.yearList, self.factoryYear)
             self.tableWidget.setRowCount(len(self.currentResult))
             self.orginRowNum = len(self.currentResult)
             for i, data in enumerate(self.currentResult):
@@ -173,7 +179,7 @@ class AddStrenthInfo(QWidget, Add_Strenth_Info):
             self.header = ['批次号', '出厂年份', '生产厂家', '装备状态', '是否到位', '文件凭证', '备注']
             self.tableWidget.setColumnCount(len(self.header))
             self.tableWidget.setHorizontalHeaderLabels(self.header)
-            self.currentResult = selectInfoAboutInput(RowData[1], RowData[0], self.yearList)
+            self.currentResult = selectInfoAboutInput(RowData[1], RowData[0], self.yearList, self.factoryYear)
             self.tableWidget.setRowCount(len(self.currentResult))
             self.orginRowNum = len(self.currentResult)
             #print("结果为：", self.currentResult)
