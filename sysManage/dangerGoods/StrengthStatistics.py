@@ -4,7 +4,7 @@ from widgets.dangerGoods.dangerGoodsStatisticsUI import DangerGoodsStatisticsUI
 
 import sys
 from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QTableWidget, QHeaderView, QTableWidgetItem, QComboBox, \
-    QMessageBox
+    QMessageBox, QTreeWidgetItem
 
 
 class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
@@ -12,9 +12,11 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
         super(StrengthStatistics, self).__init__(parent)
         self.setupUi(self)
         self._init()
-    result = []
-
+    first_treeWidget_dict = {}
     currentLastRow = 0
+    info = {}
+
+
 
 
     #信号和槽连接
@@ -23,10 +25,10 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
         self.tb_input.clicked.connect(self.slotInput)
         self.tb_output.clicked.connect(self.slotOutput)
         self.tb_add.clicked.connect(self.slotAdd)
-        # self.tb_del.clicked.connect(self.slotDelete)
-        self.tw_result.cellDoubleClicked.connect(self.slotAlterAndSava)
-        self.tw_first.clicked().connect(self.displayData)
-        self.tw_first.itemChanged.connect(self.displayData(self.base))
+        self.tb_delete.clicked.connect(self.slotDelete)
+        self.tw_result.itemChanged.connect(self.slotAlterAndSava)
+
+        self.tw_first.itemClicked.connect(self.displayData)
 
 
     #信号和槽断开
@@ -38,8 +40,9 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
         self.signalConnection()
         #初始化单位列表
         initDanderGoodsUnitDirectory()
-        self.result = getResult(self.base)
-        self.displayData(self.result)
+        self._initUnitTreeWidget('',self.tw_first)
+        # self.result = getResult(self.base)
+        self.displayData()
         pass
 
 
@@ -47,88 +50,126 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
         功能：
             将列表数据展示在表中
     '''
-    def displayData(self,dataList):
-        self.tw_result.clear()
-        self.tw_result.setColumnCount(13)
-        if dataList == None or len(dataList) == 0:
-            self.tb_result.setRowCount(3)
-            self.initTableHeader()
-        else:
-            self.tw_result.setRowCount(3 + len(dataList))
-            self.initTableHeader()
-            for i in range(len(dataList)):
-                item = QTableWidgetItem(str(dataList[i][0]))
-                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-                self.tw_result.setItem(3 + i, 0, item)
+    def displayData(self):
+        self.currentCheckedUnitList = []
+        for unitID, unitItem in self.first_treeWidget_dict.items():
+            if unitItem == self.tw_first.currentItem():
+                self.currentCheckedUnitList.append(unitID)
+        if len(self.currentCheckedUnitList) > 0:
+            self._initTableWidgetByUnit(self.currentCheckedUnitList[0])
+            self.unit = self.currentCheckedUnitList[0]
 
-                item = QTableWidgetItem(getUnitNameById(dataList[i][1]))
-                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-                self.tw_result.setItem(3 + i, 1, item)
+    '''
+        功能：
+            根据单位id获取数据并展示
+    '''
+    def _initTableWidgetByUnit(self,unit):
 
-                item = QTableWidgetItem(dataList[i][2])
-                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-                self.tw_result.setItem(3 + i, 2, item)
+        self.rowCount =  2 + getCountOfUnit(unit)
+        self.columnCount = 12
+        self.currentLastRow = self.rowCount - 1
+        self.initHeader()
+        if self.rowCount > 2:
+            trainResultCount = 0
+            chemicalResultCount = 0
+            trainResult = getDataByUnitAndType(unit,'训练用毒剂')
+            if trainResult != None:
+                self.diplayDataByType(2,trainResult,'训练用毒剂')
+                trainResultCount = len(trainResult)
+            else:
+                trainResultCount = 0
+            chemicalResult = getDataByUnitAndType(unit, '防化放射源')
+            if chemicalResult != None:
+                self.diplayDataByType(2 + trainResultCount, chemicalResult, '防化放射源')
+                chemicalResultCount = len(chemicalResult)
+            else:
+                chemicalResultCount = 0
+            explosionResult = getDataByUnitAndType(unit, '防化防爆弹药')
+            if explosionResult != None:
+                self.diplayDataByType(2 + trainResultCount + chemicalResultCount, explosionResult, '防化防爆弹药')
 
-                item = QTableWidgetItem(dataList[i][3])
-                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-                self.tw_result.setItem(3 + i, 3, item)
-
-                item = QTableWidgetItem(dataList[i][4])
-                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-                self.tw_result.setItem(3 + i, 4, item)
-
-                if dataList[i][5] == 1:
-                    comboBox = QComboBox()
-                    comboBox.addItems(['是','否'])
-
-                else:
-                    comboBox = QComboBox()
-                    comboBox.addItems(['否','是'])
-                self.tw_result.setCellWidget(3 + i, 5, comboBox)
-
-                item = QTableWidgetItem(dataList[i][6])
-                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-                self.tw_result.setItem(3 + i, 6, item)
-
-                item = QTableWidgetItem(dataList[i][7])
-                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-                self.tw_result.setItem(3 + i, 7, item)
-
-                item = QTableWidgetItem(dataList[i][8])
-                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-                self.tw_result.setItem(3 + i, 8, item)
-
-                item = QTableWidgetItem(str(dataList[i][9]))
-                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-                self.tw_result.setItem(3 + i, 9, item)
-
-
-                if dataList[i][10] == '已到位':
-                    comboBox = QComboBox()
-                    comboBox.addItems(['已到位','未到位'])
-                else:
-                    comboBox = QComboBox()
-                    comboBox.addItems(['未到位','已到位'])
-                self.tw_result.setCellWidget(3 + i, 10, comboBox)
-
-                item = QTableWidgetItem(dataList[i][11])
-                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-                self.tw_result.setItem(3 + i, 11, item)
-
-                item = QTableWidgetItem(dataList[i][12])
-                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-                self.tw_result.setItem(3 + i, 12, item)
-
-    pass
 
 
 
 
     '''
         功能：
+            展示数据
+    '''
+    def diplayDataByType(self,starIndex,typeData,type):
+        item = QTableWidgetItem('%s'%type)
+        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        self.tw_result.setItem(starIndex, 1, item)
+        if len(typeData) != 1:
+            self.tw_result.setSpan(starIndex, 1, len(typeData), 1)
+        for i in range(len(typeData)):
+            index = starIndex + i
+            self.info[index] = typeData[i][0]
+            item = QTableWidgetItem(str(i + 1))
+            item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+            self.tw_result.setItem(starIndex + i, 0, item)
+            item = QTableWidgetItem(typeData[i][3])
+            item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+            self.tw_result.setItem(starIndex + i, 2, item)
+            item = QTableWidgetItem(str(typeData[i][4]))
+            item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+            self.tw_result.setItem(starIndex + i, 4, item)
+            item = QTableWidgetItem(typeData[i][5])
+            item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+            self.tw_result.setItem(starIndex + i, 5, item)
+            item = QTableWidgetItem(typeData[i][6])
+            item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+            self.tw_result.setItem(starIndex + i, 6, item)
+            item = QTableWidgetItem(typeData[i][7])
+            item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+            self.tw_result.setItem(starIndex + i, 7, item)
+            item = QTableWidgetItem(typeData[i][8])
+            item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+            self.tw_result.setItem(starIndex + i, 8, item)
+            item = QTableWidgetItem(typeData[i][9])
+            item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+            self.tw_result.setItem(starIndex + i, 9, item)
+            item = QTableWidgetItem(typeData[i][10])
+            item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+            self.tw_result.setItem(starIndex + i, 10, item)
+            item = QTableWidgetItem(typeData[i][11])
+            item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+            self.tw_result.setItem(starIndex + i, 11, item)
+
+
+
+
+    '''
+        初始化单位目录
+    '''
+
+    def _initUnitTreeWidget(self, root, mother):
+        self.tw_first.header().setVisible(False)
+        if root == '':
+            result = selectUnitInfoByDeptUper('')
+        else:
+            result = selectUnitInfoByDeptUper(root)
+
+        # rowData: (单位编号，单位名称，上级单位编号)
+        for rowData in result:
+            item = QTreeWidgetItem(mother)
+            item.setText(0, rowData[1])
+            self.first_treeWidget_dict[rowData[0]] = item
+            if rowData[0] != '':
+                self._initUnitTreeWidget(rowData[0], item)
+
+
+    '''
+        功能：
             画表头,行数至少有3行
     '''
-    def initTableHeader(self):
+
+    # 初始化表头
+    def initHeader(self):
+        self.info.clear()
+        self.tw_result.clear()
+        self.tw_result.setRowCount(self.rowCount)
+        self.tw_result.setColumnCount(self.columnCount)
         self.tw_result.verticalHeader().setVisible(False)
         self.tw_result.horizontalHeader().setVisible(False)
         # self.tw_result.setEditTriggers(QTableWidget.NoEditTriggers)
@@ -137,157 +178,126 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
         self.tw_result.resizeColumnsToContents()
         self.tw_result.resizeRowsToContents()
 
-        #绘制表头
-        item = QTableWidgetItem("阵地工程XXX防护装备安装情况")
+        # 绘制表头
+        item = QTableWidgetItem("%s防化危险品实力统计" % getUnitNameById(self.currentCheckedUnitList[0]))
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.tw_result.setItem(0, 0, item)
-        self.tw_result.setSpan(0, 0, 1, 13)
+        self.tw_result.setSpan(0, 0, 1, self.columnCount)
 
         item = QTableWidgetItem("序号")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.tw_result.setItem(1, 0, item)
-        self.tw_result.setSpan(1, 0, 2, 1)
+
+        item = QTableWidgetItem("名称")
+        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        self.tw_result.setItem(1, 1, item)
 
         item = QTableWidgetItem("单位")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tw_result.setItem(1, 1, item)
-        self.tw_result.setSpan(1, 1, 1, 2)
+        self.tw_result.setItem(1, 2, item)
 
-        item = QTableWidgetItem("基地")
-        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tw_result.setItem(2, 1, item)
-
-        item = QTableWidgetItem("番号")
-        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tw_result.setItem(2, 2, item)
-
-        item = QTableWidgetItem("阵地代号")
+        item = QTableWidgetItem("合计")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.tw_result.setItem(1, 3, item)
-        self.tw_result.setSpan(1, 3, 2, 1)
 
-        item = QTableWidgetItem("具体位置")
+        item = QTableWidgetItem("小计")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.tw_result.setItem(1, 4, item)
-        self.tw_result.setSpan(1, 4, 2, 1)
 
-        item = QTableWidgetItem("是否具备安装新型装备条件")
+        item = QTableWidgetItem("新堪品")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.tw_result.setItem(1, 5, item)
-        self.tw_result.setSpan(1, 5, 2, 1)
 
-        item = QTableWidgetItem("安装情况")
+        item = QTableWidgetItem("废品")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.tw_result.setItem(1, 6, item)
-        self.tw_result.setSpan(1, 6, 1, 5)
 
-        item = QTableWidgetItem("目前安装情况")
+        item = QTableWidgetItem("出场时间")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tw_result.setItem(2, 6, item)
-        item = QTableWidgetItem("安装时间")
-        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tw_result.setItem(2, 7, item)
-        item = QTableWidgetItem("计划安装时间")
-        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tw_result.setItem(2, 8, item)
-        item = QTableWidgetItem("数量（套）")
-        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tw_result.setItem(2, 9, item)
-        item = QTableWidgetItem("装备到位情况")
-        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tw_result.setItem(2, 10, item)
+        self.tw_result.setItem(1, 7, item)
 
-        item = QTableWidgetItem("装备运行状态")
+        item = QTableWidgetItem("入库时间")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tw_result.setItem(1, 11, item)
-        self.tw_result.setSpan(1, 11, 2, 1)
+        self.tw_result.setItem(1, 8, item)
+
+        item = QTableWidgetItem("来源")
+        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        self.tw_result.setItem(1, 9, item)
+
+        item = QTableWidgetItem("放射性活度")
+        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        self.tw_result.setItem(1, 10, item)
 
         item = QTableWidgetItem("备注")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tw_result.setItem(1, 12, item)
-        self.tw_result.setSpan(1, 12, 2, 1)
+        self.tw_result.setItem(1, 11, item)
 
 
-    '''
-        功能：
-            新增一行的数据
-    '''
-    def slotAlterAndSava(self,currentRow,currentColumn):
-        if currentRow == self.currentLastRow:
-            self.savaRowData(currentRow)
+        '''
+            功能：
+                新增一行的数据
+        '''
+    def slotAlterAndSava(self):
+        selectRow = self.tw_result.selectedItems()
+        if len(selectRow) == 0:
+            return
         else:
-            self.alterRowData(currentRow)
+            currentRow = selectRow[0].row()
+            if currentRow == self.currentLastRow:
+                self.savaRowData(currentRow)
+            else:
+                self.alterRowData(currentRow)
+            pass
 
 
     def savaRowData(self,row):
-        # print('保存一行')
+        pass
         rowData = []
+        rowData.append(self.unit)
         for i in range(1,self.tw_result.columnCount()):
-            if i == 5:
-                item = self.tw_result.cellWidget(row, i)
-                if item.currentText() == '是':
-                    rowData.append(1)
-                else:
-                    rowData.append(0)
-            elif i == 10:
-                item = self.tw_result.cellWidget(row, i)
-                rowData.append(item.currentText())
+            if i == 3:
+                continue
+            if i == 1 or i == 2 :
+                item = self.tw_result.cellWidget(row,i)
+                if item != None:
+                    rowData.append(item.currentText())
             else:
                 item = self.tw_result.item(row, i)
                 if item != None and len(item.text()) > 0:
-                    if i == 1:
-                        if getUnitIdbyName(item.text()) != None:
-                            rowData.append(getUnitIdbyName(item.text()))
-                        else:
-                            QMessageBox.warning(self, "注意", "该基地名称尚未加入基地目录！", QMessageBox.Yes, QMessageBox.Yes)
-                            break
-                    else:
-                        rowData.append(item.text())
+                    rowData.append(item.text())
                 else:
                     break
+        print(rowData)
         if len(rowData) < self.tw_result.columnCount() - 1:
             return False
         else:
-            insertOneDataIntInstallation(rowData)
+            print(rowData)
+            insertOneDataIntDangerGoods(rowData)
             QMessageBox.warning(self, "注意", "插入成功！", QMessageBox.Yes, QMessageBox.Yes)
 
     def alterRowData(self,row):
-        # print("修改一行数据")
+
+        print(self.info)
         rowData = []
+        rowData.append(self.info[row])
+        rowData.append(self.unit)
         for i in range(self.tw_result.columnCount()):
-            if i == 5:
-                item = self.tw_result.cellWidget(row, i)
-                if item != None:
-                    if item.currentText() == '是':
-                        rowData.append(1)
-                    else:
-                        rowData.append(0)
-                else:
-                    return
-            elif i == 10:
-                item = self.tw_result.cellWidget(row, i)
-                if item != None:
-                    rowData.append(item.currentText())
-                else:
-                    return
+            if i == 0:
+                continue
+            if i == 3:
+                continue
+            item = self.tw_result.item(row, i)
+            if item != None and len(item.text()) > 0:
+                rowData.append(item.text())
             else:
-                item = self.tw_result.item(row, i)
-                if item != None and len(item.text()) > 0:
-                    if i == 1:
-                        if getUnitIdbyName(item.text()) != None:
-                            rowData.append(getUnitIdbyName(item.text()))
-                        else:
-                            QMessageBox.warning(self, "注意", "该基地名称尚未加入基地目录！", QMessageBox.Yes, QMessageBox.Yes)
-                            break
-                    else:
-                        rowData.append(item.text())
-                else:
-                    break
+                break
+
+        print(rowData)
         if len(rowData) < self.tw_result.columnCount():
             return False
         else:
-            # print(rowData)
-            updataOneDataIntInstallation(rowData)
+            if updataOneDataInDangerGood(rowData) == True:
+                QMessageBox.warning(self, "注意", "修改成功！", QMessageBox.Yes, QMessageBox.Yes)
         pass
 
 
@@ -311,25 +321,29 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
         self.tw_result.insertRow(rowCount)
 
         comboBox = QComboBox()
-        comboBox.addItems(['是', '否'])
-        self.tw_result.setCellWidget(rowCount, 5, comboBox)
+        comboBox.addItems(['训练用毒剂', '防化放射源','防化防爆弹药'])
+        self.tw_result.setCellWidget(rowCount, 1, comboBox)
 
         comboBox = QComboBox()
-        comboBox.addItems(['已到位', '未到位'])
-        self.tw_result.setCellWidget(rowCount, 10, comboBox)
+        comboBox.addItems(['千克', '块','瓶','枚'])
+        self.tw_result.setCellWidget(rowCount, 2, comboBox)
         pass
 
     def slotDelete(self):
-        selectedRow = self.tw_result.selectedItems()[0].row()
-        selectedColumn = self.tw_result.selectedItems()[0].column()
+        selectedRow = self.tw_result.selectedItems()
+        if selectedRow != None:
+            if len(selectedRow) > 0:
+                rowCount = selectedRow[0].row()
+            else:
+                rowCount = 0
 
-        if selectedRow <= 3:
+
+        if rowCount <= 2:
             QMessageBox.warning(self, "注意", "请选中有效单元格！", QMessageBox.Yes, QMessageBox.Yes)
         else:
-            item = self.tw_result.item(selectedRow,0)
-            if item != None and int(item.text()) > 0:
-                deleteDataByInstallationId(item.text())
-                self.tw_result.removeRow(selectedRow)
+            goodsId = self.info[selectedRow]
+            if deleteByDangerGoodsId(goodsId) == True:
+                self.tw_result.removeRow(rowCount)
         pass
 
 
@@ -337,6 +351,6 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    widget = InstallationSituation()
+    widget = StrengthStatistics()
     widget.show()
     sys.exit(app.exec_())
