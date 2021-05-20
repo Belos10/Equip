@@ -8,6 +8,7 @@ from database.loginSql import selectUserInfoByAccont
 from sysManage.login.loginSet import loginSet
 from widgets.dangerGoods.dangerGoods import DangerGoods
 from widgets.positionEngineer.positionEngineerMain import PositionEngineerMain
+from sysManage.userInfo import get_value,set_value
 #new
 class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
     def __init__(self, parent=None):
@@ -85,10 +86,11 @@ class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
         elif self.userInfo[0][3] == "仓库":
             self.tb_ManageWidget.removeTab(5)
             self.tb_ManageWidget.removeTab(0)
-
-        self.strengthDisturb.initUserInfo(self.userInfo)
-        self.alocatMange.initUserInfo(self.userInfo)
-        self.PosEngin.slotInstallation()
+        set_value("totleUserInfo", self.userInfo)
+        print("''''''''''''''''''''''''''''''''", get_value("totleUserInfo"))
+        #self.strengthDisturb.initUserInfo(self.userInfo)
+        #self.alocatMange.initUserInfo(self.userInfo)
+        #self.PosEngin.slotInstallation()
         self.login.close()
         self.show()
 

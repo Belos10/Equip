@@ -114,6 +114,8 @@ class AllotSchedule(QWidget,AllotSchedule):
             self.first_treeWidget_dict[rowData[0]] = item
             if rowData[0] != '':
                 self._initUnitTreeWidget(rowData[0], item)
+            else:
+                return
 
 
 
@@ -131,6 +133,8 @@ class AllotSchedule(QWidget,AllotSchedule):
             self.second_treeWidget_dict[rowData[0]] = item
             if rowData[0] != '':
                 self._initEquipTreeWidget(rowData[0], item)
+            else:
+                return
 
 
 

@@ -1,10 +1,10 @@
-# -*- mode: python ; coding: utf-8 -*-
+# -*- mode: python -*-
 
 block_cipher = None
 
 
-a = Analysis(['sysManage\\main.py'],
-             pathex=['database', 'icons', 'sysManage', 'test', 'widgets', 'F:\\CodeRepository\\PythonProject\\PycharmProject\\Equip'],
+a = Analysis(['main.py'],
+             pathex=['database', 'icons', 'utills', 'venv', 'widgets', 'G:\\pythonProject\\Equip-master'],
              binaries=[],
              datas=[],
              hiddenimports=[],
@@ -13,25 +13,17 @@ a = Analysis(['sysManage\\main.py'],
              excludes=[],
              win_no_prefer_redirects=False,
              win_private_assemblies=False,
-             cipher=block_cipher,
-             noarchive=False)
+             cipher=block_cipher)
 pyz = PYZ(a.pure, a.zipped_data,
              cipher=block_cipher)
 exe = EXE(pyz,
           a.scripts,
-          [],
-          exclude_binaries=True,
+          a.binaries,
+          a.zipfiles,
+          a.datas,
           name='main',
           debug=False,
-          bootloader_ignore_signals=False,
           strip=False,
           upx=True,
+          runtime_tmpdir=None,
           console=True )
-coll = COLLECT(exe,
-               a.binaries,
-               a.zipfiles,
-               a.datas,
-               strip=False,
-               upx=True,
-               upx_exclude=[],
-               name='main')

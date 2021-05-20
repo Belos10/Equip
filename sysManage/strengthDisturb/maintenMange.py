@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, QAbstrac
 from widgets.strengthDisturb.maintenMange import Widget_Mainten_Manage
 from database.strengthDisturbSql import *
 from PyQt5.Qt import Qt
-
+from sysManage.userInfo import get_value
 '''
    编制数维护
 '''
@@ -27,20 +27,21 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
         self.currentYear = None
 
 
-    def getUserInfo(self, userInfo):
-        self.userInfo = userInfo
-        self._initAll_()
+    def getUserInfo(self):
+        self.userInfo = get_value("totleUserInfo")
+        #self._initAll_()
 
     #初始化编制数维护界面
     def _initAll_(self):
+        self.getUserInfo()
         self.first_treeWidget_dict = {}
         self.tw_first.clear()
-        self.startName = selectUnitNameByUnitID(self.userInfo[0][4])
-        item = QTreeWidgetItem(self.tw_first)
-        item.setText(0, self.startName)
-        item.setCheckState(0, Qt.Unchecked)
-        self.first_treeWidget_dict[self.userInfo[0][4]] = item
-        self._initUnitTreeWidget(self.userInfo[0][4], item)
+        #self.startName = selectUnitNameByUnitID(self.userInfo[0][4])
+        #item = QTreeWidgetItem(self.tw_first)
+        #item.setText(0, self.startName)
+        #item.setCheckState(0, Qt.Unchecked)
+        #self.first_treeWidget_dict[self.userInfo[0][4]] = item
+        self._initUnitTreeWidget("", self.tw_first)
         self._initStrenInquiry()
         self.currentYear = None
         self.currentInquiryResult = {}

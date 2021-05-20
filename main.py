@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QApplication
 from sysManage.MainWindowManage import Manage_Widgets
 from PyQt5 import sip
 from sysManage.login.login import login
-
+sys.setrecursionlimit(100000)
 '''
     显示主界面
 '''
