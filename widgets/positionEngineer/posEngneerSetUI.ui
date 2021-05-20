@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>阵地工程</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_5">
    <property name="leftMargin">
@@ -310,10 +310,10 @@
           </item>
          </layout>
         </item>
-        <item row="1" column="7">
-         <widget class="QPushButton" name="pb_add">
+        <item row="1" column="0">
+         <widget class="QLabel" name="lb_unitUper">
           <property name="text">
-           <string>增加</string>
+           <string>上级单位号：</string>
           </property>
          </widget>
         </item>
@@ -327,10 +327,27 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="4">
-         <widget class="QLabel" name="lb_equipUper">
+        <item row="0" column="4">
+         <widget class="QLabel" name="lb_equipID">
           <property name="text">
-           <string>上级装备号：</string>
+           <string>装备号：</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QLabel" name="lb_equipName">
+          <property name="text">
+           <string>装备名字：</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="le_unitID">
+          <property name="maximumSize">
+           <size>
+            <width>150</width>
+            <height>16777215</height>
+           </size>
           </property>
          </widget>
         </item>
@@ -341,6 +358,37 @@
             <width>150</width>
             <height>16777215</height>
            </size>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="5">
+         <widget class="QLineEdit" name="le_equipUper">
+          <property name="maximumSize">
+           <size>
+            <width>150</width>
+            <height>16777215</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QLabel" name="lb_unitName">
+          <property name="text">
+           <string>单位名字：</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="4">
+         <widget class="QLabel" name="lb_equipUper">
+          <property name="text">
+           <string>上级装备号：</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="lb_unitID">
+          <property name="text">
+           <string>单位号：</string>
           </property>
          </widget>
         </item>
@@ -360,27 +408,10 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="5">
-         <widget class="QLineEdit" name="le_equipUper">
-          <property name="maximumSize">
-           <size>
-            <width>150</width>
-            <height>16777215</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="lb_unitUper">
+        <item row="0" column="6">
+         <widget class="QLabel" name="lb_equipType">
           <property name="text">
-           <string>上级单位号：</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="2">
-         <widget class="QLabel" name="lb_equipName">
-          <property name="text">
-           <string>装备名字：</string>
+           <string>装备类型：</string>
           </property>
          </widget>
         </item>
@@ -394,41 +425,10 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="1">
-         <widget class="QLineEdit" name="le_unitID">
-          <property name="maximumSize">
-           <size>
-            <width>150</width>
-            <height>16777215</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="4">
-         <widget class="QLabel" name="lb_equipID">
+        <item row="1" column="7">
+         <widget class="QPushButton" name="pb_add">
           <property name="text">
-           <string>装备号：</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="2">
-         <widget class="QLabel" name="lb_unitName">
-          <property name="text">
-           <string>单位名字：</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="lb_unitID">
-          <property name="text">
-           <string>单位号：</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="6">
-         <widget class="QLabel" name="lb_equipType">
-          <property name="text">
-           <string>装备类型：</string>
+           <string>增加</string>
           </property>
          </widget>
         </item>

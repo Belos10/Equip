@@ -100,12 +100,12 @@ class Equip_Balance_Main(QWidget, EquipmentBalanceMainUI):
     # 信号与槽的连接
     def signalConnectSlot(self):
         #定义删除按钮的单机事件
-        self.pb_delete.clicked.connect(self.soltDeleteYear)
+#        self.pb_delete.clicked.connect(self.soltDeleteYear)
 
         #定义单元格的双击事件
         #self.tb_year.itemDoubleClicked.connect(self.displayResult)
         #定义新增按钮单击事件
-        self.pb_add.clicked.connect(self.addEquipmentBalance)
+ #       self.pb_add.clicked.connect(self.addEquipmentBalance)
         #导入按钮单击事件
         self.pb_input.clicked.connect(self.inputEquipmentBalance)
         #导出按钮单击事件

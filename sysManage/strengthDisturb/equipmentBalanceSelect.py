@@ -37,7 +37,7 @@ class Equip_Balance_Select(QWidget, EquipmentBalanceSelectUI):
         self.tw_first.itemClicked.connect(self.slotSelectedResult)
 
         # 当前装备目录被点击
-        self.tw_second.itemChanged.connect(self.slotSelectedResult)
+        self.tw_second.itemClicked.connect(self.slotSelectedResult)
         #
         self.pb_firstSelect.clicked.connect(self.slotClickedInqury)
         self.pb_secondSelect.clicked.connect(self.slotClickedInqury)

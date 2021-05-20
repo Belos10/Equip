@@ -42,9 +42,9 @@ class AllotSchedule(QWidget,AllotSchedule):
 
     def signalConnect(self):
         # 点击选择年份后刷新页面 初始化
-        self.lw_yearChoose.itemDoubleClicked.connect(self.slotClickedInqury)
-        self.lw_yearChoose.itemDoubleClicked.connect(self.setDisturbPlanTitle)
-        self.lw_yearChoose.itemDoubleClicked.connect(self.initDisturbPlanProof)
+        self.lw_yearChoose.itemClicked.connect(self.slotClickedInqury)
+        self.lw_yearChoose.itemClicked.connect(self.setDisturbPlanTitle)
+        self.lw_yearChoose.itemClicked.connect(self.initDisturbPlanProof)
         # 点击第一目录结果
         self.tw_first.itemClicked.connect(self.slotDisturbStrengthResult)
         # 点击第二目录结果
@@ -88,7 +88,15 @@ class AllotSchedule(QWidget,AllotSchedule):
         self.second_treeWidget_dict = {}
         self.currentYear = self.lw_yearChoose.currentItem().text()
         self._initUnitTreeWidget("", self.tw_first)
-        self._initEquipTreeWidget("", self.tw_second)
+        startEquipIDInfo = findUperEquipIDByName("通用装备")
+        for startEquipInfo in startEquipIDInfo:
+            # self.second_treeWidget_dict[0] = startEquipInfo
+            item = QTreeWidgetItem(self.tw_second)
+            item.setText(0, startEquipInfo[1])
+            item.setCheckState(0, Qt.Unchecked)
+            self.second_treeWidget_dict[startEquipInfo[0]] = item
+            self._initEquipTreeWidget(startEquipInfo[0], item)
+            break
 
 
 
@@ -151,10 +159,11 @@ class AllotSchedule(QWidget,AllotSchedule):
             if equipItem.checkState(0) == Qt.Checked:
                 equipInfo = findEquipInfo(equipID)
                 self.currentEquipdict[j]= equipInfo[0]
+                j=j+1
             elif equipItem.checkState(0) == Qt.PartiallyChecked:
                 equipInfo = findEquipInfo(equipID)
                 self.currentEquipdict[j] = equipInfo[0]
-            j=j+1
+                j=j+1
         print("self.currentEquipdict",self.currentEquipdict)
         self._initDisturbPlanByUnitListAndEquipList()
 
@@ -192,7 +201,7 @@ class AllotSchedule(QWidget,AllotSchedule):
             item = QTableWidgetItem("")
             item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
             self.disturbResult.setItem(i, 1, item)
-            item = QTableWidgetItem("")
+            item = QTableWidgetItem("0")
             item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
             self.disturbResult.setItem(i, 2, item)
             item = QTableWidgetItem("")
@@ -359,7 +368,7 @@ class AllotSchedule(QWidget,AllotSchedule):
     def initDisturbPlanNote(self):
         self.unitDisturbPlanNoteList = selectDisturbPlanNote(self.currentEquipdict, self.currentYear)
         #print("self.unitDisturbPlanNoteList", self.unitDisturbPlanNoteList)
-        for i in range(0,len(self.unitDisturbPlanNoteList)):
+        for i in range(0,len(self.currentEquipdict)):
             item=self.disturbResult.item(i,self.lenHeaderList-1)
             if self.unitDisturbPlanNoteList[i] is not None:
                 item.setText(str(self.unitDisturbPlanNoteList[i]))
@@ -371,19 +380,39 @@ class AllotSchedule(QWidget,AllotSchedule):
 
         for i in range(0, len(self.unitDisturbPlanOtherList)):
             item = self.disturbResult.item(i, 1)
-            item.setText(str(self.unitDisturbPlanOtherList[i][0]))
+            if self.unitDisturbPlanOtherList[i]:
+                item.setText(str(self.unitDisturbPlanOtherList[i][0]))
+            else:
+                item.setText("")
 
         for unitID, unitItem in self.first_treeWidget_dict.items():
             if unitItem == self.tw_first.currentItem():
                 if selectUnitIfUppermost(unitID):
+                    # print("最高级！！！！！！！！！！！！", self.unitDisturbPlanOtherList)
                     for i in range(0, len(self.unitDisturbPlanOtherList)):
                         item = self.disturbResult.item(i, 2)
-                        item.setText(str(self.unitDisturbPlanOtherList[i][1]))
+                        if self.unitDisturbPlanOtherList[i]:
+                            item.setText(str(self.unitDisturbPlanOtherList[i][1]))
+                        else:
+                            item.setText("0")
+                    for childRow, equipInfo in self.currentEquipdict.items():
+                        uperInfoList = selectUperInfoByEquipID(equipInfo[0])
+                        print("uperInfo")
+                        childNum = self.disturbResult.item(childRow, 2).text()
+                        for uperInfo in uperInfoList:
+                            for row, uperInfoRow in self.currentEquipdict.items():
+                                if uperInfo[0] == uperInfoRow[0]:
+                                    num = self.disturbResult.item(row, 2).text()
+                                    totleNum = int(childNum) + int(num)
+                                    self.disturbResult.item(row, 2).setText(str(totleNum))
                 else:
                     for i in self.currentEquipdict:
                         item = self.disturbResult.item(i, 2)
                         result = selectDisturbPlanNum({0: [unitID]}, self.currentEquipdict, self.currentYear)
-                        item.setText(str(result[i]))
+                        if result:
+                            item.setText(str(result[i]))
+                        else:
+                            item.setText("0")
 
 
     def setArmySchedule(self):

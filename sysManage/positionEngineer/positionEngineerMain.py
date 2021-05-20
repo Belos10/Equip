@@ -1,11 +1,9 @@
 
 import sys
 from PyQt5.QtWidgets import QMainWindow,QApplication,QWidget
-from sysManage.strengthDisturb.Stren_Inquiry import Stren_Inquiry
-from sysManage.strengthDisturb.strengthDisturbSet import strengthDisturbSet
-from sysManage.strengthDisturb.maintenMange import maintenManage
-from sysManage.strengthDisturb.equipmentBalanceControl import Equip_Balance_Control
-from sysManage.strengthDisturb.retirement import retirement
+
+from sysManage.positionEngineer.installationSituation import InstallationSituation
+
 #new
 from widgets.positionEngineer.positionEngineerWidget import Position_Engineer_Widget
 
@@ -15,7 +13,7 @@ class PositionEngineerMain(QMainWindow, Position_Engineer_Widget):
         super(PositionEngineerMain, self).__init__(parent)
         self.setupUi(self)
 
-        self.installationSituation = QWidget(self)
+        self.installationSituation = InstallationSituation(self)
         self.equipmentStatistics = QWidget(self)
         self.directoryMaintenance = QWidget(self)
 
@@ -24,9 +22,9 @@ class PositionEngineerMain(QMainWindow, Position_Engineer_Widget):
         self.stackedWidget.addWidget(self.directoryMaintenance)
 
         self.stackedWidget.setCurrentIndex(0)
-        self.installationSituation.setDisabled(True)
-        self.equipmentStatistics.setDisabled(False)
-        self.directoryMaintenance.setDisabled(False)
+        self.installationSituation.setDisabled(False)
+        self.equipmentStatistics.setDisabled(True)
+        self.directoryMaintenance.setDisabled(True)
         self.connectSignal()
 
 
@@ -49,7 +47,7 @@ class PositionEngineerMain(QMainWindow, Position_Engineer_Widget):
 
         self.slotDisconnect()
         self.stackedWidget.setCurrentIndex(0)
-        # self.strenSelect._initStrenInquiry() 初始化函数
+        #self.strenSelect._initStrenInquiry() #初始化函数
         self.connectSignal()
 
     def slotEquipmentStatistics(self):
