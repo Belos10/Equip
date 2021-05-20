@@ -2,6 +2,7 @@
 import sys
 from PyQt5.QtWidgets import QMainWindow,QApplication,QWidget
 
+from sysManage.dangerGoods.StrengthStatistics import StrengthStatistics
 from widgets.dangerGoods.dangerGoodsWidget import Danger_Goods_Widget
 from widgets.positionEngineer.positionEngineerWidget import Position_Engineer_Widget
 
@@ -10,7 +11,7 @@ class DangerGoods(QMainWindow, Danger_Goods_Widget):
         super(DangerGoods, self).__init__(parent)
         self.setupUi(self)
 
-        self.strengthStatistics = QWidget(self)
+        self.strengthStatistics = StrengthStatistics(self)
         self.directoryMaintenance = QWidget(self)
         self.stackedWidget.addWidget(self.strengthStatistics)
         self.stackedWidget.addWidget(self.directoryMaintenance)
@@ -37,6 +38,7 @@ class DangerGoods(QMainWindow, Danger_Goods_Widget):
 
         self.slotDisconnect()
         self.stackedWidget.setCurrentIndex(0)
+        self.stackedWidget.currentWidget().setDisabled(False)
         # self.strengthStatistics._init() 初始化函数
         self.connectSignal()
 

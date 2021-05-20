@@ -100,7 +100,7 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
         self.tw_result.clear()
         self.tw_result.setColumnCount(13)
         if dataList == None or len(dataList) == 0:
-            self.tb_result.setRowCount(3)
+            self.tw_result.setRowCount(3)
             self.initTableHeader()
         else:
             self.tw_result.setRowCount(3 + len(dataList))
