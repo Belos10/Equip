@@ -182,7 +182,8 @@ class retirement(QWidget, Widget_Retirement):
             if equipItem.checkState(0) == Qt.Checked or equipItem.checkState(0) == Qt.PartiallyChecked:
                 self.currentCheckedEquipList.append(equipID)
 
-
+        if self.currentCheckedEquipList == [] or self.currentCheckedUnitList == []:
+            return
         self.pb_save.setDisabled(False)
         print("装备：", self.currentCheckedEquipList)
         self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList,

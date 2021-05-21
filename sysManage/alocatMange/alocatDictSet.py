@@ -4,7 +4,8 @@ from PyQt5.QtWidgets import QApplication, QWidget, QListWidgetItem, QComboBox, Q
     QInputDialog, QMessageBox, QAbstractItemView, QTreeWidgetItem, QLineEdit
 from database.strengthDisturbSql import *
 from sysManage.alocatMange.config import ArmyTransferReceiveUnit, ArmyTransferSendUnit
-from sysManage.alocatMange.AddUnitChoose import AddUnitChoose
+from sysManage.alocatMange.AddUnitChoose import *
+from database.alocatMangeSql import *
 from PyQt5.Qt import Qt
 from database.alocatMangeSql import *
 
@@ -32,8 +33,9 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
 
         self.first_treeWidget_dict = {}  # 当前单位目录列表对象，结构为：{'行号':对应的item}
         self.second_treeWidget_dict = {}  # 当前装备目录列表对象，结构为：{'行号':对应的item}
-        self.signalConnect()
+
         self.addUnitChoose = AddUnitChoose()
+        self.signalConnect()
 
     '''
         功能：
@@ -51,6 +53,7 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
 
         self.pb_setEquip.clicked.connect(self.slotEquipDictInit)  # 设置装备目录
         self.pb_firstSelect.clicked.connect(self.slotSelectUnit)
+        self.addUnitChoose.signal.connect(self.updateUnit)
 
         # self.pb_secondSelect.clicked.connect(self.slotSelectEquip)
         # self.pb_setEquipUnit.clicked.connect(self.slotSetEquipUnit)
@@ -93,6 +96,7 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
         self.pb_setUnit.clicked.disconnect(self.slotUnitDictInit)  # 设置单元目录
 
         self.pb_setEquip.clicked.disconnect(self.slotEquipDictInit)  # 设置装备目录
+
 
     '''
         功能：
@@ -315,7 +319,7 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
         if self.changeUnit == '1':
             self.addUnitChoose.initWidget()
             self.addUnitChoose.show()
-            self.addUnitChoose.signal.connect(self.updateUnit)
+
         # 装备目录
         elif self.changeUnit == '2':
             if self.le_equipID.text() == "" or self.le_equipName.text() == "":
@@ -352,6 +356,7 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
 
     def updateUnit(self):
         insertIntoDistrubPlanUnitFromList(self.addUnitChoose.currentUnitID)
+        print("self.addUnitChoose.currentUnitID",self.addUnitChoose.currentUnitID)
         self.slotUnitDictInit()
 
     '''

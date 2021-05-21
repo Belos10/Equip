@@ -5,7 +5,7 @@ def selectYearListAboutArmy():
     conn, cur = connectMySql()
 
     yearList = []
-    sql = "select * from armytransferyear"
+    sql = "select * from armytransferyear order by year"
 
     cur.execute(sql)
     result = cur.fetchall()
@@ -24,7 +24,7 @@ def selectYearListAboutRocket():
     conn, cur = connectMySql()
 
     yearList = []
-    sql = "select * from rockettransferyear"
+    sql = "select * from rockettransferyear order by year "
 
     cur.execute(sql)
     result = cur.fetchall()
@@ -214,6 +214,7 @@ def updateDisturbPlanNum(Equip_Id,Unit_Id,Year,DisturbNum):
     conn,cur=connectMySql()
     sql="update disturbplan set DisturbNum='"+ DisturbNum + "'where Equip_Id='" + Equip_Id + "'and Unit_Id ='" \
         + Unit_Id + "' and Year = '" + Year + "'"
+    print("===========", sql)
     cur.execute(sql)
     conn.commit()
     disconnectMySql(conn,cur)
@@ -223,7 +224,7 @@ def updateDisturbPlanNum(Equip_Id,Unit_Id,Year,DisturbNum):
 def selectYearListAboutDisturbPlan():
     conn, cur = connectMySql()
     yearList = []
-    sql = "select * from disturbplanyear"
+    sql = "select * from disturbplanyear order by year"
 
     cur.execute(sql)
     result = cur.fetchall()

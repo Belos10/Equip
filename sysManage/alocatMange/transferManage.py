@@ -36,3 +36,4 @@ class transferManage(QMainWindow, Widget_Transfer_Manage):
         self.tb_armyTransfer.setDisabled(False)
         self.tb_rocketTransfer.setDisabled(True)
         self.sw_manageWIdget.setCurrentIndex(1)
+        self.rocketTransfer._initYearWidget_()

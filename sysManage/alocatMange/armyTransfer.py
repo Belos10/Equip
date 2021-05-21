@@ -109,6 +109,10 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
         #print("IDList :", IDList)
         for i in range(currentRowNum - self.orginRowCount):
             haveID = False
+            if self.tw_result.item(i + addRow, 0):
+                pass
+            else:
+                ID = ""
             ID = self.tw_result.item(i + addRow, 0).text()
             if ID == "":
                 reply = QMessageBox.question(self, '新增', '第' + str(i + addRow - 1) + '添加失败，序号不能为空', QMessageBox.Yes)
@@ -120,6 +124,10 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
             if haveID:
                 reply = QMessageBox.question(self, '新增', '第' + str(i + addRow- 1) + '添加失败，当前年份当前序号已存在', QMessageBox.Yes)
                 continue
+            if self.tw_result.item(i + addRow, 17):
+                pass
+            else:
+                Equip_Num = "-"
             Equip_Num = self.tw_result.item(i + addRow, 17).text()
             if Equip_Num.isdigit():
                 pass
