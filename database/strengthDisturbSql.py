@@ -1997,7 +1997,6 @@ def insertIntoRetireYear(year):
 def delRetireYearByYear(year):
     conn, cur = connectMySql()
 
-    result = selectAllRetirementYearInfo()
     sql = "delete from retireyear where year = '" + year + "'"
     # print(sql)
     cur.execute(sql)
@@ -2007,7 +2006,17 @@ def delRetireYearByYear(year):
     cur.execute(sql)
     conn.commit()
     disconnectMySql(conn, cur)
-
+# 删除退休表所有年份
+def delRetireYearALLYear():
+    conn, cur = connectMySql()
+    sql = "truncate table retireyear "
+    # print(sql)
+    cur.execute(sql)
+    sql = "truncate table retire "
+    # print(sql)
+    cur.execute(sql)
+    conn.commit()
+    disconnectMySql(conn, cur)
 
 def insertIntoWeaveYear(year):
     conn, cur = connectMySql()

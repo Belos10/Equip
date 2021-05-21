@@ -72,6 +72,7 @@ class PositionEngineerMain(QMainWindow, Position_Engineer_Widget):
         self.slotDisconnect()
         self.stackedWidget.setCurrentIndex(2)
         self.stackedWidget.currentWidget().setDisabled(False)
+        self.directoryMaintenance
         self.connectSignal()
         # self.directoryMaintenance._initAll_() 初始化函数
 

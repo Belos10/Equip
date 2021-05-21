@@ -238,13 +238,13 @@ def getResultByYearAndEquipAndUnit(year,equipList,unitList):
             # sorted(resultList, key=operator.itemgetter('Equip_ID'))
 
 def deleteByYear(year):
+
     sql = "select equip_balance_id from equipment_balance where year='%s'"%year
     data = executeSql(sql)
     if data != None:
         for item in data:
             equipKey = data[0]
             sqls = []
-
             sql = "delete from eb_carry where equip_balance_id='%s'" % equipKey
             sqls.append(sql)
             sql = "delete from eb_change_project where equip_balance_id='%s'" % equipKey
