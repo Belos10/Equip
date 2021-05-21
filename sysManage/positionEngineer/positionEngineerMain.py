@@ -66,6 +66,7 @@ class PositionEngineerMain(QMainWindow, Position_Engineer_Widget):
 
     def slotDirectoryMaintenance(self):
         self.tb_installation.setDisabled(False)
+
         self.tb_equipmentStatistics.setDisabled(False)
         self.tb_directoryMaintenance.setDisabled(True)
         self.slotDisconnect()
