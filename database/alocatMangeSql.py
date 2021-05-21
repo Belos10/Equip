@@ -1,5 +1,5 @@
 from database.strengthDisturbSql import *
-
+#new
 #查询陆军调拨单所有年份表, 返回全部年份列表
 def selectYearListAboutArmy():
     conn, cur = connectMySql()

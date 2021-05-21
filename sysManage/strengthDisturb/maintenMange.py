@@ -245,11 +245,20 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
             item = QTreeWidgetItem(root.pop(0))
             item.setText(0, UnitInfo[1])
             item.setCheckState(0, Qt.Unchecked)
+            if UnitInfo:
+                if UnitInfo[4]  == "是":
+                    publicItem = QTreeWidgetItem(item)
+                    publicEuip = selectPubilcEquipInfoByGroupID(UnitInfo[0])
+                    if publicEuip:
+                        publicItem.setText(0, "公用装备")
+                        self.first_treeWidget_dict[publicEuip[0]] = publicItem
+                        publicItem.setCheckState(0, Qt.Unchecked)
             self.first_treeWidget_dict[UnitInfo[0]] = item
             result = selectUnitInfoByDeptUper(UnitInfo[0])
             for resultInfo in result:
                 stack.append(resultInfo)
                 root.append(item)
+
 
     #查看当前被选中的单位和装备并初试化
     def slotInquryStrengthResult(self):

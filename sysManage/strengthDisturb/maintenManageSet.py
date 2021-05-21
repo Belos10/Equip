@@ -64,12 +64,14 @@ class maintenManageSet(QWidget, Widget_Mainten_Manage_Set):
             for resultInfo in result:
                 stack.append(resultInfo)
                 root.append(item)
-            if UnitInfo[4] == "是":
-                pulicEquipInfo = selectPubilcEquipInfoByGroupID(UnitInfo[0])
-                publicItem = QTreeWidgetItem(item)
-                publicItem.setText(0, UnitInfo[1])
-                self.first_treeWidget_dict[pulicEquipInfo[0]] = publicItem
-                self.currentPublicInfo.append(pulicEquipInfo)
+            if UnitInfo:
+                if UnitInfo[4] == "是":
+                    publicItem = QTreeWidgetItem(item)
+                    publicEuip = selectPubilcEquipInfoByGroupID(UnitInfo[0])
+                    if publicEuip:
+                        publicItem.setText(0, "公用装备")
+                        self.first_treeWidget_dict[publicEuip[0]] = publicItem
+                        self.currentPublicInfo.append(publicEuip)
 
     def signalConnect(self):
         #当前单位结果界面某行被选中
@@ -170,8 +172,7 @@ class maintenManageSet(QWidget, Widget_Mainten_Manage_Set):
             return
         if self.tw_unit.item(self.currentRow, 2).text() != self.cb_isGroup.currentText():
             updateUnitIsGroupFromUnit(self.lb_unitID.text(), self.cb_isGroup.currentText())
-            self._initPublicEquipTableWidget_()
-            self._initUnitTableWidget()
+
             self.first_treeWidget_dict = {}
             self.tw_first.clear()
             self._initAll_()
