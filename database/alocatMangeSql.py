@@ -214,7 +214,7 @@ def updateDisturbPlanNum(Equip_Id,Unit_Id,Year,DisturbNum):
     conn,cur=connectMySql()
     sql="update disturbplan set DisturbNum='"+ DisturbNum + "'where Equip_Id='" + Equip_Id + "'and Unit_Id ='" \
         + Unit_Id + "' and Year = '" + Year + "'"
-    print("===========", sql)
+    #print("===========", sql)
     cur.execute(sql)
     conn.commit()
     disconnectMySql(conn,cur)
