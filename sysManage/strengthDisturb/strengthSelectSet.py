@@ -24,6 +24,7 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
 
         self.first_treeWidget_dict = {}  # 当前单位目录列表对象，结构为：{'行号':对应的item}
         self.second_treeWidget_dict = {}  # 当前装备目录列表对象，结构为：{'行号':对应的item}
+        self.currentUnitTableResult = []
         self.signalConnect()
 
     def getUserInfo(self):
@@ -57,8 +58,6 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
             if item.text(0) == findText:
                 self.tw_first.setCurrentItem(item)
                 break
-
-
 
     def slotInputDataByExcel(self):
         if self.changeUnit:
@@ -116,7 +115,6 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
         self.pb_setEquip.clicked.disconnect(self.slotEquipDictInit)  # 设置装备目录
 
 
-
     '''
         功能：
             清除所有数据
@@ -133,6 +131,7 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
         self.le_unitName.clear()
         self.le_equipName.clear()
         self.le_equipUper.clear()
+        self.currentUnitTableResult = []
 
     '''
         功能：
@@ -161,19 +160,49 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
         self.pb_setUnit.setDisabled(True)
         self.pb_setEquipUnit.setDisabled(True)
         self.pb_setUnitAlias.setDisabled(0)
-        print("userInfo :   ", self.userInfo)
+        self.first_treeWidget_dict = {}
 
-        #self.startName = selectUnitNameByUnitID(self.userInfo[0][4])
-        #item = QTreeWidgetItem(self.tw_first)
-        #item.setText(0, self.startName)
-        #self.first_treeWidget_dict[self.userInfo[0][4]] = item
-
-        #从数据库中单位表中获取数据初始化单位目录，tableWidget显示所有的单位表
-        self._initUnitTreeWidget("", self.tw_first)
-        self._initUnitTableWidget()
+        self.startInfo = selectUnitInfoByUnitID(self.userInfo[0][4])
+        stack = []
+        root = []
+        if self.startInfo:
+            stack.append(self.startInfo)
+            root.append(self.tw_first)
+            self.initUnitTreeWidget(stack, root)
+            #从数据库中单位表中获取数据初始化单位目录，tableWidget显示所有的单位表
+            #self._initUnitTreeWidget("", self.tw_first)
+            self._initUnitTableWidget()
 
         self.changeUnit = True              #设置当前为修改单位状态
 
+    '''
+            功能：
+                单位目录的初始化，显示整个单位表
+                参数表：root为上级单位名字，mother为上级节点对象
+    '''
+    def initUnitTreeWidget(self, stack, root):
+        while stack:
+            UnitInfo = stack.pop(0)
+            self.currentUnitTableResult.append(UnitInfo)
+            item = QTreeWidgetItem(root.pop(0))
+            item.setText(0, UnitInfo[1])
+            self.first_treeWidget_dict[UnitInfo[0]] = item
+            result = selectUnitInfoByDeptUper(UnitInfo[0])
+            for resultInfo in result:
+                stack.append(resultInfo)
+                root.append(item)
+
+
+    def initEquipTreeWidget(self, stack, root):
+        while stack:
+            EquipInfo = stack.pop(0)
+            item = QTreeWidgetItem(root.pop(0))
+            item.setText(0, EquipInfo[1])
+            self.second_treeWidget_dict[EquipInfo[0]] = item
+            result = selectEquipInfoByEquipUper(EquipInfo[0])
+            for resultInfo in result:
+                stack.append(resultInfo)
+                root.append(item)
     '''
             功能：
                 点击设置装备目录按钮后的初始化
@@ -202,62 +231,30 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
         self.pb_setUnitAlias.setDisabled(1)
 
         # 从数据库中单位表中获取数据初始化单位目录，tableWidget显示所有的单位表
-        self._initEquipTreeWidget("", self.tw_second)
-        self._initEquipTableWidget()
+        equipInfo = None
+        equipInfo = selectEquipInfoByEquipUper("")
+        stack = []
+        root = []
+        if equipInfo:
+            stack.append(equipInfo[0])
+            root.append(self.tw_second)
+            self.initEquipTreeWidget(stack, root)
+            # 从数据库中单位表中获取数据初始化单位目录，tableWidget显示所有的单位表
+            # self._initUnitTreeWidget("", self.tw_first)
+            self._initEquipTableWidget()
 
         self.changeUnit = False  # 设置当前为修改单位状态
-
-    '''
-        功能：
-            单位目录的初始化，显示整个单位表
-            参数表：root为上级单位名字，mother为上级节点对象
-    '''
-    def _initUnitTreeWidget(self, root, mother):
-        if root == '':
-            result = selectUnitInfoByDeptUper('')
-        else:
-            result = selectUnitInfoByDeptUper(root)
-
-        #rowData: (单位编号，单位名称，上级单位编号)
-        for rowData in result:
-            item = QTreeWidgetItem(mother)
-            item.setText(0, rowData[1])
-            self.first_treeWidget_dict[rowData[0]] = item
-            if rowData[0] != '':
-                self._initUnitTreeWidget(rowData[0], item)
-            else:
-                return None
-
-    def getTableUnitInfo(self, root):
-        if root[0] == '':
-            result = selectUnitInfoByDeptUper('')
-        else:
-            result = selectUnitInfoByDeptUper(root[0])
-
-            # rowData: (单位编号，单位名称，上级单位编号)
-        for rowData in result:
-            self.unitDictInfo.append(rowData)
-            if rowData[0] != '':
-                self.getTableUnitInfo(rowData[0])
-            else:
-                return
     '''
         功能：
             设置单元时的初始化tableWidget，显示整个单位表
     '''
     def _initUnitTableWidget(self):
-        self.unitDictInfo = []
-        #self.startInfo = selectUnitInfoByUnitID(self.userInfo[0][4])
-        #self.unitDictInfo.append(self.startInfo)
-        #self.getTableUnitInfo(self.userInfo[0][4])
-        result = selectAllDataAboutUnit()
-
         header = ['单位编号', '单位名称', '上级单位编号','单位别名']
         self.tb_result.setColumnCount(len(header))
-        self.tb_result.setRowCount(len(result))
+        self.tb_result.setRowCount(len(self.currentUnitTableResult))
         self.tb_result.setHorizontalHeaderLabels(header)
 
-        for i, data in enumerate(result):
+        for i, data in enumerate(self.currentUnitTableResult):
             item = QTableWidgetItem(data[0])
             self.tb_result.setItem(i, 0, item)
             item = QTableWidgetItem(data[1])
@@ -365,33 +362,33 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
                 Unit_ID = self.le_unitID.text()
                 Unit_Name = self.le_unitName.text()
                 Unit_Uper = self.le_unitUper.text()
-                unitInfoTuple = selectAllDataAboutUnit()
-
+                allUnitInfo = selectAllDataAboutUnit()
                 haveID = False
                 haveUperID = False
                 if Unit_Uper == '':
                     haveUperID = True
 
-                for unitInfo in unitInfoTuple:
+                for unitInfo in allUnitInfo:
                     if Unit_ID == unitInfo[0]:
-                        reply = QMessageBox.question(self, '新增失败', '单位ID已存在, 请重新填写', QMessageBox.Yes,
-                                                     QMessageBox.Cancel)
+                        reply = QMessageBox.information(self, '新增失败', '单位ID已存在, 请重新填写', QMessageBox.Yes)
                         haveID = True
-                        break
-                    elif Unit_Uper == unitInfo[0]:
+                        return
+
+                for uperID in self.first_treeWidget_dict.keys():
+                    if uperID == Unit_Uper:
                         haveUperID = True
+                        break
 
                 if haveUperID == False:
-                    reply = QMessageBox.question(self, '新增失败', '上级单位ID不存在, 请重新填写', QMessageBox.Yes,
-                                                 QMessageBox.Cancel)
-                elif haveUperID == True and haveID == False:
+                    reply = QMessageBox.information(self, '新增失败', '上级单位ID不存在, 请重新填写', QMessageBox.Yes)
+                    return
+                else:
                     addDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper)
-
                 self.slotUnitDictInit()
         # 装备目录
         else:
             if self.le_equipID.text() == "" or self.le_equipName.text() == "":
-                reply = QMessageBox.question(self, '新增失败', '装备ID或装备名字为空，拒绝增加，请重新填写', QMessageBox.Yes,
+                reply = QMessageBox.information(self, '新增失败', '装备ID或装备名字为空，拒绝增加，请重新填写', QMessageBox.Yes,
                                              QMessageBox.Cancel)
             else:
                 Equip_ID = self.le_equipID.text()
@@ -408,17 +405,18 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
 
                 for equipInfo in equipInfoTuple:
                     if Equip_ID == equipInfo[0]:
-                        reply = QMessageBox.question(self, '新增失败', '装备ID已存在, 请重新填写', QMessageBox.Yes,
+                        reply = QMessageBox.information(self, '新增失败', '装备ID已存在, 请重新填写', QMessageBox.Yes,
                                                      QMessageBox.Cancel)
                         haveID = True
-                        break
+                        return
                     elif Equip_Uper == equipInfo[0]:
                         haveUperID = True
 
                 if haveUperID == False:
                     reply = QMessageBox.question(self, '新增失败', '上级装备ID不存在, 请重新填写', QMessageBox.Yes,
                                                  QMessageBox.Cancel)
-                elif haveUperID == True and haveID == False:
+                    return
+                else:
                     addDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type)
                 self.slotEquipDictInit()
 

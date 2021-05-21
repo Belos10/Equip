@@ -574,6 +574,7 @@ def updateDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper):
     # print(sql)
     cur.execute(sql)
 
+
     conn.commit()
     disconnectMySql(conn, cur)
 
@@ -692,6 +693,7 @@ def delDataInUnit(Unit_ID):
         # print(sql)
         cur.execute(sql)
 
+
     conn.commit()
     disconnectMySql(conn, cur)
 
@@ -735,6 +737,14 @@ def delDataInEquip(Equip_ID):
         cur.execute(sql)
 
         sql = "Delete from retire where Equip_ID = '" + EquipID + "'"
+        # print(sql)
+        cur.execute(sql)
+
+        sql = "Delete from rockettransfer where Equip_ID = '" + EquipID + "'"
+        # print(sql)
+        cur.execute(sql)
+
+        sql = "Delete from armytransfer where Equip_ID = '" + EquipID + "'"
         # print(sql)
         cur.execute(sql)
     conn.commit()
@@ -1683,6 +1693,13 @@ def selectGroupIDByPublicEquip(Group_ID):
     else:
         return "0"
 
+def selectPubilcEquipInfoByGroupID(Group_ID):
+    conn, cur = connectMySql()
+    sql = "select * from pubilcequip where Group_ID = '" + Group_ID + "'"
+    cur.execute(sql)
+    result = cur.fetchall()
+    for resultInfo in result:
+        return resultInfo
 
 # 查找某个公用装备编号所属的旅团编号
 def selectEquipIDByPublicEquip(Equip_ID):
@@ -1898,6 +1915,10 @@ def selectAboutRetireByEquipShow(UnitList, EquipList, year):
             equipInfo = selectEquipInfoByEquipID(EquipID)
             equipName = equipInfo[0][1]
             equipUnit = equipInfo[0][5]
+            if equipUnit:
+                pass
+            else:
+                equipUnit = ""
             if weaveInfo:
                 weave = weaveInfo[0][5]
             else:
@@ -1910,7 +1931,7 @@ def selectAboutRetireByEquipShow(UnitList, EquipList, year):
             super = str(int(now) - int(weave))
             apply = ''
             other = ''
-            print(ID, unitID, EquipID, equipName, equipUnit, weave, num, now, super, other, year)
+            print("'''''''''''''''''''", ID, unitID, EquipID, equipName, equipUnit, weave, num, now, super, other, year)
             haveChild = selectEquipIsHaveChild(EquipID)
             insertIntoRetire(ID, unitID, EquipID, equipName, equipUnit, weave, num, now, super, apply, other, year)
             currentResultInfo = [ID, unitID, EquipID, equipName, equipUnit, weave, num, now, super, apply, other, year]

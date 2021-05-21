@@ -377,12 +377,11 @@ class AllotSchedule(QWidget,AllotSchedule):
             if self.unitDisturbPlanNoteList[i] is not None:
                 item.setText(str(self.unitDisturbPlanNoteList[i]))
 
-
-    # 读取机关计划数与装备单位
     def initDisturbPlanOther(self):
         self.unitDisturbPlanOtherList = selectDisturbPlanOther(self.currentEquipdict, self.currentYear)
+        # print("the num :--------------------0", self.unitDisturbPlanOtherList)
 
-        for i in range(0, len(self.unitDisturbPlanOtherList)):
+        for i in range(0, len(self.currentEquipdict)):
             item = self.disturbResult.item(i, 1)
             if self.unitDisturbPlanOtherList[i]:
                 item.setText(str(self.unitDisturbPlanOtherList[i][0]))
@@ -393,7 +392,7 @@ class AllotSchedule(QWidget,AllotSchedule):
             if unitItem == self.tw_first.currentItem():
                 if selectUnitIfUppermost(unitID):
                     # print("最高级！！！！！！！！！！！！", self.unitDisturbPlanOtherList)
-                    for i in range(0, len(self.unitDisturbPlanOtherList)):
+                    for i in range(0, len(self.currentEquipdict)):
                         item = self.disturbResult.item(i, 2)
                         if self.unitDisturbPlanOtherList[i]:
                             item.setText(str(self.unitDisturbPlanOtherList[i][1]))
@@ -410,14 +409,15 @@ class AllotSchedule(QWidget,AllotSchedule):
                                     totleNum = int(childNum) + int(num)
                                     self.disturbResult.item(row, 2).setText(str(totleNum))
                 else:
+                    # print("currentEquip:", self.currentEquipdict)
                     for i in self.currentEquipdict:
                         item = self.disturbResult.item(i, 2)
                         result = selectDisturbPlanNum({0: [unitID]}, self.currentEquipdict, self.currentYear)
+                        print("*/////////////////////////", result)
                         if result:
                             item.setText(str(result[i]))
                         else:
                             item.setText("0")
-
 
     def setArmySchedule(self):
         self.armySchedule.setYear(self.currentYear)
@@ -441,8 +441,11 @@ class AllotSchedule(QWidget,AllotSchedule):
                 info1.append(self.te_proof.toPlainText())
                 info1.append(result1[0][1])
                 self.rocketSchedule.getUnitIDList(currentUnit,self.currentEquipdict[self.disturbResult.currentRow()],self.currentYear,info1)
-        self.rocketSchedule.show()
-        self.rocketSchedule.signal.connect(self.updateRocket)
+            else:
+                self.rocketSchedule.getUnitIDList("", "",
+                                                  "", "")
+            self.rocketSchedule.show()
+            self.rocketSchedule.signal.connect(self.updateRocket)
 
     def updateRocket(self):
         currentRow = self.disturbResult.currentRow()

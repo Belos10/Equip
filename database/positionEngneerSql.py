@@ -112,14 +112,49 @@ def getUnits():
         从总的单位表中初始化阵地工程单位表，只包含基地一级以及下一级旅团。
 '''
 def initPosenginUnitDirectory():
-    sql = "select Unit_ID,Unit_Name,Unit_Uper from unit where Unit_Name like '%基地%' or Unit_Name like '%旅团%' or Unit_Name like '%阵地%' "
-    units = executeSql(sql)
-    if units is not None or len(units) != 0:
-        for unit in units:
-            insertOneDateIntoUnitDirectory(unit[0],unit[1],unit[2])
+    sql = "select Unit_ID,Unit_Name,Unit_Uper from unit where length (Unit_Uper) < 1 "
+    fatherUnit = executeSql(sql)
+    if fatherUnit != None:
+        unit = fatherUnit[0][0]
+        insertThreeLevelUnit(unit)
+
+
+
 '''
-    功能：
-        从总的装备表初始化阵地工程装备表，只选择专用装备及其附属装备。
+    判断一个基地是否为
+'''
+def insertThreeLevelUnit(unitId):
+    print(gradeInUnit(unitId))
+    if unitId == None:
+        return
+    if gradeInUnit(unitId) == 3:
+        unit = getUnitByIDInUnit(unitId)
+        if unit != None:
+            insertOneDateIntoUnitDirectory(unit[0], unit[1], unit[2])
+    elif gradeInUnit(unitId) < 3:
+        childUnits = findChildInUnit(unitId)
+        print(childUnits)
+        if childUnits != None:
+            for child in childUnits:
+                # print(child)
+                insertThreeLevelUnit(child)
+    else:
+        return
+
+
+
+def getUnitByIDInUnit(unitId):
+    sql = "select Unit_ID,Unit_Name,Unit_Uper from unit where Unit_ID=%s" % unitId
+    result = executeSql(sql)
+    if result != None :
+        return result[0]
+    else:
+        return None
+
+
+'''
+功能：
+    从总的装备表初始化阵地工程装备表，只选择专用装备及其附属装备。
 '''
 def initPosenginEquipmentDirectory():
     #一级目录
@@ -151,6 +186,14 @@ def insertOneDateIntoUnitDirectory(Unit_ID,Unit_Name,Unit_Uper):
     if not exists('posengin_unit_directory','Unit_ID',Unit_ID):
         sql = "insert into posengin_unit_directory values (%s,'%s',%s)"%(Unit_ID,Unit_Name,Unit_Uper)
         executeCommit(sql)
+    else:
+        sql = "update posengin_unit_directory set Unit_ID='%s',Unit_Name='%s',Unit_Uper='%s'"%(Unit_ID,Unit_Name,Unit_Uper)
+        executeCommit(sql)
+
+'''
+    功能：
+        向阵地工程目录表中删除一条单挑数据
+'''
 
 '''
     功能：
@@ -368,7 +411,18 @@ def gradeOfUnit(UnitId):
         return gradeOfUnit(data['Unit_Uper']) + 1
     else:
         return 0
-
+'''
+    功能：
+        判断单位的为几级单位
+'''
+def gradeInUnit(UnitId):
+    sql = "select Unit_Uper from unit where Unit_ID='%s'"%UnitId
+    data = selectOne(sql)
+    print(data)
+    if data != None:
+        return gradeInUnit(data['Unit_Uper']) + 1
+    else:
+        return 0
 '''
     功能：
         找寻一个单位的上级单位
@@ -418,7 +472,24 @@ def findChildUnit(unitId):
             return None
     else:
         return None
+'''
+    功能：
+        寻找一个单位的一级子单位,在单位总表中
+'''
+def findChildInUnit(unitId):
 
+    sql = "select Unit_ID,Unit_Name,Unit_Uper from unit where Unit_Uper=%s"%unitId
+    data = executeSql(sql)
+    if data != None:
+        result = []
+        for item in data:
+            result.append(item[0])
+        if len(result) > 0:
+            return result
+        else:
+            return None
+    else:
+        return None
 '''
     功能：
         判断武器是否为最末级武器
@@ -454,6 +525,6 @@ def getEquipmentUnitName(equipment):
 
 if __name__ == '__main__':
     data = ['3','003','钢铁雄心基地','xxxx',1,'准备到位','2020-06','2020-12',150,'未到位','未运行','无']
-    print(initPosenginEquipmentDirectory())
+    print(initPosenginUnitDirectory())
     pass
 

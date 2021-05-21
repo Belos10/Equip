@@ -50,11 +50,12 @@ class totalModel(QDialog, Widget_Dital_Model):
             Trans_Reason = ""
 
         # 调拨性质
-        if self.tw_ditalModel.item(4, half + 3):
-            Trans = self.tw_ditalModel.item(4, half + 3).text()
+        if self.tw_ditalModel.item(4, half + 2):
+            Trans = self.tw_ditalModel.item(4, half + 2).text()
             print("Trans, ", Trans)
         else:
             Trans = ""
+            print("Trans===============")
 
         # 调拨方式
         if self.tw_ditalModel.item(11, 1):
@@ -64,8 +65,8 @@ class totalModel(QDialog, Widget_Dital_Model):
             Trans_Way = ""
 
         # 运输方式
-        if self.tw_ditalModel.item(11, half + 3):
-            Port_Way = self.tw_ditalModel.item(11, half + 3).text()
+        if self.tw_ditalModel.item(11, half + 2):
+            Port_Way = self.tw_ditalModel.item(11, half + 2).text()
             print("Port_Way, ", Port_Way)
         else:
             Port_Way = ""
@@ -93,8 +94,8 @@ class totalModel(QDialog, Widget_Dital_Model):
             Send_UnitName = ""
 
         #交装联系人联系方式
-        if self.tw_ditalModel.item(6, half + 3):
-            Send_Tel = self.tw_ditalModel.item(6, half + 3).text()
+        if self.tw_ditalModel.item(6, half + 2):
+            Send_Tel = self.tw_ditalModel.item(6, half + 2).text()
             print("Send_Tel, ", Send_Tel)
         else:
             Send_Tel = ""
@@ -114,8 +115,8 @@ class totalModel(QDialog, Widget_Dital_Model):
             Recive_Connect = ""
 
         # 接装联系人联系方式
-        if self.tw_ditalModel.item(10, half + 3):
-            Recive_Tel = self.tw_ditalModel.item(10, half + 3).text()
+        if self.tw_ditalModel.item(10, half + 2):
+            Recive_Tel = self.tw_ditalModel.item(10, half + 2).text()
             print("Recive_Tel, ", Recive_Tel)
         else:
             Recive_Tel = ""

@@ -6,6 +6,7 @@ from sysManage.strengthDisturb.strengthDisturbSet import strengthDisturbSet
 from sysManage.strengthDisturb.maintenMange import maintenManage
 from sysManage.strengthDisturb.equipmentBalanceControl import Equip_Balance_Control
 from sysManage.strengthDisturb.retirement import retirement
+from sysManage.userInfo import get_value
 #new
 class strengthDisturb(QMainWindow, Strength_Disturb_Widget):
     def __init__(self, parent=None):
@@ -34,11 +35,8 @@ class strengthDisturb(QMainWindow, Strength_Disturb_Widget):
 
         self.connectSignal()
 
-    def initUserInfo(self, userInfo):
-        self.userInfo = userInfo
-        self.strenSelect.initUserInfo(self.userInfo)
-        self.strengthDisturbSet.getUserInfo(self.userInfo)
-        self.maintenMange.getUserInfo(self.userInfo)
+    def getUserInfo(self):
+        self.userInfo = get_value('totleUserInfo')
 
     def connectSignal(self):
         self.tb_strengthSelect.clicked.connect(self.slotSelectStrength)

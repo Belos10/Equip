@@ -30,6 +30,9 @@ class Widget_Transfer_Model(object):
         self.pb_confirm = QtWidgets.QPushButton(Dialog)
         self.pb_confirm.setObjectName("pb_confirm")
         self.horizontalLayout.addWidget(self.pb_confirm)
+        self.pb_saveSingle = QtWidgets.QPushButton(Dialog)
+        self.pb_saveSingle.setObjectName("pb_saveSingle")
+        self.horizontalLayout.addWidget(self.pb_saveSingle)
         self.pb_saveTotal = QtWidgets.QPushButton(Dialog)
         self.pb_saveTotal.setObjectName("pb_saveTotal")
         self.horizontalLayout.addWidget(self.pb_saveTotal)
@@ -49,6 +52,7 @@ class Widget_Transfer_Model(object):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
         self.pb_confirm.setText(_translate("Dialog", "确定"))
+        self.pb_saveSingle.setText(_translate("Dialog", "保存分单"))
         self.pb_saveTotal.setText(_translate("Dialog", "保存总单"))
         self.pb_input.setText(_translate("Dialog", "导入"))
         self.pb_output.setText(_translate("Dialog", "导出"))

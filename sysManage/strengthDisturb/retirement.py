@@ -1,10 +1,9 @@
 from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, QAbstractItemView, \
     QMessageBox, QListWidgetItem,QInputDialog
 from widgets.strengthDisturb.retirement import Widget_Retirement
-from database.strengthDisturbSql import selectEquipInfoByEquipUper,selectUnitInfoByDeptUper,\
-    selectAllRetirementYearInfo,selectAboutWeaveByEquipShow,selectAboutWeaveByEquipShow,\
-    selectAboutRetireByEquipShow, isSecondDict,updateRetireAboutRetire,insertIntoRetireYear,delRetireYearByYear, selectEquipIsHaveChild
+from database.strengthDisturbSql import *
 from PyQt5.Qt import Qt
+from sysManage.userInfo import get_value
 
 '''
    编制数维护
@@ -19,13 +18,15 @@ class retirement(QWidget, Widget_Retirement):
 
         self.tw_first.header().setVisible(False)
         self.tw_second.header().setVisible(False)
-
+        self.userInfo = None
         self._initAll_()
         self.signalConnect()
 
         # 初始化编制数维护界面
-
+    def getUserInfo(self):
+        self.userInfo = get_value("totleUserInfo")
     def _initAll_(self):
+        self.getUserInfo()
         self.first_treeWidget_dict = {}
         self.tw_first.clear()
         self._initUnitTreeWidget('', self.tw_first)
@@ -101,6 +102,7 @@ class retirement(QWidget, Widget_Retirement):
                点击查询按钮时，设置当前可选项和不可选项，并初始化装备和单位目录
     '''
     def slotClickedInqury(self):
+        self.getUserInfo()
         self.first_treeWidget_dict = {}
         self.second_treeWidget_dict = {}
         self.tw_first.clear()
@@ -118,8 +120,54 @@ class retirement(QWidget, Widget_Retirement):
         #        self.tb_rechoose.setDisabled(False)
 
         self.currentYear = self.lw_year.currentItem().text()
-        self._initUnitTreeWidget("", self.tw_first)
-        self._initEquipTreeWidget("", self.tw_second)
+        self.startInfo = selectUnitInfoByUnitID(self.userInfo[0][4])
+        stack = []
+        root = []
+        if self.startInfo:
+            stack.append(self.startInfo)
+            root.append(self.tw_first)
+            self.initUnitTreeWidget(stack, root)
+
+        equipInfo = None
+        equipInfo = selectEquipInfoByEquipUper("")
+        stack = []
+        root = []
+        if equipInfo:
+            stack.append(equipInfo[0])
+            root.append(self.tw_second)
+            self.initEquipTreeWidget(stack, root)
+            # 从数据库中单位表中获取数据初始化单位目录，tableWidget显示所有的单位表
+            # self._initUnitTreeWidget("", self.tw_first)
+
+    def initEquipTreeWidget(self, stack, root):
+        while stack:
+            EquipInfo = stack.pop(0)
+            item = QTreeWidgetItem(root.pop(0))
+            item.setText(0, EquipInfo[1])
+            item.setCheckState(0, Qt.Unchecked)
+            self.second_treeWidget_dict[EquipInfo[0]] = item
+            result = selectEquipInfoByEquipUper(EquipInfo[0])
+            for resultInfo in result:
+                stack.append(resultInfo)
+                root.append(item)
+
+    '''
+                功能：
+                    单位目录的初始化，显示整个单位表
+                    参数表：root为上级单位名字，mother为上级节点对象
+        '''
+
+    def initUnitTreeWidget(self, stack, root):
+        while stack:
+            UnitInfo = stack.pop(0)
+            item = QTreeWidgetItem(root.pop(0))
+            item.setText(0, UnitInfo[1])
+            #item.setCheckState(0, Qt.Unchecked)
+            self.first_treeWidget_dict[UnitInfo[0]] = item
+            result = selectUnitInfoByDeptUper(UnitInfo[0])
+            for resultInfo in result:
+                stack.append(resultInfo)
+                root.append(item)
 
         # 查看当前被选中的单位和装备并初始化
     def slotInquryStrengthResult(self):
@@ -134,7 +182,8 @@ class retirement(QWidget, Widget_Retirement):
             if equipItem.checkState(0) == Qt.Checked or equipItem.checkState(0) == Qt.PartiallyChecked:
                 self.currentCheckedEquipList.append(equipID)
 
-
+        if self.currentCheckedEquipList == [] or self.currentCheckedUnitList == []:
+            return
         self.pb_save.setDisabled(False)
         print("装备：", self.currentCheckedEquipList)
         self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList,

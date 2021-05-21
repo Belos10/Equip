@@ -4,7 +4,8 @@ from PyQt5.QtWidgets import QApplication, QWidget, QListWidgetItem, QComboBox, Q
     QInputDialog, QMessageBox, QAbstractItemView, QTreeWidgetItem, QLineEdit
 from database.strengthDisturbSql import *
 from sysManage.alocatMange.config import ArmyTransferReceiveUnit, ArmyTransferSendUnit
-from sysManage.alocatMange.AddUnitChoose import AddUnitChoose
+from sysManage.alocatMange.AddUnitChoose import *
+from database.alocatMangeSql import *
 from PyQt5.Qt import Qt
 from database.alocatMangeSql import *
 
@@ -95,6 +96,7 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
         self.pb_setUnit.clicked.disconnect(self.slotUnitDictInit)  # 设置单元目录
 
         self.pb_setEquip.clicked.disconnect(self.slotEquipDictInit)  # 设置装备目录
+
 
     '''
         功能：
@@ -354,6 +356,7 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
 
     def updateUnit(self):
         insertIntoDistrubPlanUnitFromList(self.addUnitChoose.currentUnitID)
+        print("self.addUnitChoose.currentUnitID",self.addUnitChoose.currentUnitID)
         self.slotUnitDictInit()
 
     '''

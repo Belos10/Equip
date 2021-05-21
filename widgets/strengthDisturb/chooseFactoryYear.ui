@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>385</width>
-    <height>301</height>
+    <width>400</width>
+    <height>300</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,7 +15,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" stretch="7,3">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="3,7,0,0">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="3,7">
      <item>
       <widget class="QLabel" name="label">
        <property name="text">
@@ -24,31 +24,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="cb_factoryYearStart">
-       <property name="maximumSize">
-        <size>
-         <width>100</width>
-         <height>16777215</height>
-        </size>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>至</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="cb_factoryYearEnd">
-       <property name="maximumSize">
-        <size>
-         <width>100</width>
-         <height>16777215</height>
-        </size>
-       </property>
-      </widget>
+      <widget class="QComboBox" name="cb_factoryYear"/>
      </item>
     </layout>
    </item>
