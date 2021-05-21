@@ -421,9 +421,8 @@ def addDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper):
     cur.execute(sql)
     sql = "INSERT INTO disturbplanunit (Unit_ID, Unit_Name, Unit_Uper,Unit_Alias, Is_Group) VALUES" \
           + "('" + Unit_ID + "','" + Unit_Name + "','" + Unit_Uper + "', '', Is_Group = '否')"
-    # print(sql)
-    # 执行sql语句，并发送给数据库
     cur.execute(sql)
+
 
     equipInfoTuple = selectAllDataAboutEquip()
     strengthYearInfoTuple = selectAllDataAboutStrengthYear()
@@ -2010,7 +2009,6 @@ def insertIntoRetireYear(year):
 def delRetireYearByYear(year):
     conn, cur = connectMySql()
 
-    result = selectAllRetirementYearInfo()
     sql = "delete from retireyear where year = '" + year + "'"
     # print(sql)
     cur.execute(sql)
@@ -2020,7 +2018,17 @@ def delRetireYearByYear(year):
     cur.execute(sql)
     conn.commit()
     disconnectMySql(conn, cur)
-
+# 删除退休表所有年份
+def delRetireYearALLYear():
+    conn, cur = connectMySql()
+    sql = "truncate table retireyear "
+    # print(sql)
+    cur.execute(sql)
+    sql = "truncate table retire "
+    # print(sql)
+    cur.execute(sql)
+    conn.commit()
+    disconnectMySql(conn, cur)
 
 def insertIntoWeaveYear(year):
     conn, cur = connectMySql()

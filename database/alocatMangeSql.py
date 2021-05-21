@@ -240,8 +240,6 @@ def insertIntoDisturbPlanYear(year):
     conn, cur = connectMySql()
     EquipList=selectAllDataAboutEquip()
     UnitList=selectAllDataAboutUnit()
-    # print("所有装备",EquipList)
-    # print("所有单位",UnitList)
     result = selectYearListAboutDisturbPlan()
     sql = "insert into disturbplanyear (num, year,proof) VALUES" \
           + "('" + str(len(result) + 1) + "', '" + str(year) + "','')"

@@ -1,3 +1,4 @@
+from database.SD_EquipmentBanlanceSql import deleteByYear
 from widgets.strengthDisturb.stren_inquiry import Widget_Stren_Inquiry
 from PyQt5.QtWidgets import QWidget, QTreeWidgetItemIterator, QTreeWidgetItem, QMessageBox, \
     QCheckBox, QListWidgetItem, QInputDialog
@@ -218,6 +219,8 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
             reply = QMessageBox.question(self, '删除', '是否删除当前年份以及当前年份下所有数据？', QMessageBox.Yes, QMessageBox.Cancel)
             if reply == QMessageBox.Yes:
                 delStrengthYearByYear(currentYear)
+                deleteByYear(currentYear)
+                deleteByYear(str(int(currentYear) + 1))
                 self._initSelectYear_()
             else:
                 return

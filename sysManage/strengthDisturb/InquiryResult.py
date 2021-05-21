@@ -1,5 +1,7 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QTableWidgetItem, QAbstractItemView, QMessageBox
+
+from database.SD_EquipmentBanlanceSql import updateOneEquipmentBalanceData
 from widgets.strengthDisturb.inquiry_result import Widget_Inquiry_Result
 from database.strengthDisturbSql import selectAboutStrengthByUnitListAndEquipList, selectUnitIsHaveChild, selectEquipIsHaveChild,\
     selectAboutStrengthByEquipShow,selectAboutStrengthByUnitShow, updateStrengthAboutStrengrh,updateStrengthAboutStrengrh
@@ -176,6 +178,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                                                             self.tw_inquiryResult.item(currentRow,
                                                                                        currentColumn).text(),
                                                             resultInfo[4])
+                                    updateOneEquipmentBalanceData(str(int(self.year) + 1), Equip_ID,Unit_ID)
                                     self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
                                 else:
                                     self.tw_inquiryResult.item(currentRow, currentColumn).setText(resultInfo[4])

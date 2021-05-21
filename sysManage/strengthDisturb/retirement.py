@@ -75,9 +75,14 @@ class retirement(QWidget, Widget_Retirement):
 
     def slotDelYear(self):
         currentRow = self.lw_year.currentRow()
+
         if currentRow == 0:
             reply = QMessageBox.question(self, '删除', '是否删除所有年份以及年份下所有数据？', QMessageBox.Yes, QMessageBox.Cancel)
-            if QMessageBox.Cancel:
+            if reply == QMessageBox.Cancel:
+                return
+            else:
+                delRetireYearALLYear()
+                self._initSelectYear_()
                 return
         if currentRow < 0:
             reply = QMessageBox.question(self, '删除', '请选中某年进行删除', QMessageBox.Yes)

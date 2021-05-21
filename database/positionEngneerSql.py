@@ -187,7 +187,7 @@ def insertOneDateIntoUnitDirectory(Unit_ID,Unit_Name,Unit_Uper):
         sql = "insert into posengin_unit_directory values (%s,'%s',%s)"%(Unit_ID,Unit_Name,Unit_Uper)
         executeCommit(sql)
     else:
-        sql = "update posengin_unit_directory set Unit_ID='%s',Unit_Name='%s',Unit_Uper='%s'"%(Unit_ID,Unit_Name,Unit_Uper)
+        sql = "update posengin_unit_directory set Unit_ID='%s',Unit_Name='%s',Unit_Uper='%s' where Unit_ID='%s'"%(Unit_ID,Unit_Name,Unit_Uper,Unit_ID)
         executeCommit(sql)
 
 '''
@@ -202,6 +202,10 @@ def insertOneDateIntoUnitDirectory(Unit_ID,Unit_Name,Unit_Uper):
 def insertOneDateIntoEquipmentDirectory(Equip_ID,Equip_Name,Equip_Uper,Equip_Type,Unit_ID):
     if not exists('posengin_equipment_directory','Equip_ID',Equip_ID):
         sql = "insert into posengin_equipment_directory(Equip_ID,Equip_Name,Equip_Uper,Equip_Type,Unit_ID) values ('%s','%s','%s','%s','%s')"%(Equip_ID,Equip_Name,Equip_Uper,Equip_Type,Unit_ID)
+        executeCommit(sql)
+    else:
+        sql = "update posengin_equipment_directory set Equip_Name='%s',Equip_Uper='%s',Equip_Type='%s',Unit_ID='%s' where Equip_ID='%s'" % (
+        Equip_Name, Equip_Uper,Equip_Type, Unit_ID, Equip_ID)
         executeCommit(sql)
 '''
     功能：
@@ -352,54 +356,6 @@ def selectUnitInfoByDeptUper(Unit_Uper):
     # print(result)
     return result
 
-# 根据Equip_Uper查询单位信息,并返回
-def selectEquipInfoByEquipUper(Equip_Uper):
-    conn, cur = connectMySql()
-    sql = "select * from posengin_equipment_directory where Equip_Uper = '" + Equip_Uper + "'"
-    cur.execute(sql)
-    result = cur.fetchall()
-    disconnectMySql(conn, cur)
-    return result
-
-#判断是否是基地
-def isBase(unitId):
-    sql = "select Unit_Name from posengin_unit_directory where Unit_ID='%s'"%unitId
-    data = selectOne(sql)
-    if data != None:
-        unitName = data['Unit_Name']
-        if '基地' in unitName:
-            return True
-        else:
-            return False
-    else:
-        return False
-
-    # 判断是否是旅团
-def isBrigade(unitId):
-    sql = "select Unit_Name from posengin_unit_directory where Unit_ID='%s'" % unitId
-    data = selectOne(sql)
-    if data != None:
-        unitName = data['Unit_Name']
-        if '旅团' in unitName:
-            return True
-        else:
-            return False
-    else:
-        return False
-
-   # 判断是否是阵地
-def isPositions(unitId):
-    sql = "select Unit_Name from posengin_unit_directory where Unit_ID='%s'" % unitId
-    data = selectOne(sql)
-    if data != None:
-        unitName = data['Unit_Name']
-        if '阵地' in unitName:
-            return True
-        else:
-            return False
-    else:
-        return False
-
 '''
     功能：
         判断单位的为几级单位
@@ -523,8 +479,174 @@ def getEquipmentUnitName(equipment):
     if result != None:
         return result['unit']
 
+#根据Dept_Uper查询单位信息,并返回
+def selectPosenginUnitInfoByDeptUper(Unit_Uper):
+    conn, cur = connectMySql()
+    sql = "select * from posengin_unit_directory where Unit_Uper = '" + Unit_Uper + "'"
+    cur.execute(sql)
+    result = cur.fetchall()
+    disconnectMySql(conn, cur)
+    # 测试结果
+    # print(result)
+    return result
+
+# 返回posengin_unit_directory单位表的所有数据
+def selectAllDataAboutPosenginUnit():
+    conn, cur = connectMySql()
+    sql = "select * from posengin_unit_directory order by Unit_ID"
+    cur.execute(sql)
+    result = cur.fetchall()
+    disconnectMySql(conn, cur)
+    # 测试结果
+    # print(result)
+    return result
+
+
+# 返回equip装备表的所有数据
+def selectAllDataAboutEquip():
+    conn, cur = connectMySql()
+
+    sql = "select * from posengin_equipment_directory"
+
+    cur.execute(sql)
+    result = cur.fetchall()
+
+    disconnectMySql(conn, cur)
+
+    # 测试结果
+    # print(result)
+
+    return result
+# 单位表disturbplanunit中删除一条数据
+def delDataInPosenginUnit(Unit_ID):
+    conn, cur = connectMySql()
+    # 插入的sql语句
+    UnitIDList = []
+    findChildPosenginUnit(Unit_ID, UnitIDList, cur)
+    print(UnitIDList)
+    for UnitID in UnitIDList:
+        if UnitID != '':
+            sql = "Delete from posengin_unit_directory where Unit_ID = '" + UnitID + "'"
+            cur.execute(sql)
+            sql = "Delete from posengin_statistics where Unit_ID = '" + UnitID + "'"
+            cur.execute(sql)
+
+        else:
+            sql = "Delete from posengin_unit_directory where Unit_ID is null"
+            cur.execute(sql)
+            sql = "Delete from posengin_statistics where Unit_ID = '" + UnitID + "'"
+            cur.execute(sql)
+    conn.commit()
+    disconnectMySql(conn, cur)
+
+def findChildPosenginUnit(Unit_ID, childUnitList, cur):
+    childUnitList.append(Unit_ID)
+    if Unit_ID != '':
+        sql = "select Unit_ID from disturbplanunit where Unit_Uper = '" + Unit_ID + "'"
+        cur.execute(sql)
+        ID_tuple = cur.fetchall()
+        for ID in ID_tuple:
+            findChildPosenginUnit(ID[0], childUnitList, cur)
+    else:
+        return
+# 按装备ID列表从unit表复制数据至disturbplanunit表
+def insertIntoPosenginUnitFromList(UnitList):
+    conn,cur = connectMySql()
+    for i in UnitList:
+        sql = "insert into posengin_unit_directory select * from unit where Unit_ID = '" + i + "'"
+        cur.execute(sql)
+    conn.commit()
+    disconnectMySql(conn,cur)
+
+# 返回disturbplanunit单位表的所有数据
+def selectAllDataAboutPosenginUnit():
+    conn, cur = connectMySql()
+    sql = "select * from posengin_unit_directory order by Unit_ID"
+    cur.execute(sql)
+    result = cur.fetchall()
+    disconnectMySql(conn, cur)
+    # 测试结果
+    # print(result)
+    return result
+
+
+# 按装备ID列表从unit表复制数据至disturbplanunit表
+def insertIntoPosenginUnitFromList(UnitList):
+    conn,cur = connectMySql()
+    for i in UnitList:
+        sql = "insert into posengin_unit_directory select * from unit where Unit_ID = '" + i + "'"
+        cur.execute(sql)
+    conn.commit()
+    disconnectMySql(conn,cur)
+#向装备目录删除一条记录
+def deleteEquipmentById(equipmentId):
+    EquipIDList = []
+    findChildEquip
+    sqls = []
+    sql = "delete from posengin_equipment_directory where Equip_ID='%s'"%(equipmentId)
+    sqls.append(sql)
+    sql = "delete from posengin_statistics where Equip_ID='%s'"%equipmentId
+    sqls.append(sql)
+    excuteupdata(sql)
+
+# 装备表equip中删除一条数据
+def delDataInEquip(Equip_ID):
+    conn, cur = connectMySql()
+    # 插入的sql语句
+    EquipIDList = []
+    findChildEquip(Equip_ID, EquipIDList, cur)
+
+    for EquipID in EquipIDList:
+        sql = "delete from posengin_equipment_directory where Equip_ID='%s'" % (EquipID)
+        # print(sql)
+        # 执行sql语句，并发送给数据库
+        cur.execute(sql)
+
+        sql = "delete from posengin_statistics where Equip_ID='%s'"%EquipID
+        # print(sql)
+        cur.execute(sql)
+    conn.commit()
+    disconnectMySql(conn, cur)
+
+
+def findChildEquip(Equip_ID, childEquipList, cur):
+    childEquipList.append(Equip_ID)
+    sql = "select Equip_ID from posengin_equipment_directory where Equip_Uper = '" + Equip_ID + "'"
+    cur.execute(sql)
+    Equip_tuple = cur.fetchall()
+    for equip in Equip_tuple:
+        findChildEquip(equip[0], childEquipList, cur)
+
+# 根据Equip_Uper查询单位信息,并返回
+def selectEquipInfoByEquipUper(Equip_Uper):
+    conn, cur = connectMySql()
+
+    sql = "select * from posengin_equipment_directory where Equip_Uper = '" + Equip_Uper + "'"
+
+    cur.execute(sql)
+    result = cur.fetchall()
+
+    disconnectMySql(conn, cur)
+    return result
+
+#返回阵地工程装备目录所有信息
+def selectAllPoseginDirectory():
+    conn, cur = connectMySql()
+
+    sql = "select * from posengin_equipment_directory"
+
+    cur.execute(sql)
+    result = cur.fetchall()
+
+    disconnectMySql(conn, cur)
+
+    # 测试结果
+    # print(result)
+
+    return result
+
 if __name__ == '__main__':
     data = ['3','003','钢铁雄心基地','xxxx',1,'准备到位','2020-06','2020-12',150,'未到位','未运行','无']
-    print(initPosenginUnitDirectory())
+    print(gradeInUnit('8'))
     pass
 

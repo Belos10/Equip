@@ -38,8 +38,6 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
     #定义初始化函数
     def _init(self):
         self.signalConnection()
-        #初始化单位列表
-        initDanderGoodsUnitDirectory()
         self._initUnitTreeWidget('',self.tw_first)
         # self.result = getResult(self.base)
         self.displayData()

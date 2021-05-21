@@ -2,6 +2,7 @@
 import sys
 from PyQt5.QtWidgets import QMainWindow,QApplication,QWidget
 
+from sysManage.positionEngineer.directoryMaintenance import DirectoryMaintenance
 from sysManage.positionEngineer.equipmentStatistics import EquipmentStatistics
 from sysManage.positionEngineer.installationSituation import InstallationSituation
 
@@ -16,7 +17,7 @@ class PositionEngineerMain(QMainWindow, Position_Engineer_Widget):
 
         self.installationSituation = InstallationSituation(self)
         self.equipmentStatistics = EquipmentStatistics(self)
-        self.directoryMaintenance = QWidget(self)
+        self.directoryMaintenance = DirectoryMaintenance(self)
 
         self.stackedWidget.addWidget(self.installationSituation)
         self.stackedWidget.addWidget(self.equipmentStatistics)
@@ -47,6 +48,7 @@ class PositionEngineerMain(QMainWindow, Position_Engineer_Widget):
         self.tb_directoryMaintenance.setDisabled(False)
 
         self.slotDisconnect()
+        self.installationSituation.init()
         self.stackedWidget.setCurrentIndex(0)
         #self.strenSelect._initStrenInquiry() #初始化函数
         self.connectSignal()
@@ -64,10 +66,13 @@ class PositionEngineerMain(QMainWindow, Position_Engineer_Widget):
 
     def slotDirectoryMaintenance(self):
         self.tb_installation.setDisabled(False)
+
         self.tb_equipmentStatistics.setDisabled(False)
         self.tb_directoryMaintenance.setDisabled(True)
         self.slotDisconnect()
         self.stackedWidget.setCurrentIndex(2)
+        self.stackedWidget.currentWidget().setDisabled(False)
+        self.directoryMaintenance
         self.connectSignal()
         # self.directoryMaintenance._initAll_() 初始化函数
 

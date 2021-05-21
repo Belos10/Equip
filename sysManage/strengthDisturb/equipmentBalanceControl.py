@@ -39,7 +39,7 @@ class Equip_Balance_Control(QWidget, EquipmentBalanceControlUI):
 
      # 双击单元格元素展示某年度某单位某装备选择界面
     def soltDisplaySelect(self,index):
-        self.select._initEquipmentBlanceSelect()
+        self.select.initEquipmentBlanceSelect()
         row = index.row()
         column = index.column()
         item = self.main.tb_year.item(row,column)
