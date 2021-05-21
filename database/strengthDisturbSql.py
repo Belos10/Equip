@@ -1,7 +1,7 @@
 import pymysql
 from database.connectAndDisSql import connectMySql, disconnectMySql
 from database.SD_EquipmentBanlanceSql import updateOneEquipmentBalanceData
-
+#new
 
 '''
     实力分布所涉及的表的sql

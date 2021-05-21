@@ -1,6 +1,6 @@
 import sys
 from PyQt5.QtWidgets import *
-
+#new
 from database.SD_EquipmentBanlanceSql import initEquipmentBalance, updateOneEquipmentBalanceData
 from widgets.alocatMange.allotSchedule import AllotSchedule
 from database.strengthDisturbSql import *
