@@ -419,9 +419,8 @@ def addDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper):
     cur.execute(sql)
     sql = "INSERT INTO disturbplanunit (Unit_ID, Unit_Name, Unit_Uper,Unit_Alias, Is_Group) VALUES" \
           + "('" + Unit_ID + "','" + Unit_Name + "','" + Unit_Uper + "', '', Is_Group = '否')"
-    # print(sql)
-    # 执行sql语句，并发送给数据库
     cur.execute(sql)
+
 
     equipInfoTuple = selectAllDataAboutEquip()
     strengthYearInfoTuple = selectAllDataAboutStrengthYear()

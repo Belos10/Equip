@@ -10,7 +10,7 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
     def __init__(self, parent=None):
         super(InstallationSituation, self).__init__(parent)
         self.setupUi(self)
-        self._init()
+        self.init()
     result = []
     base = []
     designation = []
@@ -34,10 +34,9 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
         pass
 
     #定义初始化函数
-    def _init(self):
+    def init(self):
         self.signalConnection()
         #初始化单位列表
-        initPosenginUnitDirectory()
         self.displayUnitInBox()
         self.result = getResult(self.base, self.designation, self.positionCode, self.prepare)
         self.displayData(self.result)

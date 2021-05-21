@@ -1,3 +1,4 @@
+from database.positionEngneerSql import delDataInPosenginUnit
 from widgets.alocatMange.select_set import Widget_Dict_Set
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QListWidgetItem, QComboBox, QTableWidgetItem, QDateEdit, \
@@ -428,7 +429,7 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
             reply = QMessageBox.question(self, '删除', '是否将下级单位以及所涉及的其他表关于该单位的信息一起删除？', QMessageBox.Yes,
                                          QMessageBox.Cancel)
             if reply == QMessageBox.Yes:
-                delDataInDisturbPlanUnit(self.le_unitID.text())
+                delDataInPosenginUnit(self.le_unitID.text())
                 reply = QMessageBox.question(self, '删除', '删除成功', QMessageBox.Yes)
                 self.slotUnitDictInit()
 
@@ -450,3 +451,8 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
     功能：
         单元测试
 '''
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    widget = alocatDictSet()
+    widget.show()
+    sys.exit(app.exec_())

@@ -15,15 +15,21 @@ from PyQt5.Qt import Qt
 '''
 
 
-class DirectoryMaintenance(QWidget, Widget_Dict_Set):
+class DangerGoodDirectoryMaintenance(QWidget, Widget_Dict_Set):
     def __init__(self, parent=None):
-        super(DirectoryMaintenance, self).__init__(parent)
+        super(DangerGoodDirectoryMaintenance, self).__init__(parent)
         self.setupUi(self)
 
         self.tw_first.clear()  # 删除单位目录所有数据显示
-        self.tw_second.clear()  # 删除装备目录所有数据显示
+        self.tw_second.setDisabled(True)
+        self.tw_second.setVisible(False)
+        self.le_second.setDisabled(True)
+        self.le_second.setVisible(False)
+
+        self.pb_setEquip.setVisible(False)
+        self.pb_setUnit.setVisible(False)
+
         self.tw_first.header().setVisible(False)  # 不显示树窗口的title
-        self.tw_second.header().setVisible(False)  # 不显示树窗口的title
         self.changeUnit = '0'  # 是否是修改单元的目录
 
         # QTableWidget设置整行选中
@@ -31,7 +37,6 @@ class DirectoryMaintenance(QWidget, Widget_Dict_Set):
         self.tb_result.setSelectionMode(QAbstractItemView.SingleSelection)
 
         self.first_treeWidget_dict = {}  # 当前单位目录列表对象，结构为：{'行号':对应的item}
-        self.second_treeWidget_dict = {}  # 当前装备目录列表对象，结构为：{'行号':对应的item}
 
         self.addUnitChoose = AddPosenginUnitChoose()
         self.signalConnect()
@@ -50,21 +55,15 @@ class DirectoryMaintenance(QWidget, Widget_Dict_Set):
 
         self.pb_setUnit.clicked.connect(self.slotUnitDictInit)  # 设置单元目录
 
-        self.pb_setEquip.clicked.connect(self.slotEquipDictInit)  # 设置装备目录
+        self.pb_setEquip.setDisabled(True)
+        self.le_equipName.setVisible(False)
+        self.le_equipID.setVisible(False)
+        self.le_uperID.setVisible(False)
+
+        # self.pb_setEquip.clicked.connect(self.slotEquipDictInit)  # 设置装备目录
         self.pb_firstSelect.clicked.connect(self.slotSelectUnit)
         self.addUnitChoose.signal.connect(self.updateUnit)
 
-        # self.pb_secondSelect.clicked.connect(self.slotSelectEquip)
-        # self.pb_setEquipUnit.clicked.connect(self.slotSetEquipUnit)
-
-    # def slotSetEquipUnit(self):
-    #     if self.tb_result.currentRow() == -1:
-    #         return
-    #     text, okPressed = QInputDialog.getText(self, "Get text", "装备单位为:", QLineEdit.Normal, "")
-    #     if okPressed:
-    #         print(text)
-    #         updateEquipUnit(text, self.le_equipID.text())
-    #     self.slotEquipDictInit()
     #
     def slotSelectUnit(self):
         findText = self.le_first.text()
@@ -73,12 +72,6 @@ class DirectoryMaintenance(QWidget, Widget_Dict_Set):
                 self.tw_first.setCurrentItem(item)
                 break
 
-    # def slotSelectEquip(self):
-    #     findText = self.le_second.text()
-    #     for i, item in self.second_treeWidget_dict.items():
-    #         if item.text(0) == findText:
-    #             self.tw_second.setCurrentItem(item)
-    #             break
 
     '''
             功能：
@@ -94,7 +87,7 @@ class DirectoryMaintenance(QWidget, Widget_Dict_Set):
 
         self.pb_setUnit.clicked.disconnect(self.slotUnitDictInit)  # 设置单元目录
 
-        self.pb_setEquip.clicked.disconnect(self.slotEquipDictInit)  # 设置装备目录
+        # self.pb_setEquip.clicked.disconnect(self.slotEquipDictInit)  # 设置装备目录
 
 
     '''
@@ -104,10 +97,10 @@ class DirectoryMaintenance(QWidget, Widget_Dict_Set):
 
     def delAllData(self):
         self.tw_first.clear()  # 清除单元目录所有数据
-        self.tw_second.clear()  # 清除装备目录所有数据
+        # self.tw_second.clear()  # 清除装备目录所有数据
         self.tb_result.clear()  # 清除tableWidget中所有数据
         self.le_first.clear()
-        self.le_second.clear()
+        # self.le_second.clear()
         self.le_equipID.clear()
         self.le_unitID.clear()
         self.le_unitName.clear()
@@ -451,6 +444,6 @@ class DirectoryMaintenance(QWidget, Widget_Dict_Set):
 '''
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    widget = DirectoryMaintenance()
+    widget = DangerGoodDirectoryMaintenance()
     widget.show()
     sys.exit(app.exec_())
