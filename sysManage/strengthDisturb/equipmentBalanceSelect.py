@@ -24,7 +24,7 @@ class Equip_Balance_Select(QWidget, EquipmentBalanceSelectUI):
         self.year = None
         self.result = []
         # 初始化界面
-        self._initEquipmentBlanceSelect()
+        self.initEquipmentBlanceSelect()
         # 信号连接
         self.signalConnectSlot()
 
@@ -51,8 +51,8 @@ class Equip_Balance_Select(QWidget, EquipmentBalanceSelectUI):
 
 
 
-    def _initEquipmentBlanceSelect(self):
-
+    def initEquipmentBlanceSelect(self):
+        self.tb_result.clear()
         self.tw_first.clear()
         self.tw_second.clear()
         self.tw_first.header().setVisible(False)

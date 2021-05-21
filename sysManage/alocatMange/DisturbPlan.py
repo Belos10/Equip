@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtWidgets import *
 #new
-from database.SD_EquipmentBanlanceSql import initEquipmentBalance, updateOneEquipmentBalanceData
+from database.SD_EquipmentBanlanceSql import initEquipmentBalance, updateOneEquipmentBalanceData, deleteByYear
 from widgets.alocatMange.yearListForm import yearList_Form
 from database.strengthDisturbSql import *
 from PyQt5.Qt import Qt
@@ -131,6 +131,7 @@ class DisturbPlan(QWidget, yearList_Form):
             currentYear=self.lw_yearChoose.currentItem()
             #print("currentYear.text()",currentYear.text())
             deleteDisturbPlanYear(currentYear.text())
+            deleteByYear(currentYear.text())
             self._initYearWidget_()
 
 

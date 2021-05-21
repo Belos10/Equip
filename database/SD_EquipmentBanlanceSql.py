@@ -237,6 +237,33 @@ def getResultByYearAndEquipAndUnit(year,equipList,unitList):
         return sorted(resultList, key=operator.itemgetter('Equip_ID'))
             # sorted(resultList, key=operator.itemgetter('Equip_ID'))
 
+def deleteByYear(year):
+    sql = "select equip_balance_id from equipment_balance where year='%s'"%year
+    data = executeSql(sql)
+    if data != None:
+        for item in data:
+            equipKey = data[0]
+            sqls = []
+
+            sql = "delete from eb_carry where equip_balance_id='%s'" % equipKey
+            sqls.append(sql)
+            sql = "delete from eb_change_project where equip_balance_id='%s'" % equipKey
+            sqls.append(sql)
+            sql = "delete from eb_management where equip_balance_id='%s'" % equipKey
+            sqls.append(sql)
+            sql = "delete from eb_production_year where equip_balance_id='%s'" % equipKey
+            sqls.append(sql)
+            sql = "delete from eb_quality_status where equip_balance_id='%s'" % equipKey
+            sqls.append(sql)
+            sql = "delete from eb_repair_time where equip_balance_id='%s'" % equipKey
+            sqls.append(sql)
+            sql = "delete from eb_stock where equip_balance_id='%s'" % equipKey
+            sqls.append(sql)
+            sql = "delete from equipment_balance where equip_balance_id='%s'" % equipKey
+            sqls.append(sql)
+            excuteupdata(sqls)
+
+
 #根据分配调整计划更新装备平衡表
 def updateOneEquipmentBalanceData(year,equipmentId,unitId):
     item = {}
@@ -249,8 +276,9 @@ def updateOneEquipmentBalanceData(year,equipmentId,unitId):
     item['equipmentBalanceKey'] = str(year) + item['Equip_ID'] + item['Unit_ID']
     item['year'] = str(year)
 
-    sql = "select Equip_ID,Unit_ID,Work from strength where year=%s and Equip_ID =%s and Unit_ID=%s and equipYear='' " % (str(int(year) - 1), equipmentId,unitId)
+    sql = "select Equip_ID,Unit_ID,Work from strength where year=%s and Equip_ID =%s and Unit_ID=%s and equipYear='' " % (str(int(year)), equipmentId,unitId)
     workEquipment = selectOne(sql)
+
     if workEquipment is not None:
         OrignalAuthorizedValue = int(workEquipment.get('Work', 0))
         item['OrignalAuthorizedValue'] = OrignalAuthorizedValue
@@ -261,10 +289,8 @@ def updateOneEquipmentBalanceData(year,equipmentId,unitId):
         item['originalValue'] = originalValue
     sql = "select Equip_Id,Unit_Id,DisturbNum from disturbplan where Year=%s and Equip_Id=%s and Unit_Id=%s"%(str(year), equipmentId, unitId)
     disturbEquipment =selectOne(sql)
-    #print("ceshi11111111111111111")
     if disturbEquipment is not None:
-        if (disturbEquipment.get('DisturbNum', 0) == 0 or disturbEquipment['DisturbNum'] is None or len(
-                disturbEquipment['DisturbNum']) <= 1):
+        if (disturbEquipment.get('DisturbNum', 0) == 0 or disturbEquipment['DisturbNum'] is None or len(disturbEquipment['DisturbNum']) < 1):
             disturbValue = 0
         else:
             disturbValue = int(disturbEquipment['DisturbNum'])
@@ -277,7 +303,7 @@ def updateOneEquipmentBalanceData(year,equipmentId,unitId):
         insertOneEquipmentBalanceData(item)
     else:
         alterOneEquipmentBalanceData(item)
-    #print("ceshi2222222222222222222222222")
+
 
 def alterOneEquipmentBalanceData(item):
     sql = "update equipment_balance set original_authorized_value=%d, authorized_value=%d,authorized_value_change=%d,original_value=%d where equip_balance_id=%s"\
@@ -553,7 +579,7 @@ def saveEquipmentBalanceByRow(dataList,year):
 
 
 if __name__ == "__main__":
-    updateOneEquipmentBalanceData('2001','1','1')
+    deleteByYear('0')
     # deleteOneEquipmentBalanceData('2008','2','5')
 
 
