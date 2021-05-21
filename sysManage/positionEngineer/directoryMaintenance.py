@@ -1,9 +1,11 @@
 import sys
-from PyQt5.QtWidgets import QMainWindow,QApplication
+from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget
 from widgets.strengthDisturb.strengthDisturbSet import Widget_Strength_Disturb_Set
 from sysManage.strengthDisturb.strengthSelectSet import strengthSelectSet
 from sysManage.strengthDisturb.maintenManageSet import maintenManageSet
-#new
+
+
+# new
 class strengthDisturbSet(QMainWindow, Widget_Strength_Disturb_Set):
     def __init__(self, parent=None):
         super(strengthDisturbSet, self).__init__(parent)
@@ -40,6 +42,7 @@ class strengthDisturbSet(QMainWindow, Widget_Strength_Disturb_Set):
         self.tb_selectSet.setDisabled(False)
         self.tb_maintenManageSet.setDisabled(True)
         self.maintenManageSet._initAll_()
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

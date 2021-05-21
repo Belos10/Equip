@@ -7,6 +7,7 @@ from database.strengthDisturbSql import *
 from PyQt5.Qt import Qt
 from PyQt5.QtGui import QColor, QBrush,QFont
 from database.alocatMangeSql import *
+from sysManage.userInfo import get_value
 
 '''
     分配调整计划
@@ -33,6 +34,7 @@ class DisturbPlan(QWidget, yearList_Form):
         self.le_second.setDisabled(1)
         self.tw_first.setDisabled(1)
         self.tw_second.setDisabled(1)
+
         self._initYearWidget_()
 
     def signalConnect(self):
@@ -79,9 +81,9 @@ class DisturbPlan(QWidget, yearList_Form):
     # 信号与槽连接的断开
     def signalDisconnectSlot(self):
         # 点击选择年份后刷新页面 初始化
-        self.lw_yearChoose.itemDoubleClicked.disconnect(self.slotClickedInqury)
-        self.lw_yearChoose.itemDoubleClicked.disconnect(self.setDisturbPlanTitle)
-        self.lw_yearChoose.itemDoubleClicked.disconnect(self.initDisturbPlanProof)
+        self.lw_yearChoose.itemClicked.disconnect(self.slotClickedInqury)
+        self.lw_yearChoose.itemClicked.disconnect(self.setDisturbPlanTitle)
+        self.lw_yearChoose.itemClicked.disconnect(self.initDisturbPlanProof)
 
         # 点击第一目录结果
         self.tw_first.itemClicked.disconnect(self.slotDisturbStrengthResult)
@@ -153,6 +155,7 @@ class DisturbPlan(QWidget, yearList_Form):
 
 
     def slotClickedInqury(self):
+        self.initUserInfo()
         self.tw_first.clear()
         self.tw_second.clear()
         self.tw_first.header().setVisible(False)
@@ -164,52 +167,91 @@ class DisturbPlan(QWidget, yearList_Form):
         self.first_treeWidget_dict = {}
         self.second_treeWidget_dict = {}
         self.currentYear = self.lw_yearChoose.currentItem().text()
-        startEquipIDInfo = findUperEquipIDByName("通用装备")
-        for startEquipInfo in startEquipIDInfo:
-            #self.second_treeWidget_dict[0] = startEquipInfo
-            item = QTreeWidgetItem(self.tw_second)
-            item.setText(0, startEquipInfo[1])
-            item.setCheckState(0, Qt.Unchecked)
-            self.second_treeWidget_dict[startEquipInfo[0]] = item
-            self._initEquipTreeWidget(startEquipInfo[0], item)
-            break
-        self._initUnitTreeWidget("", self.tw_first)
+        #startEquipIDInfo = findUperEquipIDByName("通用装备")
+
+        self.startInfo = selectDisturbPlanUnitInfoByUnitID(self.userInfo[0][4])
+        stack = []
+        root = []
+        if self.startInfo:
+            stack.append(self.startInfo)
+            root.append(self.tw_first)
+            self._initUnitTreeWidget(stack,root)
+
+        #equipInfo = None
+        equipInfo = selectEquipInfoByEquipUper("")
+        stack = []
+        root = []
+        if equipInfo:
+            stack.append(equipInfo[0])
+            root.append(self.tw_second)
+            self._initEquipTreeWidget(stack,root)
+            # 从数据库中单位表中获取数据初始化单位目录，tableWidget显示所有的单位表
+            # self._initUnitTreeWidget("", self.tw_first)
+
+        # for startEquipInfo in startEquipIDInfo:
+        #     #self.second_treeWidget_dict[0] = startEquipInfo
+        #     item = QTreeWidgetItem(self.tw_second)
+        #     item.setText(0, startEquipInfo[1])
+        #     item.setCheckState(0, Qt.Unchecked)
+        #     self.second_treeWidget_dict[startEquipInfo[0]] = item
+        #     self._initEquipTreeWidget(startEquipInfo[0], item)
+        #     break
+        # self._initUnitTreeWidget("", self.tw_first)
+
+    def initUserInfo(self):
+        self.userInfo = get_value("totleUserInfo")
 
 
-
-
-
-    def _initUnitTreeWidget(self, root, mother):
-        if root == '':
-            result = selectDisturbPlanUnitInfoByDeptUper('')
-        else:
-            result = selectDisturbPlanUnitInfoByDeptUper(root)
-
-        # rowData: (单位编号，单位名称，上级单位编号)
-        for rowData in result:
-            item = QTreeWidgetItem(mother)
-            item.setText(0, rowData[1])
+    def _initUnitTreeWidget(self, stack,root):
+        # if root == '':
+        #     result = selectDisturbPlanUnitInfoByDeptUper('')
+        # else:
+        #     result = selectDisturbPlanUnitInfoByDeptUper(root)
+        #
+        # # rowData: (单位编号，单位名称，上级单位编号)
+        # for rowData in result:
+        #     item = QTreeWidgetItem(mother)
+        #     item.setText(0, rowData[1])
+        #     #item.setCheckState(0, Qt.Unchecked)
+        #     self.first_treeWidget_dict[rowData[0]] = item
+        #     if rowData[0] != '':
+        #         self._initUnitTreeWidget(rowData[0], item)
+        # # print("...", self.first_treeWidget_dict)
+        while stack:
+            UnitInfo = stack.pop(0)
+            item = QTreeWidgetItem(root.pop(0))
+            item.setText(0, UnitInfo[1])
             #item.setCheckState(0, Qt.Unchecked)
-            self.first_treeWidget_dict[rowData[0]] = item
-            if rowData[0] != '':
-                self._initUnitTreeWidget(rowData[0], item)
-        # print("...", self.first_treeWidget_dict)
+            self.first_treeWidget_dict[UnitInfo[0]] = item
+            result = selectUnitInfoByDeptUper(UnitInfo[0])
+            for resultInfo in result:
+                stack.append(resultInfo)
+                root.append(item)
 
 
-
-    def _initEquipTreeWidget(self, root, mother):
-        if root == '':
-            result = selectEquipInfoByEquipUper('')
-        else:
-            result = selectEquipInfoByEquipUper(root)
-        # rowData: (装备编号，装备名称，上级装备编号, 录入类型, 装备类型)
-        for rowData in result:
-            item = QTreeWidgetItem(mother)
-            item.setText(0, rowData[1])
+    def _initEquipTreeWidget(self,stack, root):
+        # if root == '':
+        #     result = selectEquipInfoByEquipUper('')
+        # else:
+        #     result = selectEquipInfoByEquipUper(root)
+        # # rowData: (装备编号，装备名称，上级装备编号, 录入类型, 装备类型)
+        # for rowData in result:
+        #     item = QTreeWidgetItem(mother)
+        #     item.setText(0, rowData[1])
+        #     item.setCheckState(0, Qt.Unchecked)
+        #     self.second_treeWidget_dict[rowData[0]] = item
+        #     if rowData[0] != '':
+        #         self._initEquipTreeWidget(rowData[0], item)
+        while stack:
+            EquipInfo = stack.pop(0)
+            item = QTreeWidgetItem(root.pop(0))
+            item.setText(0, EquipInfo[1])
             item.setCheckState(0, Qt.Unchecked)
-            self.second_treeWidget_dict[rowData[0]] = item
-            if rowData[0] != '':
-                self._initEquipTreeWidget(rowData[0], item)
+            self.second_treeWidget_dict[EquipInfo[0]] = item
+            result = selectEquipInfoByEquipUper(EquipInfo[0])
+            for resultInfo in result:
+                stack.append(resultInfo)
+                root.append(item)
 
 
 
@@ -237,7 +279,6 @@ class DisturbPlan(QWidget, yearList_Form):
         # 获取当前装备名
         j = 0
         for equipID, equipItem in self.second_treeWidget_dict.items():
-            #print("''''''''''''''''''''j ::::::", j)
             if equipItem.checkState(0) == Qt.Checked:
                 equipInfo = findEquipInfo(equipID)
                 self.currentEquipdict[j]= equipInfo[0]
@@ -299,7 +340,6 @@ class DisturbPlan(QWidget, yearList_Form):
             item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
             self.disturbResult.setItem(i, 4 + self.lenCurrentUnitChilddict, item)
             currentRowResult.append(item)
-            #print(" ******************************** ", i, 4 + self.lenCurrentUnitChilddict)
             i = i + 1
 
         #self.disturbResult.setRowCount(n)
@@ -318,7 +358,6 @@ class DisturbPlan(QWidget, yearList_Form):
 
     # 改变调拨依据
     def slotProofChange(self):
-        #print("self.te_proof.toPlainText()",self.te_proof.toPlainText())
         updateDisturbPlanProof(self.currentYear,self.te_proof.toPlainText())
 
     # 读取初始分配计划数
@@ -346,13 +385,11 @@ class DisturbPlan(QWidget, yearList_Form):
         for i in self.currentEquipdict:
             if not selectEquipIsHaveChild(self.currentEquipdict[i][0]):
                 for j in range(0, len(self.currentUnitChilddict)):
-                    #print("'''''''''''''i, ", i, 4 + j)
                     num = self.disturbResult.item(i, 4 + j).text()
                     if num == '-1' or num == '':
                         sum = sum + 0
                     else:
                         sum = sum + int(num)
-                    #print("''''''''''''''**************")
                 self.disturbResult.item(i,3).setText(str(sum))
             sum = 0
 

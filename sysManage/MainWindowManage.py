@@ -23,6 +23,7 @@ class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
         self.contractMange = QWidget()
         self.dangerGoods = DangerGoods()
         self.PosEngin = PositionEngineerMain()
+        #self.PosEngin = QWidget()
         self.dictSelect = dictSelect()
         self.sysConfig = QWidget()
 

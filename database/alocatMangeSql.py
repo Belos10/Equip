@@ -427,8 +427,18 @@ def selectQuaAndID(Equip_ID, year):
 # 按装备ID列表从unit表复制数据至disturbplanunit表
 def insertIntoDistrubPlanUnitFromList(UnitList):
     conn,cur = connectMySql()
+    equipInfoTuple = selectAllDataAboutEquip()
+    disturbplanYearInfoTuple = selectAllDataAboutDisturbPlan()
     for i in UnitList:
+        unitInfo = selectUnitInfoByUnitID(i)
         sql = "insert into disturbplanunit select * from unit where Unit_ID = '" + i + "'"
         cur.execute(sql)
+        for equipInfo in equipInfoTuple:
+            for disturbplanYearInfo in disturbplanYearInfoTuple:
+                sql = "insert into disturbplan (Equip_Id,Equip_Name,Unit_Id,Unit_Name,Year,DisturbNum) values " \
+                      + "('" + equipInfo[0] + "','" + equipInfo[1] + "','" + i + \
+                      "','" + unitInfo[1] + "','" + disturbplanYearInfo[1] + "', '' )"
+                cur.execute(sql)
+
     conn.commit()
     disconnectMySql(conn,cur)

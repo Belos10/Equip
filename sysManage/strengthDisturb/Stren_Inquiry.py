@@ -54,8 +54,7 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
 
     def initUserInfo(self):
         self.userInfo = get_value("totleUserInfo")
-        #print("ffffffffffffffffffffffffff", self.userInfo, totleUserInfo)
-        #self._initStrenInquiry()
+
     '''
         功能：
             当选择出厂年份时，设置当前可选项和不可选项,并初始化年份目录

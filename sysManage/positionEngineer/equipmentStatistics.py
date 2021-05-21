@@ -16,11 +16,10 @@ class EquipmentStatistics(QWidget, PosEngneerStatisticsUI):
         # 当前选中的单位列表和装备列表
         self.currentCheckedUnitList = []
         self.currentCheckedEquipList = []
-        self.countOfPosition= 0
+        self.countOfPosition = 0
         self.rowAndCountIndex = {}
         self.signalConnectSlot()
         self._initEquipmentStatistics()
-
 
     # 信号与槽的连接
     def signalConnectSlot(self):
@@ -40,12 +39,11 @@ class EquipmentStatistics(QWidget, PosEngneerStatisticsUI):
         self.tb_output.clicked.connect(self.slotInput)
         self.tb_output.clicked.connect(self.slotOutput)
 
-
-    #信号和槽断开
+    # 信号和槽断开
     def slotDisconnect(self):
         pass
 
-    #定义初始化函数
+    # 定义初始化函数
     def _initEquipmentStatistics(self):
         self.tw_first.clear()
         self.tw_second.clear()
@@ -70,13 +68,9 @@ class EquipmentStatistics(QWidget, PosEngneerStatisticsUI):
         self._initEquipTreeWidget('', self.tw_second)
         pass
 
-
-
-
     def initUserInfo(self, userInfo):
         self.userInfo = userInfo
         self._initEquipmentStatistics()
-
 
     def slotSelectUnit(self):
         findText = self.le_first.text()
@@ -84,6 +78,7 @@ class EquipmentStatistics(QWidget, PosEngneerStatisticsUI):
             if item.text(0) == findText:
                 self.tw_first.setCurrentItem(item)
                 break
+
     def slotSelectEquip(self):
         findText = self.le_second.text()
         for i, item in self.second_treeWidget_dict.items():
@@ -91,12 +86,10 @@ class EquipmentStatistics(QWidget, PosEngneerStatisticsUI):
                 self.tw_second.setCurrentItem(item)
                 break
 
-
     '''
         功能：
             点击查询按钮时，设置当前可选项和不可选项，并初始化装备和单位目录
     '''
-
 
     def slotClickedInqury(self):
         self.first_treeWidget_dict = {}
@@ -124,13 +117,13 @@ class EquipmentStatistics(QWidget, PosEngneerStatisticsUI):
         self._initUnitTreeWidget(self.userInfo[0][4], item)
         self._initEquipTreeWidget("", self.tw_second)
 
-
     def slotSelectUnit(self):
         findText = self.le_first.text()
         for i, item in self.first_treeWidget_dict.items():
             if item.text(0) == findText:
                 self.tw_first.setCurrentItem(item)
                 break
+
     def slotSelectEquip(self):
         findText = self.le_second.text()
         for i, item in self.second_treeWidget_dict.items():
@@ -138,11 +131,11 @@ class EquipmentStatistics(QWidget, PosEngneerStatisticsUI):
                 self.tw_second.setCurrentItem(item)
                 break
 
-
     '''
         功能：
             查询实力结果
     '''
+
     def slotEquipmentStatisticsResult(self):
         self.currentCheckedUnitList = []
         self.currentCheckedEquipList = []
@@ -154,22 +147,21 @@ class EquipmentStatistics(QWidget, PosEngneerStatisticsUI):
             if unitItem == self.tw_first.currentItem():
                 self.currentCheckedUnitList.append(unitID)
 
-        self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList,self.currentCheckedEquipList)
+        self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList)
 
     '''
         功能：
             根据单位目录和装备目录初始化结果表格
     '''
-    def _initTableWidgetByUnitListAndEquipList(self,unitList,equipList):
+
+    def _initTableWidgetByUnitListAndEquipList(self, unitList, equipList):
         info = []
         self.tw_result.clear()
 
-
-
         if len(unitList) > 0 and len(equipList) > 0:
-            baseId = findBase(unitList[0]) #基地
+            baseId = findBase(unitList[0])  # 基地
             if baseId != None:
-                brigades = findChildUnit(baseId) # 旅团
+                brigades = findChildUnit(baseId)  # 旅团
                 if brigades != None:
 
                     lastEquipments = []
@@ -179,7 +171,7 @@ class EquipmentStatistics(QWidget, PosEngneerStatisticsUI):
                     for brigade in brigades:
                         temp = {}
                         positions = findChildUnit(brigade)
-                        if positions != None :
+                        if positions != None:
                             countOfPositions = countOfPositions + len(positions)
                             temp[brigade] = positions
                             info.append(temp.copy())
@@ -189,7 +181,7 @@ class EquipmentStatistics(QWidget, PosEngneerStatisticsUI):
                             lastEquipments.append(equip)
                     countOFEquipment = len(lastEquipments)
 
-                    #画表头
+                    # 画表头
                     self.tw_result.verticalHeader().setVisible(False)
                     self.tw_result.horizontalHeader().setVisible(False)
                     # self.tw_result.setEditTriggers(QTableWidget.NoEditTriggers)
@@ -202,7 +194,7 @@ class EquipmentStatistics(QWidget, PosEngneerStatisticsUI):
                     self.tw_result.setRowCount(rowCount)
                     self.tw_result.setColumnCount(columnCount)
 
-                    item = QTableWidgetItem('%s阵地工程X生化防护装备统计表'%getUnitNameById(baseId))
+                    item = QTableWidgetItem('%s阵地工程X生化防护装备统计表' % getUnitNameById(baseId))
                     item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
                     self.tw_result.setItem(0, 0, item)
                     self.tw_result.setSpan(0, 0, 1, columnCount)
@@ -229,13 +221,13 @@ class EquipmentStatistics(QWidget, PosEngneerStatisticsUI):
 
                     fisrtPositionIndex = 4
                     for i in range(len(info)):
-                        brigades = list(info[i].keys())  #旅团列表
+                        brigades = list(info[i].keys())  # 旅团列表
                         for brigade in brigades:
                             brigadeSubPositions = info[i].get(brigade)
                             item = QTableWidgetItem(getUnitNameById(brigade))
                             item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
                             self.tw_result.setItem(1, fisrtPositionIndex, item)
-                            self.tw_result.setSpan(1, fisrtPositionIndex, 1, 2 * len(brigadeSubPositions) )
+                            self.tw_result.setSpan(1, fisrtPositionIndex, 1, 2 * len(brigadeSubPositions))
                             for j in range(len(lastEquipments)):
                                 rowIndex = 4 + j
 
@@ -247,14 +239,11 @@ class EquipmentStatistics(QWidget, PosEngneerStatisticsUI):
                                 item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
                                 self.tw_result.setItem(rowIndex, 1, item)
 
-
                                 unit = getEquipmentUnitName(lastEquipments[j])
                                 if unit != None:
                                     item = QTableWidgetItem(getEquipmentNameById(lastEquipments[j]))
                                     item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-                                    self.tw_result.setItem(rowIndex , 2, item)
-
-
+                                    self.tw_result.setItem(rowIndex, 2, item)
 
                                 for subPosition in brigadeSubPositions:
                                     item = QTableWidgetItem(getUnitNameById(subPosition))
@@ -269,7 +258,7 @@ class EquipmentStatistics(QWidget, PosEngneerStatisticsUI):
                                     item = QTableWidgetItem('运行状态')
                                     item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
                                     self.tw_result.setItem(3, fisrtPositionIndex + 1, item)
-                                    result = getEquipmentStatisticsResultByUnitAndEquip(subPosition,lastEquipments[j])
+                                    result = getEquipmentStatisticsResultByUnitAndEquip(subPosition, lastEquipments[j])
                                     if result != None:
                                         item = QTableWidgetItem(str(result[0]))
                                         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
@@ -284,20 +273,12 @@ class EquipmentStatistics(QWidget, PosEngneerStatisticsUI):
                 else:
                     pass
 
-
-
-
-
         pass
-
-
-
-
-
 
     '''
         初始化单位目录
     '''
+
     def _initUnitTreeWidget(self, root, mother):
         if root == '':
             result = selectUnitInfoByDeptUper('')
@@ -332,16 +313,18 @@ class EquipmentStatistics(QWidget, PosEngneerStatisticsUI):
             if rowData[0] != '':
                 self._initEquipTreeWidget(rowData[0], item)
 
-
     def slotAdd(self):
         pass
+
     def slotDelete(self):
         pass
 
     def slotInput(self):
         pass
+
     def slotOutput(self):
         pass
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

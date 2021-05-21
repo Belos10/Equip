@@ -339,6 +339,8 @@ def selectEquipInfoByEquipUper(Equip_Uper):
     return result
 
 
+
+
 # 返回equip装备表的所有数据
 def selectAllDataAboutEquip():
     conn, cur = connectMySql()
@@ -466,6 +468,7 @@ def addDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper):
             sql = "insert into disturbplan (Equip_Id,Equip_Name,Unit_Id,Unit_Name,Year,DisturbNum) values " \
                   + "('" + equipInfo[0] + "','" + equipInfo[1] + "','" + Unit_ID +\
                   "','" + Unit_Name + "','"+ disturbplanYearInfo[1] +"', '' )"
+            # print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",sql)
             cur.execute(sql)
 
 
@@ -1597,6 +1600,15 @@ def selectUnitInfoByUnitID(Unit_ID):
         disconnectMySql(conn, cur)
         return info
 
+
+def selectDisturbPlanUnitInfoByUnitID(Unit_ID):
+    conn, cur = connectMySql()
+    sql = "select * from disturbplanunit where Unit_ID = '" + Unit_ID + "'"
+    cur.execute(sql)
+    result = cur.fetchall()
+    for info in result:
+        disconnectMySql(conn, cur)
+        return info
 
 def findUperIDByUnitID(Unit_ID):
     conn, cur = connectMySql()
