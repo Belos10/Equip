@@ -171,7 +171,7 @@ def getUnitById(UnitID):
 def getUnitNameById(UnitID):
     sql = "select Unit_Name from posengin_unit_directory where Unit_ID=%s"%UnitID
     result = selectOne(sql)
-    if result != None or len(result) != 0:
+    if result:
         return result['Unit_Name']
     else:
         return None

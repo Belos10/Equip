@@ -32,8 +32,9 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
 
         self.first_treeWidget_dict = {}  # 当前单位目录列表对象，结构为：{'行号':对应的item}
         self.second_treeWidget_dict = {}  # 当前装备目录列表对象，结构为：{'行号':对应的item}
-        self.signalConnect()
+
         self.addUnitChoose = AddUnitChoose()
+        self.signalConnect()
 
     '''
         功能：
@@ -51,6 +52,7 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
 
         self.pb_setEquip.clicked.connect(self.slotEquipDictInit)  # 设置装备目录
         self.pb_firstSelect.clicked.connect(self.slotSelectUnit)
+        self.addUnitChoose.signal.connect(self.updateUnit)
 
         # self.pb_secondSelect.clicked.connect(self.slotSelectEquip)
         # self.pb_setEquipUnit.clicked.connect(self.slotSetEquipUnit)
@@ -315,7 +317,7 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
         if self.changeUnit == '1':
             self.addUnitChoose.initWidget()
             self.addUnitChoose.show()
-            self.addUnitChoose.signal.connect(self.updateUnit)
+
         # 装备目录
         elif self.changeUnit == '2':
             if self.le_equipID.text() == "" or self.le_equipName.text() == "":

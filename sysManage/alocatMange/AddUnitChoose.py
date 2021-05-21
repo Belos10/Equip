@@ -60,7 +60,9 @@ class AddUnitChoose(QDialog, Widget_AddUnitChoose):
 
 
     def getCreaseUnit(self):
+        self.currentUnitID=[]
         for i in self.tb_unitChoose.selectedRanges():
+            print(i.topRow(),i.bottomRow())
             for j in range(i.topRow(),i.bottomRow()+1):
                 self.currentUnitID.append(self.tb_unitChoose.item(j,0).text())
         self.signal.emit('1')
