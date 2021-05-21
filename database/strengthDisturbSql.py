@@ -574,6 +574,7 @@ def updateDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper):
     # print(sql)
     cur.execute(sql)
 
+
     conn.commit()
     disconnectMySql(conn, cur)
 
@@ -692,6 +693,7 @@ def delDataInUnit(Unit_ID):
         # print(sql)
         cur.execute(sql)
 
+
     conn.commit()
     disconnectMySql(conn, cur)
 
@@ -735,6 +737,14 @@ def delDataInEquip(Equip_ID):
         cur.execute(sql)
 
         sql = "Delete from retire where Equip_ID = '" + EquipID + "'"
+        # print(sql)
+        cur.execute(sql)
+
+        sql = "Delete from rockettransfer where Equip_ID = '" + EquipID + "'"
+        # print(sql)
+        cur.execute(sql)
+
+        sql = "Delete from armytransfer where Equip_ID = '" + EquipID + "'"
         # print(sql)
         cur.execute(sql)
     conn.commit()

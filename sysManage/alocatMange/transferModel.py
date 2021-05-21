@@ -3,7 +3,7 @@ from PyQt5.QAxContainer import QAxObject
 from widgets.alocatMange.transferModel import Widget_Transfer_Model
 from sysManage.alocatMange.rocketTransfer import rocketTransfer
 import sys
-from PyQt5.QtWidgets import QDialog,QApplication,QWidget, QMessageBox,QFileDialog
+from PyQt5.QtWidgets import QDialog,QApplication,QWidget, QMessageBox,QFileDialog, QTableWidgetItem
 from sysManage.alocatMange.armyTransfer import armyTransfer
 from sysManage.alocatMange.totalModel import totalModel
 from sysManage.alocatMange.singleModel import singleModel
@@ -25,6 +25,7 @@ class transferModel(QDialog, Widget_Transfer_Model):
         self.currentYear = ""
         self.signalConnect()
         self.setWindowTitle("火箭军调拨单")
+
     def signalConnect(self):
         self.pb_confirm.clicked.connect(self.slotClickedConfim)
 
@@ -32,8 +33,158 @@ class transferModel(QDialog, Widget_Transfer_Model):
 
         self.pb_output.clicked.connect(self.slotClickedOutput)
 
+        self.pb_saveSingle.clicked.connect(self.slotSaveSingle)
+
     def slotClickedOutput(self):
         pass
+
+    def slotSaveSingle(self):
+        for key, page in self.currentSingelUnitPage.items():
+            half = int((page.crtColumnCount - 2) / 2)
+            # 调拨单号
+            if page.tw_ditalModel.item(3, 1):
+                Trans_ID = page.tw_ditalModel.item(3, 1).text()
+                print("Trans_ID, ", Trans_ID)
+            else:
+                Trans_ID = ""
+            item1 = QTableWidgetItem()
+            item1.setText(Trans_ID)
+            item2 = QTableWidgetItem()
+            item2.setText(Trans_ID)
+            page.tw_ditalModel.setItem(3, page.crtColumnCount + 1 + 1, item1)
+            page.tw_ditalModel.setItem(3, 2*page.crtColumnCount + 2 + 1, item2)
+
+            # 调拨日期
+            if page.tw_ditalModel.item(3, half + 2):
+                Trans_Date = page.tw_ditalModel.item(3, half + 2).text()
+                print("Trans_Date, ", Trans_Date)
+            else:
+                Trans_Date = ""
+            item1 = QTableWidgetItem()
+            item1.setText(Trans_Date)
+            item2 = QTableWidgetItem()
+            item2.setText(Trans_Date)
+            page.tw_ditalModel.setItem(3, page.crtColumnCount + 1 + half + 2, item1)
+            page.tw_ditalModel.setItem(3, 2*page.crtColumnCount + 2 + half + 2,item2)
+
+            # 调拨依据
+            if page.tw_ditalModel.item(4, 1):
+                Trans_Reason = page.tw_ditalModel.item(4, 1).text()
+                print("Trans_Reason, ", Trans_Reason)
+            else:
+                Trans_Reason = ""
+            item1 = QTableWidgetItem()
+            item1.setText(Trans_Reason)
+            item2 = QTableWidgetItem()
+            item2.setText(Trans_Reason)
+            page.tw_ditalModel.setItem(4, page.crtColumnCount + 1 + 1, item1)
+            page.tw_ditalModel.setItem(4, 2*page.crtColumnCount + 2 + 1, item2)
+
+            # 调拨性质
+            if page.tw_ditalModel.item(4, half + 2):
+                Trans = page.tw_ditalModel.item(4, half + 2).text()
+                print("Trans, ", Trans)
+            else:
+                Trans = ""
+            item1 = QTableWidgetItem()
+            item1.setText(Trans)
+            item2 = QTableWidgetItem()
+            item2.setText(Trans)
+            page.tw_ditalModel.setItem(4, page.crtColumnCount + 1 + half + 2, item1)
+            page.tw_ditalModel.setItem(4, 2*page.crtColumnCount + 2 + half + 2, item2)
+
+
+            # 交装联系人
+            if page.tw_ditalModel.item(6, 1):
+                Send_Connect = page.tw_ditalModel.item(6, 1).text()
+                print("Send_Connect, ", Send_Connect)
+            else:
+                Send_Connect = ""
+            item1 = QTableWidgetItem()
+            item1.setText(Send_Connect)
+            item2 = QTableWidgetItem()
+            item2.setText(Send_Connect)
+            page.tw_ditalModel.setItem(6, page.crtColumnCount + 1 + 1, item1)
+            page.tw_ditalModel.setItem(6, 2*page.crtColumnCount + 2 + 1, item2)
+
+            Send_UnitID = ""
+            # 交装单位
+            if page.tw_ditalModel.item(5, 1):
+                Send_UnitName = page.tw_ditalModel.item(5, 1).text()
+                print("Send_UnitName, ", Send_UnitName)
+            else:
+                Send_UnitName = ""
+            item1 = QTableWidgetItem()
+            item1.setText(Send_UnitName)
+            item2 = QTableWidgetItem()
+            item2.setText(Send_UnitName)
+            page.tw_ditalModel.setItem(5, page.crtColumnCount + 1 + 1, item1)
+            page.tw_ditalModel.setItem(5, 2*page.crtColumnCount + 2 + 1, item2)
+
+            # 交装联系人联系方式
+            if page.tw_ditalModel.item(6, half + 2):
+                Send_Tel = page.tw_ditalModel.item(6, half + 2).text()
+                print("Send_Tel, ", Send_Tel)
+            else:
+                Send_Tel = ""
+            item1 = QTableWidgetItem()
+            item1.setText(Send_Tel)
+            item2 = QTableWidgetItem()
+            item2.setText(Send_Tel)
+            page.tw_ditalModel.setItem(6, page.crtColumnCount + 1 + half + 2, item1)
+            page.tw_ditalModel.setItem(6, 2*page.crtColumnCount + 2 + half + 2, item2)
+
+            # 接装单位地址
+            if page.tw_ditalModel.item(9, 1):
+                Recive_Add = page.tw_ditalModel.item(9, 1).text()
+                print("Recive_Add, ", Recive_Add)
+            else:
+                Recive_Add = ""
+            item1 = QTableWidgetItem()
+            item1.setText(Recive_Add)
+            item2 = QTableWidgetItem()
+            item2.setText(Recive_Add)
+            page.tw_ditalModel.setItem(9, page.crtColumnCount + 1 + 1, item1)
+            page.tw_ditalModel.setItem(9, 2 * page.crtColumnCount + 2 + 1, item2)
+
+            # 接装单位
+            if page.tw_ditalModel.item(8, 1):
+                Recive_Name = page.tw_ditalModel.item(8, 1).text()
+                print("Recive_Name, ", Recive_Name)
+            else:
+                Recive_Name = ""
+            item1 = QTableWidgetItem()
+            item1.setText(Recive_Name)
+            item2 = QTableWidgetItem()
+            item2.setText(Recive_Name)
+            page.tw_ditalModel.setItem(8, page.crtColumnCount + 1 + 1, item1)
+            page.tw_ditalModel.setItem(8, 2*page.crtColumnCount + 2 + 1, item2)
+
+            # 接装联系人
+            if page.tw_ditalModel.item(10, 1):
+                Recive_Connect = page.tw_ditalModel.item(10, 1).text()
+                print("Recive_Connect, ", Recive_Connect)
+            else:
+                Recive_Connect = ""
+            item1 = QTableWidgetItem()
+            item1.setText(Recive_Connect)
+            item2 = QTableWidgetItem()
+            item2.setText(Recive_Connect)
+            page.tw_ditalModel.setItem(10, page.crtColumnCount + 1 + 1, item1)
+            page.tw_ditalModel.setItem(10, 2*page.crtColumnCount + 2 + 1, item2)
+            # 接装联系人联系方式
+            if page.tw_ditalModel.item(10, half + 2):
+                Recive_Tel = page.tw_ditalModel.item(10, half + 2).text()
+                print("Recive_Tel, ", Recive_Tel)
+            else:
+                Recive_Tel = ""
+            item1 = QTableWidgetItem()
+            item1.setText(Recive_Tel)
+            item2 = QTableWidgetItem()
+            item2.setText(Recive_Tel)
+            page.tw_ditalModel.setItem(10, page.crtColumnCount + 1 + half + 2, item1)
+            page.tw_ditalModel.setItem(10, 2*page.crtColumnCount + 2 + half+2, item2)
+
 
     def slotClickedSaveTotal(self):
         print("curent, ", self.currentSingelUnitPage)
@@ -163,6 +314,11 @@ class transferModel(QDialog, Widget_Transfer_Model):
         if reply == QMessageBox.Cancel:
             return
         else:
+
+            self.pb_confirm.setDisabled(True)
+            self.pb_saveSingle.setDisabled(True)
+            self.pb_saveTotal.setDisabled(True)
+            self.pb_input.setDisabled(True)
             self.totalModel.saveTotalModel()
             for key, page in self.currentSingelUnitPage.items():
                 page.saveSingleModel()
@@ -172,6 +328,14 @@ class transferModel(QDialog, Widget_Transfer_Model):
         self.currentYear = year
 
     def getUnitIDList(self, unitInfoList, equipInfo, year, requireInfo):
+        if unitInfoList == "" and equipInfo =="" and  year =="" and  requireInfo == "":
+            self.pb_input.setDisabled(True)
+            self.pb_output.setDisabled(True)
+            self.pb_saveTotal.setDisabled(True)
+            self.pb_saveSingle.setDisabled(True)
+            self.pb_confirm.setDisabled(True)
+            return
+        #print("==============================")
         self.unitInfoList = unitInfoList
         self.equipInfo = equipInfo
         self.year = year
@@ -179,6 +343,7 @@ class transferModel(QDialog, Widget_Transfer_Model):
         self.unitNum = len(unitInfoList)
         self.currentUnitInfoList = unitInfoList
         self.tw_transferModel.clear()
+        #print("requireInfo :==============", requireInfo)
 
         self.totalModel = totalModel()
         self.totalModel.initTableWidget(self.unitInfoList, self.equipInfo, self.year, self.requireInfo)

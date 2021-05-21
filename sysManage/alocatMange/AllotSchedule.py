@@ -441,8 +441,11 @@ class AllotSchedule(QWidget,AllotSchedule):
                 info1.append(self.te_proof.toPlainText())
                 info1.append(result1[0][1])
                 self.rocketSchedule.getUnitIDList(currentUnit,self.currentEquipdict[self.disturbResult.currentRow()],self.currentYear,info1)
-        self.rocketSchedule.show()
-        self.rocketSchedule.signal.connect(self.updateRocket)
+            else:
+                self.rocketSchedule.getUnitIDList("", "",
+                                                  "", "")
+            self.rocketSchedule.show()
+            self.rocketSchedule.signal.connect(self.updateRocket)
 
     def updateRocket(self):
         currentRow = self.disturbResult.currentRow()

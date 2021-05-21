@@ -215,50 +215,55 @@ class singleModel(QDialog, Widget_Dital_Model):
         self.tw_ditalModel.setSpan(row, startColumn + half + 3, 1, self.crtColumnCount - half - 2)
 
     def updateTableWidget(self, requireInfo):
+        self.updateSigleTable(requireInfo, 0)
+        self.updateSigleTable(requireInfo, self.crtColumnCount + 1)
+        self.updateSigleTable(requireInfo, 2 * self.crtColumnCount + 2)
+
+    def updateSigleTable(self, requireInfo, startColumn):
         print(requireInfo)
         half = int((self.crtColumnCount - 4) / 2)
-        self.tw_ditalModel.item(3, half + 3).setText(requireInfo[0])
-        self.tw_ditalModel.item(4, 1).setText(requireInfo[1])
-        self.tw_ditalModel.item(4, half + 3).setText(requireInfo[2])
-        self.tw_ditalModel.item(5, 1).setText(requireInfo[3])
-        self.tw_ditalModel.item(5, half + 3).setText(requireInfo[4])
+        self.tw_ditalModel.item(3, startColumn+half + 3).setText(requireInfo[0])
+        self.tw_ditalModel.item(4, startColumn+1).setText(requireInfo[1])
+        self.tw_ditalModel.item(4, startColumn+half + 3).setText(requireInfo[2])
+        self.tw_ditalModel.item(5, startColumn+1).setText(requireInfo[3])
+        self.tw_ditalModel.item(5, startColumn+half + 3).setText(requireInfo[4])
 
-        self.tw_ditalModel.item(6, 1).setText(requireInfo[5])
-        self.tw_ditalModel.item(6, half + 3).setText(requireInfo[6])
+        self.tw_ditalModel.item(6, startColumn+1).setText(requireInfo[5])
+        self.tw_ditalModel.item(6, startColumn+half + 3).setText(requireInfo[6])
 
-        self.tw_ditalModel.item(7, 1).setText(requireInfo[7])
-        self.tw_ditalModel.item(7, half + 3).setText(requireInfo[8])
-        self.tw_ditalModel.item(8, 1).setText(requireInfo[-2])
-        self.tw_ditalModel.item(11, 1).setText(requireInfo[-7])
-        self.tw_ditalModel.item(11, half + 3).setText(requireInfo[-6])
+        self.tw_ditalModel.item(7, startColumn+1).setText(requireInfo[7])
+        self.tw_ditalModel.item(7, startColumn+half + 3).setText(requireInfo[8])
+        self.tw_ditalModel.item(8, startColumn+1).setText(requireInfo[-2])
+        self.tw_ditalModel.item(11, startColumn+1).setText(requireInfo[-7])
+        self.tw_ditalModel.item(11, startColumn+half + 3).setText(requireInfo[-6])
 
         item = QTableWidgetItem()
         item.setText("有效期至：")
-        self.tw_ditalModel.setItem(13, 0, item)
+        self.tw_ditalModel.setItem(13, startColumn+0, item)
 
         item = QTableWidgetItem()
         item.setText(requireInfo[9])
-        self.tw_ditalModel.setItem(13, 1, item)
+        self.tw_ditalModel.setItem(13, startColumn+1, item)
 
         item = QTableWidgetItem()
         item.setText("1")
-        self.tw_ditalModel.setItem(16, 0, item)
+        self.tw_ditalModel.setItem(16, startColumn+0, item)
 
         item = QTableWidgetItem()
         item.setText(requireInfo[-5])
-        self.tw_ditalModel.setItem(16, 1, item)
+        self.tw_ditalModel.setItem(16, startColumn+1, item)
 
         item = QTableWidgetItem()
         item.setText(requireInfo[-4])
-        self.tw_ditalModel.setItem(16, 2, item)
+        self.tw_ditalModel.setItem(16, startColumn+2, item)
 
         item = QTableWidgetItem()
         item.setText(requireInfo[-3])
-        self.tw_ditalModel.setItem(16, 3, item)
+        self.tw_ditalModel.setItem(16, startColumn+3, item)
 
         item = QTableWidgetItem()
         item.setText(requireInfo[-1])
-        self.tw_ditalModel.setItem(16, 4, item)
+        self.tw_ditalModel.setItem(16, startColumn+4, item)
 
     def saveSingleModel(self):
         half = int((self.crtColumnCount - 2) / 2)
