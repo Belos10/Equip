@@ -31,7 +31,7 @@ class ArmySchedule(QDialog, widget_armySchedule ):
 
     def setYear(self, year):
         self.currentYear = year
-        print(self.currentYear)
+        #print(self.currentYear)
 
 
 

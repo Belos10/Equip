@@ -8,6 +8,8 @@ from PyQt5.Qt import Qt
 from PyQt5.QtGui import QColor, QBrush,QFont
 from database.alocatMangeSql import *
 from sysManage.userInfo import get_value
+from sysManage.alocatMange.InputProof import InputProof
+
 
 '''
     分配调整计划
@@ -19,6 +21,7 @@ class DisturbPlan(QWidget, yearList_Form):
         self.setupUi(self)
         self.initAll()
         # initDisturbPlanDatabase()
+        self.inputProof = InputProof()
         self.signalConnect()
 
 
@@ -34,7 +37,10 @@ class DisturbPlan(QWidget, yearList_Form):
         self.le_second.setDisabled(1)
         self.tw_first.setDisabled(1)
         self.tw_second.setDisabled(1)
-
+        self.tw_first.clear()
+        self.tw_second.clear()
+        self.txt_disturbPlanYear.clear()
+        self.disturbResult.clear()
         self._initYearWidget_()
 
     def signalConnect(self):
@@ -57,11 +63,12 @@ class DisturbPlan(QWidget, yearList_Form):
         # 修改分配数与备注
         self.disturbResult.itemChanged.connect(self.slotItemChange)
         # 修改调拨依据
-        self.te_proof.textChanged.connect(self.slotProofChange)
+        self.pb_proof.clicked.connect(self.slotProofChange)
 
         self.pb_firstSelect.clicked.connect(self.slotSelectUnit)
 
         self.pb_secondSelect.clicked.connect(self.slotSelectEquip)
+
 
     def slotSelectUnit(self):
         findText = self.le_first.text()
@@ -69,6 +76,7 @@ class DisturbPlan(QWidget, yearList_Form):
             if item.text(0) == findText:
                 self.tw_first.setCurrentItem(item)
                 break
+
 
     def slotSelectEquip(self):
         findText = self.le_second.text()
@@ -99,7 +107,7 @@ class DisturbPlan(QWidget, yearList_Form):
         # 修改分配数与备注
         self.disturbResult.itemChanged.disconnect(self.slotItemChange)
         # 修改调拨依据
-        self.te_proof.textChanged.disconnect(self.slotProofChange)
+        self.pb_proof.clicked.disconnect(self.slotProofChange)
 
         self.pb_firstSelect.clicked.disconnect(self.slotSelectUnit)
 
@@ -352,14 +360,13 @@ class DisturbPlan(QWidget, yearList_Form):
     # 初始化调拨依据
     def initDisturbPlanProof(self):
         proof = selectDisturbPlanProof(self.currentYear)
-        print(proof)
-        self.te_proof.setText(proof[0][0])
-        if proof[0][0] == "":
-            self.te_proof.setPlaceholderText("请输入调拨依据")
+        self.tb_proof.setText(proof[0][0])
+
 
     # 改变调拨依据
     def slotProofChange(self):
-        updateDisturbPlanProof(self.currentYear,self.te_proof.toPlainText())
+        self.inputProof.setYear(self.currentYear)
+        self.inputProof.show()
 
     # 读取初始分配计划数
     def initDisturbPlanNum(self):

@@ -36,6 +36,11 @@ class AllotSchedule(QWidget,AllotSchedule):
         self.le_second.setDisabled(1)
         self.tw_first.setDisabled(1)
         self.tw_second.setDisabled(1)
+        self.tw_first.clear()
+        self.tw_second.clear()
+        self.txt_disturbPlanYear.clear()
+        #self.te_proof.clear()
+        self.disturbResult.clear()
         self._initYearWidget_()
 
 
