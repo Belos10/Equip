@@ -11,6 +11,7 @@ from sysManage.alocatMange.ArmySchedule import ArmySchedule
 from sysManage.alocatMange.armyTransfer import armyTransfer
 from sysManage.alocatMange.ScheduleFinish import ScheduleFisish
 from sysManage.alocatMange.transferModel import transferModel
+from sysManage.userInfo import get_value
 
 class AllotSchedule(QWidget,AllotSchedule):
     def __init__(self,parent=None):
@@ -22,6 +23,7 @@ class AllotSchedule(QWidget,AllotSchedule):
         self.currentDisturbPlan = {}
         self.currentUnitDisturbPlanNum = {}
         self.unitDisturbPlanList = {}
+        self.currentEquipdict = {}
         self.armySchedule = ArmySchedule(self)
         self.scheduleFinish = ScheduleFisish(self)
         self.fileName = ""
@@ -39,6 +41,7 @@ class AllotSchedule(QWidget,AllotSchedule):
         self.tw_first.clear()
         self.tw_second.clear()
         self.txt_disturbPlanYear.clear()
+        self.cb_schedule.setDisabled(1)
         #self.te_proof.clear()
         self.disturbResult.clear()
         self._initYearWidget_()
@@ -55,6 +58,7 @@ class AllotSchedule(QWidget,AllotSchedule):
         # 点击第二目录结果
         self.tw_second.itemClicked.connect(self.slotDisturbStrengthResult)
         self.tw_second.itemChanged.connect(self.slotCheckedChange)
+        self.cb_schedule.activated.connect(self.selectSchedule)
 
 
 
@@ -89,57 +93,96 @@ class AllotSchedule(QWidget,AllotSchedule):
         self.le_second.setDisabled(False)
         self.tw_first.setDisabled(False)
         self.tw_second.setDisabled(False)
+        self.cb_schedule.setDisabled(0)
         self.first_treeWidget_dict = {}
         self.second_treeWidget_dict = {}
+        self.initUserInfo()
         self.currentYear = self.lw_yearChoose.currentItem().text()
         self._initUnitTreeWidget("", self.tw_first)
-        startEquipIDInfo = findUperEquipIDByName("通用装备")
-        for startEquipInfo in startEquipIDInfo:
-            # self.second_treeWidget_dict[0] = startEquipInfo
-            item = QTreeWidgetItem(self.tw_second)
-            item.setText(0, startEquipInfo[1])
+        startInfo = selectDisturbPlanUnitInfoByUnitID(self.userInfo[0][4])
+        stack = []
+        root = []
+        if startInfo:
+            stack.append(startInfo)
+            root.append(self.tw_first)
+            self._initUnitTreeWidget(stack, root)
+
+        equipInfo = selectEquipInfoByEquipUper("")
+        stack = []
+        root = []
+        if equipInfo:
+            stack.append(equipInfo[0])
+            root.append(self.tw_second)
+            self._initEquipTreeWidget(stack, root)
+        # startEquipIDInfo = findUperEquipIDByName("通用装备")
+        # for startEquipInfo in startEquipIDInfo:
+        #     # self.second_treeWidget_dict[0] = startEquipInfo
+        #     item = QTreeWidgetItem(self.tw_second)
+        #     item.setText(0, startEquipInfo[1])
+        #     item.setCheckState(0, Qt.Unchecked)
+        #     self.second_treeWidget_dict[startEquipInfo[0]] = item
+        #     self._initEquipTreeWidget(startEquipInfo[0], item)
+        #     break
+
+    def initUserInfo(self):
+        self.userInfo = get_value("totleUserInfo")
+
+
+    def _initUnitTreeWidget(self, stack,root):
+        # if root == '':
+        #     result = selectDisturbPlanUnitInfoByDeptUper('')
+        # else:
+        #     result = selectDisturbPlanUnitInfoByDeptUper(root)
+        #
+        # # rowData: (单位编号，单位名称，上级单位编号)
+        # for rowData in result:
+        #     item = QTreeWidgetItem(mother)
+        #     item.setText(0, rowData[1])
+        #     #item.setCheckState(0, Qt.Unchecked)
+        #     self.first_treeWidget_dict[rowData[0]] = item
+        #     if rowData[0] != '':
+        #         self._initUnitTreeWidget(rowData[0], item)
+        #     else:
+        #         return
+        while stack:
+            UnitInfo = stack.pop(0)
+            item = QTreeWidgetItem(root.pop(0))
+            item.setText(0, UnitInfo[1])
+            # item.setCheckState(0, Qt.Unchecked)
+            self.first_treeWidget_dict[UnitInfo[0]] = item
+            result = selectUnitInfoByDeptUper(UnitInfo[0])
+            for resultInfo in result:
+                stack.append(resultInfo)
+                root.append(item)
+
+
+
+
+    def _initEquipTreeWidget(self, stack,root):
+        # if root == '':
+        #     result = selectEquipInfoByEquipUper('')
+        # else:
+        #     result = selectEquipInfoByEquipUper(root)
+        # # rowData: (装备编号，装备名称，上级装备编号, 录入类型, 装备类型)
+        # for rowData in result:
+        #     item = QTreeWidgetItem(mother)
+        #     item.setText(0, rowData[1])
+        #     item.setCheckState(0, Qt.Unchecked)
+        #     self.second_treeWidget_dict[rowData[0]] = item
+        #     if rowData[0] != '':
+        #         self._initEquipTreeWidget(rowData[0], item)
+        #     else:
+        #         return
+        while stack:
+            EquipInfo = stack.pop(0)
+            item = QTreeWidgetItem(root.pop(0))
+            item.setText(0, EquipInfo[1])
             item.setCheckState(0, Qt.Unchecked)
-            self.second_treeWidget_dict[startEquipInfo[0]] = item
-            self._initEquipTreeWidget(startEquipInfo[0], item)
-            break
-
-
-
-    def _initUnitTreeWidget(self, root, mother):
-        if root == '':
-            result = selectDisturbPlanUnitInfoByDeptUper('')
-        else:
-            result = selectDisturbPlanUnitInfoByDeptUper(root)
-
-        # rowData: (单位编号，单位名称，上级单位编号)
-        for rowData in result:
-            item = QTreeWidgetItem(mother)
-            item.setText(0, rowData[1])
-            #item.setCheckState(0, Qt.Unchecked)
-            self.first_treeWidget_dict[rowData[0]] = item
-            if rowData[0] != '':
-                self._initUnitTreeWidget(rowData[0], item)
-            else:
-                return
-
-
-
-
-    def _initEquipTreeWidget(self, root, mother):
-        if root == '':
-            result = selectEquipInfoByEquipUper('')
-        else:
-            result = selectEquipInfoByEquipUper(root)
-        # rowData: (装备编号，装备名称，上级装备编号, 录入类型, 装备类型)
-        for rowData in result:
-            item = QTreeWidgetItem(mother)
-            item.setText(0, rowData[1])
-            item.setCheckState(0, Qt.Unchecked)
-            self.second_treeWidget_dict[rowData[0]] = item
-            if rowData[0] != '':
-                self._initEquipTreeWidget(rowData[0], item)
-            else:
-                return
+            self.second_treeWidget_dict[EquipInfo[0]] = item
+            result = selectEquipInfoByEquipUper(EquipInfo[0])
+            for resultInfo in result:
+                stack.append(resultInfo)
+                root.append(item)
 
 
 
@@ -148,7 +191,7 @@ class AllotSchedule(QWidget,AllotSchedule):
     '''
     def slotDisturbStrengthResult(self):
         self.yearList = []
-        self.currentEquipdict={}
+        self.originalEquipDict={}
         self.currentUnitChilddict = {}
         # 获取子单位名
         j = 0
@@ -167,23 +210,23 @@ class AllotSchedule(QWidget,AllotSchedule):
         for equipID, equipItem in self.second_treeWidget_dict.items():
             if equipItem.checkState(0) == Qt.Checked:
                 equipInfo = findEquipInfo(equipID)
-                self.currentEquipdict[j]= equipInfo[0]
+                self.originalEquipDict[j]= equipInfo[0]
                 j=j+1
             elif equipItem.checkState(0) == Qt.PartiallyChecked:
                 equipInfo = findEquipInfo(equipID)
-                self.currentEquipdict[j] = equipInfo[0]
+                self.originalEquipDict[j] = equipInfo[0]
                 j=j+1
-        print("self.currentEquipdict",self.currentEquipdict)
-        self._initDisturbPlanByUnitListAndEquipList()
-
+        print("self.originalEquipDict",self.originalEquipDict)
+        self._initDisturbPlanByUnitListAndEquipList(self.originalEquipDict)
 
 
     '''
         初始化分配计划结果
     '''
-    def _initDisturbPlanByUnitListAndEquipList(self):
+    def _initDisturbPlanByUnitListAndEquipList(self,equipDict):
         self.disturbResult.clear()
         self.disturbResult.setRowCount(0)
+        self.currentEquipdict=equipDict
         self.lenCurrentUnitChilddict=len(self.currentUnitChilddict)
         self.lenCurrentEquipdict=len(self.currentEquipdict)
 
@@ -482,3 +525,78 @@ class AllotSchedule(QWidget,AllotSchedule):
             item = QPushButton("已完成")
             self.disturbResult.setCellWidget(currentRow, 7 + self.lenCurrentUnitChilddict, item)
             updateScheduleFinish(self.currentEquipdict[currentRow][0], self.currentYear,fileName)
+
+    # 筛选调拨进度
+    def selectSchedule(self):
+        index = self.cb_schedule.currentIndex()
+        # 未选择状态
+        if index == 0:
+            self._initDisturbPlanByUnitListAndEquipList(self.originalEquipDict)
+
+        # 完成进度一
+        elif index == 1:
+            equipDict={}
+            j = 0
+            for equipID, equipItem in self.second_treeWidget_dict.items():
+                flag1 = selectArmySchedule(equipID, self.currentYear)
+                if flag1[0][0] != '0':
+                    if equipItem.checkState(0) == Qt.Checked:
+                        equipInfo = findEquipInfo(equipID)
+                        equipDict[j] = equipInfo[0]
+                        j = j + 1
+                    elif equipItem.checkState(0) == Qt.PartiallyChecked:
+                        equipInfo = findEquipInfo(equipID)
+                        equipDict[j] = equipInfo[0]
+                        j = j + 1
+            self._initDisturbPlanByUnitListAndEquipList(equipDict)
+
+        # 完成进度二
+        elif index == 2:
+            equipDict = {}
+            j = 0
+            for equipID, equipItem in self.second_treeWidget_dict.items():
+                flag2 = selectArmySchedule(equipID, self.currentYear)
+                if int(flag2[0][0]):
+                    if equipItem.checkState(0) == Qt.Checked:
+                        equipInfo = findEquipInfo(equipID)
+                        equipDict[j] = equipInfo[0]
+                        j = j + 1
+                    elif equipItem.checkState(0) == Qt.PartiallyChecked:
+                        equipInfo = findEquipInfo(equipID)
+                        equipDict[j] = equipInfo[0]
+                        j = j + 1
+            self._initDisturbPlanByUnitListAndEquipList(equipDict)
+
+        # 完成进度三
+        elif index == 3:
+            equipDict = {}
+            j = 0
+            for equipID, equipItem in self.second_treeWidget_dict.items():
+                flag3 = selectArmySchedule(equipID, self.currentYear)
+                if int(flag3[0][0]):
+                    if equipItem.checkState(0) == Qt.Checked:
+                        equipInfo = findEquipInfo(equipID)
+                        equipDict[j] = equipInfo[0]
+                        j = j + 1
+                    elif equipItem.checkState(0) == Qt.PartiallyChecked:
+                        equipInfo = findEquipInfo(equipID)
+                        equipDict[j] = equipInfo[0]
+                        j = j + 1
+            self._initDisturbPlanByUnitListAndEquipList(equipDict)
+
+        # 完成进度四
+        elif index == 4:
+            equipDict = {}
+            j = 0
+            for equipID, equipItem in self.second_treeWidget_dict.items():
+                flag4 = selectArmySchedule(equipID, self.currentYear)
+                if flag4[0][0] != '0':
+                    if equipItem.checkState(0) == Qt.Checked:
+                        equipInfo = findEquipInfo(equipID)
+                        equipDict[j] = equipInfo[0]
+                        j = j + 1
+                    elif equipItem.checkState(0) == Qt.PartiallyChecked:
+                        equipInfo = findEquipInfo(equipID)
+                        equipDict[j] = equipInfo[0]
+                        j = j + 1
+            self._initDisturbPlanByUnitListAndEquipList(equipDict)

@@ -177,11 +177,11 @@ class DisturbPlan(QWidget, yearList_Form):
         self.currentYear = self.lw_yearChoose.currentItem().text()
         #startEquipIDInfo = findUperEquipIDByName("通用装备")
 
-        self.startInfo = selectDisturbPlanUnitInfoByUnitID(self.userInfo[0][4])
+        startInfo = selectDisturbPlanUnitInfoByUnitID(self.userInfo[0][4])
         stack = []
         root = []
-        if self.startInfo:
-            stack.append(self.startInfo)
+        if startInfo:
+            stack.append(startInfo)
             root.append(self.tw_first)
             self._initUnitTreeWidget(stack,root)
 
