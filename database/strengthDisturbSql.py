@@ -1891,7 +1891,7 @@ def findUnitChildInfo(unitId):
 #查询退休年份表
 def selectAllRetirementYearInfo():
     conn, cur = connectMySql()
-    sql = "select * from retireyear"
+    sql = "select * from retireyear order by year"
     #print(sql)
     cur.execute(sql)
     result = cur.fetchall()
