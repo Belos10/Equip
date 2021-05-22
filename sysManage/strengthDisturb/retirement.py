@@ -98,7 +98,17 @@ class retirement(QWidget, Widget_Retirement):
     def slotAddNewYear(self):
         year = 0
         year, ok = QInputDialog.getInt(self, "Get year", "year:", 0, 0, 100000, 1)
+
         if year:
+            allyearInfo = selectAllRetirementYearInfo()
+            haveYear = False
+            for yearInfo in allyearInfo:
+                if str(year) == yearInfo[1]:
+                    haveYear = True
+                    break
+            if haveYear:
+                reply = QMessageBox.information(self, "新增", "年份已存在，新增失败", QMessageBox.Yes)
+                return
             insertIntoRetireYear(year)
             self._initSelectYear_()
 
@@ -187,7 +197,7 @@ class retirement(QWidget, Widget_Retirement):
             if equipItem.checkState(0) == Qt.Checked or equipItem.checkState(0) == Qt.PartiallyChecked:
                 self.currentCheckedEquipList.append(equipID)
 
-        if self.currentCheckedEquipList == []:
+        if self.currentCheckedEquipList == [] or self.currentCheckedUnitList == []:
             self.tw_result.setRowCount(2)
             return
         self.pb_save.setDisabled(False)
