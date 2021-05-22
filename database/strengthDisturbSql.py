@@ -1168,8 +1168,8 @@ def selectAboutStrengthByUnitListAndEquipList(UnitList, EquipList, yearList, equ
                     info[7] = str(int(info[4]) - int(info[6]))
                     resultList.append(info)
                 else:
-                    info = []
-                    info.append(Equip_ID, Unit_ID, equipName, unitName, '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0')
+                    info = [Equip_ID, Unit_ID, equipName, unitName, '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0']
+                    #info.append(Equip_ID, Unit_ID, equipName, unitName, '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0')
                     resultList.append(info)
 
     disconnectMySql(conn, cur)

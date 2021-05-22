@@ -395,7 +395,7 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
             item = QListWidgetItem()
             item.setText(year)
             self.lw_year.addItem(item)
-            self.currentYearListItem[year[1]] = item
+            self.currentYearListItem[year] = item
 
     #初始化单位目录
     def _initUnitTreeWidget(self, root, mother):
