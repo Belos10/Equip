@@ -1558,6 +1558,9 @@ def updateWeaveNum(Unit_ID, Equip_ID, weaveNum, orginWeave, year):
                     orginYearWorkNum = strengthInfo[0][5]
                 else:
                     orginYearWorkNum = "0"
+                    if unitName == None:
+                        unitName = "公用装备"
+                    print("test==================", EquipID, UnitID, equipName, unitName, year)
                     sql = "INSERT INTO strength (Equip_ID, Unit_ID, Equip_Name, Unit_Name, Strength, Work, Now, Error, Retire, Delay, Pre, NonObject," \
                           "NonStrength, Single, Arrive, year, equipYear) VALUES" \
                           + "('" + EquipID + "','" + UnitID + "','" + equipName + "','" + unitName + "', '0'," \

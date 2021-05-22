@@ -117,7 +117,10 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
                             reply = QMessageBox.question(self, '修改', '是否修改当前装备、单位的编制数?', QMessageBox.Yes, QMessageBox.Cancel)
                             if reply == QMessageBox.Yes:
                                 updateWeaveNum(resultRowInfo[0], resultRowInfo[1], self.tw_result.item(self.currentRow, 3).text(), resultRowInfo[5], self.year)
-                                updateOneEquipmentBalanceData(self.year, resultRowInfo[0],resultRowInfo[1])
+                                if resultRowInfo[2] == "公用装备":
+                                    pass
+                                else:
+                                    updateOneEquipmentBalanceData(self.year, resultRowInfo[0],resultRowInfo[1])
                                 self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
                                 return
                             else:
