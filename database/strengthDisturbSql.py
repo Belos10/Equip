@@ -467,7 +467,6 @@ def addDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper):
             sql = "insert into disturbplan (Equip_Id,Equip_Name,Unit_Id,Unit_Name,Year,DisturbNum) values " \
                   + "('" + equipInfo[0] + "','" + equipInfo[1] + "','" + Unit_ID +\
                   "','" + Unit_Name + "','"+ disturbplanYearInfo[1] +"', '' )"
-            # print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",sql)
             cur.execute(sql)
 
 
