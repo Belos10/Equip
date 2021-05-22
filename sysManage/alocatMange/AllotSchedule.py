@@ -277,8 +277,8 @@ class AllotSchedule(QWidget,AllotSchedule):
     # 初始化调拨依据
     def initDisturbPlanProof(self):
         proof = selectDisturbPlanProof(self.currentYear)
-        self.te_proof.setText(proof[0][0])
-        self.te_proof.setTextInteractionFlags(Qt.TextSelectableByMouse|Qt.TextSelectableByKeyboard)
+        self.tb_proof.setText(proof[0][0])
+        #self..setTextInteractionFlags(Qt.TextSelectableByMouse|Qt.TextSelectableByKeyboard)
 
 
 
@@ -384,8 +384,6 @@ class AllotSchedule(QWidget,AllotSchedule):
 
     def initDisturbPlanOther(self):
         self.unitDisturbPlanOtherList = selectDisturbPlanOther(self.currentEquipdict, self.currentYear)
-        # print("the num :--------------------0", self.unitDisturbPlanOtherList)
-
         for i in range(0, len(self.currentEquipdict)):
             item = self.disturbResult.item(i, 1)
             if self.unitDisturbPlanOtherList[i]:
@@ -396,7 +394,6 @@ class AllotSchedule(QWidget,AllotSchedule):
         for unitID, unitItem in self.first_treeWidget_dict.items():
             if unitItem == self.tw_first.currentItem():
                 if selectUnitIfUppermost(unitID):
-                    # print("最高级！！！！！！！！！！！！", self.unitDisturbPlanOtherList)
                     for i in range(0, len(self.currentEquipdict)):
                         item = self.disturbResult.item(i, 2)
                         if self.unitDisturbPlanOtherList[i]:
@@ -418,7 +415,6 @@ class AllotSchedule(QWidget,AllotSchedule):
                     for i in self.currentEquipdict:
                         item = self.disturbResult.item(i, 2)
                         result = selectDisturbPlanNum({0: [unitID]}, self.currentEquipdict, self.currentYear)
-                        print("*/////////////////////////", result)
                         if result:
                             item.setText(str(result[i]))
                         else:
@@ -432,7 +428,6 @@ class AllotSchedule(QWidget,AllotSchedule):
 
     def setRocketSchedule(self):
         row = self.disturbResult.currentRow()
-        print("row",row)
         currentUnit=[]
         for i in self.currentUnitChilddict.values():
             currentUnit.append(i)
@@ -443,7 +438,7 @@ class AllotSchedule(QWidget,AllotSchedule):
                 info1=[result1[0][0],self.disturbResult.item(row,3).text()]
                 for i in range(0,self.lenCurrentUnitChilddict):
                     info1.append(self.disturbResult.item(row,4+i).text())
-                info1.append(self.te_proof.toPlainText())
+                info1.append(self.tb_proof.toPlainText())
                 info1.append(result1[0][1])
                 self.rocketSchedule.getUnitIDList(currentUnit,self.currentEquipdict[self.disturbResult.currentRow()],self.currentYear,info1)
             else:

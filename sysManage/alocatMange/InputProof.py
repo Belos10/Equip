@@ -33,3 +33,4 @@ class InputProof(QDialog,widget_inputProof):
         else:
             updateDisturbPlanProof(self.currentYear, self.le_inputText.text())
             self.close()
+            self.signal.emit('1')

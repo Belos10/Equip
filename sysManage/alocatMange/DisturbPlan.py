@@ -37,6 +37,7 @@ class DisturbPlan(QWidget, yearList_Form):
         self.le_second.setDisabled(1)
         self.tw_first.setDisabled(1)
         self.tw_second.setDisabled(1)
+        self.pb_proof.setDisabled(1)
         self.tw_first.clear()
         self.tw_second.clear()
         self.txt_disturbPlanYear.clear()
@@ -48,12 +49,9 @@ class DisturbPlan(QWidget, yearList_Form):
         self.lw_yearChoose.itemClicked.connect(self.slotClickedInqury)
         self.lw_yearChoose.itemClicked.connect(self.setDisturbPlanTitle)
         self.lw_yearChoose.itemClicked.connect(self.initDisturbPlanProof)
-
         # 点击第一目录结果
         self.tw_first.itemClicked.connect(self.slotDisturbStrengthResult)
-
         self.tw_second.itemChanged.connect(self.slotCheckedChange)
-
         # 点击第二目录结果
         self.tw_second.itemClicked.connect(self.slotDisturbStrengthResult)
         # 新增年份
@@ -64,10 +62,9 @@ class DisturbPlan(QWidget, yearList_Form):
         self.disturbResult.itemChanged.connect(self.slotItemChange)
         # 修改调拨依据
         self.pb_proof.clicked.connect(self.slotProofChange)
-
         self.pb_firstSelect.clicked.connect(self.slotSelectUnit)
-
         self.pb_secondSelect.clicked.connect(self.slotSelectEquip)
+        self.inputProof.signal.connect(self.initDisturbPlanProof)
 
 
     def slotSelectUnit(self):
@@ -113,6 +110,7 @@ class DisturbPlan(QWidget, yearList_Form):
 
         self.pb_secondSelect.clicked.disconnect(self.slotSelectEquip)
 
+        self.inputProof.signal.disconnect(self.initDisturbPlanProof)
 
 
     # 新增年份
@@ -173,6 +171,7 @@ class DisturbPlan(QWidget, yearList_Form):
         self.le_second.setDisabled(False)
         self.tw_first.setDisabled(False)
         self.tw_second.setDisabled(False)
+        self.pb_proof.setDisabled(0)
         self.first_treeWidget_dict = {}
         self.second_treeWidget_dict = {}
         self.currentYear = self.lw_yearChoose.currentItem().text()
@@ -350,7 +349,6 @@ class DisturbPlan(QWidget, yearList_Form):
             self.disturbResult.setItem(i, 4 + self.lenCurrentUnitChilddict, item)
             currentRowResult.append(item)
             i = i + 1
-
         #self.disturbResult.setRowCount(n)
         self.initDisturbPlanNum()
         self.initDisturbPlanNote()
@@ -367,6 +365,7 @@ class DisturbPlan(QWidget, yearList_Form):
     def slotProofChange(self):
         self.inputProof.setYear(self.currentYear)
         self.inputProof.show()
+
 
     # 读取初始分配计划数
     def initDisturbPlanNum(self):
