@@ -10,6 +10,7 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
     def __init__(self, parent=None):
         super(InstallationSituation, self).__init__(parent)
         self.setupUi(self)
+        self.signalConnection()
         self.init()
     result = []
     base = []
@@ -35,7 +36,7 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
 
     #定义初始化函数
     def init(self):
-        self.signalConnection()
+
         #初始化单位列表
         self.displayUnitInBox()
         self.result = getResult(self.base, self.designation, self.positionCode, self.prepare)
@@ -362,17 +363,13 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
     def slotAdd(self):
         rowCount =  self.tw_result.rowCount()
         self.currentLastRow = rowCount
-
         self.tw_result.insertRow(rowCount)
-
         comboBox = QComboBox()
         comboBox.addItems(getUnits())
         self.tw_result.setCellWidget(rowCount, 1, comboBox)
-
         comboBox = QComboBox()
         comboBox.addItems(['是', '否'])
         self.tw_result.setCellWidget(rowCount, 5, comboBox)
-
         comboBox = QComboBox()
         comboBox.addItems(['已到位', '未到位'])
         self.tw_result.setCellWidget(rowCount, 10, comboBox)
@@ -380,22 +377,21 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
 
     def slotDelete(self):
 
-        selectedRow = self.tw_result.selectedItems()
-        if selectedRow != None:
-            if len(selectedRow) > 0:
-                rowCount = selectedRow[0].row()
-            else:
-                rowCount = 0
-
-
-        if rowCount <= 2:
-            QMessageBox.warning(self, "注意", "请选中有效单元格！", QMessageBox.Yes, QMessageBox.Yes)
+        rowCount = self.tw_result.currentRow()
+        if self.result == None:
+            resultCount = 0
         else:
+            resultCount = len(self.result)
+
+        if rowCount < 3:
+            QMessageBox.warning(self, "注意", "请选中有效单元格！", QMessageBox.Yes, QMessageBox.Yes)
+        elif rowCount >= 3 and rowCount < 3 + resultCount:
             item = self.tw_result.item(rowCount,0)
             if item != None and int(item.text()) > 0:
                 deleteDataByInstallationId(item.text())
                 self.tw_result.removeRow(rowCount)
-        pass
+        else:
+            self.tw_result.removeRow(rowCount)
 
 
 

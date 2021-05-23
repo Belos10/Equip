@@ -18,6 +18,7 @@ class Equip_Balance_Control(QWidget, EquipmentBalanceControlUI):
         self.stack = QStackedWidget(self)
         self.main = Equip_Balance_Main()
         self.select = Equip_Balance_Select()
+        self.select.initEquipmentBlanceSelect()
         self.result = Equip_Balance_Result()
         self.stack.addWidget(self.main)
         self.stack.addWidget(self.select)
@@ -66,6 +67,7 @@ class Equip_Balance_Control(QWidget, EquipmentBalanceControlUI):
                                      QMessageBox.Cancel)
         if reply == QMessageBox.Yes:
             self.stack.setCurrentIndex(0)
+            self.main.initYear()
         else:
             pass
 

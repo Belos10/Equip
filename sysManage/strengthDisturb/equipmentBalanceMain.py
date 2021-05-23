@@ -4,10 +4,9 @@ from PyQt5 import QtCore, QtWidgets, QtCore
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import QWidget, QApplication, QTreeWidgetItem, QTreeWidgetItemIterator, QMessageBox, \
     QTableWidgetItem, QStackedWidget, QHBoxLayout, QListWidgetItem
-
-from database.alocatMangeSql import selectYearListAboutDisturbPlan
 from widgets.strengthDisturb.equipmentBalance.equipmentBalanceMainUI import EquipmentBalanceMainUI
 from database.SD_EquipmentBanlanceSql import *
+from sysManage.userInfo import get_value
 
 
 class Equip_Balance_Main(QWidget, EquipmentBalanceMainUI):
@@ -16,27 +15,33 @@ class Equip_Balance_Main(QWidget, EquipmentBalanceMainUI):
         super(Equip_Balance_Main,self).__init__(parent)
         self.setupUi(self)
         #展示装备平衡表
-        self._initYear()
+        self.initYear()
         #信号连接
         self.signalConnectSlot()
 
-
-
+    def initUserInfo(self):
+        self.userInfo = get_value("totleUserInfo")
 
     '''
     功能：
         展示某年的装备平衡表
     '''
-    def _initYear(self):
-        self.years = selectYearListAboutDisturbPlan()
-        for i in range(len(self.years)):
-            newItem = QTableWidgetItem('%s年度平衡表' % self.years[i])
-            newItem.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-            current_row = self.tb_year.rowCount()
-            need_row = int(len(self.years) / 5) + 2
-            if current_row < need_row:
-                self.tb_year.insertRow(current_row)
-            self.tb_year.setItem(i/5 + 1,i%5,newItem)
+    def initYear(self):
+        self.initUserInfo()
+        self.years = findYear()
+
+        if self.years != None:
+            for i in range(len(self.years)):
+                newItem = QTableWidgetItem('%s年度平衡表' % self.years[i])
+                newItem.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                current_row = self.tb_year.rowCount()
+                need_row = int(len(self.years) / 5) + 2
+                if current_row < need_row:
+                    self.tb_year.insertRow(current_row)
+                self.tb_year.setItem(i/5 + 1,i%5,newItem)
+        else:
+            self.tb_year.setRowCount(1)
+
 
 
 
@@ -99,27 +104,10 @@ class Equip_Balance_Main(QWidget, EquipmentBalanceMainUI):
 
     # 信号与槽的连接
     def signalConnectSlot(self):
-        #定义删除按钮的单机事件
-#        self.pb_delete.clicked.connect(self.soltDeleteYear)
-
-        #定义单元格的双击事件
-        #self.tb_year.itemDoubleClicked.connect(self.displayResult)
-        #定义新增按钮单击事件
- #       self.pb_add.clicked.connect(self.addEquipmentBalance)
-        #导入按钮单击事件
         self.pb_input.clicked.connect(self.inputEquipmentBalance)
         #导出按钮单击事件
         self.pb_output.clicked.connect(self.outputEquipmentBalance)
 
-
-
-
-    # # 信号与槽连接的断开
-    # def signalDisconnectSlot(self):
-    #     # 第二个目录选定后进行查询并显示结果
-    #     self.tw_second.currentItemChanged.disconnect(self.slotInqury)
-    #
-    #     #表格的双击事件获取
 
 
 

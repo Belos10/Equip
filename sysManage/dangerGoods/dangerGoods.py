@@ -39,7 +39,7 @@ class DangerGoods(QMainWindow, Danger_Goods_Widget):
         self.slotDisconnect()
         self.stackedWidget.setCurrentIndex(0)
         self.stackedWidget.currentWidget().setDisabled(False)
-        # self.strengthStatistics._init() 初始化函数
+        self.strengthStatistics.init()
         self.connectSignal()
 
     def slotDirectoryMaintenance(self):

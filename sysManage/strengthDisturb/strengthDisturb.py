@@ -87,7 +87,7 @@ class strengthDisturb(QMainWindow, Strength_Disturb_Widget):
         self.slotDisconnect()
         self.stackedWidget.setCurrentIndex(2)
         self.connectSignal()
-        self.equipBalance.main._initYear()
+        self.equipBalance.main.initYear()
         self.equipBalance.stack.setCurrentIndex(0)
 
     def slotApplyRetire(self):

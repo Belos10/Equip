@@ -11,7 +11,8 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
     def __init__(self, parent=None):
         super(StrengthStatistics, self).__init__(parent)
         self.setupUi(self)
-        self._init()
+        self.signalConnection()
+        self.init()
     first_treeWidget_dict = {}
     currentLastRow = 0
     info = {}
@@ -36,8 +37,8 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
         pass
 
     #定义初始化函数
-    def _init(self):
-        self.signalConnection()
+    def init(self):
+        self.tw_result.clear()
         self._initUnitTreeWidget('',self.tw_first)
         # self.result = getResult(self.base)
         self.displayData()

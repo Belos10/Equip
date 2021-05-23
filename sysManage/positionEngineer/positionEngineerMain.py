@@ -50,6 +50,7 @@ class PositionEngineerMain(QMainWindow, Position_Engineer_Widget):
         self.slotDisconnect()
         self.installationSituation.init()
         self.stackedWidget.setCurrentIndex(0)
+        self.installationSituation.init()
         #self.strenSelect._initStrenInquiry() #初始化函数
         self.connectSignal()
 

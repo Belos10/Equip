@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QWidget, QApplication, QMessageBox, QTableWidgetItem
 from database.SD_EquipmentBanlanceSql import *
 from database.strengthDisturbSql import *
 from widgets.strengthDisturb.equipmentBalance.equipmentBalanceSelectUI import EquipmentBalanceSelectUI
+from sysManage.userInfo import get_value
 
 first_treeWidget_dict = {}
 second_treeWidget_dict = {}
@@ -23,8 +24,7 @@ class Equip_Balance_Select(QWidget, EquipmentBalanceSelectUI):
         self.equipList = []
         self.year = None
         self.result = []
-        # 初始化界面
-        self.initEquipmentBlanceSelect()
+        self.startInfo = None
         # 信号连接
         self.signalConnectSlot()
 
@@ -50,8 +50,12 @@ class Equip_Balance_Select(QWidget, EquipmentBalanceSelectUI):
 
 
 
+    def initUserInfo(self):
+        self.userInfo = get_value("totleUserInfo")
+
 
     def initEquipmentBlanceSelect(self):
+        self.initUserInfo()
         self.tb_result.clear()
         self.tw_first.clear()
         self.tw_second.clear()
@@ -72,24 +76,45 @@ class Equip_Balance_Select(QWidget, EquipmentBalanceSelectUI):
         # 当前选中的单位列表和装备列表
         self.currentCheckedUnitList = []
         self.currentCheckedEquipList = []
-        self._initUnitTreeWidget("", self.tw_first)
-        self._initEquipTreeWidget("", self.tw_second)
+
+        if self.userInfo:
+            self.startInfo = selectUnitInfoByUnitID(self.userInfo[0][4])
+
+        stack = []
+        root = []
+        if self.startInfo:
+            stack.append(self.startInfo)
+            root.append(self.tw_first)
+            self._initUnitTreeWidget(stack, root)
+
+        equipInfo = None
+        equipInfo = selectEquipInfoByEquipUper("")
+        stack = []
+        root = []
+        if equipInfo:
+            stack.append(equipInfo[0])
+            root.append(self.tw_second)
+            self._initEquipTreeWidget(stack, root)
         self._initTableHeader()
 
-    def _initUnitTreeWidget(self, root, mother):
-        if root == '':
-            result = selectDisturbPlanUnitInfoByDeptUper('')
-        else:
-            result = selectDisturbPlanUnitInfoByDeptUper(root)
 
-        # rowData: (单位编号，单位名称，上级单位编号)
-        for rowData in result:
-            item = QTreeWidgetItem(mother)
-            item.setText(0, rowData[1])
-            self.first_treeWidget_dict[rowData[0]] = item
-            if rowData[0] != '':
-                self._initUnitTreeWidget(rowData[0], item)
+    '''
+                功能：
+                    单位目录的初始化，显示整个单位表
+                    参数表：root为上级单位名字，mother为上级节点对象
+    '''
 
+    def _initUnitTreeWidget(self, stack, root):
+        while stack:
+            UnitInfo = stack.pop(0)
+            item = QTreeWidgetItem(root.pop(0))
+            item.setText(0, UnitInfo[1])
+            item.setCheckState(0, Qt.Unchecked)
+            self.first_treeWidget_dict[UnitInfo[0]] = item
+            result = selectUnitInfoByDeptUper(UnitInfo[0])
+            for resultInfo in result:
+                stack.append(resultInfo)
+                root.append(item)
 
     def slotClickedInqury(self):
         self.first_treeWidget_dict = {}
@@ -284,26 +309,18 @@ class Equip_Balance_Select(QWidget, EquipmentBalanceSelectUI):
         else:
             pass
 
-
-    '''
-        功能：
-            初始化装备目录
-    '''
-
-    def _initEquipTreeWidget(self, root, mother):
-        if root == '':
-            result = selectEquipInfoByEquipUper('')
-        else:
-            result = selectEquipInfoByEquipUper(root)
-
-        # rowData: (装备编号，装备名称，上级装备编号, 录入类型, 装备类型)
-        for rowData in result:
-            item = QTreeWidgetItem(mother)
-            item.setText(0, rowData[1])
+    def _initEquipTreeWidget(self, stack, root):
+        while stack:
+            EquipInfo = stack.pop(0)
+            item = QTreeWidgetItem(root.pop(0))
+            item.setText(0, EquipInfo[1])
             item.setCheckState(0, Qt.Unchecked)
-            self.second_treeWidget_dict[rowData[0]] = item
-            if rowData[0] != '':
-                self._initEquipTreeWidget(rowData[0], item)
+            self.second_treeWidget_dict[EquipInfo[0]] = item
+            result = selectEquipInfoByEquipUper(EquipInfo[0])
+            for resultInfo in result:
+                stack.append(resultInfo)
+                root.append(item)
+
 
 
     def _initTableHeader(self):

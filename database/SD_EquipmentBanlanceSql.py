@@ -147,42 +147,20 @@ def findYear():
     sql = "select year from equipment_balance group by year "
     data = selectData(sql)
     year = []
-    print("data",data)
-    if data[0][0]:
-        pass
-    else:
-        return year
-    for key in range(len(data)):
-        if(len(data[key][0]) <= 1):
-            continue
+    print(data)
+    if len(data) > 0:
+        if data[0][0]:
+            pass
         else:
-            year.append(data[key][0])
+            return year
+        for key in range(len(data)):
+            if(len(data[key][0]) <= 1):
+                continue
+            else:
+                year.append(data[key][0])
 
-    return tuple(year)
-'''
-删除某一年度装备平衡表
-'''
-def deleteYear(year):
-    sqlFindid = "select equip_balance_id from equipment_balance where year=%s"%year
-    data = executeSql(sqlFindid)
-    ids = []
-    for key in range(len(data)):
-        ids.append(data[key][0])
-    for id in ids:
-        sqlDelete = "delete from eb_quality_status where equip_balance_id=%s"%id
-        executeCommit(sqlDelete)
-        sqlDelete = "delete from eb_change_project where equip_balance_id=%s"%id
-        executeCommit(sqlDelete)
-        sqlDelete = "delete from eb_carry where equip_balance_id=%s" % id
-        executeCommit(sqlDelete)
-        sqlDelete = "delete from eb_stock where equip_balance_id=%s" % id
-        executeCommit(sqlDelete)
-        sqlDelete = "delete from eb_management where equip_balance_id=%s" % id
-        executeCommit(sqlDelete)
-        sqlDelete = "delete from eb_repair_time where equip_balance_id=%s" % id
-        executeCommit(sqlDelete)
-        sqlDelete = "delete from equipment_balance where equip_balance_id=%s" % id
-        executeCommit(sqlDelete)
+        return tuple(year)
+
 
 def _dateSaveToList(dataDict):
     newDateList = []
@@ -237,31 +215,30 @@ def getResultByYearAndEquipAndUnit(year,equipList,unitList):
         return sorted(resultList, key=operator.itemgetter('Equip_ID'))
             # sorted(resultList, key=operator.itemgetter('Equip_ID'))
 
+'''
+删除某一年度装备平衡表
+'''
 def deleteByYear(year):
-
-    sql = "select equip_balance_id from equipment_balance where year='%s'"%year
-    data = executeSql(sql)
-    if data != None:
-        for item in data:
-            equipKey = data[0]
-            sqls = []
-            sql = "delete from eb_carry where equip_balance_id='%s'" % equipKey
-            sqls.append(sql)
-            sql = "delete from eb_change_project where equip_balance_id='%s'" % equipKey
-            sqls.append(sql)
-            sql = "delete from eb_management where equip_balance_id='%s'" % equipKey
-            sqls.append(sql)
-            sql = "delete from eb_production_year where equip_balance_id='%s'" % equipKey
-            sqls.append(sql)
-            sql = "delete from eb_quality_status where equip_balance_id='%s'" % equipKey
-            sqls.append(sql)
-            sql = "delete from eb_repair_time where equip_balance_id='%s'" % equipKey
-            sqls.append(sql)
-            sql = "delete from eb_stock where equip_balance_id='%s'" % equipKey
-            sqls.append(sql)
-            sql = "delete from equipment_balance where equip_balance_id='%s'" % equipKey
-            sqls.append(sql)
-            excuteupdata(sqls)
+    sqlFindid = "select equip_balance_id from equipment_balance where year=%s"%year
+    data = executeSql(sqlFindid)
+    ids = []
+    for key in range(len(data)):
+        ids.append(data[key][0])
+    for id in ids:
+        sqlDelete = "delete from eb_quality_status where equip_balance_id=%s"%id
+        executeCommit(sqlDelete)
+        sqlDelete = "delete from eb_change_project where equip_balance_id=%s"%id
+        executeCommit(sqlDelete)
+        sqlDelete = "delete from eb_carry where equip_balance_id=%s" % id
+        executeCommit(sqlDelete)
+        sqlDelete = "delete from eb_stock where equip_balance_id=%s" % id
+        executeCommit(sqlDelete)
+        sqlDelete = "delete from eb_management where equip_balance_id=%s" % id
+        executeCommit(sqlDelete)
+        sqlDelete = "delete from eb_repair_time where equip_balance_id=%s" % id
+        executeCommit(sqlDelete)
+        sqlDelete = "delete from equipment_balance where equip_balance_id=%s" % id
+        executeCommit(sqlDelete)
 
 
 #根据分配调整计划更新装备平衡表
@@ -579,7 +556,8 @@ def saveEquipmentBalanceByRow(dataList,year):
 
 
 if __name__ == "__main__":
-    deleteByYear('0')
+    deleteYear('2019')
+
     # deleteOneEquipmentBalanceData('2008','2','5')
 
 
