@@ -328,6 +328,7 @@ class transferModel(QDialog, Widget_Transfer_Model):
         self.currentYear = year
 
     def getUnitIDList(self, unitInfoList, equipInfo, year, requireInfo):
+        print("===========", requireInfo)
         if unitInfoList == "" and equipInfo =="" and  year =="" and  requireInfo == "":
             self.pb_input.setDisabled(True)
             self.pb_output.setDisabled(True)
@@ -348,7 +349,10 @@ class transferModel(QDialog, Widget_Transfer_Model):
         self.totalModel = totalModel()
         self.totalModel.initTableWidget(self.unitInfoList, self.equipInfo, self.year, self.requireInfo)
         self.tw_transferModel.addTab(self.totalModel, "总单")
-        for unitInfo in unitInfoList:
+        print("require", self.requireInfo)
+        for unitInfo, num in zip(unitInfoList, requireInfo[2: -3]):
+            if num == "" or num == "0":
+                continue
             page = singleModel()
             self.tw_transferModel.addTab(page, unitInfo[0])
             self.currentSingelUnitPage[unitInfo[0]] = page
