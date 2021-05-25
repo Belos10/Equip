@@ -1914,7 +1914,7 @@ def selectEquipInfoByEquipID(EquipID):
     conn, cur = connectMySql()
     sql = "select * from equip where Equip_ID = '" + \
           EquipID + "'"
-    #print(sql)
+    print(sql)
     cur.execute(sql)
     result = cur.fetchall()
     return result
