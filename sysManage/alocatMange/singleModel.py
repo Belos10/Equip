@@ -164,6 +164,28 @@ class singleModel(QDialog, Widget_Dital_Model):
         self.initLastFourRow("经 办 人:", "", "经 办 人:", "", self.crtRowCount - 2, startColumn)
         self.initLastFourRow("日    期:", "", "日    期:", "", self.crtRowCount - 1, startColumn)
 
+        for i in range(3*self.crtColumnCount + 2):
+            item = QTableWidgetItem()
+            item.setText("")
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.tw_ditalModel.setItem(12, i, item)
+            item = QTableWidgetItem()
+            item.setText("")
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.tw_ditalModel.setItem(13, i, item)
+            item = QTableWidgetItem()
+            item.setText("")
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.tw_ditalModel.setItem(16, i, item)
+            item = QTableWidgetItem()
+            item.setText("")
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.tw_ditalModel.setItem(17, i, item)
+            item = QTableWidgetItem()
+            item.setText("")
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.tw_ditalModel.setItem(self.crtRowCount-5, i, item)
+
     def initNinethRow(self, first, second, row, startColumn):
         item = QTableWidgetItem()
         item.setText(first)
@@ -199,6 +221,7 @@ class singleModel(QDialog, Widget_Dital_Model):
 
         item = QTableWidgetItem()
         item.setText("")
+
         half = int((self.crtColumnCount - 4) / 2)
         print(self.crtColumnCount, half)
         self.tw_ditalModel.setItem(row, startColumn + 2, item)
@@ -206,13 +229,17 @@ class singleModel(QDialog, Widget_Dital_Model):
 
         item = QTableWidgetItem()
         item.setText(third)
+
         item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
         self.tw_ditalModel.setItem(row, startColumn + half + 2, item)
 
         item = QTableWidgetItem()
         item.setText(fourth)
         self.tw_ditalModel.setItem(row, startColumn + half + 3, item)
-        self.tw_ditalModel.setSpan(row, startColumn + half + 3, 1, self.crtColumnCount - half - 2)
+
+        item = QTableWidgetItem()
+        item.setText("")
+        self.tw_ditalModel.setItem(row, startColumn + half + 4, item)
 
     def updateTableWidget(self, requireInfo):
         self.updateSigleTable(requireInfo, 0)

@@ -49,7 +49,7 @@ class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
         self.signalConnect()
 
     def signalConnect(self):
-        #self.tb_ManageWidget.currentChanged.connect(self.slotCurrentChange)
+        self.tb_ManageWidget.currentChanged.connect(self.slotCurrentChange)
 
         self.login.tb_cancel.clicked.connect(self.slotCloseSystem)
 
@@ -96,8 +96,9 @@ class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
         self.show()
 
     def slotCurrentChange(self):
-        if self.tb_ManageWidget.currentIndex() == 1:
-            self.strengthDisturb.strenSelect._initAllDict()
+        if self.tb_ManageWidget.currentWidget() == self.setLogin:
+            self.setLogin.initWidgets()
+
 
 
 

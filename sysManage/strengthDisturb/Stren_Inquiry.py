@@ -402,13 +402,18 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         if self.currentColumn != 2:
             for i, resultRowInfo in self.inquiry_result.currentInquiryResult.items():
                 if i == self.currentRow:
-                    unitHaveChild = selectUnitIsHaveChild(resultRowInfo[1])
-                    equipHaveChild = selectEquipIsHaveChild(resultRowInfo[0])
+                    unitHaveChild = selectUnitIsHaveChild(resultRowInfo[0])
+                    equipHaveChild = selectEquipIsHaveChild(resultRowInfo[1])
+                    equipInfo = selectEquipInfoByEquipID(resultRowInfo[0])
                     if unitHaveChild or equipHaveChild:
-                        reply = QMessageBox.information(self, '录入', '该单位或装备不是末级，无法录入', QMessageBox.Yes,
-                                                     QMessageBox.Cancel)
+                        reply = QMessageBox.information(self, '录入', '该单位或装备不是末级，无法录入', QMessageBox.Yes)
                         return
-                    elif self.inquiry_result.chooseFactoryYear.selectAll:
+                    if equipInfo:
+
+                        if equipInfo[0][3] == "空":
+                            reply = QMessageBox.information(self, '录入', '请设置该装备录入类型，无法录入', QMessageBox.Yes)
+                            return
+                    if self.inquiry_result.chooseFactoryYear.selectAll:
                         self.sw_strenSelectMan.setCurrentIndex(1)
                         #print("=====================", resultRowInfo, self.currentYear, self.inquiry_result.currentFactoryYear)
                         self.add_strenth_info._initTableWidget_(resultRowInfo, self.currentYear, self.inquiry_result.currentFactoryYear)

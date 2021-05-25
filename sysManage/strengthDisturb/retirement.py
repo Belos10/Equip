@@ -455,4 +455,4 @@ class retirement(QWidget, Widget_Retirement):
 
 
 
-chinese = ['', '(一)', '(二)', '(三)', '(四)', '(五)','(六)','(七)']
+chinese = ['', '(一)', '(二)', '(三)', '(四)', '(五)','(六)','(七)', '']

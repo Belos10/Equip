@@ -246,6 +246,12 @@ class totalModel(QDialog, Widget_Dital_Model):
         item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
         self.tw_ditalModel.setItem(14, 4, item)
 
+        for i in range(5, self.crtColumnCount - 1):
+            item = QTableWidgetItem()
+            item.setText("")
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.tw_ditalModel.setItem(14, i, item)
+
         item = QTableWidgetItem()
         item.setText("备注")
         item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
@@ -281,6 +287,25 @@ class totalModel(QDialog, Widget_Dital_Model):
 
         item = QDateEdit()
         self.tw_ditalModel.setCellWidget(13, 1, item)
+        for i in range(self.crtColumnCount):
+            item = QTableWidgetItem()
+            item.setText("")
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.tw_ditalModel.setItem(12, i, item)
+            item = QTableWidgetItem()
+            item.setText("")
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.tw_ditalModel.setItem(16, i, item)
+            item = QTableWidgetItem()
+            item.setText("")
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.tw_ditalModel.setItem(self.crtRowCount - 5, i, item)
+
+        for i in range(2, self.crtColumnCount):
+            item = QTableWidgetItem()
+            item.setText("")
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.tw_ditalModel.setItem(13, i, item)
 
     def initNinethRow(self, first, second, row):
         item = QTableWidgetItem()
@@ -305,9 +330,14 @@ class totalModel(QDialog, Widget_Dital_Model):
             item = QDateEdit()
             half = int((self.crtColumnCount - 4) / 2)
             self.tw_ditalModel.setCellWidget(row, half + 3, item)
-            #self.tw_ditalModel.setSpan(row, 2, 1, half)
 
             self.tw_ditalModel.setSpan(row, half + 3, 1, self.crtColumnCount - half - 2)
+        elif row == 8 or row == 9:
+            item = QTableWidgetItem()
+            item.setText("")
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.tw_ditalModel.setItem(row, half + 2, item)
+            self.tw_ditalModel.setSpan(row, half + 2, 1, self.crtColumnCount - half - 2)
         else:
             item = QTableWidgetItem()
             item.setText("")
@@ -320,6 +350,10 @@ class totalModel(QDialog, Widget_Dital_Model):
         item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
         self.tw_ditalModel.setItem(row, 0, item)
         half = int((self.crtColumnCount - 4) / 2)
+        item = QTableWidgetItem()
+        item.setText("")
+        item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+        self.tw_ditalModel.setItem(row, 2, item)
 
         item = QTableWidgetItem()
         item.setText(second)
@@ -334,6 +368,7 @@ class totalModel(QDialog, Widget_Dital_Model):
         else:
             item = QTableWidgetItem()
             item.setText("")
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             half = int((self.crtColumnCount - 4) / 2)
             print(self.crtColumnCount, half)
             self.tw_ditalModel.setItem(row, 2, item)
@@ -342,9 +377,16 @@ class totalModel(QDialog, Widget_Dital_Model):
         item = QTableWidgetItem()
         item.setText(third)
         item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+        item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
         self.tw_ditalModel.setItem(row, half + 2, item)
 
         item = QTableWidgetItem()
         item.setText(fourth)
+        item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
         self.tw_ditalModel.setItem(row, half + 3, item)
-        self.tw_ditalModel.setSpan(row, half + 3, 1, self.crtColumnCount - half - 2)
+
+        item = QTableWidgetItem()
+        item.setText("")
+        item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+        self.tw_ditalModel.setItem(row, half + 4, item)
+        self.tw_ditalModel.setSpan(row, half + 4, 1, self.crtColumnCount - half - 3)
