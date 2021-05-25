@@ -2,7 +2,6 @@
 import sys
 from PyQt5.QtWidgets import QMainWindow,QApplication,QWidget
 
-from sysManage.positionEngineer.directoryMaintenance import DirectoryMaintenance
 from sysManage.positionEngineer.equipmentStatistics import EquipmentStatistics
 from sysManage.positionEngineer.installationSituation import InstallationSituation
 

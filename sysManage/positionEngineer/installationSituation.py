@@ -380,7 +380,6 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
         if len(rowData) < self.tw_result.columnCount():
             return False
         else:
-            # print(rowData)
             updataOneDataIntInstallation(rowData)
         pass
 
