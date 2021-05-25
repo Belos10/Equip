@@ -427,13 +427,6 @@ class EquipmentStatistics(QWidget, PosEngneerStatisticsUI):
 
 
 
-
-
-
-
-
-
-
     def slotInput(self):
         pass
 
