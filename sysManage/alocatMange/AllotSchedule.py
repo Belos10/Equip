@@ -445,7 +445,6 @@ class AllotSchedule(QWidget,AllotSchedule):
                             item.setText("0")
                     for childRow, equipInfo in self.currentEquipdict.items():
                         uperInfoList = selectUperInfoByEquipID(equipInfo[0])
-                        print("uperInfo")
                         childNum = self.disturbResult.item(childRow, 2).text()
                         for uperInfo in uperInfoList:
                             for row, uperInfoRow in self.currentEquipdict.items():
@@ -454,7 +453,6 @@ class AllotSchedule(QWidget,AllotSchedule):
                                     totleNum = int(childNum) + int(num)
                                     self.disturbResult.item(row, 2).setText(str(totleNum))
                 else:
-                    # print("currentEquip:", self.currentEquipdict)
                     for i in self.currentEquipdict:
                         item = self.disturbResult.item(i, 2)
                         result = selectDisturbPlanNum({0: [unitID]}, self.currentEquipdict, self.currentYear)
@@ -555,7 +553,7 @@ class AllotSchedule(QWidget,AllotSchedule):
             equipDict = {}
             j = 0
             for equipID, equipItem in self.second_treeWidget_dict.items():
-                flag2 = selectArmySchedule(equipID, self.currentYear)
+                flag2 = selectAllotCondition(equipID, self.currentYear)
                 if int(flag2[0][0]):
                     if equipItem.checkState(0) == Qt.Checked:
                         equipInfo = findEquipInfo(equipID)
@@ -572,7 +570,7 @@ class AllotSchedule(QWidget,AllotSchedule):
             equipDict = {}
             j = 0
             for equipID, equipItem in self.second_treeWidget_dict.items():
-                flag3 = selectArmySchedule(equipID, self.currentYear)
+                flag3 = selectRocketSchedule(equipID, self.currentYear)
                 if int(flag3[0][0]):
                     if equipItem.checkState(0) == Qt.Checked:
                         equipInfo = findEquipInfo(equipID)
@@ -589,7 +587,7 @@ class AllotSchedule(QWidget,AllotSchedule):
             equipDict = {}
             j = 0
             for equipID, equipItem in self.second_treeWidget_dict.items():
-                flag4 = selectArmySchedule(equipID, self.currentYear)
+                flag4 = selectIfScheduleFinish(equipID, self.currentYear)
                 if flag4[0][0] != '0':
                     if equipItem.checkState(0) == Qt.Checked:
                         equipInfo = findEquipInfo(equipID)
