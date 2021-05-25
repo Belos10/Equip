@@ -42,7 +42,7 @@ class AllotSchedule(QWidget,AllotSchedule):
         self.tw_second.clear()
         self.txt_disturbPlanYear.clear()
         self.cb_schedule.setDisabled(1)
-        #self.te_proof.clear()
+        self.tb_proof.clear()
         self.disturbResult.clear()
         self._initYearWidget_()
 
@@ -425,15 +425,17 @@ class AllotSchedule(QWidget,AllotSchedule):
             if self.unitDisturbPlanNoteList[i] is not None:
                 item.setText(str(self.unitDisturbPlanNoteList[i]))
 
+    # 初始化机关单位数与装备单位
     def initDisturbPlanOther(self):
         self.unitDisturbPlanOtherList = selectDisturbPlanOther(self.currentEquipdict, self.currentYear)
+        # 装备单位
         for i in range(0, len(self.currentEquipdict)):
             item = self.disturbResult.item(i, 1)
             if self.unitDisturbPlanOtherList[i]:
                 item.setText(str(self.unitDisturbPlanOtherList[i][0]))
             else:
                 item.setText("")
-
+        # 机关单位数
         for unitID, unitItem in self.first_treeWidget_dict.items():
             if unitItem == self.tw_first.currentItem():
                 if selectUnitIfUppermost(unitID):
@@ -450,8 +452,8 @@ class AllotSchedule(QWidget,AllotSchedule):
                             for row, uperInfoRow in self.currentEquipdict.items():
                                 if uperInfo[0] == uperInfoRow[0]:
                                     num = self.disturbResult.item(row, 2).text()
-                                    totleNum = int(childNum) + int(num)
-                                    self.disturbResult.item(row, 2).setText(str(totleNum))
+                                    totalNum = int(childNum) + int(num)
+                                    self.disturbResult.item(row, 2).setText(str(totalNum))
                 else:
                     for i in self.currentEquipdict:
                         item = self.disturbResult.item(i, 2)
@@ -460,6 +462,7 @@ class AllotSchedule(QWidget,AllotSchedule):
                             item.setText(str(result[i]))
                         else:
                             item.setText("0")
+
 
     def setArmySchedule(self):
         self.armySchedule.setYear(self.currentYear)

@@ -40,6 +40,7 @@ class DisturbPlan(QWidget, yearList_Form):
         self.pb_proof.setDisabled(1)
         self.tw_first.clear()
         self.tw_second.clear()
+        self.tb_proof.clear()
         self.txt_disturbPlanYear.clear()
         self.disturbResult.clear()
         self._initYearWidget_()
@@ -529,8 +530,8 @@ class DisturbPlan(QWidget, yearList_Form):
                             for row, uperInfoRow in self.currentEquipdict.items():
                                 if uperInfo[0] == uperInfoRow[0]:
                                     num = self.disturbResult.item(row, 2).text()
-                                    totleNum = int(childNum) + int(num)
-                                    self.disturbResult.item(row, 2).setText(str(totleNum))
+                                    totalNum = int(childNum) + int(num)
+                                    self.disturbResult.item(row, 2).setText(str(totalNum))
                 else:
                     for i in self.currentEquipdict:
                         item = self.disturbResult.item(i, 2)
