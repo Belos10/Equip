@@ -42,7 +42,7 @@ class AllotSchedule(QWidget,AllotSchedule):
         self.tw_second.clear()
         self.txt_disturbPlanYear.clear()
         self.cb_schedule.setDisabled(1)
-        #self.te_proof.clear()
+        self.tb_proof.clear()
         self.disturbResult.clear()
         self._initYearWidget_()
 
@@ -425,15 +425,17 @@ class AllotSchedule(QWidget,AllotSchedule):
             if self.unitDisturbPlanNoteList[i] is not None:
                 item.setText(str(self.unitDisturbPlanNoteList[i]))
 
+    # 初始化机关单位数与装备单位
     def initDisturbPlanOther(self):
         self.unitDisturbPlanOtherList = selectDisturbPlanOther(self.currentEquipdict, self.currentYear)
+        # 装备单位
         for i in range(0, len(self.currentEquipdict)):
             item = self.disturbResult.item(i, 1)
             if self.unitDisturbPlanOtherList[i]:
                 item.setText(str(self.unitDisturbPlanOtherList[i][0]))
             else:
                 item.setText("")
-
+        # 机关单位数
         for unitID, unitItem in self.first_treeWidget_dict.items():
             if unitItem == self.tw_first.currentItem():
                 if selectUnitIfUppermost(unitID):
@@ -445,16 +447,14 @@ class AllotSchedule(QWidget,AllotSchedule):
                             item.setText("0")
                     for childRow, equipInfo in self.currentEquipdict.items():
                         uperInfoList = selectUperInfoByEquipID(equipInfo[0])
-                        print("uperInfo")
                         childNum = self.disturbResult.item(childRow, 2).text()
                         for uperInfo in uperInfoList:
                             for row, uperInfoRow in self.currentEquipdict.items():
                                 if uperInfo[0] == uperInfoRow[0]:
                                     num = self.disturbResult.item(row, 2).text()
-                                    totleNum = int(childNum) + int(num)
-                                    self.disturbResult.item(row, 2).setText(str(totleNum))
+                                    totalNum = int(childNum) + int(num)
+                                    self.disturbResult.item(row, 2).setText(str(totalNum))
                 else:
-                    # print("currentEquip:", self.currentEquipdict)
                     for i in self.currentEquipdict:
                         item = self.disturbResult.item(i, 2)
                         result = selectDisturbPlanNum({0: [unitID]}, self.currentEquipdict, self.currentYear)
@@ -462,6 +462,7 @@ class AllotSchedule(QWidget,AllotSchedule):
                             item.setText(str(result[i]))
                         else:
                             item.setText("0")
+
 
     def setArmySchedule(self):
         self.armySchedule.setYear(self.currentYear)
@@ -555,7 +556,7 @@ class AllotSchedule(QWidget,AllotSchedule):
             equipDict = {}
             j = 0
             for equipID, equipItem in self.second_treeWidget_dict.items():
-                flag2 = selectArmySchedule(equipID, self.currentYear)
+                flag2 = selectAllotCondition(equipID, self.currentYear)
                 if int(flag2[0][0]):
                     if equipItem.checkState(0) == Qt.Checked:
                         equipInfo = findEquipInfo(equipID)
@@ -572,7 +573,7 @@ class AllotSchedule(QWidget,AllotSchedule):
             equipDict = {}
             j = 0
             for equipID, equipItem in self.second_treeWidget_dict.items():
-                flag3 = selectArmySchedule(equipID, self.currentYear)
+                flag3 = selectRocketSchedule(equipID, self.currentYear)
                 if int(flag3[0][0]):
                     if equipItem.checkState(0) == Qt.Checked:
                         equipInfo = findEquipInfo(equipID)
@@ -589,7 +590,7 @@ class AllotSchedule(QWidget,AllotSchedule):
             equipDict = {}
             j = 0
             for equipID, equipItem in self.second_treeWidget_dict.items():
-                flag4 = selectArmySchedule(equipID, self.currentYear)
+                flag4 = selectIfScheduleFinish(equipID, self.currentYear)
                 if flag4[0][0] != '0':
                     if equipItem.checkState(0) == Qt.Checked:
                         equipInfo = findEquipInfo(equipID)
