@@ -687,7 +687,7 @@ def delDataInUnit(Unit_ID):
             for equipID in equipInfoList:
                 for yearInfo in yearInfoList:
                     strengthInfo = selectStrength(equipID, unitID, yearInfo[1], conn, cur)
-                    inputInfo = selectIDFromInputInfo(equipID, unitID, yearInfo[1])
+                    inputInfo = selectFromInputInfo(equipID, unitID, yearInfo[1])
                     if strengthInfo:
                         updateStrengthAboutStrengrh(unitID, equipID, yearInfo[1], "0", strengthInfo[0][4])
                         updateWeaveNum(unitID, equipID, "0", strengthInfo[0][5], yearInfo[1])
@@ -697,7 +697,7 @@ def delDataInUnit(Unit_ID):
         for equipID in equipInfoList:
             for yearInfo in yearInfoList:
                 strengthInfo = selectStrength(equipID, Unit_ID, yearInfo[1], conn, cur)
-                inputInfo = selectIDFromInputInfo(equipID, Unit_ID, yearInfo[1])
+                inputInfo = selectFromInputInfo(equipID, Unit_ID, yearInfo[1])
                 if strengthInfo:
                     updateStrengthAboutStrengrh(Unit_ID, equipID, yearInfo[1], "0", strengthInfo[0][4])
                     updateWeaveNum(Unit_ID, equipID, "0", strengthInfo[0][5], yearInfo[1])
@@ -770,7 +770,7 @@ def delDataInEquip(Equip_ID):
             for unitID in unitIDList:
                 for yearInfo in yearInfoList:
                     strengthInfo = selectStrength(equipID, unitID, yearInfo[1], conn, cur)
-                    inputInfo = selectIDFromInputInfo(equipID, unitID, yearInfo[1])
+                    inputInfo = selectFromInputInfo(equipID, unitID, yearInfo[1])
                     if strengthInfo:
                         updateStrengthAboutStrengrh(unitID, equipID, yearInfo[1], "0", strengthInfo[0][4])
                         updateWeaveNum(unitID, equipID, "0", strengthInfo[0][5], yearInfo[1])
@@ -780,10 +780,11 @@ def delDataInEquip(Equip_ID):
         for unitID in unitIDList:
             for yearInfo in yearInfoList:
                 strengthInfo = selectStrength(Equip_ID, unitID, yearInfo[1], conn, cur)
-                inputInfo = selectIDFromInputInfo(Equip_ID, unitID, yearInfo[1])
+                inputInfo = selectFromInputInfo(Equip_ID, unitID, yearInfo[1])
                 if strengthInfo:
                     updateStrengthAboutStrengrh(unitID, Equip_ID, yearInfo[1], "0", strengthInfo[0][4])
                     updateWeaveNum(unitID, Equip_ID, "0", strengthInfo[0][5], yearInfo[1])
+                    #print("////////////////", inputInfo)
                     for input in inputInfo:
                         delFromInputInfo(unitID, Equip_ID, input[2], input[3], input[4], input[-1])
 
@@ -1168,6 +1169,12 @@ def selectIDFromInputInfo(EquipID, UnitID, strengthYear):
     result = cur.fetchall()
     return result
 
+def selectFromInputInfo(EquipID, UnitID, strengthYear):
+    conn, cur = connectMySql()
+    sql = "select * from inputinfo where Equip_ID = '" + EquipID + "' and Unit_ID = '" + UnitID + "' and inputYear = '" + strengthYear + "'"
+    cur.execute(sql)
+    result = cur.fetchall()
+    return result
 '''
     新增一个实力查询年份
 '''
