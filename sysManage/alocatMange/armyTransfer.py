@@ -1,9 +1,8 @@
 from widgets.alocatMange.armyTransfer import Widget_Army_Transfer
 import sys
 from PyQt5.QtWidgets import QApplication,QWidget, QListWidgetItem, QComboBox, QTableWidgetItem, QDateEdit, QInputDialog,QMessageBox,QPushButton
-from database.alocatMangeSql import selectYearListAboutArmy, selectArmyTransferByYear, insertIntoArmyTransferYear, \
-    insertIntoArmyTransfer, selectIDFromArmyByYear, delArmyTransferByIDAndYear, delArmyTransferYearByYear
-from database.strengthDisturbSql import selectAllEndEquip,findUperEquipIDByName,selectEquipInfoByEquipUper,EquipNotHaveChild
+from database.alocatMangeSql import *
+from database.strengthDisturbSql import *
 from sysManage.alocatMange.config import ArmyTransferReceiveUnit, ArmyTransferSendUnit
 from PyQt5.Qt import Qt
 
@@ -85,6 +84,9 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
     '''
     def slotDelCurrentRow(self):
         currentRow = self.tw_result.currentRow()
+        if len(self.currentResult) + 2 < currentRow and currentRow != -1:
+            self.tw_result.removeRow(currentRow)
+            return
         #print(currentRow)
         if currentRow < 2:
             reply = QMessageBox.question(self, '删除', '当前未选中某行，请选中某行删除', QMessageBox.Yes)
@@ -106,6 +108,7 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
         currentRowNum = self.tw_result.rowCount() - 2
         addRow = 2 + self.orginRowCount
         IDList = selectIDFromArmyByYear(self.currentYear)
+        equipIDList = selectEquipIDFromArmyByYear(self.currentYear)
         #print("IDList :", IDList)
         for i in range(currentRowNum - self.orginRowCount):
             haveID = False
@@ -134,29 +137,96 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
             else:
                 reply = QMessageBox.question(self, '新增', '第' + str(i + addRow-1) + '添加失败，数量必须为整数', QMessageBox.Yes)
                 continue
-            Trans_ID = self.tw_result.item(i + addRow, 1).text()
-            Trans_Date = self.tw_result.cellWidget(i + addRow, 2).text()
-            Trans_Date = self.currentYear + "/" + Trans_Date
-            print(Trans_Date)
-            Trans_Reason = self.tw_result.item(i + addRow, 3).text()
-            Trans = self.tw_result.item(i + addRow, 4).text()
-            Trans_Way = self.tw_result.item(i + addRow, 5).text()
-            Port_Way = self.tw_result.item(i + addRow, 6).text()
-            Effic_Date = self.tw_result.cellWidget(i + addRow, 7).text()
-            Send_UintID = '01'
-            Send_UnitName = self.tw_result.item(i + addRow, 8).text()
-            Send_Connect = self.tw_result.item(i + addRow, 9).text()
-            Send_Tel = self.tw_result.item(i + addRow, 10).text()
-            Receive_Name = self.tw_result.item(i + addRow, 11).text()
-            Receive_Connect = self.tw_result.item(i + addRow, 12).text()
-            Receive_Tel = self.tw_result.item(i + addRow, 13).text()
             index = self.tw_result.cellWidget(i + addRow, 14).currentIndex()
             Equip_ID = self.currentEquipInfo[index][0]
-            Equip_Name = self.tw_result.cellWidget(i + addRow, 14).currentText()
-            Equip_Unit = self.tw_result.item(i + addRow, 15).text()
-            Equip_Quity = self.tw_result.item(i + addRow, 16).text()
+            haveEquip = False
+            for equipID in equipIDList:
+                if Equip_ID == equipID:
+                    haveEquip = True
+            if haveEquip:
+                reply = QMessageBox.information(self, '新增', '第' + str(i + addRow - 1) + '添加失败，当前年份该装备已录入', QMessageBox.Yes)
+                continue
+            if self.tw_result.item(i + addRow, 1):
+                Trans_ID = self.tw_result.item(i + addRow, 1).text()
+            else:
+                Trans_ID = ""
+            if self.tw_result.cellWidget(i + addRow, 2):
+                Trans_Date = self.tw_result.cellWidget(i + addRow, 2).text()
+            else:
+                Trans_Date = ""
+            Trans_Date = self.currentYear + "/" + Trans_Date
+            #print(Trans_Date)
+            if self.tw_result.item(i + addRow, 3):
+                Trans_Reason = self.tw_result.item(i + addRow, 3).text()
+            else:
+                Trans_Reason = ""
+            if self.tw_result.item(i + addRow, 4):
+                Trans = self.tw_result.item(i + addRow, 4).text()
+            else:
+                Trans = ""
+            if self.tw_result.item(i + addRow, 5):
+                Trans_Way = self.tw_result.item(i + addRow, 5).text()
+            else:
+                Trans_Way = ""
 
-            Equip_Other = self.tw_result.item(i + addRow, 18).text()
+            if self.tw_result.item(i + addRow, 6):
+                Port_Way = self.tw_result.item(i + addRow, 6).text()
+            else:
+                Port_Way = ""
+
+            if self.tw_result.cellWidget(i + addRow, 7):
+                Effic_Date = self.tw_result.cellWidget(i + addRow, 7).text()
+            else:
+                Effic_Date = ""
+
+            Send_UintID = '01'
+            if self.tw_result.item(i + addRow, 8):
+                Send_UnitName = self.tw_result.item(i + addRow, 8).text()
+            else:
+                Send_UnitName = ""
+
+            if self.tw_result.item(i + addRow, 9):
+                Send_Connect = self.tw_result.item(i + addRow, 9).text()
+            else:
+                Send_Connect = ""
+            if self.tw_result.item(i + addRow, 10):
+                Send_Tel = self.tw_result.item(i + addRow, 10).text()
+            else:
+                Send_Tel = ""
+
+            if self.tw_result.item(i + addRow, 11):
+                Receive_Name = self.tw_result.item(i + addRow, 11).text()
+            else:
+                Receive_Name = ""
+
+            if self.tw_result.item(i + addRow, 12):
+                Receive_Connect = self.tw_result.item(i + addRow, 12).text()
+            else:
+                Receive_Connect = ""
+
+            if self.tw_result.item(i + addRow, 13):
+                Receive_Tel = self.tw_result.item(i + addRow, 13).text()
+            else:
+                Receive_Tel = ""
+
+            if self.tw_result.cellWidget(i + addRow, 14):
+                Equip_Name = self.tw_result.cellWidget(i + addRow, 14).currentText()
+            else:
+                Equip_Name = ""
+            if self.tw_result.item(i + addRow, 15):
+                Equip_Unit = self.tw_result.item(i + addRow, 15).text()
+            else:
+                Equip_Unit = ""
+
+            if self.tw_result.item(i + addRow, 16):
+                Equip_Quity = self.tw_result.item(i + addRow, 16).text()
+            else:
+                Equip_Quity = ""
+
+            if self.tw_result.item(i + addRow, 18):
+                Equip_Other = self.tw_result.item(i + addRow, 18).text()
+            else:
+                Equip_Other = ""
             insertIntoArmyTransfer(ID, Trans_ID, Trans_Date, Trans_Reason, Trans, Trans_Way,
                                    Port_Way, Effic_Date, Send_UintID, Send_UnitName, Send_Connect,
                                    Send_Tel, Receive_Name, Receive_Connect, Receive_Tel,

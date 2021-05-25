@@ -119,6 +119,17 @@ def insertIntoRocketTransfer(ID, Trans_ID, Trans_Date, Trans_Reason, Trans, Tran
     conn.commit()
     disconnectMySql(conn, cur)
 
+def selectEquipIDFromArmyByYear(year):
+    conn, cur = connectMySql()
+    result = selectYearListAboutArmy()
+    sql = "select Equip_ID from armyTransfer where year = '" + year + "'"
+    cur.execute(sql)
+    result = cur.fetchall()
+    equipID = []
+    for year in result:
+        equipID.append(year[0])
+    disconnectMySql(conn, cur)
+    return equipID
 
 #返回当前年份中陆军调拨单序号
 def selectIDFromArmyByYear(year):
