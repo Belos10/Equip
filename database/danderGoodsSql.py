@@ -112,14 +112,32 @@ def exists(tableName,fieldName,fieldItem):
 
 #根据Dept_Uper查询单位信息,并返回
 def selectUnitInfoByDeptUper(Unit_Uper):
-    conn, cur = connectMySql()
-    sql = "select * from dangergoods_unit_directory where Unit_Uper = '" + Unit_Uper + "'"
-    cur.execute(sql)
-    result = cur.fetchall()
-    disconnectMySql(conn, cur)
-    # 测试结果
-    # print(result)
-    return result
+    if gradeInUnit(Unit_Uper) < 3:
+        conn, cur = connectMySql()
+        sql = "select * from unit where Unit_Uper = '" + Unit_Uper + "'"
+        cur.execute(sql)
+        result = cur.fetchall()
+        disconnectMySql(conn, cur)
+        # 测试结果
+        # print(result)
+        return result
+    else:
+        return []
+
+
+
+
+'''
+    功能：
+        判断单位的为几级单位
+'''
+def gradeInUnit(UnitId):
+    sql = "select Unit_Uper from unit where Unit_ID='%s'"%UnitId
+    data = selectOne(sql)
+    if data != None:
+        return gradeInUnit(data['Unit_Uper']) + 1
+    else:
+        return 0
 '''
     功能：
         根据单位Id从dangergoods表获取数据
@@ -133,9 +151,9 @@ def getDataByUnit(unit):
         return None
 
 def getUnitNameById(UnitID):
-    sql = "select Unit_Name from dangergoods_unit_directory where Unit_ID=%s"%UnitID
+    sql = "select Unit_Name from unit where Unit_ID=%s"%UnitID
     result = selectOne(sql)
-    if result != None or len(result) != 0:
+    if result != None :
         return result['Unit_Name']
     else:
         return None
@@ -178,11 +196,11 @@ def updataOneDataInDangerGood(rowData):
         向表中插入一条数据
 '''
 def insertOneDataIntDangerGoods(rowData):
-    sql = "insert into dangergoods(Unit_ID,type,unit,count," \
+    sql = "insert into dangergoods(Unit_ID,type,name,unit,count," \
           "new_product,waste_product,delivery_time,storage_time,source,radioactivity,notes) " \
-          "values('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')"%(rowData[0],rowData[1],rowData[2],rowData[3],rowData[4],
+          "values('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')"%(rowData[0],rowData[1],rowData[2],rowData[3],rowData[4],
                                                           rowData[5],rowData[6],rowData[7],rowData[8],rowData[9],
-                                                          rowData[10])
+                                                          rowData[10],rowData[11])
     executeCommit(sql)
     return True
 '''
@@ -193,6 +211,60 @@ def deleteByDangerGoodsId(dangerGoodsId):
     sql = "delete from dangergoods where goods_Id='%s'"%dangerGoodsId
     executeCommit(sql)
     return True
+'''
+    获取某基地所属的旅团
+'''
+def getBrigadesByBaseId(baseId):
+    children = findChildUnit(baseId)
+    brigades = []
+    for child in children:
+        if gradeInUnit(child) == 4:
+            temp = getUnit(child)
+            if len(temp) > 1:
+                brigades.append(temp.copy())
+    return brigades
+
+'''
+    功能：
+        寻找一个单位的一级子单位
+'''
+def findChildUnit(unitId):
+    result = []
+    sql = "select Unit_ID from unit where Unit_Uper=%s"%unitId
+    data = executeSql(sql)
+    if data != None:
+        for item in data:
+            result.append(item[0])
+    return result
+
+'''
+    功能：
+        根据单位号返回单位的信息
+'''
+def getUnit(unitId):
+    result = {}
+    sql = "select Unit_ID,Unit_Name from unit where Unit_ID='%s'"%unitId
+    data =selectOne(sql)
+    if data != None:
+        result['Unit_ID'] = data['Unit_ID']
+        result['Unit_Name'] = data['Unit_Name']
+    return result
+'''
+    功能：
+        返回某个旅团的所有阵地
+'''
+def getpositionsByPositionId(PositionId):
+    children = findChildUnit(PositionId)
+    Positions = []
+    for child in children:
+        if gradeInUnit(child) == 5:
+            temp = getUnit(child)
+            if len(temp) > 1:
+                Positions.append(temp.copy())
+    return Positions
+
+    pass
+
 if __name__ == '__main__':
-    print(type(getCountOfUnit('1')))
+    print(getpositionsByPositionId('6'))
     pass

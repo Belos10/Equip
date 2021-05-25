@@ -42,15 +42,15 @@ class Danger_Goods_Widget(object):
         self.tb_strengthStatistics.setObjectName("tb_strengthStatistics")
         self.tb_strengthStatistics.setToolButtonStyle(Qt.Qt.ToolButtonTextUnderIcon)
 
-        self.tb_directoryMaintenance = QtWidgets.QToolButton(MainWindow)
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(":/pic/set.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.tb_directoryMaintenance.setIcon(icon)
-        self.tb_directoryMaintenance.setObjectName("tb_directoryMaintenance")
-        self.tb_directoryMaintenance.setToolButtonStyle(Qt.Qt.ToolButtonTextUnderIcon)
+        # self.tb_directoryMaintenance = QtWidgets.QToolButton(MainWindow)
+        # icon = QtGui.QIcon()
+        # icon.addPixmap(QtGui.QPixmap(":/pic/set.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        # self.tb_directoryMaintenance.setIcon(icon)
+        # self.tb_directoryMaintenance.setObjectName("tb_directoryMaintenance")
+        # self.tb_directoryMaintenance.setToolButtonStyle(Qt.Qt.ToolButtonTextUnderIcon)
 
         self.toolBar.addWidget(self.tb_strengthStatistics)
-        self.toolBar.addWidget(self.tb_directoryMaintenance)
+        # self.toolBar.addWidget(self.tb_directoryMaintenance)
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
@@ -59,6 +59,6 @@ class Danger_Goods_Widget(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.toolBar.setWindowTitle(_translate("MainWindow", "toolBar"))
         self.tb_strengthStatistics.setText(_translate("MainWindow", "实力统计"))
-        self.tb_directoryMaintenance.setText(_translate("MainWindow", "目录维护"))
+        # self.tb_directoryMaintenance.setText(_translate("MainWindow", "目录维护"))
 
 import icons.resource_rc

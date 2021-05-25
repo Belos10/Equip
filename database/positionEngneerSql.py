@@ -96,6 +96,10 @@ def selectUnitNameByUnitID(Unit_ID):
 '''
 def getUnits():
     units = []
+
+
+
+
     sql = "select Unit_Name from posengin_unit_directory group by Unit_Name order by 'Unit_ID' desc "
     result = executeSql(sql)
     if result is not None or len(result) != 0:
@@ -124,7 +128,6 @@ def initPosenginUnitDirectory():
     判断一个基地是否为
 '''
 def insertThreeLevelUnit(unitId):
-    print(gradeInUnit(unitId))
     if unitId == None:
         return
     if gradeInUnit(unitId) == 3:
@@ -190,10 +193,7 @@ def insertOneDateIntoUnitDirectory(Unit_ID,Unit_Name,Unit_Uper):
         sql = "update posengin_unit_directory set Unit_ID='%s',Unit_Name='%s',Unit_Uper='%s' where Unit_ID='%s'"%(Unit_ID,Unit_Name,Unit_Uper,Unit_ID)
         executeCommit(sql)
 
-'''
-    功能：
-        向阵地工程目录表中删除一条单挑数据
-'''
+
 
 '''
     功能：
@@ -223,6 +223,13 @@ def getUnitNameById(UnitID):
     else:
         return None
 
+def getUnitNameByIdInUnit(UnitID):
+    sql = "select Unit_Name from unit where Unit_ID=%s"%UnitID
+    result = selectOne(sql)
+    if result:
+        return result['Unit_Name']
+    else:
+        return None
 '''
     功能：
         判断某条数据是否存在在表中
@@ -347,14 +354,36 @@ def getEquipmentStatisticsResultByUnitAndEquip(unit,equipment):
 
 #根据Dept_Uper查询单位信息,并返回
 def selectUnitInfoByDeptUper(Unit_Uper):
-    conn, cur = connectMySql()
-    sql = "select * from posengin_unit_directory where Unit_Uper = '" + Unit_Uper + "'"
-    cur.execute(sql)
-    result = cur.fetchall()
-    disconnectMySql(conn, cur)
-    # 测试结果
-    # print(result)
-    return result
+    if gradeInUnit(Unit_Uper) < 3:
+        conn, cur = connectMySql()
+        sql = "select * from unit where Unit_Uper = '" + Unit_Uper + "'"
+        cur.execute(sql)
+        result = cur.fetchall()
+        disconnectMySql(conn, cur)
+        # 测试结果
+        # print(result)
+        return result
+    else:
+        return []
+
+#根据Dept_Uper查询单位信息,并返回
+def findBases(unitId):
+    result = []
+    grade = gradeInUnit(unitId)
+    if grade == 2:
+        result.extend(findChildInUnit(unitId))
+        return result
+    elif grade < 2:
+        children = findChildInUnit(unitId)
+        for child in children:
+            result.extend(findBases(child))
+        return result
+    elif grade == 3:
+        result.append(unitId)
+        return result
+    elif grade > 3:
+        return result
+
 
 '''
     功能：
@@ -374,7 +403,6 @@ def gradeOfUnit(UnitId):
 def gradeInUnit(UnitId):
     sql = "select Unit_Uper from unit where Unit_ID='%s'"%UnitId
     data = selectOne(sql)
-    print(data)
     if data != None:
         return gradeInUnit(data['Unit_Uper']) + 1
     else:
@@ -390,24 +418,32 @@ def findUperUnit(unitId):
         return data['Unit_Uper']
     else:
         return None
+
+def findUperUnitInUnit(unitId):
+    sql =  "select Unit_Uper from unit where Unit_ID='%s'"%unitId
+    data = selectOne(sql)
+    if data != None:
+        return data['Unit_Uper']
+    else:
+        return None
 '''
     功能：
         找寻一个单位的基地
 '''
 def findBase(unitID):
-    if gradeOfUnit(unitID) < 3:
+    if gradeInUnit(unitID) < 3:
         pass
-    elif gradeOfUnit(unitID) == 3 : #基地
+    elif gradeInUnit(unitID) == 3 : #基地
         return unitID
-    elif gradeOfUnit(unitID) == 4:  #旅团
-        return  findUperUnit(unitID)
-    elif gradeOfUnit(unitID) == 5:  #阵地
-        uperId = findUperUnit(unitID)
-        while gradeOfUnit(uperId) != 3:
-            newUperId = findUperUnit(uperId)
+    elif gradeInUnit(unitID) == 4:  #旅团
+        return  findUperUnitInUnit(unitID)
+    elif gradeInUnit(unitID) == 5:  #阵地
+        uperId = findUperUnitInUnit(unitID)
+        while gradeInUnit(uperId) != 3:
+            newUperId = findUperUnitInUnit(uperId)
             uperId = newUperId
         return  uperId
-    elif gradeOfUnit(unitID) > 5:
+    elif gradeInUnit(unitID) > 5:
         return None
 
 '''
@@ -443,28 +479,28 @@ def findChildInUnit(unitId):
         if len(result) > 0:
             return result
         else:
-            return None
+            return []
     else:
-        return None
+        return []
 '''
     功能：
         判断武器是否为最末级武器
 '''
 
 def isLastLevelEquipment(equipmentId):
-    sql = "select Equip_ID from posengin_equipment_directory where Unit_ID='专用装备'  and Equip_Type='逐号录入' and Equip_ID=%s"%equipmentId
+    sql = "select Equip_ID from equip where Equip_Type='专用装备'  and length (Input_Type) > 3 and Equip_ID=%s"%equipmentId
     result = executeSql(sql)
     if result != None:
         return True
     else:
-        False
+        return False
 
 '''
     功能：
         根据装备Id获取装备名称
 '''
 def getEquipmentNameById(equipmentId):
-    sql = "select Equip_Name from posengin_equipment_directory where Equip_ID='%s'"%equipmentId
+    sql = "select Equip_Name from equip where Equip_ID='%s'"%equipmentId
     result = selectOne(sql)
     if result != None:
         return result['Equip_Name']
@@ -621,7 +657,7 @@ def findChildEquip(Equip_ID, childEquipList, cur):
 def selectEquipInfoByEquipUper(Equip_Uper):
     conn, cur = connectMySql()
 
-    sql = "select * from posengin_equipment_directory where Equip_Uper = '" + Equip_Uper + "'"
+    sql = "select * from equip where Equip_Uper = '" + Equip_Uper + "'"
 
     cur.execute(sql)
     result = cur.fetchall()
@@ -645,8 +681,60 @@ def selectAllPoseginDirectory():
 
     return result
 
+
+'''
+    功能：
+        返回武器的单位
+'''
+def getEquipmentTypeById(equipmentId):
+    sql = "select unit from equip where Equip_ID='%s'"%equipmentId
+    data = selectOne(sql)
+    if data != None:
+        return data['unit']
+    else:
+        return '无'
+
+
+'''
+    功能：
+        获取对应装备对应单位的statistics表的数据
+'''
+def getStatictsResult(unitId,equipemntId):
+    result = []
+    sql = "select statistics_Id,Unit_ID,Equip_ID,count,status from  posengin_statistics where Unit_ID='%s' and Equip_ID='%s'"%(unitId,equipemntId)
+    data = selectData(sql)
+    if len(data) > 0:
+        return data[0]
+    else:
+        return result
+'''
+    功能：
+        修改一行数据
+'''
+def alterData(statisticsId,cout,status):
+    sql = "update posengin_statistics set count='%d',status='%s' where statistics_Id='%s'"%(cout,status,statisticsId)
+    executeCommit(sql)
+    return True
+'''
+    功能：
+        删除条数据
+'''
+def deleteData(statisticsId):
+    sql = "delete from posengin_statistics where statistics_Id='%s'"%statisticsId
+    executeCommit(sql)
+    return True
+
+'''
+    功能：
+        插入一条数据
+'''
+def insertData(equipmentId,unitId,count,status):
+    sql = "insert into posengin_statistics(Unit_ID,Equip_ID,count,status) values ('%s','%s','%d','%s')"%(unitId,equipmentId,count,status)
+    executeCommit(sql)
+    return True
+
 if __name__ == '__main__':
     data = ['3','003','钢铁雄心基地','xxxx',1,'准备到位','2020-06','2020-12',150,'未到位','未运行','无']
-    print(gradeInUnit('8'))
+    print(type([]) == list)
     pass
 

@@ -1,5 +1,6 @@
 from PyQt5.QtCore import Qt
 from database.danderGoodsSql import *
+from sysManage.userInfo import get_value
 from widgets.dangerGoods.dangerGoodsStatisticsUI import DangerGoodsStatisticsUI
 
 import sys
@@ -11,6 +12,8 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
     def __init__(self, parent=None):
         super(StrengthStatistics, self).__init__(parent)
         self.setupUi(self)
+        self.startInfo = None
+        self.dataLen = 0
         self.signalConnection()
         self.init()
     first_treeWidget_dict = {}
@@ -19,7 +22,8 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
 
 
 
-
+    def initUserInfo(self):
+        self.userInfo = get_value("totleUserInfo")
     #信号和槽连接
     def signalConnection(self):
 
@@ -38,9 +42,25 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
 
     #定义初始化函数
     def init(self):
+        self.initUserInfo()
         self.tw_result.clear()
-        self._initUnitTreeWidget('',self.tw_first)
-        # self.result = getResult(self.base)
+        self.tw_first.header().setVisible(False)
+
+        self.first_treeWidget_dict = {}
+        # 当前选中的单位列表和装备列表
+        self.currentCheckedUnitList = []
+
+        if self.userInfo:
+            from database.strengthDisturbSql import selectUnitInfoByUnitID
+            self.startInfo = selectUnitInfoByUnitID(self.userInfo[0][4])
+
+        stack = []
+        root = []
+        if self.startInfo:
+            stack.append(self.startInfo)
+            root.append(self.tw_first)
+            self._initUnitTreeWidget(stack, root)
+
         self.displayData()
         pass
 
@@ -55,8 +75,11 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
             if unitItem == self.tw_first.currentItem():
                 self.currentCheckedUnitList.append(unitID)
         if len(self.currentCheckedUnitList) > 0:
-            self._initTableWidgetByUnit(self.currentCheckedUnitList[0])
-            self.unit = self.currentCheckedUnitList[0]
+            if gradeInUnit(self.currentCheckedUnitList[0]) == 3:
+                self._initTableWidgetByUnit(self.currentCheckedUnitList[0])
+                self.unit = self.currentCheckedUnitList[0]
+            else:
+                return
 
     '''
         功能：
@@ -65,7 +88,7 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
     def _initTableWidgetByUnit(self,unit):
 
         self.rowCount =  2 + getCountOfUnit(unit)
-        self.columnCount = 12
+        self.columnCount = 13
         self.currentLastRow = self.rowCount - 1
         self.initHeader()
         if self.rowCount > 2:
@@ -86,6 +109,9 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
             explosionResult = getDataByUnitAndType(unit, '防化防爆弹药')
             if explosionResult != None:
                 self.diplayDataByType(2 + trainResultCount + chemicalResultCount, explosionResult, '防化防爆弹药')
+                self.dataLen = trainResultCount + chemicalResultCount + len(explosionResult)
+            else:
+                self.dataLen = trainResultCount + chemicalResultCount
 
 
 
@@ -104,58 +130,77 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
         for i in range(len(typeData)):
             index = starIndex + i
             self.info[index] = typeData[i][0]
+            #序号
             item = QTableWidgetItem(str(i + 1))
             item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             self.tw_result.setItem(starIndex + i, 0, item)
+
+            #名称
             item = QTableWidgetItem(typeData[i][3])
             item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             self.tw_result.setItem(starIndex + i, 2, item)
-            item = QTableWidgetItem(str(typeData[i][4]))
+
+            #单位
+            item = QTableWidgetItem(typeData[i][4])
             item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-            self.tw_result.setItem(starIndex + i, 4, item)
-            item = QTableWidgetItem(typeData[i][5])
+            self.tw_result.setItem(starIndex + i, 3, item)
+
+            #小计
+            item = QTableWidgetItem(str(typeData[i][5]))
             item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             self.tw_result.setItem(starIndex + i, 5, item)
+
+            #新堪品
             item = QTableWidgetItem(typeData[i][6])
             item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             self.tw_result.setItem(starIndex + i, 6, item)
+
+
             item = QTableWidgetItem(typeData[i][7])
             item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             self.tw_result.setItem(starIndex + i, 7, item)
+
             item = QTableWidgetItem(typeData[i][8])
             item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             self.tw_result.setItem(starIndex + i, 8, item)
+
             item = QTableWidgetItem(typeData[i][9])
             item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             self.tw_result.setItem(starIndex + i, 9, item)
+
             item = QTableWidgetItem(typeData[i][10])
             item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             self.tw_result.setItem(starIndex + i, 10, item)
+
             item = QTableWidgetItem(typeData[i][11])
             item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             self.tw_result.setItem(starIndex + i, 11, item)
 
+            item = QTableWidgetItem(typeData[i][12])
+            item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+            self.tw_result.setItem(starIndex + i, 12, item)
+
+
 
 
 
     '''
-        初始化单位目录
-    '''
+                   功能：
+                       单位目录的初始化，显示整个单位表
+                       参数表：root为上级单位名字，mother为上级节点对象
+       '''
 
-    def _initUnitTreeWidget(self, root, mother):
-        self.tw_first.header().setVisible(False)
-        if root == '':
-            result = selectUnitInfoByDeptUper('')
-        else:
-            result = selectUnitInfoByDeptUper(root)
-
-        # rowData: (单位编号，单位名称，上级单位编号)
-        for rowData in result:
-            item = QTreeWidgetItem(mother)
-            item.setText(0, rowData[1])
-            self.first_treeWidget_dict[rowData[0]] = item
-            if rowData[0] != '':
-                self._initUnitTreeWidget(rowData[0], item)
+    def _initUnitTreeWidget(self, stack, root):
+        while stack:
+            UnitInfo = stack.pop(0)
+            item = QTreeWidgetItem(root.pop(0))
+            item.setText(0, UnitInfo[1])
+            # item.setCheckState(0, Qt.Unchecked)
+            self.first_treeWidget_dict[UnitInfo[0]] = item
+            result = selectUnitInfoByDeptUper(UnitInfo[0])
+            for resultInfo in result:
+                stack.append(resultInfo)
+                root.append(item)
 
 
     '''
@@ -187,49 +232,53 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.tw_result.setItem(1, 0, item)
 
-        item = QTableWidgetItem("名称")
+        item = QTableWidgetItem("类型")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.tw_result.setItem(1, 1, item)
 
-        item = QTableWidgetItem("单位")
+        item = QTableWidgetItem("名称")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.tw_result.setItem(1, 2, item)
 
-        item = QTableWidgetItem("合计")
+        item = QTableWidgetItem("单位")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.tw_result.setItem(1, 3, item)
 
-        item = QTableWidgetItem("小计")
+        item = QTableWidgetItem("合计")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.tw_result.setItem(1, 4, item)
 
-        item = QTableWidgetItem("新堪品")
+        item = QTableWidgetItem("小计")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.tw_result.setItem(1, 5, item)
 
-        item = QTableWidgetItem("废品")
+        item = QTableWidgetItem("新堪品")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.tw_result.setItem(1, 6, item)
 
-        item = QTableWidgetItem("出场时间")
+        item = QTableWidgetItem("废品")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.tw_result.setItem(1, 7, item)
 
-        item = QTableWidgetItem("入库时间")
+        item = QTableWidgetItem("出场时间")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.tw_result.setItem(1, 8, item)
 
-        item = QTableWidgetItem("来源")
+        item = QTableWidgetItem("入库时间")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.tw_result.setItem(1, 9, item)
 
-        item = QTableWidgetItem("放射性活度")
+        item = QTableWidgetItem("来源")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.tw_result.setItem(1, 10, item)
 
-        item = QTableWidgetItem("备注")
+        item = QTableWidgetItem("放射性活度")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.tw_result.setItem(1, 11, item)
+
+        item = QTableWidgetItem("备注")
+        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        self.tw_result.setItem(1, 12, item)
 
 
         '''
@@ -250,13 +299,12 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
 
 
     def savaRowData(self,row):
-        pass
         rowData = []
         rowData.append(self.unit)
         for i in range(1,self.tw_result.columnCount()):
-            if i == 3:
+            if i == 4:
                 continue
-            if i == 1 or i == 2 :
+            if i == 1 or i == 3 :
                 item = self.tw_result.cellWidget(row,i)
                 if item != None:
                     rowData.append(item.currentText())
@@ -266,7 +314,7 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
                     rowData.append(item.text())
                 else:
                     break
-        print(rowData)
+
         if len(rowData) < self.tw_result.columnCount() - 1:
             return False
         else:
@@ -276,7 +324,6 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
 
     def alterRowData(self,row):
 
-        print(self.info)
         rowData = []
         rowData.append(self.info[row])
         rowData.append(self.unit)
@@ -314,37 +361,30 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
             新增按钮槽函数
     '''
     def slotAdd(self):
-        rowCount =  self.tw_result.rowCount()
-        self.currentLastRow = rowCount
-
-        self.tw_result.insertRow(rowCount)
-
-        comboBox = QComboBox()
-        comboBox.addItems(['训练用毒剂', '防化放射源','防化防爆弹药'])
-        self.tw_result.setCellWidget(rowCount, 1, comboBox)
-
-        comboBox = QComboBox()
-        comboBox.addItems(['千克', '块','瓶','枚'])
-        self.tw_result.setCellWidget(rowCount, 2, comboBox)
-        pass
+        if self.tw_result.rowCount() < 3 + self.dataLen:
+            rowCount =  self.tw_result.rowCount()
+            self.currentLastRow = rowCount
+            self.tw_result.insertRow(rowCount)
+            comboBox = QComboBox()
+            comboBox.addItems(['训练用毒剂', '防化放射源','防化防爆弹药'])
+            self.tw_result.setCellWidget(rowCount, 1, comboBox)
+            comboBox = QComboBox()
+            comboBox.addItems(['千克', '块','瓶','枚'])
+            self.tw_result.setCellWidget(rowCount, 3, comboBox)
+        else:
+            QMessageBox.warning(self, "注意", "请先将数据添加完成！", QMessageBox.Yes, QMessageBox.Yes)
+            pass
 
     def slotDelete(self):
-        selectedRow = self.tw_result.selectedItems()
-        if selectedRow != None:
-            if len(selectedRow) > 0:
-                rowCount = selectedRow[0].row()
-            else:
-                rowCount = 0
-
-
-        if rowCount <= 2:
+        selectedRow = self.tw_result.currentRow()
+        if selectedRow < 2:
             QMessageBox.warning(self, "注意", "请选中有效单元格！", QMessageBox.Yes, QMessageBox.Yes)
-        else:
+        elif selectedRow >= 2 and selectedRow < self.dataLen + 2:
             goodsId = self.info[selectedRow]
             if deleteByDangerGoodsId(goodsId) == True:
-                self.tw_result.removeRow(rowCount)
-        pass
-
+                self.tw_result.removeRow(selectedRow)
+        else:
+            self.tw_result.removeRow(selectedRow)
 
 
 

@@ -1,5 +1,6 @@
 from PyQt5.QtCore import Qt
 from database.positionEngneerSql import *
+from sysManage.userInfo import get_value
 from widgets.positionEngineer.posEngneerInstallationUI import PosEngneerInstallationUI
 import sys
 from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QTableWidget, QHeaderView, QTableWidgetItem, QComboBox, \
@@ -10,6 +11,9 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
     def __init__(self, parent=None):
         super(InstallationSituation, self).__init__(parent)
         self.setupUi(self)
+        self.startInfo = None
+        self.infoDict = {}
+        self.baseNames = []
         self.signalConnection()
         self.init()
     result = []
@@ -30,32 +34,48 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
         self.tw_result.itemChanged.connect(self.slotAlterAndSava)
 
 
+    def initUserInfo(self):
+        self.userInfo = get_value("totleUserInfo")
     #信号和槽断开
     def slotDisconnect(self):
         pass
 
     #定义初始化函数
     def init(self):
+        self.initUserInfo()
+        if self.userInfo:
+            from database.strengthDisturbSql import selectUnitInfoByUnitID
+            self.startInfo = selectUnitInfoByUnitID(self.userInfo[0][4])
 
-        #初始化单位列表
-        self.displayUnitInBox()
-        self.result = getResult(self.base, self.designation, self.positionCode, self.prepare)
-        self.displayData(self.result)
+        stack = []
+        if self.startInfo:
+            stack.append(self.startInfo)
+            self.initUnitComboxs(stack)
+
+
+        self.displayData()
         pass
 
 
+
+
+
     '''
-        功能：
-            初始化基地下拉列表框
+                功能：
+                    单位目录的初始化，显示整个单位表
+                    参数表：root为上级单位名字，mother为上级节点对象
     '''
-    def displayUnitInBox(self):
-        units = getUnits()
+
+    def initUnitComboxs(self, stack):
         self.cb_base.clear()
-        if len(units)!= 0:
-            self.cb_base.addItem('')
-            self.cb_base.addItems(units)
-
-        pass
+        unitId = stack.pop()
+        bases = findBases(unitId[0])
+        self.baseNames = []
+        for base in bases:
+            unitName = getUnitNameByIdInUnit(base)
+            self.infoDict[unitName] = base
+            self.baseNames.append(unitName)
+        self.cb_base.addItems(self.baseNames)
 
     '''
         功能：
@@ -90,15 +110,16 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
             else:
                 self.prepare[0] = self.cb_prepare.currentText()
 
-        self.result = getResult(self.base,self.designation,self.positionCode,self.prepare)
-        self.displayData(self.result)
+        self.displayData()
     '''
         功能：
             将列表数据展示在表中
     '''
-    def displayData(self,dataList):
+    def displayData(self):
+        self.result = getResult(self.base, self.designation, self.positionCode, self.prepare)
         self.tw_result.clear()
         self.tw_result.setColumnCount(13)
+        dataList = self.result
         if dataList == None or len(dataList) == 0:
             self.tw_result.setRowCount(3)
             self.initTableHeader()
@@ -190,69 +211,85 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
         item = QTableWidgetItem("阵地工程XXX防护装备安装情况")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.tw_result.setItem(0, 0, item)
+        item.setFlags(Qt.ItemIsEnabled)
         self.tw_result.setSpan(0, 0, 1, 13)
 
         item = QTableWidgetItem("序号")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.tw_result.setItem(1, 0, item)
+        item.setFlags(Qt.ItemIsEnabled)
         self.tw_result.setSpan(1, 0, 2, 1)
 
         item = QTableWidgetItem("单位")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.tw_result.setItem(1, 1, item)
+        item.setFlags(Qt.ItemIsEnabled)
         self.tw_result.setSpan(1, 1, 1, 2)
 
         item = QTableWidgetItem("基地")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        item.setFlags(Qt.ItemIsEnabled)
         self.tw_result.setItem(2, 1, item)
 
         item = QTableWidgetItem("番号")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        item.setFlags(Qt.ItemIsEnabled)
         self.tw_result.setItem(2, 2, item)
 
         item = QTableWidgetItem("阵地代号")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        item.setFlags(Qt.ItemIsEnabled)
         self.tw_result.setItem(1, 3, item)
         self.tw_result.setSpan(1, 3, 2, 1)
 
         item = QTableWidgetItem("具体位置")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        item.setFlags(Qt.ItemIsEnabled)
         self.tw_result.setItem(1, 4, item)
         self.tw_result.setSpan(1, 4, 2, 1)
 
         item = QTableWidgetItem("是否具备安装新型装备条件")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        item.setFlags(Qt.ItemIsEnabled)
         self.tw_result.setItem(1, 5, item)
         self.tw_result.setSpan(1, 5, 2, 1)
 
         item = QTableWidgetItem("安装情况")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        item.setFlags(Qt.ItemIsEnabled)
         self.tw_result.setItem(1, 6, item)
         self.tw_result.setSpan(1, 6, 1, 5)
 
         item = QTableWidgetItem("目前安装情况")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        item.setFlags(Qt.ItemIsEnabled)
         self.tw_result.setItem(2, 6, item)
         item = QTableWidgetItem("安装时间")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        item.setFlags(Qt.ItemIsEnabled)
         self.tw_result.setItem(2, 7, item)
         item = QTableWidgetItem("计划安装时间")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        item.setFlags(Qt.ItemIsEnabled)
         self.tw_result.setItem(2, 8, item)
         item = QTableWidgetItem("数量（套）")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        item.setFlags(Qt.ItemIsEnabled)
         self.tw_result.setItem(2, 9, item)
         item = QTableWidgetItem("装备到位情况")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        item.setFlags(Qt.ItemIsEnabled)
         self.tw_result.setItem(2, 10, item)
 
         item = QTableWidgetItem("装备运行状态")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        item.setFlags(Qt.ItemIsEnabled)
         self.tw_result.setItem(1, 11, item)
         self.tw_result.setSpan(1, 11, 2, 1)
 
         item = QTableWidgetItem("备注")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        item.setFlags(Qt.ItemIsEnabled)
         self.tw_result.setItem(1, 12, item)
         self.tw_result.setSpan(1, 12, 2, 1)
 
@@ -299,6 +336,7 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
         else:
             insertOneDataIntInstallation(rowData)
             QMessageBox.warning(self, "注意", "插入成功！", QMessageBox.Yes, QMessageBox.Yes)
+            self.displayData()
 
     def alterRowData(self,row):
         # print("修改一行数据")
@@ -361,19 +399,23 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
             新增按钮槽函数
     '''
     def slotAdd(self):
-        rowCount =  self.tw_result.rowCount()
-        self.currentLastRow = rowCount
-        self.tw_result.insertRow(rowCount)
-        comboBox = QComboBox()
-        comboBox.addItems(getUnits())
-        self.tw_result.setCellWidget(rowCount, 1, comboBox)
-        comboBox = QComboBox()
-        comboBox.addItems(['是', '否'])
-        self.tw_result.setCellWidget(rowCount, 5, comboBox)
-        comboBox = QComboBox()
-        comboBox.addItems(['已到位', '未到位'])
-        self.tw_result.setCellWidget(rowCount, 10, comboBox)
-        pass
+        if self.tw_result.rowCount() <= 3 + len(self.result):
+            rowCount =  self.tw_result.rowCount()
+            self.currentLastRow = rowCount
+            self.tw_result.insertRow(rowCount)
+            comboBox = QComboBox()
+            comboBox.addItems(self.baseNames)
+            self.tw_result.setCellWidget(rowCount, 1, comboBox)
+            comboBox = QComboBox()
+            comboBox.addItems(['是', '否'])
+            self.tw_result.setCellWidget(rowCount, 5, comboBox)
+            comboBox = QComboBox()
+            comboBox.addItems(['已到位', '未到位'])
+            self.tw_result.setCellWidget(rowCount, 10, comboBox)
+        else:
+            QMessageBox.warning(self, "注意", "请先将数据补充完整！", QMessageBox.Yes, QMessageBox.Yes)
+
+
 
     def slotDelete(self):
 
@@ -392,6 +434,7 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
                 self.tw_result.removeRow(rowCount)
         else:
             self.tw_result.removeRow(rowCount)
+
 
 
 

@@ -50,15 +50,15 @@ class Position_Engineer_Widget(object):
         self.tb_equipmentStatistics.setToolButtonStyle(Qt.Qt.ToolButtonTextUnderIcon)
 
 
-        self.tb_directoryMaintenance = QtWidgets.QToolButton(MainWindow)
-        icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap(":/pic/set.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.tb_directoryMaintenance.setIcon(icon2)
-        self.tb_directoryMaintenance.setObjectName("tb_directoryMaintenance")
-        self.tb_directoryMaintenance.setToolButtonStyle(Qt.Qt.ToolButtonTextUnderIcon)
+        # self.tb_directoryMaintenance = QtWidgets.QToolButton(MainWindow)
+        # icon2 = QtGui.QIcon()
+        # icon2.addPixmap(QtGui.QPixmap(":/pic/set.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        # self.tb_directoryMaintenance.setIcon(icon2)
+        # self.tb_directoryMaintenance.setObjectName("tb_directoryMaintenance")
+        # self.tb_directoryMaintenance.setToolButtonStyle(Qt.Qt.ToolButtonTextUnderIcon)
         self.toolBar.addWidget(self.tb_installation)
         self.toolBar.addWidget(self.tb_equipmentStatistics)
-        self.toolBar.addWidget(self.tb_directoryMaintenance)
+        # self.toolBar.addWidget(self.tb_directoryMaintenance)
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
@@ -68,6 +68,6 @@ class Position_Engineer_Widget(object):
         self.toolBar.setWindowTitle(_translate("MainWindow", "toolBar"))
         self.tb_installation.setText(_translate("MainWindow", "防护安装情况"))
         self.tb_equipmentStatistics.setText(_translate("MainWindow", "防护质量统计"))
-        self.tb_directoryMaintenance.setText(_translate("MainWindow", "阵地目录维护"))
+        # self.tb_directoryMaintenance.setText(_translate("MainWindow", "阵地目录维护"))
 
 import icons.resource_rc
