@@ -107,7 +107,7 @@ class AllotSchedule(QWidget,AllotSchedule):
             root.append(self.tw_first)
             self._initUnitTreeWidget(stack, root)
 
-        equipInfo = selectEquipInfoByEquipUper("")
+        equipInfo =  findUperEquipIDByName("通用装备")
         stack = []
         root = []
         if equipInfo:
@@ -197,14 +197,14 @@ class AllotSchedule(QWidget,AllotSchedule):
         j = 0
         for unitID, unitItem in self.first_treeWidget_dict.items():
             if unitItem == self.tw_first.currentItem():
-                if selectUnitIfUppermost(unitID):
-                    result = selectAllDataAboutDisturbPlanUnitExceptFirst()
-                else:
+                if selectUnitIfBase(unitID):
                     result = findDisturbPlanUnitChildInfo(unitID)
+                else:
+                    result = selectDisturbPlanChooseUnit()
                 for resultInfo in result:
                     self.currentUnitChilddict[j] = resultInfo
                     j = j + 1
-        print("unit", self.currentUnitChilddict)
+        #print("unit", self.currentUnitChilddict)
         # 获取当前装备名
         j = 0
         for equipID, equipItem in self.second_treeWidget_dict.items():
@@ -216,7 +216,7 @@ class AllotSchedule(QWidget,AllotSchedule):
                 equipInfo = findEquipInfo(equipID)
                 self.originalEquipDict[j] = equipInfo[0]
                 j=j+1
-        print("self.originalEquipDict",self.originalEquipDict)
+        #print("self.originalEquipDict",self.originalEquipDict)
         self._initDisturbPlanByUnitListAndEquipList(self.originalEquipDict)
 
 
@@ -292,6 +292,7 @@ class AllotSchedule(QWidget,AllotSchedule):
                 self.disturbResult.setCellWidget(i, 4 + self.lenCurrentUnitChilddict, item)
 
                 # 是否具备接装条件
+
                 flag2 = selectAllotCondition(self.currentEquipdict[i][0],self.currentYear)
                 item = QPushButton("设置进度")
                 item.clicked.connect(self.setCondition)
@@ -466,12 +467,22 @@ class AllotSchedule(QWidget,AllotSchedule):
 
     def setArmySchedule(self):
         self.armySchedule.setYear(self.currentYear)
+        self.armySchedule.setWindowTitle("陆军调拨单选择")
+        self.armySchedule.setWindowFlags(Qt.Dialog|Qt.WindowCloseButtonHint)
         self.armySchedule._initSelf_()
         self.armySchedule.show()
         self.armySchedule.signal.connect(self.updateArmy)
 
     def setRocketSchedule(self):
         row = self.disturbResult.currentRow()
+        currentColomn = self.disturbResult.currentColumn()
+        if row < 0 or currentColomn < 0:
+            return
+        if currentColomn - 1 < 0:
+            return
+        if self.disturbResult.cellWidget(row, currentColomn - 1).text() != "已完成":
+            reply = QMessageBox.question(self, "设置接装条件", "上一级未完成", QMessageBox.Yes)
+            return
         currentUnit=[]
         for i in self.currentUnitChilddict.values():
             currentUnit.append(i)
@@ -488,6 +499,7 @@ class AllotSchedule(QWidget,AllotSchedule):
             else:
                 self.rocketSchedule.getUnitIDList("", "",
                                                   "", "")
+            self.rocketSchedule.setWindowFlags(Qt.Dialog|Qt.WindowCloseButtonHint)
             self.rocketSchedule.show()
             self.rocketSchedule.signal.connect(self.updateRocket)
 
@@ -507,6 +519,14 @@ class AllotSchedule(QWidget,AllotSchedule):
 
     def setCondition(self):
         currentRow=self.disturbResult.currentRow()
+        currentColomn = self.disturbResult.currentColumn()
+        if currentRow < 0 or currentColomn <0:
+            return
+        if currentColomn - 1 < 0:
+            return
+        if self.disturbResult.cellWidget(currentRow, currentColomn - 1).text() != "已完成":
+            reply = QMessageBox.question(self, "设置接装条件", "上一级未完成", QMessageBox.Yes)
+            return
         reply = QMessageBox.question(self,"设置接装条件","是否具备接装条件？",QMessageBox.Yes,QMessageBox.Cancel)
         if reply==QMessageBox.Yes:
             item = QPushButton("已完成")
@@ -514,6 +534,16 @@ class AllotSchedule(QWidget,AllotSchedule):
             updateAllotCondition(self.currentEquipdict[currentRow][0],self.currentYear)
 
     def setScheduleFinish(self):
+        currentRow = self.disturbResult.currentRow()
+        currentColomn = self.disturbResult.currentColumn()
+        if currentRow < 0 or currentColomn < 0:
+            return
+        if currentColomn - 1 < 0:
+            return
+        if self.disturbResult.cellWidget(currentRow, currentColomn - 1).text() != "已完成":
+            reply = QMessageBox.question(self, "设置接装条件", "上一级未完成", QMessageBox.Yes)
+            return
+        self.scheduleFinish.setWindowFlags(Qt.Dialog|Qt.WindowCloseButtonHint)
         self.scheduleFinish.show()
         self.scheduleFinish.signal.connect(self.updateFinish)
 
@@ -590,7 +620,6 @@ class AllotSchedule(QWidget,AllotSchedule):
             equipDict = {}
             j = 0
             for equipID, equipItem in self.second_treeWidget_dict.items():
-                flag4 = selectIfScheduleFinish(equipID, self.currentYear)
                 if flag4[0][0] != '0':
                     if equipItem.checkState(0) == Qt.Checked:
                         equipInfo = findEquipInfo(equipID)

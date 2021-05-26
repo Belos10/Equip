@@ -1,6 +1,7 @@
 import pymysql
 from database.config import ConnectMySqlDict
-
+import sqlite3
+import os
 '''
     功能：
         连接数据库，返回conn以及cur
@@ -12,6 +13,9 @@ def connectMySql():
     password = ConnectMySqlDict.get('password')
     db = ConnectMySqlDict.get('db')
 
+    # BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    # conn = sqlite3.connect(os.path.join(BASE_DIR, 'NuclearManageSystem.db'))
+    # cur = conn.cursor()
     conn = pymysql.connect(host=host, port=port, user=user, password=password, db=db)
     cur = conn.cursor()
 
@@ -24,6 +28,12 @@ def connectMySql():
 def disconnectMySql(conn, cur):
     cur.close()
     conn.close()
+
+
+
+
+
+
 
 '''
     功能：

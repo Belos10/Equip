@@ -441,3 +441,27 @@ def insertIntoDistrubPlanUnitFromList(UnitList):
 
     conn.commit()
     disconnectMySql(conn,cur)
+
+# 查找是否是第三级目录的各基地
+def selectUnitIfBase(unitID):
+    conn, cur = connectMySql()
+    sql = "select Unit_Uper from unit where Unit_ID = '" + unitID + "'"
+    cur.execute(sql)
+    result = cur.fetchall()
+    disconnectMySql(conn, cur)
+    if result[0][0] == '2':
+        return True
+    else:
+        return False
+
+
+def selectDisturbPlanChooseUnit():
+    conn, cur = connectMySql()
+    sql = "select * from unit where Unit_Uper= '2' or Unit_ID = '3'"
+    cur.execute(sql)
+    result = cur.fetchall()
+    disconnectMySql(conn, cur)
+    if result:
+        return result
+    else:
+        return []

@@ -319,6 +319,9 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
         # 单位目录
         if self.changeUnit == '1':
             self.addUnitChoose.initWidget()
+            self.addUnitChoose.tb_unitChoose.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+            self.addUnitChoose.tb_unitChoose.verticalHeader().setSectionResizeMode(QHeaderView.Stretch)
+            self.addUnitChoose.setWindowFlags(Qt.Dialog|Qt.WindowCloseButtonHint)
             self.addUnitChoose.show()
 
         # 装备目录

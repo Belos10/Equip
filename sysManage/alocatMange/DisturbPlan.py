@@ -187,7 +187,7 @@ class DisturbPlan(QWidget, yearList_Form):
             self._initUnitTreeWidget(stack,root)
 
         #equipInfo = None
-        equipInfo = selectEquipInfoByEquipUper("")
+        equipInfo = findUperEquipIDByName("通用装备")
         stack = []
         root = []
         if equipInfo:
@@ -277,10 +277,10 @@ class DisturbPlan(QWidget, yearList_Form):
         j = 0
         for unitID, unitItem in self.first_treeWidget_dict.items():
             if unitItem == self.tw_first.currentItem():
-                # if selectUnitIfUppermost(unitID):
-                #     result = selectAllDataAboutDisturbPlanUnitExceptFirst()
-                # else:
-                result = findDisturbPlanUnitChildInfo(unitID)
+                if selectUnitIfBase(unitID):
+                    result = findDisturbPlanUnitChildInfo(unitID)
+                else:
+                    result = selectDisturbPlanChooseUnit()
                 for resultInfo in result:
                     self.currentUnitChilddict[j] = resultInfo
                     j=j+1
@@ -409,7 +409,7 @@ class DisturbPlan(QWidget, yearList_Form):
             if selectEquipIsHaveChild(self.currentEquipdict[i][0]):
                 for j in range(1,self.disturbResult.columnCount()):
                     item = self.disturbResult.item(i,j)
-                    item.setText("")
+                    # item.setText("")
                     # item.setBackground(QBrush(QColor(240, 240, 240)))
                     item.setFlags(Qt.ItemIsEnabled|Qt.ItemIsSelectable)
 
@@ -489,16 +489,13 @@ class DisturbPlan(QWidget, yearList_Form):
     # 读取初始分配计划备注
     def initDisturbPlanNote(self):
         self.unitDisturbPlanNoteList = selectDisturbPlanNote(self.currentEquipdict, self.currentYear)
-        #print("result :   ", self.unitDisturbPlanNoteList)
-        #print("self.unitDisturbPlanNoteList", self.unitDisturbPlanNoteList)
 
         for i in range(0,len(self.currentEquipdict)):
-            #print("''''''''''''''''''", i)
             item=self.disturbResult.item(i,self.lenHeaderList-1)
             if self.unitDisturbPlanNoteList[i] is not None:
                 item.setText(str(self.unitDisturbPlanNoteList[i]))
             item.setFlags(Qt.ItemIsEnabled|Qt.ItemIsSelectable|Qt.ItemIsEditable)
-            #print("************")
+
 
         # 读取机关计划数与装备单位
     def initDisturbPlanOther(self):
