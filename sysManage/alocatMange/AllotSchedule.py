@@ -620,6 +620,7 @@ class AllotSchedule(QWidget,AllotSchedule):
             equipDict = {}
             j = 0
             for equipID, equipItem in self.second_treeWidget_dict.items():
+                flag4 = selectIfScheduleFinish(equipID, self.currentYear)
                 if flag4[0][0] != '0':
                     if equipItem.checkState(0) == Qt.Checked:
                         equipInfo = findEquipInfo(equipID)
