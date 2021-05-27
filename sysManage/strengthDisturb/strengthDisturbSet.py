@@ -31,6 +31,7 @@ class strengthDisturbSet(QMainWindow, Widget_Strength_Disturb_Set):
 
     def slotSelectSet(self):
         self.signalConnect()
+        self.strengthSelectSet.initSelectSet()
         self.sw_setManage.setCurrentIndex(0)
         self.disconnectSlot()
         self.tb_selectSet.setDisabled(True)

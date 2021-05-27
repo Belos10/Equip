@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1018</width>
-    <height>668</height>
+    <width>1132</width>
+    <height>699</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -50,6 +50,26 @@
       <item row="0" column="0">
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
+         <widget class="QComboBox" name="cb_setChoose">
+          <property name="minimumSize">
+           <size>
+            <width>150</width>
+            <height>0</height>
+           </size>
+          </property>
+          <item>
+           <property name="text">
+            <string>设置单位目录</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>设置装备目录</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item>
          <spacer name="horizontalSpacer">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -63,30 +83,37 @@
          </spacer>
         </item>
         <item>
-         <widget class="QPushButton" name="pb_setUnitAlias">
+         <widget class="QPushButton" name="pb_add">
           <property name="text">
-           <string>设置单位别名</string>
+           <string>增加</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pb_setEquipUnit">
+         <widget class="QPushButton" name="pb_update">
           <property name="text">
-           <string>设置当前装备单位</string>
+           <string>修改</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pb_setUnit">
+         <widget class="QPushButton" name="pb_del">
           <property name="text">
-           <string>设置单位目录</string>
+           <string>删除</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pb_setEquip">
+         <widget class="QPushButton" name="pb_input">
           <property name="text">
-           <string>设置装备目录</string>
+           <string>导入</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pb_output">
+          <property name="text">
+           <string>导出</string>
           </property>
          </widget>
         </item>
@@ -278,89 +305,6 @@
         <property name="spacing">
          <number>0</number>
         </property>
-        <item row="0" column="7">
-         <widget class="QComboBox" name="cb_inputType">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>150</width>
-            <height>0</height>
-           </size>
-          </property>
-          <item>
-           <property name="text">
-            <string>空</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>逐号录入</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>逐批录入</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item row="0" column="2">
-         <widget class="QLabel" name="lb_unitName">
-          <property name="text">
-           <string>单位名字：</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="lb_unitID">
-          <property name="text">
-           <string>单位号：</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="4">
-         <widget class="QLabel" name="lb_equipID">
-          <property name="text">
-           <string>装备号：</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="6">
-         <widget class="QLabel" name="lb_inputType">
-          <property name="text">
-           <string>装备录入类型：</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="9">
-         <widget class="QPushButton" name="pb_add">
-          <property name="text">
-           <string>增加</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="10">
-         <widget class="QPushButton" name="pb_update">
-          <property name="text">
-           <string>修改</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="3">
-         <widget class="QLineEdit" name="le_equipName">
-          <property name="maximumSize">
-           <size>
-            <width>150</width>
-            <height>16777215</height>
-           </size>
-          </property>
-         </widget>
-        </item>
         <item row="1" column="0">
          <widget class="QLabel" name="lb_unitUper">
           <property name="text">
@@ -371,7 +315,7 @@
         <item row="1" column="2">
          <widget class="QLabel" name="lb_equipName">
           <property name="text">
-           <string>装备名字：</string>
+           <string>单位别名：</string>
           </property>
          </widget>
         </item>
@@ -382,31 +326,28 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="7">
-         <widget class="QComboBox" name="cb_equipType">
-          <item>
-           <property name="text">
-            <string>空</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>通用装备</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>专用装备</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item row="1" column="9">
-         <widget class="QPushButton" name="pb_del">
-          <property name="text">
-           <string>删除</string>
+        <item row="1" column="3">
+         <widget class="QLineEdit" name="le_unitAlias">
+          <property name="maximumSize">
+           <size>
+            <width>150</width>
+            <height>16777215</height>
+           </size>
           </property>
          </widget>
+        </item>
+        <item row="0" column="6">
+         <widget class="QLabel" name="lb_inputType">
+          <property name="text">
+           <string>装备名字：</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="7">
+         <widget class="QLineEdit" name="le_equipUnit"/>
+        </item>
+        <item row="0" column="7">
+         <widget class="QLineEdit" name="le_equipName"/>
         </item>
         <item row="0" column="3">
          <widget class="QLineEdit" name="le_unitName">
@@ -424,38 +365,15 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="10">
-         <widget class="QPushButton" name="pb_input">
-          <property name="text">
-           <string>批量导入</string>
-          </property>
-         </widget>
-        </item>
         <item row="1" column="6">
          <widget class="QLabel" name="lb_equipType">
           <property name="text">
-           <string>装备类型：</string>
+           <string>装备单位：</string>
           </property>
          </widget>
         </item>
-        <item row="0" column="8">
-         <spacer name="horizontalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Fixed</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="le_unitUper">
+        <item row="0" column="5">
+         <widget class="QLineEdit" name="le_equipID">
           <property name="maximumSize">
            <size>
             <width>150</width>
@@ -474,25 +392,84 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="5">
-         <widget class="QLineEdit" name="le_equipID">
-          <property name="maximumSize">
-           <size>
-            <width>150</width>
-            <height>16777215</height>
-           </size>
+        <item row="0" column="4">
+         <widget class="QLabel" name="lb_equipID">
+          <property name="text">
+           <string>装备号：</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="5">
-         <widget class="QLineEdit" name="le_equipUper">
-          <property name="maximumSize">
-           <size>
-            <width>150</width>
-            <height>16777215</height>
-           </size>
+        <item row="0" column="2">
+         <widget class="QLabel" name="lb_unitName">
+          <property name="text">
+           <string>单位名字：</string>
           </property>
          </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="lb_unitID">
+          <property name="text">
+           <string>单位号：</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="8">
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>装备类型：</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="9">
+         <widget class="QComboBox" name="cb_equipType">
+          <item>
+           <property name="text">
+            <string>空</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>通用装备</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>专用装备</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="1" column="8">
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>装备录入类型：</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="9">
+         <widget class="QComboBox" name="cb_inputType">
+          <item>
+           <property name="text">
+            <string>空</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>逐号录入信息</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>逐批录入信息</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="1" column="5">
+         <widget class="QComboBox" name="cb_equipUper"/>
+        </item>
+        <item row="1" column="1">
+         <widget class="QComboBox" name="cb_unitUper"/>
         </item>
        </layout>
       </item>

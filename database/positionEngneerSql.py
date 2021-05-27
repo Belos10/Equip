@@ -4,7 +4,6 @@ import operator
 
 
 def selectData(sql):
-    conn, cur = connectMySql()
     cur.execute(sql)
     data = cur.fetchall()
     cur.close()
@@ -12,7 +11,6 @@ def selectData(sql):
     return data
 
 def selectDateDict(sql):
-    conn, cur = connectMySql()
     cur = conn.cursor(DictCursor)
     cur.execute(sql)
     dataDict = cur.fetchall()
@@ -24,7 +22,6 @@ def selectDateDict(sql):
         执行查找一条数据的sql语句，以字典的形式返回结果
 '''
 def selectOne(sql):
-    conn, cur = connectMySql()
     cur = conn.cursor(DictCursor)
     cur.execute(sql)
     data = cur.fetchone()
@@ -37,7 +34,6 @@ def selectOne(sql):
 def excuteupdata(sqls):
     if sqls is None or len(sqls) == 0:
         return False
-    conn, cur = connectMySql()
     for sql in sqls:
        executeCommit(sql)
     cur.close()
@@ -52,12 +48,11 @@ def executeSql(sql):
         args：
             sql  ：sql语句
     """
-    conn, cur = connectMySql()
     try:
         cur.execute(sql)
         records = cur.fetchall()
         return records
-    except pymysql.Error as e:
+    except BaseException  as e:
         error = 'MySQL execute failed! ERROR (%s): %s' %(e.args[0],e.args[1])
         print(error)
 
@@ -65,11 +60,10 @@ def executeCommit(sql=''):
     """执行数据库sql语句，针对更新,删除,事务等操作失败时回滚
 
     """
-    conn, cur = connectMySql()
     try:
         cur.execute(sql)
         conn.commit()
-    except pymysql.Error as e:
+    except BaseException  as e:
         conn.rollback()
         error = 'MySQL execute failed! ERROR (%s): %s' %(e.args[0],e.args[1])
         print("error:", error)
@@ -81,8 +75,6 @@ def executeCommit(sql=''):
         Unit_ID: 需要找的单位的ID号 
 '''
 def selectUnitNameByUnitID(Unit_ID):
-    conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="test")
-    cur = conn.cursor()
     sql = "select Unit_Name from unit where Unit_ID = '" + Unit_ID + "'"
     cur.execute(sql)
     unitName = cur.fetchall()
@@ -347,11 +339,9 @@ def getEquipmentStatisticsResultByUnitAndEquip(unit,equipment):
 
 #根据Dept_Uper查询单位信息,并返回
 def selectUnitInfoByDeptUper(Unit_Uper):
-    conn, cur = connectMySql()
     sql = "select * from posengin_unit_directory where Unit_Uper = '" + Unit_Uper + "'"
     cur.execute(sql)
     result = cur.fetchall()
-    disconnectMySql(conn, cur)
     # 测试结果
     # print(result)
     return result
@@ -481,22 +471,18 @@ def getEquipmentUnitName(equipment):
 
 #根据Dept_Uper查询单位信息,并返回
 def selectPosenginUnitInfoByDeptUper(Unit_Uper):
-    conn, cur = connectMySql()
     sql = "select * from posengin_unit_directory where Unit_Uper = '" + Unit_Uper + "'"
     cur.execute(sql)
     result = cur.fetchall()
-    disconnectMySql(conn, cur)
     # 测试结果
     # print(result)
     return result
 
 # 返回posengin_unit_directory单位表的所有数据
 def selectAllDataAboutPosenginUnit():
-    conn, cur = connectMySql()
     sql = "select * from posengin_unit_directory order by Unit_ID"
     cur.execute(sql)
     result = cur.fetchall()
-    disconnectMySql(conn, cur)
     # 测试结果
     # print(result)
     return result
@@ -504,14 +490,12 @@ def selectAllDataAboutPosenginUnit():
 
 # 返回equip装备表的所有数据
 def selectAllDataAboutEquip():
-    conn, cur = connectMySql()
 
     sql = "select * from posengin_equipment_directory"
 
     cur.execute(sql)
     result = cur.fetchall()
 
-    disconnectMySql(conn, cur)
 
     # 测试结果
     # print(result)
@@ -519,7 +503,6 @@ def selectAllDataAboutEquip():
     return result
 # 单位表disturbplanunit中删除一条数据
 def delDataInPosenginUnit(Unit_ID):
-    conn, cur = connectMySql()
     # 插入的sql语句
     UnitIDList = []
     findChildPosenginUnit(Unit_ID, UnitIDList, cur)
@@ -537,7 +520,6 @@ def delDataInPosenginUnit(Unit_ID):
             sql = "Delete from posengin_statistics where Unit_ID = '" + UnitID + "'"
             cur.execute(sql)
     conn.commit()
-    disconnectMySql(conn, cur)
 
 def findChildPosenginUnit(Unit_ID, childUnitList, cur):
     childUnitList.append(Unit_ID)
@@ -551,20 +533,16 @@ def findChildPosenginUnit(Unit_ID, childUnitList, cur):
         return
 # 按装备ID列表从unit表复制数据至disturbplanunit表
 def insertIntoPosenginUnitFromList(UnitList):
-    conn,cur = connectMySql()
     for i in UnitList:
         sql = "insert into posengin_unit_directory select * from unit where Unit_ID = '" + i + "'"
         cur.execute(sql)
     conn.commit()
-    disconnectMySql(conn,cur)
 
 # 返回disturbplanunit单位表的所有数据
 def selectAllDataAboutPosenginUnit():
-    conn, cur = connectMySql()
     sql = "select * from posengin_unit_directory order by Unit_ID"
     cur.execute(sql)
     result = cur.fetchall()
-    disconnectMySql(conn, cur)
     # 测试结果
     # print(result)
     return result
@@ -572,12 +550,10 @@ def selectAllDataAboutPosenginUnit():
 
 # 按装备ID列表从unit表复制数据至disturbplanunit表
 def insertIntoPosenginUnitFromList(UnitList):
-    conn,cur = connectMySql()
     for i in UnitList:
         sql = "insert into posengin_unit_directory select * from unit where Unit_ID = '" + i + "'"
         cur.execute(sql)
     conn.commit()
-    disconnectMySql(conn,cur)
 #向装备目录删除一条记录
 def deleteEquipmentById(equipmentId):
     EquipIDList = []
@@ -591,7 +567,6 @@ def deleteEquipmentById(equipmentId):
 
 # 装备表equip中删除一条数据
 def delDataInEquip(Equip_ID):
-    conn, cur = connectMySql()
     # 插入的sql语句
     EquipIDList = []
     findChildEquip(Equip_ID, EquipIDList, cur)
@@ -606,7 +581,6 @@ def delDataInEquip(Equip_ID):
         # print(sql)
         cur.execute(sql)
     conn.commit()
-    disconnectMySql(conn, cur)
 
 
 def findChildEquip(Equip_ID, childEquipList, cur):
@@ -619,26 +593,20 @@ def findChildEquip(Equip_ID, childEquipList, cur):
 
 # 根据Equip_Uper查询单位信息,并返回
 def selectEquipInfoByEquipUper(Equip_Uper):
-    conn, cur = connectMySql()
-
     sql = "select * from posengin_equipment_directory where Equip_Uper = '" + Equip_Uper + "'"
 
     cur.execute(sql)
     result = cur.fetchall()
 
-    disconnectMySql(conn, cur)
     return result
 
 #返回阵地工程装备目录所有信息
 def selectAllPoseginDirectory():
-    conn, cur = connectMySql()
 
     sql = "select * from posengin_equipment_directory"
 
     cur.execute(sql)
     result = cur.fetchall()
-
-    disconnectMySql(conn, cur)
 
     # 测试结果
     # print(result)

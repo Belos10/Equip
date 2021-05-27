@@ -1,5 +1,5 @@
 import pymysql
-from database.connectAndDisSql import connectMySql, disconnectMySql
+from database.connectAndDisSql import cur, conn
 from database.SD_EquipmentBanlanceSql import updateOneEquipmentBalanceData
 #new
 
@@ -76,8 +76,6 @@ def findChildEquip(Equip_ID, childEquipList, cur):
         Unit_ID: 需要找的单位的ID号 
 '''
 def selectUnitNameByUnitID(Unit_ID):
-    conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="test")
-    cur = conn.cursor()
     sql = "select Unit_Name from unit where Unit_ID = '" + Unit_ID + "'"
     cur.execute(sql)
     unitName = cur.fetchall()
@@ -91,8 +89,6 @@ def selectUnitNameByUnitID(Unit_ID):
         Unit_ID: 需要找的装备的ID号 
 '''
 def selectEquipNameByEquipID(Equip_ID):
-    conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="test")
-    cur = conn.cursor()
     sql = "select Equip_Name from equip where Equip_ID = '" + Equip_ID + "'"
     cur.execute(sql)
     equipName = cur.fetchall()
@@ -145,15 +141,11 @@ def findEquipList(EquipID, EquipList, cur):
         判断装备是否是最底层装备
 '''
 def EquipNotHaveChild(Equip_ID):
-    conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="test")
-    cur = conn.cursor()
     # 插入的sql语句
     sql = "select * from equip where Equip_Uper = '" + Equip_ID + "'"
     # 执行sql语句，并发送给数据库
     cur.execute(sql)
     result = cur.fetchall()
-    cur.close()
-    conn.close()
     if result:
         return False
     else:
@@ -165,15 +157,11 @@ def EquipNotHaveChild(Equip_ID):
         判断单位是否是最底层单位
 '''
 def UnitNotHaveChild(Unit_ID):
-    conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="test")
-    cur = conn.cursor()
     # 插入的sql语句
     sql = "select * from unit where Unit_Uper = '" + Unit_ID + "'"
     # 执行sql语句，并发送给数据库
     cur.execute(sql)
     result = cur.fetchall()
-    cur.close()
-    conn.close()
     if result:
         return False
     else:
@@ -184,14 +172,10 @@ def UnitNotHaveChild(Unit_ID):
         找到某个单位的一级上级单位
 '''
 def selectUnitDictByUper(Unit_Uper):
-    conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="test")
-    cur = conn.cursor()
     sql = "select * from unit where Unit_Uper = '" + Unit_Uper + "'"
     cur.execute(sql)
     # 获取查询到的数据，是以字典的形式存储的，所以读取需要使用data[i][j]下标定位
     data = cur.fetchall()
-    cur.close()
-    conn.close()
     return data
 
 
@@ -200,9 +184,6 @@ def selectUnitDictByUper(Unit_Uper):
         增加装备目录
 '''
 def add_UnitDictEquip(Equip_ID, Equip_Name, Equip_Uper):
-    # print("''''''''''")
-    conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="test")
-    cur = conn.cursor()
     # 插入的sql语句
     sql = "INSERT INTO equip (Equip_ID, Equip_Name, Equip_Uper) VALUES" \
           + "('" + Equip_ID + "','" + Equip_Name + "','" + Equip_Uper + "')"
@@ -211,14 +192,10 @@ def add_UnitDictEquip(Equip_ID, Equip_Name, Equip_Uper):
     # 执行sql语句，并发送给数据库
     cur.execute(sql)
     conn.commit()
-    cur.close()
-    conn.close()
 
 
 # 更改装备目录
 def update_Equip_Dict(Equip_ID, Equip_Name, Equip_Uper):
-    conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="test")
-    cur = conn.cursor()
     # 插入的sql语句
     sql = "Update equip set Equip_Name = '" + Equip_Name + "', Equip_Uper = '" + Equip_Uper \
           + "' where Equip_ID = '" + Equip_ID + "'"
@@ -226,44 +203,32 @@ def update_Equip_Dict(Equip_ID, Equip_Name, Equip_Uper):
     # 执行sql语句，并发送给数据库
     cur.execute(sql)
     conn.commit()
-    cur.close()
-    conn.close()
 
 
 # 删除装备及子目录
 def del_Equip_And_Child(Equip_ID, Equip_Uper):
-    conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="test")
-    cur = conn.cursor()
     # 插入的sql语句
     sql = "delete from equip where Equip_ID = '" + Equip_ID + "'" + "and Equip_Uper = '" + Equip_Uper + "'"
     # print(sql)
     # 执行sql语句，并发送给数据库
     cur.execute(sql)
     conn.commit()
-    cur.close()
-    conn.close()
 
 
 # 删除装备目录
 def del_Equip_Dict(Equip_ID):
-    conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="test")
-    cur = conn.cursor()
     # 插入的sql语句
     sql = "delete from equip where Equip_ID = '" + Equip_ID + "'"
     # print(sql)
     # 执行sql语句，并发送给数据库
     cur.execute(sql)
     conn.commit()
-    cur.close()
-    conn.close()
 
 #根据Dept_Uper查询单位信息,并返回
 def selectUnitInfoByDeptUper(Unit_Uper):
-    conn, cur = connectMySql()
     sql = "select * from unit where Unit_Uper = '" + Unit_Uper + "'"
     cur.execute(sql)
     result = cur.fetchall()
-    disconnectMySql(conn, cur)
     # 测试结果
     # print(result)
     return result
@@ -271,11 +236,9 @@ def selectUnitInfoByDeptUper(Unit_Uper):
 
 #根据Dept_Uper查询单位信息,并返回
 def selectDisturbPlanUnitInfoByDeptUper(Unit_Uper):
-    conn, cur = connectMySql()
     sql = "select * from disturbplanunit where Unit_Uper = '" + Unit_Uper + "'"
     cur.execute(sql)
     result = cur.fetchall()
-    disconnectMySql(conn, cur)
     # 测试结果
     # print(result)
     return result
@@ -283,11 +246,9 @@ def selectDisturbPlanUnitInfoByDeptUper(Unit_Uper):
 
 # 返回disturbplanunit单位表的所有数据
 def selectAllDataAboutDisturbPlanUnit():
-    conn, cur = connectMySql()
     sql = "select * from disturbplanunit order by Unit_ID"
     cur.execute(sql)
     result = cur.fetchall()
-    disconnectMySql(conn, cur)
     # 测试结果
     # print(result)
     return result
@@ -295,11 +256,9 @@ def selectAllDataAboutDisturbPlanUnit():
 
 # 返回disturbplanunit单位表除机关外的所有数据
 def selectAllDataAboutDisturbPlanUnitExceptFirst():
-    conn, cur = connectMySql()
     sql = "select * from disturbplanunit where Unit_Uper != ''"
     cur.execute(sql)
     result = cur.fetchall()
-    disconnectMySql(conn, cur)
     # 测试结果
     # print(result)
     return result
@@ -307,14 +266,11 @@ def selectAllDataAboutDisturbPlanUnitExceptFirst():
 
 # 返回unit单位表的所有数据
 def selectAllDataAboutUnit():
-    conn, cur = connectMySql()
 
     sql = "select * from unit order by Unit_ID"
 
     cur.execute(sql)
     result = cur.fetchall()
-
-    disconnectMySql(conn, cur)
 
     # 测试结果
     #print("单位表所有数据result",result)
@@ -324,14 +280,11 @@ def selectAllDataAboutUnit():
 
 # 根据Equip_Uper查询单位信息,并返回
 def selectEquipInfoByEquipUper(Equip_Uper):
-    conn, cur = connectMySql()
 
     sql = "select * from equip where Equip_Uper = '" + Equip_Uper + "'"
 
     cur.execute(sql)
     result = cur.fetchall()
-
-    disconnectMySql(conn, cur)
 
     # 测试结果
     # print(result)
@@ -343,30 +296,55 @@ def selectEquipInfoByEquipUper(Equip_Uper):
 
 # 返回equip装备表的所有数据
 def selectAllDataAboutEquip():
-    conn, cur = connectMySql()
 
     sql = "select * from equip"
 
     cur.execute(sql)
     result = cur.fetchall()
 
-    disconnectMySql(conn, cur)
-
     # 测试结果
     # print(result)
 
     return result
 
+# 返回unit单位目录所有ID
+def selectAllIDFromUnit():
+
+    sql = "select Unit_ID from unit"
+
+    cur.execute(sql)
+    result = cur.fetchall()
+    #print("---------", result)
+    IDList = []
+    for IDinfo in result:
+        IDList.append(IDinfo[0])
+    # 测试结果
+    # print(result)
+
+    return IDList
+
+# 返回equip装备目录所有ID
+def selectAllIDFromEquip():
+
+    sql = "select Equip_ID from equip"
+
+    cur.execute(sql)
+    result = cur.fetchall()
+    IDList = []
+    for IDinfo in result:
+        IDList.append(IDinfo[0])
+    # 测试结果
+    # print(result)
+
+    return IDList
+
 #查询所有出厂年份
 def selectAllDataAboutFactoryYear():
-    conn, cur = connectMySql()
 
     sql = "select * from factoryyear order By year"
 
     cur.execute(sql)
     result = cur.fetchall()
-
-    disconnectMySql(conn, cur)
 
     # 测试结果
     # print(result)
@@ -378,14 +356,11 @@ def selectAllDataAboutFactoryYear():
 
 # 查找所有的编制年份
 def selectAllDataAboutWeaveYear():
-    conn, cur = connectMySql()
 
     sql = "select * from weaveyear"
 
     cur.execute(sql)
     result = cur.fetchall()
-
-    disconnectMySql(conn, cur)
 
     # 测试结果
     # print(result)
@@ -395,42 +370,36 @@ def selectAllDataAboutWeaveYear():
 
 
 def selectAllDataAboutDisturbPlan():
-    conn, cur = connectMySql()
     sql = "select * from disturbplanyear"
     cur.execute(sql)
     result = cur.fetchall()
-    disconnectMySql(conn, cur)
     return result
 
 def addDataIntoDisturbPlanUnit(Unit_ID, Unit_Name, Unit_Uper):
-    conn, cur = connectMySql()
     sql = "INSERT INTO disturbplanunit (Unit_ID, Unit_Name, Unit_Uper,Unit_Alias, Is_Group) VALUES" \
-          + "('" + Unit_ID + "','" + Unit_Name + "','" + Unit_Uper + "', '' ,Is_Group = '否')"
+          + "('" + Unit_ID + "','" + Unit_Name + "','" + Unit_Uper + "', '' ,'否')"
     cur.execute(sql)
     conn.commit()
-    disconnectMySql(conn, cur)
 
 # 往单位表unit中插入一条数据
-def addDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper):
-    conn, cur = connectMySql()
+def addDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper, unitAlias):
     # 插入的sql语句
     sql = "INSERT INTO unit (Unit_ID, Unit_Name, Unit_Uper,Unit_Alias, Is_Group) VALUES" \
-          + "('" + Unit_ID + "','" + Unit_Name + "','" + Unit_Uper + "', '' ,Is_Group = '否')"
-    # print(sql)
+          + "('" + Unit_ID + "','" + Unit_Name + "','" + Unit_Uper + "', '" + unitAlias + "','否')"
+    print(sql)
     # 执行sql语句，并发送给数据库
     cur.execute(sql)
     sql = "INSERT INTO disturbplanunit (Unit_ID, Unit_Name, Unit_Uper,Unit_Alias, Is_Group) VALUES" \
-          + "('" + Unit_ID + "','" + Unit_Name + "','" + Unit_Uper + "', '', Is_Group = '否')"
-    cur.execute(sql)
+          + "('" + Unit_ID + "','" + Unit_Name + "','" + Unit_Uper  + "', '" + unitAlias + "','否')"
 
 
     equipInfoTuple = selectAllDataAboutEquip()
-    strengthYearInfoTuple = selectAllDataAboutStrengthYear()
-    factoryYearInfoTuple = selectAllDataAboutFactoryYear()
+#    strengthYearInfoTuple = selectAllDataAboutStrengthYear()
+#    factoryYearInfoTuple = selectAllDataAboutFactoryYear()
     disturbplanYearInfoTuple = selectAllDataAboutDisturbPlan()
 
     for equipInfo in equipInfoTuple:
-        for strengthYearInfo in strengthYearInfoTuple:
+        """for strengthYearInfo in strengthYearInfoTuple:
             for factoryYearInfo in factoryYearInfoTuple:
                 sql = "INSERT INTO strength (Equip_ID, Unit_ID, Equip_Name, Unit_Name, Strength, Work, Now, Error, Retire, Delay, Pre, NonObject," \
                       "NonStrength, Single, Arrive, year, equipYear) VALUES" \
@@ -449,7 +418,7 @@ def addDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper):
                   + "('" + equipInfo[0] + "','" + Unit_ID + "','" + equipInfo[1] + "','" + Unit_Name + "', '0'," \
                                                                                                        " '0', '0', '0','0', '0', '0', '0', '0', '0', '0'," + "'" + \
                   strengthYearInfo[1] + "', '" + "" + "')"
-            cur.execute(sql)
+            cur.execute(sql)"""
 
         for disturbplanYearInfo in disturbplanYearInfoTuple:
             sql = "insert into disturbplan (Equip_Id,Equip_Name,Unit_Id,Unit_Name,Year,DisturbNum) values " \
@@ -459,12 +428,10 @@ def addDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper):
 
 
     conn.commit()
-    disconnectMySql(conn, cur)
 
 
 # 往装备表equip中插入一条数据
 def addDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type):
-    conn, cur = connectMySql()
     # 插入的sql语句
     sql = "INSERT INTO equip (Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type, unit) VALUES" \
           + "('" + Equip_ID + "','" + Equip_Name + "','" + Equip_Uper + "','" + Input_Type + "','" + Equip_Type + "', '')"
@@ -515,24 +482,20 @@ def addDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type):
               + "('" + Equip_ID + "','" + Equip_Name + "', '0','0','0','0','" + disturbplanYearInfo[1] + "' )"
         cur.execute(sql)
     conn.commit()
-    disconnectMySql(conn, cur)
 
 
 # 单位表disturbplanunit中修改一条数据
 def updateDataIntoDisturbPlanUnit(Unit_ID, Unit_Name, Unit_Uper):
-    conn, cur = connectMySql()
     sql = "Update disturbplanunit set Unit_Name = '" + Unit_Name + "' where Unit_ID = '" + Unit_ID + "'"
     # print(sql)
     cur.execute(sql)
     conn.commit()
-    disconnectMySql(conn, cur)
 
 
 #单位表unit中修改一条数据
-def updateDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper):
-    conn, cur = connectMySql()
+def updateDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper, unitAlias):
     # 插入的sql语句
-    sql = "Update unit set Unit_Name = '" + Unit_Name + "', Unit_Uper = '" + Unit_Uper + "' where Unit_ID = '" + Unit_ID + "'"
+    sql = "Update unit set Unit_Name = '" + Unit_Name + "', Unit_Uper = '" + Unit_Uper + "', Unit_Alias = '" + unitAlias + "' where Unit_ID = '" + Unit_ID + "'"
     # print(sql)
     # 执行sql语句，并发送给数据库
     cur.execute(sql)
@@ -555,12 +518,10 @@ def updateDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper):
 
 
     conn.commit()
-    disconnectMySql(conn, cur)
 
 
 # 单位表equip中修改一条数据
 def updateDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type):
-    conn, cur = connectMySql()
     # 插入的sql语句
     sql = "Update equip set Equip_Name = '" + Equip_Name + "', Equip_Uper = '" + Equip_Uper + "', Input_Type = '" + Input_Type + \
           "', Equip_Type = '" + Equip_Type + "' where Equip_ID = '" + Equip_ID + "'"
@@ -588,12 +549,9 @@ def updateDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type
     # print(sql)
     cur.execute(sql)
     conn.commit()
-    disconnectMySql(conn, cur)
-
 
 # 找到某个旅团的公用装备信息
 def findChildUnitForPublic(Unit_ID):
-    conn, cur = connectMySql()
     sql = "select * from pubilcequip where Group_ID = '" + Unit_ID + "'"
     cur.execute(sql)
     result = cur.fetchall()
@@ -602,7 +560,6 @@ def findChildUnitForPublic(Unit_ID):
 
 # 单位表disturbplanunit中删除一条数据
 def delDataInDisturbPlanUnit(Unit_ID):
-    conn, cur = connectMySql()
     # 插入的sql语句
     UnitIDList = []
     findChildDisturbPlanUnit(Unit_ID, UnitIDList, cur)
@@ -622,7 +579,6 @@ def delDataInDisturbPlanUnit(Unit_ID):
 
 
     conn.commit()
-    disconnectMySql(conn, cur)
 
 def selectStrength(EquipID, UnitID, year, conn, cur):
     sql = "select * from strength where Equip_ID = '" + EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + year + "'"
@@ -639,7 +595,6 @@ def selectStrengthInfo(EquipID, UnitID, year):
     return result
 
 def selectAllChildEquipInfo():
-    conn, cur = connectMySql()
     equipInfoList = selectAllDataAboutEquip()
     equipList = []
     for equipInfo in equipInfoList:
@@ -651,7 +606,6 @@ def selectAllChildEquipInfo():
     return equipList
 
 def selectAllChildUnitInfo():
-    conn, cur = connectMySql()
     unitInfoList = selectAllDataAboutUnit()
     unitList = []
     for unitInfo in unitInfoList:
@@ -664,7 +618,6 @@ def selectAllChildUnitInfo():
 
 # 单位表unit中删除一条数据
 def delDataInUnit(Unit_ID):
-    conn, cur = connectMySql()
     # 插入的sql语句
     UnitIDList = []
     findChildUnit(Unit_ID, UnitIDList, cur)
@@ -746,12 +699,10 @@ def delDataInUnit(Unit_ID):
 
 
     conn.commit()
-    disconnectMySql(conn, cur)
 
 
 # 装备表equip中删除一条数据
 def delDataInEquip(Equip_ID):
-    conn, cur = connectMySql()
     # 插入的sql语句
     EquipIDList = []
     findChildEquip(Equip_ID, EquipIDList, cur)
@@ -831,19 +782,15 @@ def delDataInEquip(Equip_ID):
         # print(sql)
         cur.execute(sql)
     conn.commit()
-    disconnectMySql(conn, cur)
 
 
 # 返回strengthyear表中所有信息
 def selectAllDataAboutStrengthYear():
-    conn, cur = connectMySql()
 
     sql = "select * from strengthyear order by year"
 
     cur.execute(sql)
     result = cur.fetchall()
-
-    disconnectMySql(conn, cur)
 
     # 测试结果
     # print(result)
@@ -852,7 +799,6 @@ def selectAllDataAboutStrengthYear():
 
 #按照单位编号，装备编号以及录入年份查找录入信息
 def selectInfoAboutInput(Unit_ID, Equip_ID, inputYear, factoryYear):
-    conn, cur = connectMySql()
 
     resultList = []
     if factoryYear == "":
@@ -865,21 +811,16 @@ def selectInfoAboutInput(Unit_ID, Equip_ID, inputYear, factoryYear):
     result = cur.fetchall()
     for resultInfo in result:
         resultList.append(resultInfo)
-
-    disconnectMySql(conn, cur)
     return resultList
 
 
 # 判断当前是否为公用装备
 def selectIsPublicEquip(Unit_ID):
-    conn, cur = connectMySql()
 
     sql = "select * from pubilcequip where Equip_ID = '" + Unit_ID + "'"
     # print(sql)
     cur.execute(sql)
     result = cur.fetchall()
-
-    disconnectMySql(conn, cur)
     if result:
         return True
     else:
@@ -888,7 +829,6 @@ def selectIsPublicEquip(Unit_ID):
 
 # 按装备展开时根据单位列表、装备列表以及年份查询实力表
 def selectAboutWeaveByEquipShow(UnitList, EquipList, yearList):
-    conn, cur = connectMySql()
     temp = ['Equip_ID', 'Unit_ID', 'Equip_Name', 'Unit_Name', '0', '0', '0', '0', '0', '0',
             '0', '0', '0', '0', '0']
     tempList = []
@@ -905,13 +845,11 @@ def selectAboutWeaveByEquipShow(UnitList, EquipList, yearList):
                 result = cur.fetchall()
                 for resultInfo in result:
                     resultList.append(resultInfo)
-    disconnectMySql(conn, cur)
     return resultList
 
 
 # 按装备展开时根据单位列表、装备列表以及年份查询实力表
 def selectAboutStrengthByEquipShow(UnitList, EquipList, yearList,equipYear,startYear, endYear):
-    conn, cur = connectMySql()
     resultList = []
     for Unit_ID in UnitList:
         for Equip_ID in EquipList:
@@ -948,19 +886,15 @@ def selectAboutStrengthByEquipShow(UnitList, EquipList, yearList,equipYear,start
                         info = []
                         info.append(childEquipID, Unit_ID, equipName, unitName, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0")
                         resultList.append(info)
-    disconnectMySql(conn, cur)
     return resultList
 
 
 # 判断当前单位是否是旅团
 def selectUnitIsGroup(Unit_ID):
-    conn, cur = connectMySql()
 
     sql = "select * from unit where Is_Group = '是' and Unit_ID = '" + Unit_ID + "'"
     cur.execute(sql)
     result = cur.fetchall()
-
-    disconnectMySql(conn, cur)
     if result:
         return True
     else:
@@ -969,7 +903,6 @@ def selectUnitIsGroup(Unit_ID):
 
 # 按单位展开时根据单位列表、装备列表以及年份查询编制表
 def selectAboutWeaveByUnitShow(UnitList, EquipList, yearList):
-    conn, cur = connectMySql()
     temp = ['Equip_ID', 'Unit_ID', 'Equip_Name', 'Unit_Name', '0', '0', '0', '0', '0', '0',
             '0', '0', '0', '0', '0']
     tempList = []
@@ -1004,13 +937,10 @@ def selectAboutWeaveByUnitShow(UnitList, EquipList, yearList):
                     result = cur.fetchall()
                     for resultInfo in result:
                         resultList.append(resultInfo)
-
-    disconnectMySql(conn, cur)
     return resultList
 
 # 按单位展开时根据单位列表、装备列表以及年份查询实力表
 def selectAboutStrengthByUnitShow(UnitList, EquipList, yearList, equipYear, startFactoryYear, endFactoryYear):
-    conn, cur = connectMySql()
     temp = ['Equip_ID', 'Unit_ID', 'Equip_Name', 'Unit_Name', '0', '0', '0', '0', '0', '0',
             '0', '0', '0', '0', '0']
     tempList = []
@@ -1054,12 +984,10 @@ def selectAboutStrengthByUnitShow(UnitList, EquipList, yearList, equipYear, star
                         info.append(Equip_ID, childUnitID, equipName, unitName, "0", '0', '0', '0',
                                     '0', '0', '0', '0', '0', '0', '0', '0', '0')
 
-    disconnectMySql(conn, cur)
     return resultList
 
 
 def insertIntoStrengthYear(year):
-    conn, cur = connectMySql()
     year = str(year)
     result = selectAllStrengthYearInfo()
     sql = "insert into strengthyear(ID, year) values ('" + str(len(result) + 1) + "', '" + year + "')"
@@ -1096,31 +1024,26 @@ def insertIntoStrengthYear(year):
                 cur.execute(sql)
 
     conn.commit()
-    disconnectMySql(conn, cur)
 
 def selectDataFromStrengthByYear(year):
-    conn, cur = connectMySql()
     sql = "select * from strength where year = '" + str(year) + "'"
     cur.execute(sql)
     result = cur.fetchall()
     return result
 
 def selectDataFromInputByYear(year):
-    conn, cur = connectMySql()
     sql = "select * from inputinfo where year = '" + str(year) + "'"
     cur.execute(sql)
     result = cur.fetchall()
     return result
 
 def selectDataFromWeaveByYear(year):
-    conn, cur = connectMySql()
     sql = "select * from weave where year = '" + str(year) + "'"
     cur.execute(sql)
     result = cur.fetchall()
     return result
 
 def insertBeforYearIntoStrength(year):
-    conn, cur = connectMySql()
     beforYearStrengthInfo  = selectDataFromStrengthByYear(year - 1)
     beforYearInputInfoTuple = selectDataFromInputByYear(year - 1)
     weaveInfoTuple = selectDataFromWeaveByYear(year - 1)
@@ -1159,18 +1082,15 @@ def insertBeforYearIntoStrength(year):
             cur.execute(sql)
 
     conn.commit()
-    disconnectMySql(conn, cur)
     return
 
 def selectIDFromInputInfo(EquipID, UnitID, strengthYear):
-    conn, cur = connectMySql()
     sql = "select ID from inputinfo where Equip_ID = '" + EquipID + "' and Unit_ID = '" + UnitID + "' and inputYear = '" + strengthYear + "'"
     cur.execute(sql)
     result = cur.fetchall()
     return result
 
 def selectFromInputInfo(EquipID, UnitID, strengthYear):
-    conn, cur = connectMySql()
     sql = "select * from inputinfo where Equip_ID = '" + EquipID + "' and Unit_ID = '" + UnitID + "' and inputYear = '" + strengthYear + "'"
     cur.execute(sql)
     result = cur.fetchall()
@@ -1179,7 +1099,6 @@ def selectFromInputInfo(EquipID, UnitID, strengthYear):
     新增一个实力查询年份
 '''
 def insertIntoStrengthYear(year):
-    conn, cur = connectMySql()
     year = str(year)
     result = selectAllStrengthYearInfo()
     sql = "insert into strengthyear(ID, year) values ('" + str(len(result) + 1) + "', '" + year + "')"
@@ -1216,11 +1135,9 @@ def insertIntoStrengthYear(year):
                 cur.execute(sql)
 
     conn.commit()
-    disconnectMySql(conn, cur)
 
 # 没有展开时根据单位列表、装备列表以及年份查询编制表
 def selectAboutWeaveByUnitListAndEquipList(UnitList, EquipList, yearList):
-    conn, cur = connectMySql()
     # print(UnitList, EquipList)
     temp = ['Unit_ID', 'Equip_ID', 'Unit_Name', 'Equip_Name', '0', '0', '0']
     tempList = []
@@ -1237,12 +1154,10 @@ def selectAboutWeaveByUnitListAndEquipList(UnitList, EquipList, yearList):
             result = cur.fetchall()
             for resultInfo in result:
                 resultList.append(resultInfo)
-    disconnectMySql(conn, cur)
     return resultList
 
 #没有展开时根据单位列表、装备列表以及年份查询实力表
 def selectAboutStrengthByUnitListAndEquipList(UnitList, EquipList, yearList, equipYear, startFactoryYear, endFactoryYear):
-    conn, cur = connectMySql()
     # print(UnitList, EquipList)
     temp = ['Equip_ID', 'Unit_ID', 'Equip_Name', 'Unit_Name', '0', '0', '0', '0', '0', '0',
             '0', '0', '0', '0', '0']
@@ -1281,22 +1196,17 @@ def selectAboutStrengthByUnitListAndEquipList(UnitList, EquipList, yearList, equ
                     info = [Equip_ID, Unit_ID, equipName, unitName, '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0']
                     #info.append(Equip_ID, Unit_ID, equipName, unitName, '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0')
                     resultList.append(info)
-
-    disconnectMySql(conn, cur)
     # print(resultList)
     return resultList
 
 
 # 查看某单位是否有子单位
 def selectUnitIsHaveChild(Unit_ID):
-    conn, cur = connectMySql()
 
     sql = "select * from unit where Unit_Uper = '" + Unit_ID + "'"
 
     cur.execute(sql)
     result = cur.fetchall()
-
-    disconnectMySql(conn, cur)
     if result:
         return True
     else:
@@ -1305,14 +1215,11 @@ def selectUnitIsHaveChild(Unit_ID):
 
 # 查看某装备是否有子装备
 def selectEquipIsHaveChild(Equip_ID):
-    conn, cur = connectMySql()
 
     sql = "select * from equip where Equip_Uper = '" + Equip_ID + "'"
 
     cur.execute(sql)
     result = cur.fetchall()
-
-    disconnectMySql(conn, cur)
     if result:
         return True
     else:
@@ -1321,14 +1228,11 @@ def selectEquipIsHaveChild(Equip_ID):
 
 # 返回装备是否是逐批录入
 def selectEquipInputType(Equip_ID):
-    conn, cur = connectMySql()
 
     sql = "select * from equip where Equip_ID = '" + Equip_ID + "'"
 
     cur.execute(sql)
     result = cur.fetchall()
-
-    disconnectMySql(conn, cur)
     for resultInfo in result:
         if resultInfo[3] == '逐批录入':
             return True
@@ -1339,51 +1243,42 @@ def selectEquipInputType(Equip_ID):
 # 查找某个单位的所有上级单位编号
 def findUnitUperIDList(Unit_ID, UnitIDList):
     UnitIDList.append(Unit_ID)
-    conn, cur = connectMySql()
     sql = "select Unit_Uper from unit where Unit_ID = '" + Unit_ID + "'"
     cur.execute(sql)
     uperIDTuple = cur.fetchall()
     for uperIDInfo in uperIDTuple:
         if uperIDInfo[0] != '':
             findUnitUperIDList(uperIDInfo[0], UnitIDList)
-    disconnectMySql(conn, cur)
 
 
 # 查找某个装备的所有上级单位编号
 def findEquipUperIDList(Equip_ID, EquipIDList):
     EquipIDList.append(Equip_ID)
-    conn, cur = connectMySql()
     sql = "select Equip_Uper from equip where Equip_ID = '" + Equip_ID + "'"
     cur.execute(sql)
     uperIDTuple = cur.fetchall()
     for uperIDInfo in uperIDTuple:
         if uperIDInfo[0] != '':
             findEquipUperIDList(uperIDInfo[0], EquipIDList)
-    disconnectMySql(conn, cur)
 
 # 通过单位号和装备号查找strength某条记录的实力数，现有数
 def seletNumAboutStrength(Unit_ID, Equip_ID, year, equipYear):
-    conn, cur = connectMySql()
     sql = "select * from strength where Equip_ID = '" + Equip_ID \
           + "' and Unit_ID = '" + Unit_ID + "' and year = '" + year + "' and equipYear = '" + equipYear + "'"
     cur.execute(sql)
     result = cur.fetchall()
-    disconnectMySql(conn, cur)
     return result
 
 
 # 通过单位号和装备号查找strength某条记录的编制数
 def seletNumAboutWork(Unit_ID, Equip_ID, year):
-    conn, cur = connectMySql()
     sql = "select Work from weave where Equip_ID = '" + Equip_ID + "' and Unit_ID = '" + Unit_ID + "' and year = '" + year + "'"
     cur.execute(sql)
     result = cur.fetchall()
-    disconnectMySql(conn, cur)
     return result
 
 
 def delWeaveYearByYear(year):
-    conn, cur = connectMySql()
     sql = "delete from weaveyear where year = '" + year + "'"
     cur.execute(sql)
 
@@ -1400,17 +1295,13 @@ def delWeaveYearByYear(year):
     sql = "delete from weave where year = '" + year + "'"
     cur.execute(sql)
     conn.commit()
-    disconnectMySql(conn, cur)
 
 def delFactoryYear(year):
-    conn, cur = connectMySql()
     sql = "delete from factoryyear where year = '" + year + "'"
     cur.execute(sql)
     conn.commit()
-    disconnectMySql(conn, cur)
 # 删除某条录入信息
 def delFromInputInfo(Unit_ID, Equip_ID, ID, num, year, inputYear):
-    conn, cur = connectMySql()
     EquipIDList = []
     UnitIDList = []
     delNum = int(num)
@@ -1468,10 +1359,8 @@ def delFromInputInfo(Unit_ID, Equip_ID, ID, num, year, inputYear):
     cur.execute(sql)
 
     conn.commit()
-    disconnectMySql(conn, cur)
 
 def selectDataFromInputByYear(year):
-    conn, cur = connectMySql()
     sql = "select * from inputinfo where year = '" + str(year) +"'"
     cur.execute(sql)
     result = cur.fetchall()
@@ -1479,7 +1368,6 @@ def selectDataFromInputByYear(year):
 
 # 修改批量录入某条数据的数量
 def updateNumMutilInput(Unit_ID, Equip_ID, ID, num, orginNum, year, strengthYear):
-    conn, cur = connectMySql()
     EquipIDList = []
     UnitIDList = []
     updateNum = int(num)
@@ -1517,11 +1405,9 @@ def updateNumMutilInput(Unit_ID, Equip_ID, ID, num, orginNum, year, strengthYear
     # print(sql)
     cur.execute(sql)
     conn.commit()
-    disconnectMySql(conn, cur)
 
 # 判断是否有当前出厂年份
 def isHaveFactoryYear(year):
-    conn, cur = connectMySql()
     sql = "select * from factoryyear where year = '" + year + "'"
     cur.execute(sql)
     result = cur.fetchall()
@@ -1531,7 +1417,6 @@ def isHaveFactoryYear(year):
         return False
 
 def addNewFactoryYear(year):
-    conn, cur = connectMySql()
     result = selectAllDataAboutFactoryYear()
     sql = "insert into factoryyear(ID, year) values ('" + str(len(result) + 1) + "', '" + year + "')"
     print(sql)
@@ -1552,12 +1437,10 @@ def addNewFactoryYear(year):
                 cur.execute(sql)
 
     conn.commit()
-    disconnectMySql(conn, cur)
 
 # 往录入表inputinfo中插入一条数据
 def addDataIntoInputInfo(Unit_ID, Equip_ID, ID, num, year, shop, state, arrive, confirm, other, strengthYear):
     print("====================", strengthYear, year)
-    conn, cur = connectMySql()
     EquipIDList = []
     UnitIDList = []
     addNum = int(num)
@@ -1633,12 +1516,10 @@ def addDataIntoInputInfo(Unit_ID, Equip_ID, ID, num, year, shop, state, arrive, 
 
 
     conn.commit()
-    disconnectMySql(conn, cur)
 
 
 # 根据单位号和装备号查询现有数和实力数
 def selectNowNumAndStrengthNum(Unit_ID, Equip_ID, year, factoryYear):
-    conn, cur = connectMySql()
     sql = "SELECT Now, Strength from strength where Unit_ID = '" + Unit_ID + "' and Equip_ID = '" + Equip_ID + "' and year = '" + year + "' and equipYear = '" + factoryYear + "'"
     cur.execute(sql)
     result = cur.fetchall()
@@ -1649,7 +1530,6 @@ def selectNowNumAndStrengthNum(Unit_ID, Equip_ID, year, factoryYear):
 # 修改当前编制数
 def updateWeaveNum(Unit_ID, Equip_ID, weaveNum, orginWeave, year):
     #print("weavechange:", Unit_ID, Equip_ID, weaveNum, orginWeave, year)
-    conn, cur = connectMySql()
     if selectIsPublicEquip(Unit_ID):
         Group_ID = selectEquipIDByPublicEquip(Unit_ID)
         UnitIDList = []
@@ -1717,11 +1597,9 @@ def updateWeaveNum(Unit_ID, Equip_ID, weaveNum, orginWeave, year):
                       EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + year + "'"
                 cur.execute(sql)
     conn.commit()
-    disconnectMySql(conn, cur)
 
 # 根据单位号，装备号修改某年的实力数，strengthNum为修改后的实力数，orginStrengthNum为原来的实力数
 def updateStrengthAboutStrengrh(Unit_ID, Equip_ID, year, strengthNum, orginStrengthNum):
-    conn, cur = connectMySql()
     print("==================updateStrengthAboutStrengrh===============", Unit_ID, Equip_ID, year, strengthNum, orginStrengthNum)
     EquipIDList = []
     UnitIDList = []
@@ -1757,7 +1635,6 @@ def updateStrengthAboutStrengrh(Unit_ID, Equip_ID, year, strengthNum, orginStren
             cur.execute(sql)
 
     conn.commit()
-    disconnectMySql(conn, cur)
 
 
 # 查找所有末级装备
@@ -1775,7 +1652,6 @@ def selectAllEndEquip():
 # 查找实力查询所有年份名字
 def selectAllStrengthYear():
     yearList = []
-    conn, cur = connectMySql()
     sql = "SELECT * from strengthyear ORDER BY year"
     cur.execute(sql)
     yearListTuple = cur.fetchall()
@@ -1788,14 +1664,12 @@ def selectAllStrengthYear():
 # 查找实力查询所有年份信息
 def selectAllStrengthYearInfo():
     yearList = []
-    conn, cur = connectMySql()
     sql = "SELECT * from strengthyear order by year"
     cur.execute(sql)
     yearListTuple = cur.fetchall()
     return yearListTuple
 
 def selectAllFromPulicEquipByUnit(UnitInfoList):
-    conn, cur = connectMySql()
     resultList = []
     for UnitInfo in UnitInfoList:
         sql = "select * from pubilcequip where Group_ID = '" + UnitInfo[0] + "'"
@@ -1803,39 +1677,31 @@ def selectAllFromPulicEquipByUnit(UnitInfoList):
         result = cur.fetchall()
         if result:
             resultList.append(result[0])
-    disconnectMySql(conn, cur)
     return resultList
 
 # 获取公用装备信息
 def selectAllFromPulicEquip():
-    conn, cur = connectMySql()
     sql = "select * from pubilcequip"
     cur.execute(sql)
     result = cur.fetchall()
-    disconnectMySql(conn, cur)
     return result
 
 def selectUnitInfoByUnitID(Unit_ID):
-    conn, cur = connectMySql()
     sql = "select * from unit where Unit_ID = '" + Unit_ID + "'"
     cur.execute(sql)
     result = cur.fetchall()
     for info in result:
-        disconnectMySql(conn, cur)
         return info
 
 
 def selectDisturbPlanUnitInfoByUnitID(Unit_ID):
-    conn, cur = connectMySql()
     sql = "select * from disturbplanunit where Unit_ID = '" + Unit_ID + "'"
     cur.execute(sql)
     result = cur.fetchall()
     for info in result:
-        disconnectMySql(conn, cur)
         return info
 
 def findUperIDByUnitID(Unit_ID):
-    conn, cur = connectMySql()
     sql = "select Unit_Uper from unit where Unit_ID = '" + Unit_ID + "'"
     cur.execute(sql)
     unitUper = None
@@ -1843,16 +1709,13 @@ def findUperIDByUnitID(Unit_ID):
     for info in result:
         unitUper = info[0]
         break
-    disconnectMySql(conn, cur)
     return unitUper
 
 # 查找编制表中某个装备以及某个单位的编制数
 def selectWorkNumFromWeave(Unit_ID, Equip_ID, year):
-    conn, cur = connectMySql()
     sql = "select Work from weave where Unit_ID = '" + Unit_ID + "' and Equip_ID = '" + Equip_ID + "' and year = '" + year + "'"
     cur.execute(sql)
     result = cur.fetchall()
-    disconnectMySql(conn, cur)
     if result:
         return result[0][0]
     else:
@@ -1861,7 +1724,6 @@ def selectWorkNumFromWeave(Unit_ID, Equip_ID, year):
 
 # 修改单位是否是旅团状态
 def updateUnitIsGroupFromUnit(Unit_ID, Is_Group):
-    conn, cur = connectMySql()
     if Is_Group == '否':
         uperUnitList = []
         findUnitUperIDList(Unit_ID, uperUnitList)
@@ -1914,12 +1776,10 @@ def updateUnitIsGroupFromUnit(Unit_ID, Is_Group):
                           1] + "', '0', '0', '0', '" + weaveYearInfo[1] + "')"
                 cur.execute(sql)
     conn.commit()
-    disconnectMySql(conn, cur)
 
 
 # 查找某个旅团编号的公用装备编号
 def selectGroupIDByPublicEquip(Group_ID):
-    conn, cur = connectMySql()
     sql = "select Equip_ID from pubilcequip where Group_ID = '" + Group_ID + "'"
     cur.execute(sql)
     result = cur.fetchall()
@@ -1930,7 +1790,6 @@ def selectGroupIDByPublicEquip(Group_ID):
         return "0"
 
 def selectPubilcEquipInfoByGroupID(Group_ID):
-    conn, cur = connectMySql()
     sql = "select * from pubilcequip where Group_ID = '" + Group_ID + "'"
     cur.execute(sql)
     result = cur.fetchall()
@@ -1939,7 +1798,6 @@ def selectPubilcEquipInfoByGroupID(Group_ID):
 
 # 查找某个公用装备编号所属的旅团编号
 def selectEquipIDByPublicEquip(Equip_ID):
-    conn, cur = connectMySql()
     sql = "select Group_ID from pubilcequip where Equip_ID = '" + Equip_ID + "'"
     cur.execute(sql)
     result = cur.fetchall()
@@ -1951,7 +1809,6 @@ def selectEquipIDByPublicEquip(Equip_ID):
 
 # 修改录入信息表的某个信息
 def updateInputInfo(Unit_ID, Equip_ID, ID, num, year, shop, state, arrive, confirm, other):
-    conn, cur = connectMySql()
     sql = "update inputinfo set year = '" + year + "', shop = '" + shop + "', state = '" \
           + state + "', arrive = '" + arrive + "', confirm = '" + confirm + "', other = '" + other + \
           "' where Unit_ID = '" + Unit_ID + "' and Equip_ID = '" + Equip_ID + "' and ID = '" + ID + "'"
@@ -1963,11 +1820,9 @@ def updateInputInfo(Unit_ID, Equip_ID, ID, num, year, shop, state, arrive, confi
 
 # 获取某单位的所有子单位名称
 def findUnitChildName(unitId):
-    conn, cur = connectMySql()
     sql = "select Unit_Name from unit where Unit_Uper = '" + unitId + "'"
     cur.execute(sql)
     result = cur.fetchall()
-    disconnectMySql(conn, cur)
     if result:
         return result
     else:
@@ -1975,11 +1830,9 @@ def findUnitChildName(unitId):
 
 
 def findDisturbPlanUnitChildInfo(unitId):
-    conn, cur = connectMySql()
     sql = "select * from disturbplanunit where Unit_Uper = '" + unitId + "'"
     cur.execute(sql)
     result = cur.fetchall()
-    disconnectMySql(conn, cur)
     #print("result",result)
     if result:
         return result
@@ -1989,11 +1842,9 @@ def findDisturbPlanUnitChildInfo(unitId):
 
 
 def findUnitChildInfo(unitId):
-    conn, cur = connectMySql()
     sql = "select * from unit where Unit_Uper = '" + unitId + "'"
     cur.execute(sql)
     result = cur.fetchall()
-    disconnectMySql(conn, cur)
     #print("result",result)
     if result:
         return result
@@ -2002,7 +1853,6 @@ def findUnitChildInfo(unitId):
 
 #查询退休年份表
 def selectAllRetirementYearInfo():
-    conn, cur = connectMySql()
     sql = "select * from retireyear order by year"
     #print(sql)
     cur.execute(sql)
@@ -2010,7 +1860,6 @@ def selectAllRetirementYearInfo():
     return result
 
 def isHaveRecord(UnitID, EquipID, year):
-    conn, cur = connectMySql()
     sql = "select * from retire where Equip_ID = '" + \
           EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + year + "'"
     #print(sql)
@@ -2023,7 +1872,6 @@ def isHaveRecord(UnitID, EquipID, year):
 
 
 def selectEquipInfoByEquipID(EquipID):
-    conn, cur = connectMySql()
     sql = "select * from equip where Equip_ID = '" + \
           EquipID + "'"
     print(sql)
@@ -2032,11 +1880,9 @@ def selectEquipInfoByEquipID(EquipID):
     return result
 
 def findEquipInfo(equipId):
-    conn, cur = connectMySql()
     sql = "select * from equip where Equip_ID = '" + equipId + "'"
     cur.execute(sql)
     result = cur.fetchall()
-    disconnectMySql(conn, cur)
     #print("result",result)
     if result:
         return result
@@ -2045,7 +1891,6 @@ def findEquipInfo(equipId):
 
 # 查询编制信息
 def selectWeaveInfo(UnitID, EquipID, year):
-    conn, cur = connectMySql()
     sql = "select * from weave where Equip_ID = '" + \
           EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + year + "'"
     print(sql)
@@ -2057,7 +1902,6 @@ def selectWeaveInfo(UnitID, EquipID, year):
 # 插入退休表
 def insertIntoRetire(ID, Unit_ID, EquipID, Equip_Name,Equip_Unit,Weave, Num, Now, Super, Apply, Other, year):
     #print(ID, Unit_ID, EquipID, Equip_Name,Equip_Unit,Weave, Num, Now, Super, Apply, Other, year)
-    conn, cur = connectMySql()
     sql = "insert into retire (ID, Unit_ID, Equip_ID, Equip_Name, Equip_Unit, Weave, Num, Now, Super, Apply, Other, year) VALUES" \
           + "('" + ID + "', '" + Unit_ID + "', '" + EquipID + "', '" + Equip_Name + "', '" + Equip_Unit + "', '" + Weave + "', '"\
           + Num + "', '" + Now + "', '" + Super + "', '" + Apply + "', '" + Other + "','" + year + "')"
@@ -2067,7 +1911,6 @@ def insertIntoRetire(ID, Unit_ID, EquipID, Equip_Name,Equip_Unit,Weave, Num, Now
 
 # 查询退休信息
 def selectInfoFromRetire(unitID, equipID, year):
-    conn, cur = connectMySql()
     sql = "select * from retire where Equip_ID = '" + \
           equipID + "' and Unit_ID = '" + unitID + "' and year = '" + year + "'"
     print(sql)
@@ -2081,11 +1924,9 @@ def selectInfoFromRetire(unitID, equipID, year):
 
 # 获取某装备的所有子装备ID
 def findEquipChildID(equipId):
-    conn, cur = connectMySql()
     sql = "select Unit_Name from equip where Equip_Uper = '" + equipId + "'"
     cur.execute(sql)
     result = cur.fetchall()
-    disconnectMySql(conn, cur)
     if result:
         return result
     else:
@@ -2093,7 +1934,6 @@ def findEquipChildID(equipId):
 
 # 查询实力信息
 def selectStrengthInfo(unitID, EquipID, year):
-    conn, cur = connectMySql()
     sql = "select * from strength where Equip_ID = '" + \
           EquipID + "' and Unit_ID = '" + unitID + "' and year = '" + year + "' and equipYear = ''"
     print(sql)
@@ -2104,17 +1944,14 @@ def selectStrengthInfo(unitID, EquipID, year):
 
 # 单位ID对应单位名
 def findUnitNameFromID(UnitID):
-    conn, cur = connectMySql()
     sql = "select Unit_Name from unit where Unit_ID = '" + UnitID + "'"
     cur.execute(sql)
     result = cur.fetchall()
-    disconnectMySql(conn, cur)
     return result
 
 
 # 查询前更新退休表
 def selectUpdateIntoRetire(unitID, EquipID, year):
-    conn, cur = connectMySql()
     weaveInfo = selectWeaveInfo(unitID, EquipID, year)
     strengthInfo = selectStrengthInfo(unitID, EquipID, year)
     print("weaveInfo ============ ", weaveInfo, "strengthInfo ===========", strengthInfo)
@@ -2182,7 +2019,6 @@ def selectAboutRetireByEquipShow(UnitList, EquipList, year):
 
 # 查找某个装备的子目录
 def selectChildEquip(Equip_ID):
-    conn, cur = connectMySql()
     sql = "select * from equip where Equip_Uper = '" + \
           Equip_ID + "'"
     print(sql)
@@ -2207,7 +2043,6 @@ def isSecondDict(EquipID):
 
 # 更新退休表
 def updateRetireAboutRetire(num, apply, other, orginInfo):
-    conn, cur = connectMySql()
     print("原来的数据：", orginInfo)
     if orginInfo:
         sql = "update retire set Num = '" + num + "', Apply = '" + apply + "', Other = '" + other +\
@@ -2220,7 +2055,6 @@ def updateRetireAboutRetire(num, apply, other, orginInfo):
 
 # 退役年份表中添加年份
 def insertIntoRetireYear(year):
-    conn, cur = connectMySql()
 
     result = selectAllRetirementYearInfo()
     sql = "insert into retireyear (ID, year) VALUES" \
@@ -2228,12 +2062,10 @@ def insertIntoRetireYear(year):
     # print(sql)
     cur.execute(sql)
     conn.commit()
-    disconnectMySql(conn, cur)
 
 
 # 删除某个退休年份
 def delRetireYearByYear(year):
-    conn, cur = connectMySql()
 
     sql = "delete from retireyear where year = '" + year + "'"
     # print(sql)
@@ -2243,10 +2075,8 @@ def delRetireYearByYear(year):
     # print(sql)
     cur.execute(sql)
     conn.commit()
-    disconnectMySql(conn, cur)
 # 删除退休表所有年份
 def delRetireYearALLYear():
-    conn, cur = connectMySql()
     sql = "truncate table retireyear "
     # print(sql)
     cur.execute(sql)
@@ -2254,10 +2084,8 @@ def delRetireYearALLYear():
     # print(sql)
     cur.execute(sql)
     conn.commit()
-    disconnectMySql(conn, cur)
 
 def insertIntoWeaveYear(year):
-    conn, cur = connectMySql()
     allEquipList = selectAllDataAboutEquip()
     allUnitList = selectAllDataAboutUnit()
 
@@ -2282,24 +2110,19 @@ def insertIntoWeaveYear(year):
             print(sql)
             cur.execute(sql)
     conn.commit()
-    disconnectMySql(conn, cur)
 
 
 # 设置单位别名
 def updateUnitAlias(Unit_Alias,Unit_ID):
-    conn, cur = connectMySql()
     sql = "update unit set Unit_Alias = '" + Unit_Alias + "' where Unit_ID = '" + Unit_ID + "'"
     cur.execute(sql)
     sql = "update disturbplanunit set Unit_Alias = '" + Unit_Alias + "' where Unit_ID = '" + Unit_ID + "'"
     cur.execute(sql)
     conn.commit()
-    disconnectMySql(conn, cur)
 
 
 # 设置装备数量单位
 def updateEquipUnit(unit, Equip_ID):
-    conn, cur = connectMySql()
-
     sql = "update equip set unit = '" \
           + unit + "' where Equip_ID = '" + Equip_ID + "'"
     cur.execute(sql)
@@ -2309,12 +2132,10 @@ def updateEquipUnit(unit, Equip_ID):
     cur.execute(sql)
 
     conn.commit()
-    disconnectMySql(conn, cur)
 
 
 
 def delStrengthYearByYear(year):
-    conn, cur = connectMySql()
 
     sql = "delete from weave where year = '" + year + "'"
     print(sql)
@@ -2330,31 +2151,24 @@ def delStrengthYearByYear(year):
     cur.execute(sql)
 
     conn.commit()
-    disconnectMySql(conn, cur)
 
 #根据装备ID查找某个装备的单位
 def findEquipUnitByEquipID(EquipID):
-    conn, cur = connectMySql()
     sql = "select unit from equip where Equip_ID ='" + EquipID + "'"
     cur.execute(sql)
     result = cur.fetchall()
-    disconnectMySql(conn, cur)
     return result
 
 def findUperEquipIDByName(Equip_Name):
-    conn, cur = connectMySql()
     sql = "select * from equip where Equip_Name ='" + Equip_Name + "'"
     cur.execute(sql)
     result = cur.fetchall()
-    disconnectMySql(conn, cur)
     return result
 
 def selectUnitIfUppermost(Unit_Id):
-    conn, cur = connectMySql()
     sql = "select Unit_Uper from unit where Unit_ID = '" + Unit_Id + "'"
     cur.execute(sql)
     result = cur.fetchall()
-    disconnectMySql(conn, cur)
     if result[0][0]== '':
         return True
     else:
@@ -2364,7 +2178,6 @@ def findUperInfoList(EquipID, UperList):
     if EquipID == "":
         return
     else:
-        conn, cur = connectMySql()
         sql = "select Equip_Uper from equip where Equip_ID = '" + EquipID + "'"
         cur.execute(sql)
         result = cur.fetchall()
@@ -2372,7 +2185,6 @@ def findUperInfoList(EquipID, UperList):
             UperList.append(resultInfo)
             if resultInfo:
                 findUperInfoList(resultInfo[0], UperList)
-        disconnectMySql(conn, cur)
 
 def selectUperInfoByEquipID(EquipID):
     UperList = []

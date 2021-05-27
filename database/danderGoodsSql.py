@@ -1,10 +1,7 @@
 from pymysql.cursors import DictCursor
 from database.connectAndDisSql import *
-import operator
-
 
 def selectData(sql):
-    conn, cur = connectMySql()
     cur.execute(sql)
     data = cur.fetchall()
     cur.close()
@@ -12,7 +9,6 @@ def selectData(sql):
     return data
 
 def selectDateDict(sql):
-    conn, cur = connectMySql()
     cur = conn.cursor(DictCursor)
     cur.execute(sql)
     dataDict = cur.fetchall()
@@ -24,7 +20,6 @@ def selectDateDict(sql):
         执行查找一条数据的sql语句，以字典的形式返回结果
 '''
 def selectOne(sql):
-    conn, cur = connectMySql()
     cur = conn.cursor(DictCursor)
     cur.execute(sql)
     data = cur.fetchone()
@@ -37,7 +32,6 @@ def selectOne(sql):
 def excuteupdata(sqls):
     if sqls is None or len(sqls) == 0:
         return False
-    conn, cur = connectMySql()
     for sql in sqls:
        executeCommit(sql)
     cur.close()
@@ -52,12 +46,11 @@ def executeSql(sql):
         args：
             sql  ：sql语句
     """
-    conn, cur = connectMySql()
     try:
         cur.execute(sql)
         records = cur.fetchall()
         return records
-    except pymysql.Error as e:
+    except BaseException  as e:
         error = 'MySQL execute failed! ERROR (%s): %s' %(e.args[0],e.args[1])
         print(error)
 
@@ -65,11 +58,10 @@ def executeCommit(sql=''):
     """执行数据库sql语句，针对更新,删除,事务等操作失败时回滚
 
     """
-    conn, cur = connectMySql()
     try:
         cur.execute(sql)
         conn.commit()
-    except pymysql.Error as e:
+    except BaseException  as e:
         conn.rollback()
         error = 'MySQL execute failed! ERROR (%s): %s' %(e.args[0],e.args[1])
         print("error:", error)
@@ -112,11 +104,9 @@ def exists(tableName,fieldName,fieldItem):
 
 #根据Dept_Uper查询单位信息,并返回
 def selectUnitInfoByDeptUper(Unit_Uper):
-    conn, cur = connectMySql()
     sql = "select * from dangergoods_unit_directory where Unit_Uper = '" + Unit_Uper + "'"
     cur.execute(sql)
     result = cur.fetchall()
-    disconnectMySql(conn, cur)
     # 测试结果
     # print(result)
     return result

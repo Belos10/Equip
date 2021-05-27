@@ -25,32 +25,54 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
         self.first_treeWidget_dict = {}  # 当前单位目录列表对象，结构为：{'行号':对应的item}
         self.second_treeWidget_dict = {}  # 当前装备目录列表对象，结构为：{'行号':对应的item}
         self.currentUnitTableResult = []
+        self.cb_setChoose.setCurrentIndex(0)
+        self.slotUnitDictInit()
         self.signalConnect()
 
     def getUserInfo(self):
         self.userInfo = get_value("totleUserInfo")
+
+    '''
+           功能：
+               清除所有数据
+       '''
+    def delAllData(self):
+        self.first_treeWidget_dict = {}
+        self.second_treeWidget_dict = {}
+        self.currentUnitTableResult = []
+        self.tw_first.clear()  # 清除单元目录所有数据
+        self.tw_second.clear()  # 清除装备目录所有数据
+        self.tb_result.clear()  # 清除tableWidget中所有数据
+        self.le_first.clear()   #清除单位查询输入
+        self.le_second.clear()
+        self.le_equipID.clear()
+        self.le_unitID.clear()
+        self.le_unitName.clear()
+        self.le_equipID.clear()
+        self.le_equipName.clear()
+        self.le_equipUnit.clear()
+        self.cb_equipUper.clear()
+        self.le_unitAlias.clear()
+        self.cb_equipUper.clear()
     '''
         功能：
             所有信号的连接
     '''
     def signalConnect(self):
+        self.cb_setChoose.currentIndexChanged.connect(self.slotChangeSet)
         self.pb_add.clicked.connect(self.slotAddDict)  # 添加数据
         self.pb_update.clicked.connect(self.slotUpdate)  # 修改数据
         self.pb_del.clicked.connect(self.slotDelDict)  # 删除数据
-
         self.tb_result.itemClicked.connect(self.slotClickedRow)  # 选中当前tablewidget的某行
-
-        self.pb_setUnit.clicked.connect(self.slotUnitDictInit)  # 设置单元目录
-
-        self.pb_setEquip.clicked.connect(self.slotEquipDictInit)  # 设置装备目录
-
-        self.pb_setEquipUnit.clicked.connect(self.slotSetEquipUnit)
-        self.pb_setUnitAlias.clicked.connect(self.slotSetUnitAlias)
+#        self.pb_setEquipUnit.clicked.connect(self.slotSetEquipUnit)
+#        self.pb_setUnitAlias.clicked.connect(self.slotSetUnitAlias)
         self.pb_firstSelect.clicked.connect(self.slotSelectUnit)
-
         self.pb_secondSelect.clicked.connect(self.slotSelectEquip)
-
         self.pb_input.clicked.connect(self.slotInputDataByExcel)
+
+    def slotChangeSet(self):
+        if self.cb_setChoose.currentIndex() == 0:
+            self.slotUnitDictInit()
 
     def slotSelectUnit(self):
         findText = self.le_first.text()
@@ -115,23 +137,7 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
         self.pb_setEquip.clicked.disconnect(self.slotEquipDictInit)  # 设置装备目录
 
 
-    '''
-        功能：
-            清除所有数据
-    '''
-    def delAllData(self):
-        self.tw_first.clear()  # 清除单元目录所有数据
-        self.tw_second.clear()  # 清除装备目录所有数据
-        self.tb_result.clear()  # 清除tableWidget中所有数据
-        self.le_first.clear()
-        self.le_second.clear()
-        self.le_equipID.clear()
-        self.le_unitID.clear()
-        self.le_unitUper.clear()
-        self.le_unitName.clear()
-        self.le_equipName.clear()
-        self.le_equipUper.clear()
-        self.currentUnitTableResult = []
+
 
     '''
         功能：
@@ -148,32 +154,34 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
         self.tw_first.setDisabled(False)    #设置单位目录为可选中
         self.le_first.setDisabled(False)
         self.pb_firstSelect.setDisabled(False)
+
+        self.le_unitID.setDisabled(False)
+        self.le_unitName.setDisabled(False)
         self.le_equipID.setDisabled(True)
         self.le_equipName.setDisabled(True)
-        self.le_equipUper.setDisabled(True)
         self.cb_equipType.setDisabled(True)
+
+        self.cb_unitUper.setDisabled(False)
+        self.le_unitAlias.setDisabled(False)
+        self.cb_equipUper.setDisabled(True)
+        self.le_equipUnit.setDisabled(True)
         self.cb_inputType.setDisabled(True)
-        self.le_unitUper.setDisabled(False)
-        self.le_unitName.setDisabled(False)
-        self.le_unitID.setDisabled(False)
-        self.pb_setEquip.setDisabled(False)
-        self.pb_setUnit.setDisabled(True)
-        self.pb_setEquipUnit.setDisabled(True)
-        self.pb_setUnitAlias.setDisabled(0)
         self.first_treeWidget_dict = {}
 
-        self.startInfo = selectUnitInfoByUnitID(self.userInfo[0][4])
-        stack = []
-        root = []
-        if self.startInfo:
-            stack.append(self.startInfo)
-            root.append(self.tw_first)
-            self.initUnitTreeWidget(stack, root)
-            #从数据库中单位表中获取数据初始化单位目录，tableWidget显示所有的单位表
-            #self._initUnitTreeWidget("", self.tw_first)
-            self._initUnitTableWidget()
-
-        self.changeUnit = True              #设置当前为修改单位状态
+        self.cb_unitUper.clear()
+        unitIDList = selectAllIDFromUnit()
+        self.cb_unitUper.addItems(unitIDList)
+        if self.userInfo:
+            self.startInfo = selectUnitInfoByUnitID(self.userInfo[0][4])
+            stack = []
+            root = []
+            if self.startInfo:
+                stack.append(self.startInfo)
+                root.append(self.tw_first)
+                self.initUnitTreeWidget(stack, root)
+                #从数据库中单位表中获取数据初始化单位目录，tableWidget显示所有的单位表
+                #self._initUnitTreeWidget("", self.tw_first)
+                self._initUnitTableWidget()
 
     '''
             功能：
