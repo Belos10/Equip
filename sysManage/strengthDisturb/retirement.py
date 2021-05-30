@@ -473,7 +473,7 @@ class retirement(QWidget, Widget_Retirement):
             self.tw_result.setItem(i + 2, 8, item)
             #备注
             item = QTableWidgetItem(LineInfo[11])
-            self.tw_result.setItem(i + 2, 8, item)
+            self.tw_result.setItem(i + 2, 9, item)
             self.currentInquiryResult[i] = LineInfo
 
     def slotSaveRetire(self):
@@ -484,8 +484,9 @@ class retirement(QWidget, Widget_Retirement):
             return
         for i, result in self.currentInquiryResult.items():
             num = self.tw_result.item(i + 2, 5).text()
-            apply = self.tw_result.item(i + 2, 7).text()
-            other = self.tw_result.item(i + 2, 8).text()
+            apply = self.tw_result.item(i + 2, 8).text()
+            other = self.tw_result.item(i + 2, 9).text()
+
             updateRetireAboutRetire(num, apply, other, result)
 
         reply = QMessageBox.question(self, '修改', '修改成功', QMessageBox.Yes)
