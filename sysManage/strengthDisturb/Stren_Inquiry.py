@@ -224,29 +224,15 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         year, ok = QInputDialog.getInt(self, "Get year", "year:", 0, 0, 100000, 1)
         if ok:
             allyearInfo = selectAllStrengthYear()
-            haveYear = False
-            haveBefore = False
-
-            for yearInfo in allyearInfo:
-                if str(year) == yearInfo:
-                    haveYear = True
-                    print("yihou============")
-                if str(year - 1) == yearInfo:
-                    haveBefore = True
-
-            if haveYear == True:
+            if isHaveStrengthYear(str(year)):
                 QMessageBox.information(self, "新增", "该年份已经存在，拒绝添加！", QMessageBox.Yes)
                 return
-
-            reply = QMessageBox.question(self, '新增', '是否将去年的数据同时导入今年？', QMessageBox.Yes, QMessageBox.Cancel)
-            if reply == QMessageBox.Cancel:
-                insertIntoStrengthYear(year)
-                self._initSelectYear_()
             else:
-                if haveBefore == True:
-                    insertBeforYearIntoStrength(year)#只导入去年的记录
+                insertSuccess = insertIntoStrengthYear(year)
+                if insertSuccess == True:
+                    QMessageBox.information(self, "新增", "新增成功！", QMessageBox.Yes)
                 else:
-                    insertIntoStrengthYear(year)
+                    QMessageBox.information(self, "新增", str(insertSuccess) + ",新增失败！", QMessageBox.Yes)
                 self._initSelectYear_()
 
     # 信号与槽连接的断开
