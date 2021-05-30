@@ -150,6 +150,7 @@ class ArmySchedule(QDialog, widget_armySchedule ):
         self.tw_result.setSpan(0, 14, 2, 1)
         self.tw_result.setSpan(0, 15, 2, 1)
         self.tw_result.setSpan(0, 18, 2, 1)
+        self.tw_result.setSelectionBehavior(QAbstractItemView.SelectRows)
 
 
     '''

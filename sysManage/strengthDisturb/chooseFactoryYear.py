@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QWidget, QTableWidgetItem, QComboBox, QMessageBox,QD
 from PyQt5.Qt import Qt
 from widgets.strengthDisturb.chooseFactoryYear import widget_chooseFactoryYear
 from database.strengthDisturbSql import selectEquipInputType, selectInfoAboutInput, selectNowNumAndStrengthNum, \
-    selectAllStrengthYear, updateInputInfo,updateNumMutilInput, delFromInputInfo
+    selectAllStrengthYear, updateInputInfo, delFromInputInfo
 
 '''
     类功能：

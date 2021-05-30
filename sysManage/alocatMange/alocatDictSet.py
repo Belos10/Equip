@@ -327,8 +327,7 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
         # 装备目录
         elif self.changeUnit == '2':
             if self.le_equipID.text() == "" or self.le_equipName.text() == "":
-                reply = QMessageBox.question(self, '新增失败', '装备ID或装备名字为空，拒绝增加，请重新填写', QMessageBox.Yes,
-                                             QMessageBox.Cancel)
+                reply = QMessageBox.information(self, '新增失败', '装备ID或装备名字为空，拒绝增加，请重新填写', QMessageBox.Yes)
             else:
                 Equip_ID = self.le_equipID.text()
                 Equip_Name = self.le_equipName.text()
@@ -344,16 +343,14 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
 
                 for equipInfo in equipInfoTuple:
                     if Equip_ID == equipInfo[0]:
-                        reply = QMessageBox.question(self, '新增失败', '装备ID已存在, 请重新填写', QMessageBox.Yes,
-                                                     QMessageBox.Cancel)
+                        reply = QMessageBox.information(self, '新增失败', '装备ID已存在, 请重新填写', QMessageBox.Yes)
                         haveID = True
                         break
                     elif Equip_Uper == equipInfo[0]:
                         haveUperID = True
 
                 if haveUperID == False:
-                    reply = QMessageBox.question(self, '新增失败', '上级装备ID不存在, 请重新填写', QMessageBox.Yes,
-                                                 QMessageBox.Cancel)
+                    reply = QMessageBox.information(self, '新增失败', '上级装备ID不存在, 请重新填写', QMessageBox.Yes)
                 elif haveUperID == True and haveID == False:
                     addDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type)
                 self.slotEquipDictInit()
@@ -400,8 +397,7 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
         elif self.changeUnit == '2':
             if (self.tb_result.item(self.tb_result.currentRow(),
                                     0).text() != self.le_equipID.text()) or self.le_equipName.text() == "":
-                reply = QMessageBox.question(self, '修改失败', '装备ID不能修改或装备名字为空，拒绝修改，请重新填写', QMessageBox.Yes,
-                                             QMessageBox.Cancel)
+                reply = QMessageBox.information(self, '修改失败', '装备ID不能修改或装备名字为空，拒绝修改，请重新填写', QMessageBox.Yes)
             else:
                 Equip_ID = self.le_equipID.text()
                 Equip_Name = self.le_equipName.text()
@@ -415,8 +411,7 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
                         haveUperID = True
 
                 if haveUperID == False:
-                    reply = QMessageBox.question(self, '修改失败', '上级装备ID在装备列表中不存在，拒绝修改，请重新填写', QMessageBox.Yes,
-                                                 QMessageBox.Cancel)
+                    reply = QMessageBox.information(self, '修改失败', '上级装备ID在装备列表中不存在，拒绝修改，请重新填写', QMessageBox.Yes)
                 else:
                     updateDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type)
                     self.slotEquipDictInit()
@@ -425,13 +420,12 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
         功能：
             删除目录
     '''
-
     def slotDelDict(self):
         # 单位目录
         if self.changeUnit == '1':
-            reply = QMessageBox.question(self, '删除', '是否将下级单位以及所涉及的其他表关于该单位的信息一起删除？', QMessageBox.Yes,
-                                         QMessageBox.Cancel)
+            reply = QMessageBox.information(self, '删除', '是否将下级单位以及所涉及的其他表关于该单位的信息一起删除？', QMessageBox.Yes)
             if reply == QMessageBox.Yes:
+                delDataInDisturbPlanUnit(self.le_unitID.text())
                 delDataInPosenginUnit(self.le_unitID.text())
                 reply = QMessageBox.question(self, '删除', '删除成功', QMessageBox.Yes)
                 self.slotUnitDictInit()
@@ -440,8 +434,7 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
                 reply = QMessageBox.question(self, '删除', '删除失败', QMessageBox.Yes)
         # 装备目录
         elif self.changeUnit == '2':
-            reply = QMessageBox.question(self, '删除', '是否将下级装备以及所涉及的其他表关于该装备的信息一起删除？', QMessageBox.Yes,
-                                         QMessageBox.Cancel)
+            reply = QMessageBox.information(self, '删除', '是否将下级装备以及所涉及的其他表关于该装备的信息一起删除？', QMessageBox.Yes)
             if reply == QMessageBox.Yes:
                 delDataInEquip(self.le_equipID.text())
                 reply = QMessageBox.question(self, '删除', '删除成功', QMessageBox.Yes)

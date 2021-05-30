@@ -1793,45 +1793,45 @@ def selectDataFromInputByYear(year):
     result = cur.fetchall()
     return result
 
-# 修改批量录入某条数据的数量
-def updateNumMutilInput(Unit_ID, Equip_ID, ID, num, orginNum, year, strengthYear):
-    EquipIDList = []
-    UnitIDList = []
-    updateNum = int(num)
-    findUnitUperIDList(Unit_ID, UnitIDList)
-    findEquipUperIDList(Equip_ID, EquipIDList)
-
-    for UnitID in UnitIDList:
-        for EquipID in EquipIDList:
-            strengthYearNum, nowYearNum = seletNumAboutStrength(UnitID, EquipID, strengthYear, year)
-            changeYearNowNum = int(nowYearNum) - int(orginNum) + updateNum
-            changeYearErrorNum = int(strengthYearNum) - changeYearNowNum
-            strengthAllNum, nowAllNum = seletNumAboutStrength(UnitID, EquipID, strengthYear, '')
-            changeAllNowNum = int(nowAllNum) - int(orginNum) + updateNum
-            changeAllErrorNum = int(strengthAllNum) - changeAllNowNum
-            sql = "Update strength set Now = '" + str(changeYearNowNum) + "', Error = '" + str(
-                changeYearErrorNum) + "' where Equip_ID = '" + \
-                  EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + strengthYear \
-                  + "' and equipYear = '" + year + "'"
-
-            cur.execute(sql)
-
-            sql = "Update weave set Now = '" + str(changeAllNowNum) + "' where Equip_ID = '" + \
-                  EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + strengthYear + "'"
-
-            cur.execute(sql)
-            sql = "update strength set Now = '" + str(changeAllNowNum) + "', Error = '" + str(
-                changeAllErrorNum) + "' where Unit_ID = '" \
-                  + UnitID + "' and Equip_ID = '" + EquipID + "' and year = '" + strengthYear + "' and equipYear = ''"
-            # print(sql)
-            cur.execute(sql)
-
-    sql = "update inputinfo set num = '" + num + "' where Unit_ID = '" + Unit_ID + \
-          "' and Equip_ID = '" + Equip_ID + "' and ID = '" + ID + "' and year = '" + year + "'"
-    cur.execute(sql)
-    # print(sql)
-    cur.execute(sql)
-    conn.commit()
+# # 修改批量录入某条数据的数量
+# def updateNumMutilInput(Unit_ID, Equip_ID, ID, num, orginNum, year, strengthYear):
+#     EquipIDList = []
+#     UnitIDList = []
+#     updateNum = int(num)
+#     findUnitUperIDList(Unit_ID, UnitIDList)
+#     findEquipUperIDList(Equip_ID, EquipIDList)
+#
+#     for UnitID in UnitIDList:
+#         for EquipID in EquipIDList:
+#             strengthYearNum, nowYearNum = seletNumAboutStrength(UnitID, EquipID, strengthYear, year)
+#             changeYearNowNum = int(nowYearNum) - int(orginNum) + updateNum
+#             changeYearErrorNum = int(strengthYearNum) - changeYearNowNum
+#             strengthAllNum, nowAllNum = seletNumAboutStrength(UnitID, EquipID, strengthYear, '')
+#             changeAllNowNum = int(nowAllNum) - int(orginNum) + updateNum
+#             changeAllErrorNum = int(strengthAllNum) - changeAllNowNum
+#             sql = "Update strength set Now = '" + str(changeYearNowNum) + "', Error = '" + str(
+#                 changeYearErrorNum) + "' where Equip_ID = '" + \
+#                   EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + strengthYear \
+#                   + "' and equipYear = '" + year + "'"
+#
+#             cur.execute(sql)
+#
+#             sql = "Update weave set Now = '" + str(changeAllNowNum) + "' where Equip_ID = '" + \
+#                   EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + strengthYear + "'"
+#
+#             cur.execute(sql)
+#             sql = "update strength set Now = '" + str(changeAllNowNum) + "', Error = '" + str(
+#                 changeAllErrorNum) + "' where Unit_ID = '" \
+#                   + UnitID + "' and Equip_ID = '" + EquipID + "' and year = '" + strengthYear + "' and equipYear = ''"
+#             # print(sql)
+#             cur.execute(sql)
+#
+#     sql = "update inputinfo set num = '" + num + "' where Unit_ID = '" + Unit_ID + \
+#           "' and Equip_ID = '" + Equip_ID + "' and ID = '" + ID + "' and year = '" + year + "'"
+#     cur.execute(sql)
+#     # print(sql)
+#     cur.execute(sql)
+#     conn.commit()
 
 # 判断是否有当前出厂年份
 def isHaveFactoryYear(year):
