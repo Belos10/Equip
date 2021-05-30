@@ -2851,12 +2851,11 @@ def inputIntoUnitFromExcel(unitInfoList):
                     conn.rollback()
                     errorInfo.append(error)
                     continue
+
+
     try:
         conn.commit()
-        if errorInfo != []:
-            return errorInfo
-        else:
-            return True
+        return True
     except Exception as e:
         error = "commit 失败"
         conn.rollback()

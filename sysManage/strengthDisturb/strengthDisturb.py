@@ -107,7 +107,7 @@ class strengthDisturb(QMainWindow, Strength_Disturb_Widget):
         self.tb_equipBalance.setDisabled(False)
         self.tb_maintenMange.setDisabled(False)
         self.tb_strengthDisturbSet.setDisabled(True)
-
+        self.strengthDisturbSet.initStrengthDisturbSet()
         self.slotDisconnect()
         self.stackedWidget.setCurrentIndex(4)
         self.connectSignal()

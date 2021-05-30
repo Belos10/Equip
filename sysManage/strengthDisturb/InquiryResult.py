@@ -1,12 +1,13 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QTableWidgetItem, QAbstractItemView, QMessageBox
-
+from PyQt5.QtWidgets import QApplication, QWidget, QTableWidgetItem, QAbstractItemView, QMessageBox, QLineEdit,QHeaderView
+from PyQt5.Qt import QRegExp, QRegExpValidator,QKeyEvent
 from database.SD_EquipmentBanlanceSql import updateOneEquipmentBalanceData
 from widgets.strengthDisturb.inquiry_result import Widget_Inquiry_Result
-from database.strengthDisturbSql import selectAboutStrengthByUnitListAndEquipList, selectUnitIsHaveChild, selectEquipIsHaveChild,\
-    selectAboutStrengthByEquipShow,selectAboutStrengthByUnitShow, updateStrengthAboutStrengrh,updateStrengthAboutStrengrh
+from database.strengthDisturbSql import *
 from sysManage.strengthDisturb.chooseFactoryYear import chooseFactoryYear
 from PyQt5.Qt import Qt
+
+regx = QRegExp("[0-9]*")
 #new
 '''
     类功能：
@@ -34,13 +35,12 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                       '正常到位']
         self.tw_inquiryResult.setHorizontalHeaderLabels(headerlist)
         self.tw_inquiryResult.setColumnCount(len(headerlist))
+        self.tw_inquiryResult.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
     '''
         信号和槽连接
     '''
     def signalConnect(self):
-        #当前表格中某个值被修改
-        self.tw_inquiryResult.itemChanged.connect(self.slotItemChange)
 
         #当点击按装备展开时
         self.rb_equipShow.clicked.connect(self.slotClickedRB)
@@ -69,7 +69,6 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         self.chooseFactoryYear.tb_yes.clicked.connect(self.slotChangeSeeMethod)
 
     def slotChangeSeeMethod(self):
-        #print("0000000000000", self.chooseFactoryYear.selectAll)
         if self.chooseFactoryYear.selectAll:
             self.currentFactoryYear = ""
             self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
@@ -181,37 +180,34 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                     Equip_ID = resultInfo[0]
                     unitHaveChild = selectUnitIsHaveChild(Unit_ID)
                     equipHaveChild = selectEquipIsHaveChild(Equip_ID)
+                    if self.tw_inquiryResult.cellWidget(currentRow, currentColumn).text() == str(resultInfo[4]):
+                        return
                     if self.currentFactoryYear != "":
                         reply = QMessageBox.question(self, '清除', '清除失败,请将出厂年份设置为全部', QMessageBox.Yes)
-                        self.tw_inquiryResult.item(currentRow, currentColumn).setText(resultInfo[4])
+                        self.tw_inquiryResult.cellWidget(currentRow, currentColumn).setText(resultInfo[4])
                         return
                     if unitHaveChild or equipHaveChild:
                         reply = QMessageBox.question(self, '修改', '只能修改末级实力数，修改失败', QMessageBox.Yes)
-                        self.tw_inquiryResult.item(currentRow, currentColumn).setText(resultInfo[4])
+                        self.tw_inquiryResult.cellWidget(currentRow, currentColumn).setText(str(resultInfo[4]))
                         return
                     elif self.year == '全部':
                         reply = QMessageBox.question(self, '修改', '只能某一年，修改失败', QMessageBox.Yes)
-                        self.tw_inquiryResult.item(currentRow, currentColumn).setText(resultInfo[4])
+                        self.tw_inquiryResult.cellWidget(currentRow, currentColumn).setText(resultInfo[4])
                         return
                     else:
-                        if self.tw_inquiryResult.item(currentRow, currentColumn).text() != resultInfo[4]:
+                        if self.tw_inquiryResult.cellWidget(currentRow, currentColumn).text() != resultInfo[4]:
                             try:
-                                strength = int(self.tw_inquiryResult.item(currentRow, currentColumn).text())
-                                reply = QMessageBox.question(self, '修改', '是否修改当前实力数？', QMessageBox.Yes,
-                                                         QMessageBox.Cancel)
-                                if reply == QMessageBox.Yes:
-                                    updateStrengthAboutStrengrh(Unit_ID, Equip_ID, self.year,
-                                                            self.tw_inquiryResult.item(currentRow,
+                                updateSuccess = updateStrengthAboutStrengrh(Unit_ID, Equip_ID, self.year,
+                                                            self.tw_inquiryResult.cellWidget(currentRow,
                                                                                        currentColumn).text(),
-                                                            resultInfo[4])
-                                    updateOneEquipmentBalanceData(str(int(self.year) + 1), Equip_ID,Unit_ID)
-                                    self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
-                                else:
-                                    self.tw_inquiryResult.item(currentRow, currentColumn).setText(resultInfo[4])
-                                    return
+                                                            str(resultInfo[4]))
+                                if updateSuccess != True:
+                                    QMessageBox.information(self, "修改", str(updateSuccess) + "修改失败", QMessageBox.Yes)
+                                QMessageBox.information(self, "修改", "修改成功！", QMessageBox.Yes)
+                                self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
                             except ValueError:
                                 reply = QMessageBox.question(self, '修改失败', '只能修改为整数', QMessageBox.Yes)
-                                self.tw_inquiryResult.item(currentRow, currentColumn).setText(resultInfo[4])
+                                self.tw_inquiryResult.cellWidget(currentRow, currentColumn).setText(str(resultInfo[4]))
                                 return
         elif currentColumn == 0:
             for i, resultInfo in self.currentInquiryResult.items():
@@ -245,7 +241,6 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                       '正常到位']
         self.tw_inquiryResult.setHorizontalHeaderLabels(headerlist)
         self.tw_inquiryResult.setColumnCount(len(headerlist))
-        #print("===================1111111111111   ", self.currentFactoryYear)
         if self.rb_equipShow.isChecked():
             #按装备展开
             resultList = selectAboutStrengthByEquipShow(UnitList, EquipList, year, self.currentFactoryYear, self.startFactoryYear, self.endFactoryYear)
@@ -256,9 +251,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
             resultList = selectAboutStrengthByUnitListAndEquipList(UnitList, EquipList, year, self.currentFactoryYear, self.startFactoryYear, self.endFactoryYear)
 
         if self.cb_showLast.isChecked():
-            resultListEquip = selectAboutStrengthByEquipShow(UnitList, EquipList, year, self.currentFactoryYear, self.startFactoryYear, self.endFactoryYear)
-            resultListUnit = selectAboutStrengthByUnitShow(UnitList, EquipList, year, self.currentFactoryYear, self.startFactoryYear, self.endFactoryYear)
-            resultList = resultListEquip + resultListUnit
+            resultList = selectAboutStrengthByLast(UnitList, EquipList, year, self.currentFactoryYear, self.startFactoryYear, self.endFactoryYear)
             self.rb_unitShow.setCheckable(False)
             self.rb_equipShow.setCheckable(False)
             self.rb_equipShow.setDisabled(True)
@@ -270,7 +263,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
             self.rb_unitShow.setDisabled(False)
 
         self.tw_inquiryResult.setRowCount(len(resultList))
-
+        isMinyear = selectIsMinStrengthYear(year)
         i = 0
         for LineInfo in resultList:
             if self.cb_showDistence.isChecked():
@@ -278,29 +271,38 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                     item = QTableWidgetItem(LineInfo[3])
                     item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                     self.tw_inquiryResult.setItem(i, 0, item)
+
                     item = QTableWidgetItem(LineInfo[2])
+                    item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                     self.tw_inquiryResult.setItem(i, 1, item)
-                    item = QTableWidgetItem(LineInfo[4])
-                    self.tw_inquiryResult.setItem(i, 2, item)
-                    item = QTableWidgetItem(LineInfo[5])
+
+                    item = QLineEdit()
+                    item.setText(str(LineInfo[4]))
+                    item.textChanged.connect(self.slotItemChange)
+                    item.setStyleSheet("background:transparent;border-width:0")
+                    validator = QRegExpValidator(regx)
+                    item.setValidator(validator)
+                    self.tw_inquiryResult.setCellWidget(i, 2, item)
+
+                    item = QTableWidgetItem(str(LineInfo[5]))
                     self.tw_inquiryResult.setItem(i, 3, item)
-                    item = QTableWidgetItem(LineInfo[6])
+                    item = QTableWidgetItem(str(LineInfo[6]))
                     self.tw_inquiryResult.setItem(i, 4, item)
-                    item = QTableWidgetItem(LineInfo[7])
+                    item = QTableWidgetItem(str(LineInfo[7]))
                     self.tw_inquiryResult.setItem(i, 5, item)
-                    item = QTableWidgetItem(LineInfo[8])
+                    item = QTableWidgetItem(str(LineInfo[8]))
                     self.tw_inquiryResult.setItem(i, 6, item)
-                    item = QTableWidgetItem(LineInfo[9])
+                    item = QTableWidgetItem(str(LineInfo[9]))
                     self.tw_inquiryResult.setItem(i, 7, item)
-                    item = QTableWidgetItem(LineInfo[10])
+                    item = QTableWidgetItem(str(LineInfo[10]))
                     self.tw_inquiryResult.setItem(i, 8, item)
-                    item = QTableWidgetItem(LineInfo[11])
+                    item = QTableWidgetItem(str(LineInfo[11]))
                     self.tw_inquiryResult.setItem(i, 9, item)
-                    item = QTableWidgetItem(LineInfo[12])
+                    item = QTableWidgetItem(str(LineInfo[12]))
                     self.tw_inquiryResult.setItem(i, 10, item)
-                    item = QTableWidgetItem(LineInfo[13])
+                    item = QTableWidgetItem(str(LineInfo[13]))
                     self.tw_inquiryResult.setItem(i, 11, item)
-                    item = QTableWidgetItem(LineInfo[14])
+                    item = QTableWidgetItem(str(LineInfo[14]))
                     self.tw_inquiryResult.setItem(i, 12, item)
 
                     self.currentInquiryResult[i] = LineInfo
@@ -312,27 +314,34 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                 self.tw_inquiryResult.setItem(i, 0, item)
                 item = QTableWidgetItem(LineInfo[2])
                 self.tw_inquiryResult.setItem(i, 1, item)
-                item = QTableWidgetItem(LineInfo[4])
-                self.tw_inquiryResult.setItem(i, 2, item)
-                item = QTableWidgetItem(LineInfo[5])
+
+                item = QLineEdit()
+                item.setText(str(LineInfo[4]))
+                item.setStyleSheet("background:transparent;border-width:0")
+                item.textChanged.connect(self.slotItemChange)
+                validator = QRegExpValidator(regx)
+                item.setValidator(validator)
+                self.tw_inquiryResult.setCellWidget(i, 2, item)
+
+                item = QTableWidgetItem(str(LineInfo[5]))
                 self.tw_inquiryResult.setItem(i, 3, item)
-                item = QTableWidgetItem(LineInfo[6])
+                item = QTableWidgetItem(str(LineInfo[6]))
                 self.tw_inquiryResult.setItem(i, 4, item)
-                item = QTableWidgetItem(LineInfo[7])
+                item = QTableWidgetItem(str(LineInfo[7]))
                 self.tw_inquiryResult.setItem(i, 5, item)
-                item = QTableWidgetItem(LineInfo[8])
+                item = QTableWidgetItem(str(LineInfo[8]))
                 self.tw_inquiryResult.setItem(i, 6, item)
-                item = QTableWidgetItem(LineInfo[9])
+                item = QTableWidgetItem(str(LineInfo[9]))
                 self.tw_inquiryResult.setItem(i, 7, item)
-                item = QTableWidgetItem(LineInfo[10])
+                item = QTableWidgetItem(str(LineInfo[10]))
                 self.tw_inquiryResult.setItem(i, 8, item)
-                item = QTableWidgetItem(LineInfo[11])
+                item = QTableWidgetItem(str(LineInfo[11]))
                 self.tw_inquiryResult.setItem(i, 9, item)
-                item = QTableWidgetItem(LineInfo[12])
+                item = QTableWidgetItem(str(LineInfo[12]))
                 self.tw_inquiryResult.setItem(i, 10, item)
-                item = QTableWidgetItem(LineInfo[13])
+                item = QTableWidgetItem(str(LineInfo[13]))
                 self.tw_inquiryResult.setItem(i, 11, item)
-                item = QTableWidgetItem(LineInfo[14])
+                item = QTableWidgetItem(str(LineInfo[14]))
                 self.tw_inquiryResult.setItem(i, 12, item)
 
                 self.currentInquiryResult[i] = LineInfo

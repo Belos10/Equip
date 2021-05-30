@@ -3,6 +3,7 @@ import sys
 from PyQt5.QtWidgets import QMainWindow,QApplication,QWidget
 from widgets.dictSelect.dictSelect import Widget_Dict_Select
 from sysManage.dictSelect.regularManage import regularManage
+from sysManage.dictSelect.fatorySet import factorySet
 #new
 class dictSelect(QMainWindow, Widget_Dict_Select):
     def __init__(self, parent=None):
@@ -10,7 +11,7 @@ class dictSelect(QMainWindow, Widget_Dict_Select):
         self.setupUi(self)
 
         self.equipHandbook = QWidget(self)
-        self.factoryDict = QWidget(self)
+        self.factoryDict = factorySet(self)
         self.presentRoom = QWidget(self)
         self.regularManage = regularManage(self)
 
@@ -51,6 +52,7 @@ class dictSelect(QMainWindow, Widget_Dict_Select):
         self.tb_factoryDict.setDisabled(True)
         self.tb_presentRoom.setDisabled(False)
         self.tb_regularManage.setDisabled(False)
+        self.factoryDict.initWidget()
 
     def slotPresentRoom(self):
         self.sw_dictSelectMange.setCurrentIndex(2)

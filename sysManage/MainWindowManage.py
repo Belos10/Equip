@@ -9,20 +9,14 @@ from sysManage.login.loginSet import loginSet
 from sysManage.dangerGoods.dangerGoods import DangerGoods
 from sysManage.positionEngineer.positionEngineerMain import PositionEngineerMain
 from sysManage.userInfo import get_value,set_value
-from database.connectAndDisSql import *
-from icons.readQss import qss
 #new
 class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
     def __init__(self, parent=None):
         super(Manage_Widgets, self).__init__(parent)
         self.setupUi(self)
-        """if qss == None:
-            reply = QMessageBox.information(self, "加载", '样式加载失败', QMessageBox.Yes)
-        else:
-            self.setStyleSheet(qss)"""
         self.setLogin = loginSet()
         self.strengthDisturb = strengthDisturb()
-        self.alocatMange = alocatMange()
+        self.alocatMange = QWidget()
         self.purChasPlan = QWidget()
         self.mantanSupport = QWidget()
         self.warStorage = QWidget()
@@ -52,7 +46,6 @@ class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
         self.login.show()
         self.hide()
 
-
         self.signalConnect()
 
     def signalConnect(self):
@@ -66,8 +59,6 @@ class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
         app = QApplication.instance()
         # 退出应用程序
         app.quit()
-        cur.close()
-        conn.close()
 
     def slotLoginSystem(self):
         self.accont = self.login.le_accont.text()
@@ -75,9 +66,7 @@ class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
         if self.accont == "":
             reply = QMessageBox.question(self, '登录', '登陆失败，请输入账号',QMessageBox.Yes)
             return
-
         self.userInfo = selectUserInfoByAccont(self.accont)
-        print(self.userInfo)
         if self.userInfo:
             if self.userInfo[0][2] != self.pswd:
                 reply = QMessageBox.question(self, '登录', '登录失败,密码错误', QMessageBox.Yes)
