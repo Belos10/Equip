@@ -16,7 +16,7 @@ class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
         self.setupUi(self)
         self.setLogin = loginSet()
         self.strengthDisturb = strengthDisturb()
-        self.alocatMange = QWidget()
+        self.alocatMange = alocatMange()
         self.purChasPlan = QWidget()
         self.mantanSupport = QWidget()
         self.warStorage = QWidget()

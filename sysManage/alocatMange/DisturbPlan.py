@@ -240,6 +240,7 @@ class DisturbPlan(QWidget, yearList_Form):
                 root.append(item)
 
 
+
     def _initEquipTreeWidget(self,stack, root):
         # if root == '':
         #     result = selectEquipInfoByEquipUper('')
@@ -263,6 +264,7 @@ class DisturbPlan(QWidget, yearList_Form):
             for resultInfo in result:
                 stack.append(resultInfo)
                 root.append(item)
+        #print("first_treeWidget_dict", self.first_treeWidget_dict)
 
 
 
@@ -278,6 +280,7 @@ class DisturbPlan(QWidget, yearList_Form):
         self.disturbResult.clear()
         # 获取子单位名
         j = 0
+
         for unitID, unitItem in self.first_treeWidget_dict.items():
             if unitItem == self.tw_first.currentItem():
                 if selectUnitIfBase(unitID):

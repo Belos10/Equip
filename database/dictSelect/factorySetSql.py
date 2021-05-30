@@ -23,3 +23,12 @@ def addInfoIntoFactory(ID, name, address, connect, tel1, represent, tel2):
         return True
     except Exception as e:
         return e
+
+def selectAllNameAboutFactory():
+    sql = "select name from factory"
+    cur.execute(sql)
+    result = cur.fetchall()
+    resultList = []
+    for resultInfo in result:
+        resultList.append(resultInfo[0])
+    return resultList

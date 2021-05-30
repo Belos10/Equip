@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QWidget, QTableWidgetItem, QComboBox, QMessageBox, Q
 from PyQt5.Qt import QRegExp,QRegExpValidator, Qt
 from widgets.strengthDisturb.add_strenth_info import Add_Strenth_Info
 from database.strengthDisturbSql import *
+from database.dictSelect.factorySetSql import *
 from sysManage.strengthDisturb.chooseFactoryYear import chooseFactoryYear
 from database.alocatMangeSql import *
 

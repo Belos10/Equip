@@ -13,7 +13,7 @@ class AddUnitChoose(QDialog, Widget_AddUnitChoose):
         super(AddUnitChoose, self).__init__(parent)
         self.setupUi(self)
         self.signalConnect()
-        self.unitAllList={}
+        self.unitAllList=[]
         self.unitDisturbList={}
         self.initWidget()
         self.currentUnitID=[]
@@ -28,8 +28,8 @@ class AddUnitChoose(QDialog, Widget_AddUnitChoose):
 
     # 获取装备列表
     def initUnitList(self):
-        #pass
-        self.unitAllList = selectAllDataAboutUnit()
+        self.unitAllList=[]
+        selectAllDataAboutUnit(self.unitAllList)
         header = ['单位编号', '单位名称', '上级单位编号', '单位别名']
         self.tb_unitChoose.setColumnCount(len(header))
         self.tb_unitChoose.setRowCount(len(self.unitAllList))

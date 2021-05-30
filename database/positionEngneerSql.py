@@ -22,10 +22,6 @@ def selectUnitNameByUnitID(Unit_ID):
 '''
 def getUnits():
     units = []
-
-
-
-
     sql = "select Unit_Name from posengin_unit_directory group by Unit_Name order by 'Unit_ID' desc "
     result = executeSql(sql)
     if result is not None or len(result) != 0:
