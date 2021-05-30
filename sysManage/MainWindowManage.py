@@ -16,13 +16,13 @@ class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
         self.setupUi(self)
         self.setLogin = loginSet()
         self.strengthDisturb = strengthDisturb()
-        self.alocatMange = alocatMange()
+        self.alocatMange = QWidget()
         self.purChasPlan = QWidget()
         self.mantanSupport = QWidget()
         self.warStorage = QWidget()
         self.contractMange = QWidget()
-        self.dangerGoods = DangerGoods()
-        self.PosEngin = PositionEngineerMain()
+        self.dangerGoods = QWidget()
+        self.PosEngin = QWidget()
         #self.PosEngin = QWidget()
         self.dictSelect = dictSelect()
         self.sysConfig = QWidget()
@@ -66,9 +66,7 @@ class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
         if self.accont == "":
             reply = QMessageBox.question(self, '登录', '登陆失败，请输入账号',QMessageBox.Yes)
             return
-
         self.userInfo = selectUserInfoByAccont(self.accont)
-        print(self.userInfo)
         if self.userInfo:
             if self.userInfo[0][2] != self.pswd:
                 reply = QMessageBox.question(self, '登录', '登录失败,密码错误', QMessageBox.Yes)

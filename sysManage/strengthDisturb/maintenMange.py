@@ -1,9 +1,12 @@
 from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, QAbstractItemView, \
-    QMessageBox, QListWidgetItem,QInputDialog
+    QMessageBox, QListWidgetItem,QInputDialog,QHeaderView,QLineEdit
 from widgets.strengthDisturb.maintenMange import Widget_Mainten_Manage
 from database.strengthDisturbSql import *
 from PyQt5.Qt import Qt
 from sysManage.userInfo import get_value
+from PyQt5.Qt import QRegExp, QRegExpValidator,QKeyEvent
+
+regx = QRegExp("[0-9]*")
 '''
    编制数维护
 '''
@@ -25,7 +28,7 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
         self.equipList = []
         self.year = '全部'
         self.currentYear = None
-
+        self.tw_result.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
     def getUserInfo(self):
         self.userInfo = get_value("totleUserInfo")
@@ -107,20 +110,25 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
                 if i == self.currentRow:
                     unitHaveChild = selectUnitIsHaveChild(resultRowInfo[0])
                     equipHaveChild = selectEquipIsHaveChild(resultRowInfo[1])
+                    if isHavePulicEquip(resultRowInfo[0]):
+                        reply = QMessageBox.question(self, '录入', '该单位或装备不是末级，无法修改', QMessageBox.Yes)
+                        self.tw_result.cellWidget(self.currentRow, 3).setText(str(resultRowInfo[5]))
+                        return
                     if unitHaveChild or equipHaveChild:
                         reply = QMessageBox.question(self, '录入', '该单位或装备不是末级，无法修改', QMessageBox.Yes)
-                        self.tw_result.item(self.currentRow, 3).setText(resultRowInfo[5])
+                        self.tw_result.cellWidget(self.currentRow, 3).setText(str(resultRowInfo[5]))
                         return
                     else:
                         try:
-                            weave = self.tw_result.item(self.currentRow, 3).text()
+                            weave = self.tw_result.cellWidget(self.currentRow, 3).text()
                             reply = QMessageBox.question(self, '修改', '是否修改当前装备、单位的编制数?', QMessageBox.Yes, QMessageBox.Cancel)
                             if reply == QMessageBox.Yes:
-                                updateWeaveNum(resultRowInfo[0], resultRowInfo[1], self.tw_result.item(self.currentRow, 3).text(), resultRowInfo[5], self.year)
-                                if resultRowInfo[2] == "公用装备":
-                                    pass
-                                else:
-                                    updateOneEquipmentBalanceData(self.year, resultRowInfo[0],resultRowInfo[1])
+                                updataSuccess = updateWeaveNum(resultRowInfo[0], resultRowInfo[1], self.tw_result.cellWidget(self.currentRow, 3).text(), str(resultRowInfo[5]), self.year)
+                                if updataSuccess != True:
+                                    QMessageBox.information(self, "修改", str(updataSuccess) + "修改失败", QMessageBox.Yes)
+                                    return
+
+                                #updateOneEquipmentBalanceData(self.year, resultRowInfo[0],resultRowInfo[1])
                                 self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
                                 return
                             else:
@@ -128,9 +136,8 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
                                 return
                         except ValueError:
                             reply = QMessageBox.question(self, '修改', '编制数只能修改为整数?', QMessageBox.Yes)
-                            self.tw_result.item(self.currentRow, 3).setText(resultRowInfo[5])
+                            self.tw_result.cellWidget(self.currentRow, 3).setText(resultRowInfo[5])
                             return
-
         else:
             pass
 
@@ -151,12 +158,17 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
             year = resultInfo[7]
             unitHaveChild = selectUnitIsHaveChild(Unit_ID)
             equipHaveChild = selectEquipIsHaveChild(Equip_ID)
+
             if unitHaveChild or equipHaveChild:
                 reply = QMessageBox.question(self, '清除', '第' + str(i) + "行清除失败，只能清除末级单位和装备编制数", QMessageBox.Yes)
                 continue
             else:
-                updateWeaveNum(Unit_ID, Equip_ID, year, "0", orginNum)
+                updateSuccess = updateWeaveNum(Unit_ID, Equip_ID, year, "0", orginNum)
+                if updateSuccess != True:
+                    QMessageBox.information(self, '清除', '第' + str(i) + "行清除失败, " + str(updateSuccess), QMessageBox.Yes)
+                    return
                 updateOneEquipmentBalanceData(year, Equip_ID, Unit_ID)
+                QMessageBox.information(self, '成功', '第' + str(i) + "行清除成功", QMessageBox.Yes)
                 self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
 
     #清除当前行的编制数
@@ -277,6 +289,13 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
             if equipItem.checkState(0) == Qt.Checked:
                 self.currentCheckedEquipList.append(equipID)
 
+        if self.currentCheckedUnitList == [] or self.currentCheckedEquipList == []:
+            headerlist = ['单位名称', '装备名称', '实力数', '编制数', '现有数']
+            self.tw_result.setHorizontalHeaderLabels(headerlist)
+            self.currentInquiryResult.clear()
+            self.tw_result.setColumnCount(len(headerlist))
+            self.tw_result.setRowCount(0)
+            return
         self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList, self.currentYear)
 
     # 初始化tableWidget
@@ -297,9 +316,7 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
             self.resultList = selectAboutWeaveByUnitListAndEquipList(UnitList, EquipList, year)
 
         if self.cb_showLast.isChecked():
-            self.resultListEquip = selectAboutWeaveByEquipShow(UnitList, EquipList, year)
-            self.resultListUnit = selectAboutWeaveByUnitShow(UnitList, EquipList, year)
-            self.resultList = self.resultListEquip + self.resultListUnit
+            self.resultList = selectAboutWeaveByLast(UnitList, EquipList, year)
             self.rb_unitShow.setCheckable(False)
             self.rb_equipShow.setCheckable(False)
             self.rb_equipShow.setDisabled(True)
@@ -318,18 +335,25 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
 
         i = 0
         for LineInfo in self.resultList:
-            item = QTableWidgetItem(LineInfo[2])
+            item = QTableWidgetItem(str(LineInfo[2]))
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.tw_result.setItem(i, 0, item)
-            item = QTableWidgetItem(LineInfo[3])
+            item = QTableWidgetItem(str(LineInfo[3]))
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.tw_result.setItem(i, 1, item)
-            item = QTableWidgetItem(LineInfo[4])
+            item = QTableWidgetItem(str(LineInfo[4]))
             self.tw_result.setItem(i, 2, item)
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-            item = QTableWidgetItem(LineInfo[5])
-            self.tw_result.setItem(i, 3, item)
-            item = QTableWidgetItem(LineInfo[6])
+
+            item = QLineEdit()
+            item.setText(str(LineInfo[5]))
+            item.textChanged.connect(self.slotResultItemChange)
+            item.setStyleSheet("background:transparent;border-width:0")
+            validator = QRegExpValidator(regx)
+            item.setValidator(validator)
+            self.tw_result.setCellWidget(i, 3, item)
+            item = QTableWidgetItem(str(LineInfo[6]))
+
             self.tw_result.setItem(i, 4, item)
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.currentInquiryResult[i] = LineInfo
@@ -389,6 +413,7 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
         self.currentYearListItem = {}
         self.yearList = []
         self.lw_year.clear()
+        allyearList = []
         allyearList = selectAllDataAboutStrengthYear()
 
         for year in allyearList:

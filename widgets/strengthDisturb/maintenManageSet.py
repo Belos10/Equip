@@ -10,7 +10,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-#new
+
 class Widget_Mainten_Manage_Set(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
@@ -73,21 +73,23 @@ class Widget_Mainten_Manage_Set(object):
         self.label_2 = QtWidgets.QLabel(self.groupBox_2)
         self.label_2.setObjectName("label_2")
         self.gridLayout_2.addWidget(self.label_2, 0, 0, 1, 1)
+        self.label = QtWidgets.QLabel(self.groupBox_2)
+        self.label.setObjectName("label")
+        self.gridLayout_2.addWidget(self.label, 1, 0, 1, 1)
         self.lb_unitID = QtWidgets.QLabel(self.groupBox_2)
         self.lb_unitID.setText("")
         self.lb_unitID.setObjectName("lb_unitID")
         self.gridLayout_2.addWidget(self.lb_unitID, 0, 1, 1, 1)
         self.pb_update = QtWidgets.QPushButton(self.groupBox_2)
         self.pb_update.setObjectName("pb_update")
-        self.gridLayout_2.addWidget(self.pb_update, 0, 2, 2, 1)
-        self.label = QtWidgets.QLabel(self.groupBox_2)
-        self.label.setObjectName("label")
-        self.gridLayout_2.addWidget(self.label, 1, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.pb_update, 0, 3, 2, 1)
         self.cb_isGroup = QtWidgets.QComboBox(self.groupBox_2)
         self.cb_isGroup.setObjectName("cb_isGroup")
         self.cb_isGroup.addItem("")
         self.cb_isGroup.addItem("")
         self.gridLayout_2.addWidget(self.cb_isGroup, 1, 1, 1, 1)
+        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.gridLayout_2.addItem(spacerItem, 0, 2, 1, 1)
         self.verticalLayout.addLayout(self.gridLayout_2)
         self.gridLayout_4.addWidget(self.groupBox_2, 0, 1, 1, 1)
         self.groupBox_3 = QtWidgets.QGroupBox(Form)
@@ -123,8 +125,8 @@ class Widget_Mainten_Manage_Set(object):
         item = self.tw_unit.horizontalHeaderItem(2)
         item.setText(_translate("Form", "是否为旅团"))
         self.label_2.setText(_translate("Form", "当前单位编号："))
-        self.pb_update.setText(_translate("Form", "修改"))
         self.label.setText(_translate("Form", "是否为旅团："))
+        self.pb_update.setText(_translate("Form", "修改"))
         self.cb_isGroup.setItemText(0, _translate("Form", "是"))
         self.cb_isGroup.setItemText(1, _translate("Form", "否"))
         self.groupBox_3.setTitle(_translate("Form", "公用装备显示"))

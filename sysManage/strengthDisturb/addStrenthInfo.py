@@ -1,7 +1,15 @@
-from PyQt5.QtWidgets import QWidget, QTableWidgetItem, QComboBox, QMessageBox
+from PyQt5.QtWidgets import QWidget, QTableWidgetItem, QComboBox, QMessageBox, QLineEdit,QHeaderView,QAbstractItemView
+from PyQt5.Qt import QRegExp,QRegExpValidator, Qt
 from widgets.strengthDisturb.add_strenth_info import Add_Strenth_Info
 from database.strengthDisturbSql import *
+from sysManage.strengthDisturb.chooseFactoryYear import chooseFactoryYear
+from database.alocatMangeSql import *
 
+regx = QRegExp("[0-9]*")
+allFactoryYearInt = list(range(1970, 2022))
+allFactoryYear = [str(x) for x in allFactoryYearInt]
+equipState = ['新品','堪用品','待修品','废品']
+isArrive = ['是', '否']
 '''
     类功能：
         信息录入界面管理
@@ -18,7 +26,19 @@ class AddStrenthInfo(QWidget, Add_Strenth_Info):
         self.equipID = None
         self.isMutilInput = None
         self.allYear = None
+        self.lineEdit.setAlignment(Qt.AlignCenter)
 
+        self.chooseFactoryYear = chooseFactoryYear(self)
+        self.chooseFactoryYear.initComBoxAboutYear()
+        self.chooseFactoryYear.hide()
+
+        self.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.lineEdit.setFocusPolicy(Qt.NoFocus)
+        self.lb_factorYear.setText("当前查询出厂年份为：全部")
+        self.factoryYear = ""
+        self.startFactoryYear = ""
+        self.endFactoryYear = ""
+        self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.signalConnect()
 
     def signalConnect(self):
@@ -26,110 +46,58 @@ class AddStrenthInfo(QWidget, Add_Strenth_Info):
         self.pb_Increase.clicked.connect(self.slotAddSingle)
 
         #查看数据是否修改
-        self.tableWidget.itemChanged.connect(self.slotItemChanged)
+        #self.tableWidget.itemChanged.connect(self.slotItemChanged)
 
         #删除某行数据
         self.pb_Delete.clicked.connect(self.deleteNote)
 
+        self.pb_chooseFactoryYear.clicked.connect(self.slotChooseFactoryYear)
+
+        self.chooseFactoryYear.tb_cancel.clicked.connect(self.slotCancelChoose)
+
+        self.chooseFactoryYear.tb_yes.clicked.connect(self.slotChangeSeeMethod)
+
+    def slotChangeSeeMethod(self):
+        if self.chooseFactoryYear.selectAll:
+            self.factoryYear = ""
+            self._initTableWidget_(self.RowData, self.yearList)
+            self.lb_factorYear.setText("当前查询出厂年份为：全部")
+            self.chooseFactoryYear.hide()
+            self.setDisabled(False)
+        else:
+            self.factoryYear = "---"
+            self.startFactoryYear = self.chooseFactoryYear.startFactoryYear
+            self.endFactoryYear = self.chooseFactoryYear.endFactoryYear
+            #print("===============0", self.startFactoryYear, self.endFactoryYear)
+            if int(self.startFactoryYear) > int(self.endFactoryYear):
+                reply = QMessageBox.information(self,"查询", "请重新选择，开始年份必须小于等于结束年份", QMessageBox.Yes)
+                return
+            else:
+                self.lb_factorYear.setText("当前查询出厂年份为：" + self.startFactoryYear + "年 至 " + self.endFactoryYear + "年")
+                self._initTableWidget_(self.RowData, self.yearList)
+                self.chooseFactoryYear.hide()
+                self.setDisabled(False)
+
+    def slotCancelChoose(self):
+        self.setDisabled(False)
+        self.chooseFactoryYear.hide()
 
     def slotDisconnect(self):
         self.pb_Increase.clicked.disconnect(self.slotAddSingle)
         # 查看数据是否修改
         self.tableWidget.itemChanged.disconnect(self.slotItemChanged)
 
-    '''
-        当前有行的数据被改变
-    '''
-    def slotItemChanged(self, item):
-        haveYear = False
-        row = item.row()
-        if row + 1 > self.orginRowNum:
-            return
-        else:
-            currentColumn = self.tableWidget.currentColumn()
-            if self.isMutilInput:
-                for i, resultRow in enumerate(self.currentResult):
-                    if i == row:
-                        if currentColumn == 0:
-                            self.tableWidget.item(row, 0).setText(resultRow[2])
-                        elif currentColumn == 1:
-                            reply = QMessageBox.question(self, '修改', '是否修改当前行的值？', QMessageBox.Yes,
-                                                         QMessageBox.Cancel)
-                            if reply == QMessageBox.Yes:
-                                updateNumMutilInput(resultRow[0], resultRow[1], resultRow[2],
-                                                    self.tableWidget.item(row, 1).text(), resultRow[3], resultRow[4])
-                                self._initTableWidget_(self.RowData, self.yearList)
-                        else:
-                            reply = QMessageBox.question(self, '修改', '是否修改当前行的值？', QMessageBox.Yes,
-                                                         QMessageBox.Cancel)
-                            if reply == QMessageBox.Yes:
-                                if currentColumn == 2:
-                                    year = self.tableWidget.item(row, 2).text()
-                                    for y in self.allYear:
-                                        if year == y:
-                                            haveYear = True
-                                    if haveYear == False:
-                                        reply = QMessageBox.question(self, '修改', '当前年份不存在， 修改失败', QMessageBox.Yes)
-                                        self.tableWidget.item(row, currentColumn).setText(resultRow[currentColumn + 2])
-                                        return
-                                ID = self.tableWidget.item(row, 0).text()
-                                num = self.tableWidget.item(row, 1).text()
-                                year = self.tableWidget.item(row, 2).text()
-                                shop = self.tableWidget.item(row, 3).text()
-                                state = self.tableWidget.item(row, 4).text()
-                                arrive = self.tableWidget.item(row, 5).text()
-                                confirm = self.tableWidget.item(row, 6).text()
-                                other = self.tableWidget.item(row, 7).text()
-                                print(self.unitID, self.equipID, ID, num, year, shop, state, arrive, confirm, other)
-                                updateInputInfo(self.unitID, self.equipID, ID, num, year, shop, state, arrive, confirm, other, self.yearList)
-                            else:
-                                self.tableWidget.item(row, currentColumn).setText(resultRow[currentColumn + 2])
-            else:
-                for i, resultRow in enumerate(self.currentResult):
-                    if i == row:
-                        if currentColumn == 0:
-                            self.tableWidget.item(row, 0).setText(resultRow[2])
-                        else:
-                            reply = QMessageBox.question(self, '修改', '是否修改当前行的值？', QMessageBox.Yes,
-                                                         QMessageBox.Cancel)
-                            if reply == QMessageBox.Yes:
-                                if currentColumn == 1:
-                                    year = self.tableWidget.item(row, 2).text()
-                                    for y in self.allYear:
-                                        if year == y:
-                                            haveYear = True
-                                    if haveYear == False:
-                                        reply = QMessageBox.question(self, '修改', '当前年份不存在， 修改失败', QMessageBox.Yes,
-                                                                 QMessageBox.Cancel)
-                                        self.tableWidget.item(row, currentColumn).setText(resultRow[currentColumn + 2])
-                                        return
-                                ID = self.tableWidget.item(row, 0).text()
-                                year = self.tableWidget.item(row, 1).text()
-                                shop = self.tableWidget.item(row, 2).text()
-                                state = self.tableWidget.item(row, 3).text()
-                                arrive = self.tableWidget.item(row, 4).text()
-                                confirm = self.tableWidget.item(row, 5).text()
-                                other = self.tableWidget.item(row, 6).text()
-                                updateInputInfo(self.unitID, self.equipID, ID, "1", year, shop, state, arrive, confirm,
-                                                other)
-                            else:
-                                self.tableWidget.item(row, currentColumn).setText(resultRow[currentColumn + 2])
+    def slotChooseFactoryYear(self):
+        self.chooseFactoryYear.show()
+        self.setDisabled(True)
+        self.chooseFactoryYear.setDisabled(False)
 
-    '''
-        功能：
-            初始化录入信息界面以及tablewidget
-    '''
-    def _initTableWidget_(self, RowData, yearList, factoryYear):
-        if factoryYear == "全部":
-            self.factoryYear = ""
-        else:
-            self.factoryYear = factoryYear
+    #初始化录入信息界面以及tablewidget
+    def _initTableWidget_(self, RowData, yearList):
         self.RowData = RowData
         print("test:                 ", self.RowData)
-        self.tableWidget.itemChanged.disconnect(self.slotItemChanged)
         self.unitID = RowData[1]
         self.equipID = RowData[0]
-        #self.factoryYear = factoryYear
         if findEquipUnitByEquipID(self.equipID):
             self.equipUnit = findEquipUnitByEquipID(self.equipID)[0][0]
         else:
@@ -142,104 +110,142 @@ class AddStrenthInfo(QWidget, Add_Strenth_Info):
         self.tableWidget.setRowCount(0)
         self.strgenthInfo = RowData
         self.now, self.strength= selectNowNumAndStrengthNum(RowData[1], RowData[0], self.yearList, self.factoryYear)
+        self.now, self.strength = str(self.now), str(self.strength)
         self.label_UnitName.setText(RowData[3])
         self.label_EquipName.setText(RowData[2])
         self.label_ExistNumber.setText(self.now)
         self.label_PowerNumber.setText(self.strength)
-        self.isMutilInput = selectEquipInputType(RowData[0]) #查看是否是逐批信息录入
         if self.isMutilInput:
-            self.textBrowser.setText("逐批信息录入")
+            self.lineEdit.setText("逐批信息录入")
             self.header = ['批次号', '数量', '出厂年份', '生产厂家', '装备状态', '是否到位', '文件凭证', '备注']
             self.tableWidget.setColumnCount(len(self.header))
             self.tableWidget.setHorizontalHeaderLabels(self.header)
-            self.currentResult = selectInfoAboutInput(RowData[1], RowData[0], self.yearList, self.factoryYear)
+            self.currentResult = selectInfoAboutInput(RowData[1], RowData[0], self.yearList, self.factoryYear, self.startFactoryYear, self.endFactoryYear)
             self.tableWidget.setRowCount(len(self.currentResult))
             self.orginRowNum = len(self.currentResult)
+            self.now = 0
+
             for i, data in enumerate(self.currentResult):
                 item = QTableWidgetItem(data[2])
+                item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                 self.tableWidget.setItem(i, 0, item)
                 item = QTableWidgetItem(data[3])
+                item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                 self.tableWidget.setItem(i, 1, item)
                 item = QTableWidgetItem(data[4])
+                item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                 self.tableWidget.setItem(i, 2, item)
                 item = QTableWidgetItem(data[5])
+                item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                 self.tableWidget.setItem(i, 3, item)
                 item = QTableWidgetItem(data[6])
+                item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                 self.tableWidget.setItem(i, 4, item)
                 item = QTableWidgetItem(data[7])
+                item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                 self.tableWidget.setItem(i, 5, item)
                 item = QTableWidgetItem(data[8])
+                item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                 self.tableWidget.setItem(i, 6, item)
                 item = QTableWidgetItem(data[9])
+                item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                 self.tableWidget.setItem(i, 7, item)
                 self.currentResult[i] = data
+                self.now = self.now + int(data[3])
+            self.label_ExistNumber.setText(str(self.now))
         else:
-            self.textBrowser.setText("逐号信息录入")
+            self.lineEdit.setText("逐号信息录入")
             self.header = ['批次号', '出厂年份', '生产厂家', '装备状态', '是否到位', '文件凭证', '备注']
             self.tableWidget.setColumnCount(len(self.header))
             self.tableWidget.setHorizontalHeaderLabels(self.header)
-            self.currentResult = selectInfoAboutInput(RowData[1], RowData[0], self.yearList, self.factoryYear)
+            self.currentResult = selectInfoAboutInput(RowData[1], RowData[0], self.yearList, self.factoryYear, self.startFactoryYear, self.endFactoryYear)
             self.tableWidget.setRowCount(len(self.currentResult))
             self.orginRowNum = len(self.currentResult)
+            self.now = self.orginRowNum
+            self.label_ExistNumber.setText(str(self.now))
             #print("结果为：", self.currentResult)
             for i, data in enumerate(self.currentResult):
                 item = QTableWidgetItem(data[2])
+                item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                 self.tableWidget.setItem(i, 0, item)
                 item = QTableWidgetItem(data[4])
+                item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                 self.tableWidget.setItem(i, 1, item)
                 item = QTableWidgetItem(data[5])
+                item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                 self.tableWidget.setItem(i, 2, item)
                 item = QTableWidgetItem(data[6])
+                item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                 self.tableWidget.setItem(i, 3, item)
                 item = QTableWidgetItem(data[7])
+                item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                 self.tableWidget.setItem(i, 4, item)
                 item = QTableWidgetItem(data[8])
+                item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                 self.tableWidget.setItem(i, 5, item)
                 item = QTableWidgetItem(data[9])
+                item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                 self.tableWidget.setItem(i, 6, item)
                 self.currentResult[i] = data
         self.isChange = False
-        self.tableWidget.itemChanged.connect(self.slotItemChanged)
 
     # 信息录入界面新增按钮
     def slotAddSingle(self):
         #yearList = selectAllStrengthYear()
+        validator = QRegExpValidator(regx)
         if self.isMutilInput:
             row = self.tableWidget.rowCount()
-            item = QTableWidgetItem("")
-            self.tableWidget.setItem(row + 1, 0, item)
-            item = QTableWidgetItem("")
-            self.tableWidget.setItem(row + 1, 1, item)
-            item = QTableWidgetItem("")
-            self.tableWidget.setItem(row + 1, 2, item)
-            item = QTableWidgetItem("")
-            self.tableWidget.setItem(row + 1, 3, item)
-            item = QTableWidgetItem("")
-            self.tableWidget.setItem(row + 1, 4, item)
-            item = QTableWidgetItem("")
-            self.tableWidget.setItem(row + 1, 5, item)
-            item = QTableWidgetItem("")
-            self.tableWidget.setItem(row + 1, 6, item)
-            item = QTableWidgetItem("")
-            self.tableWidget.setItem(row + 1, 7, item)
             self.tableWidget.setRowCount(row + 1)
+            item = QTableWidgetItem("")
+            self.tableWidget.setItem(row, 0, item)
+            line = QLineEdit()
+            line.setValidator(validator)
+            self.tableWidget.setCellWidget(row, 1, line)
+            item = QComboBox()
+            item.addItems(allFactoryYear)
+            self.tableWidget.setCellWidget(row, 2, item)
+            factoryInfoNameList = selectAllNameAboutFactory()
+            item = QComboBox()
+            item.addItems(factoryInfoNameList)
+            self.tableWidget.setCellWidget(row, 3, item)
+            item = QComboBox()
+            item.addItems(equipState)
+            self.tableWidget.setCellWidget(row, 4, item)
+            item = QComboBox()
+            item.addItems(isArrive)
+            self.tableWidget.setCellWidget(row, 5, item)
+            item = QComboBox()
+            alocteYearList = selectYearListAboutDisturbPlan()
+            confirm = [x + "年分配调整计划" for x in alocteYearList]
+            item.addItems(confirm)
+            self.tableWidget.setCellWidget(row, 6, item)
+            item = QTableWidgetItem("")
+            self.tableWidget.setItem(row, 7, item)
         else:
             row = self.tableWidget.rowCount()
-            item = QTableWidgetItem("")
-            self.tableWidget.setItem(row + 1, 0, item)
-            item = QTableWidgetItem("")
-            self.tableWidget.setItem(row + 1, 1, item)
-            item = QTableWidgetItem("")
-            self.tableWidget.setItem(row + 1, 2, item)
-            item = QTableWidgetItem("")
-            self.tableWidget.setItem(row + 1, 3, item)
-            item = QTableWidgetItem("")
-            self.tableWidget.setItem(row + 1, 4, item)
-            item = QTableWidgetItem("")
-            self.tableWidget.setItem(row + 1, 5, item)
-            item = QTableWidgetItem("")
-            self.tableWidget.setItem(row + 1, 6, item)
             self.tableWidget.setRowCount(row + 1)
+            item = QTableWidgetItem("")
+            self.tableWidget.setItem(row, 0, item)
+            item = QComboBox()
+            item.addItems(allFactoryYear)
+            self.tableWidget.setCellWidget(row, 1, item)
+            factoryInfoNameList = selectAllNameAboutFactory()
+            item = QComboBox()
+            item.addItems(factoryInfoNameList)
+            self.tableWidget.setCellWidget(row, 2, item)
+            item = QComboBox()
+            item.addItems(equipState)
+            self.tableWidget.setCellWidget(row, 3, item)
+            item = QComboBox()
+            item.addItems(isArrive)
+            self.tableWidget.setCellWidget(row, 4, item)
+            item = QComboBox()
+            alocteYearList = selectYearListAboutDisturbPlan()
+            confirm = [x + "年分配调整计划" for x in alocteYearList]
+            item.addItems(confirm)
+            self.tableWidget.setCellWidget(row, 5, item)
+            item = QTableWidgetItem("")
+            self.tableWidget.setItem(row, 6, item)
 
     # 信息录入界面删除按钮
     def deleteNote(self):
@@ -255,12 +261,10 @@ class AddStrenthInfo(QWidget, Add_Strenth_Info):
                 for i, resultInfo in enumerate(self.currentResult):
                     if i == currentRow:
                         year = resultInfo[4]
-                        delFromInputInfo(resultInfo[0], resultInfo[1], resultInfo[2], resultInfo[3], resultInfo[4], self.yearList)
-                        inputInfo = selectDataFromInputByYear(year)
-                        if inputInfo:
-                            pass
-                        else:
-                            delFactoryYear(year)
+                        delSuccess = delFromInputInfo(resultInfo[0], resultInfo[1], resultInfo[2], resultInfo[3], resultInfo[4], self.yearList)
+                        if delSuccess != True:
+                            reply = QMessageBox.question(self, '删除', str(delSuccess) + '删除失败！', QMessageBox.Yes)
+                            return
                         reply = QMessageBox.question(self, '删除', '删除成功！', QMessageBox.Yes)
-                        self._initTableWidget_(self.RowData, self.yearList, self.factoryYear)
+                        self._initTableWidget_(self.RowData, self.yearList)
                         return
