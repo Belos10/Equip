@@ -1,5 +1,3 @@
-from pymysql.cursors import DictCursor
-
 from database.connectAndDisSql import *
 import operator
 '''
@@ -68,70 +66,6 @@ tableInformation = {
         '64': {'tableName': 'eb_production_year', 'fieldName': 'between2001and2005'},
         '65': {'tableName': 'eb_production_year', 'fieldName': 'after2006'}
     }
-def selectData(sql):
-    cur.execute(sql)
-    # 获取查询到的数据，是以字典的形式存储的，所以读取需要使用data[i][j]下标定位
-    data = cur.fetchall()
-    cur.close()
-    conn.close()
-    return data
-
-def selectDateDict(sql):
-    cur = conn.cursor(DictCursor)
-    cur.execute(sql)
-    dataDict = cur.fetchall()
-    cur.close()
-    conn.close()
-    return dataDict
-def selectOne(sql):
-    cur = conn.cursor(DictCursor)
-    cur.execute(sql)
-    data = cur.fetchone()
-    cur.close()
-    conn.close()
-    return data
- #执行多条更新语句
-def excuteupdata(sqls):
-    if sqls is None or len(sqls) == 0:
-        return False
-    for sql in sqls:
-       executeCommit(sql)
-    cur.close()
-    conn.close()
-
-
-
-
-
-
-
-def executeSql(sql):
-    """执行sql语句，针对读操作返回结果集
-
-        args：
-            sql  ：sql语句
-    """
-    try:
-        cur.execute(sql)
-        records = cur.fetchall()
-        return records
-    except BaseException as e:
-        error = 'MySQL execute failed! ERROR (%s): %s' %(e.args[0],e.args[1])
-        print(error)
-
-
-def executeCommit(sql=''):
-    """执行数据库sql语句，针对更新,删除,事务等操作失败时回滚
-
-    """
-    try:
-        cur.execute(sql)
-        conn.commit()
-    except BaseException  as e:
-        conn.rollback()
-        error = 'MySQL execute failed! ERROR (%s): %s' %(e.args[0],e.args[1])
-        print("error:", error)
-        return error
 
 
 '''
@@ -141,42 +75,20 @@ def findYear():
     sql = "select year from equipment_balance group by year "
     data = selectData(sql)
     year = []
-    print("data",data)
-    if data[0][0]:
-        pass
-    else:
-        return year
-    for key in range(len(data)):
-        if(len(data[key][0]) <= 1):
-            continue
+    print(data)
+    if len(data) > 0:
+        if data[0][0]:
+            pass
         else:
-            year.append(data[key][0])
+            return year
+        for key in range(len(data)):
+            if(len(data[key][0]) <= 1):
+                continue
+            else:
+                year.append(data[key][0])
 
-    return tuple(year)
-'''
-删除某一年度装备平衡表
-'''
-def deleteYear(year):
-    sqlFindid = "select equip_balance_id from equipment_balance where year=%s"%year
-    data = executeSql(sqlFindid)
-    ids = []
-    for key in range(len(data)):
-        ids.append(data[key][0])
-    for id in ids:
-        sqlDelete = "delete from eb_quality_status where equip_balance_id=%s"%id
-        executeCommit(sqlDelete)
-        sqlDelete = "delete from eb_change_project where equip_balance_id=%s"%id
-        executeCommit(sqlDelete)
-        sqlDelete = "delete from eb_carry where equip_balance_id=%s" % id
-        executeCommit(sqlDelete)
-        sqlDelete = "delete from eb_stock where equip_balance_id=%s" % id
-        executeCommit(sqlDelete)
-        sqlDelete = "delete from eb_management where equip_balance_id=%s" % id
-        executeCommit(sqlDelete)
-        sqlDelete = "delete from eb_repair_time where equip_balance_id=%s" % id
-        executeCommit(sqlDelete)
-        sqlDelete = "delete from equipment_balance where equip_balance_id=%s" % id
-        executeCommit(sqlDelete)
+        return tuple(year)
+
 
 def _dateSaveToList(dataDict):
     newDateList = []
@@ -231,31 +143,30 @@ def getResultByYearAndEquipAndUnit(year,equipList,unitList):
         return sorted(resultList, key=operator.itemgetter('Equip_ID'))
             # sorted(resultList, key=operator.itemgetter('Equip_ID'))
 
+'''
+删除某一年度装备平衡表
+'''
 def deleteByYear(year):
-
-    sql = "select equip_balance_id from equipment_balance where year='%s'"%year
-    data = executeSql(sql)
-    if data != None:
-        for item in data:
-            equipKey = data[0]
-            sqls = []
-            sql = "delete from eb_carry where equip_balance_id='%s'" % equipKey
-            sqls.append(sql)
-            sql = "delete from eb_change_project where equip_balance_id='%s'" % equipKey
-            sqls.append(sql)
-            sql = "delete from eb_management where equip_balance_id='%s'" % equipKey
-            sqls.append(sql)
-            sql = "delete from eb_production_year where equip_balance_id='%s'" % equipKey
-            sqls.append(sql)
-            sql = "delete from eb_quality_status where equip_balance_id='%s'" % equipKey
-            sqls.append(sql)
-            sql = "delete from eb_repair_time where equip_balance_id='%s'" % equipKey
-            sqls.append(sql)
-            sql = "delete from eb_stock where equip_balance_id='%s'" % equipKey
-            sqls.append(sql)
-            sql = "delete from equipment_balance where equip_balance_id='%s'" % equipKey
-            sqls.append(sql)
-            excuteupdata(sqls)
+    sqlFindid = "select equip_balance_id from equipment_balance where year=%s"%year
+    data = executeSql(sqlFindid)
+    ids = []
+    for key in range(len(data)):
+        ids.append(data[key][0])
+    for id in ids:
+        sqlDelete = "delete from eb_quality_status where equip_balance_id=%s"%id
+        executeCommit(sqlDelete)
+        sqlDelete = "delete from eb_change_project where equip_balance_id=%s"%id
+        executeCommit(sqlDelete)
+        sqlDelete = "delete from eb_carry where equip_balance_id=%s" % id
+        executeCommit(sqlDelete)
+        sqlDelete = "delete from eb_stock where equip_balance_id=%s" % id
+        executeCommit(sqlDelete)
+        sqlDelete = "delete from eb_management where equip_balance_id=%s" % id
+        executeCommit(sqlDelete)
+        sqlDelete = "delete from eb_repair_time where equip_balance_id=%s" % id
+        executeCommit(sqlDelete)
+        sqlDelete = "delete from equipment_balance where equip_balance_id=%s" % id
+        executeCommit(sqlDelete)
 
 
 #根据分配调整计划更新装备平衡表
@@ -573,7 +484,8 @@ def saveEquipmentBalanceByRow(dataList,year):
 
 
 if __name__ == "__main__":
-    deleteByYear('0')
+    pass
+
     # deleteOneEquipmentBalanceData('2008','2','5')
 
 

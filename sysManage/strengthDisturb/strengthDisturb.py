@@ -16,7 +16,7 @@ class strengthDisturb(QMainWindow, Strength_Disturb_Widget):
         self.strenSelect = Stren_Inquiry(self)
         self.strenSelect.initStrenInquiry()
         self.maintenMange = maintenManage(self)
-        self.equipBalance = Equip_Balance_Control(self)
+        self.equipBalance = QWidget(self)
         self.applyRetire = retirement(self)
         self.strengthDisturbSet = strengthDisturbSet(self)
         self.userInfo = None

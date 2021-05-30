@@ -1,73 +1,6 @@
-from pymysql.cursors import DictCursor
 from database.connectAndDisSql import *
 import operator
 
-
-def selectData(sql):
-    cur.execute(sql)
-    data = cur.fetchall()
-    cur.close()
-    conn.close()
-    return data
-
-def selectDateDict(sql):
-    cur = conn.cursor(DictCursor)
-    cur.execute(sql)
-    dataDict = cur.fetchall()
-    cur.close()
-    conn.close()
-    return dataDict
-'''
-    功能：
-        执行查找一条数据的sql语句，以字典的形式返回结果
-'''
-def selectOne(sql):
-    cur = conn.cursor(DictCursor)
-    cur.execute(sql)
-    data = cur.fetchone()
-    cur.close()
-    conn.close()
-    return data
-
-
- #执行多条更新语句
-def excuteupdata(sqls):
-    if sqls is None or len(sqls) == 0:
-        return False
-    for sql in sqls:
-       executeCommit(sql)
-    cur.close()
-    conn.close()
-'''
-    功能：
-        执行查询语句，以元组的方式返回查询到的数据
-'''
-def executeSql(sql):
-    """执行sql语句，针对读操作返回结果集
-
-        args：
-            sql  ：sql语句
-    """
-    try:
-        cur.execute(sql)
-        records = cur.fetchall()
-        return records
-    except BaseException  as e:
-        error = 'MySQL execute failed! ERROR (%s): %s' %(e.args[0],e.args[1])
-        print(error)
-
-def executeCommit(sql=''):
-    """执行数据库sql语句，针对更新,删除,事务等操作失败时回滚
-
-    """
-    try:
-        cur.execute(sql)
-        conn.commit()
-    except BaseException  as e:
-        conn.rollback()
-        error = 'MySQL execute failed! ERROR (%s): %s' %(e.args[0],e.args[1])
-        print("error:", error)
-        return error
 
 '''
     功能：
@@ -75,6 +8,7 @@ def executeCommit(sql=''):
         Unit_ID: 需要找的单位的ID号 
 '''
 def selectUnitNameByUnitID(Unit_ID):
+    cur = conn.cursor()
     sql = "select Unit_Name from unit where Unit_ID = '" + Unit_ID + "'"
     cur.execute(sql)
     unitName = cur.fetchall()
@@ -88,6 +22,10 @@ def selectUnitNameByUnitID(Unit_ID):
 '''
 def getUnits():
     units = []
+
+
+
+
     sql = "select Unit_Name from posengin_unit_directory group by Unit_Name order by 'Unit_ID' desc "
     result = executeSql(sql)
     if result is not None or len(result) != 0:
@@ -116,7 +54,6 @@ def initPosenginUnitDirectory():
     判断一个基地是否为
 '''
 def insertThreeLevelUnit(unitId):
-    print(gradeInUnit(unitId))
     if unitId == None:
         return
     if gradeInUnit(unitId) == 3:
@@ -182,10 +119,7 @@ def insertOneDateIntoUnitDirectory(Unit_ID,Unit_Name,Unit_Uper):
         sql = "update posengin_unit_directory set Unit_ID='%s',Unit_Name='%s',Unit_Uper='%s' where Unit_ID='%s'"%(Unit_ID,Unit_Name,Unit_Uper,Unit_ID)
         executeCommit(sql)
 
-'''
-    功能：
-        向阵地工程目录表中删除一条单挑数据
-'''
+
 
 '''
     功能：
@@ -215,6 +149,13 @@ def getUnitNameById(UnitID):
     else:
         return None
 
+def getUnitNameByIdInUnit(UnitID):
+    sql = "select Unit_Name from unit where Unit_ID=%s"%UnitID
+    result = selectOne(sql)
+    if result:
+        return result['Unit_Name']
+    else:
+        return None
 '''
     功能：
         判断某条数据是否存在在表中
@@ -339,12 +280,35 @@ def getEquipmentStatisticsResultByUnitAndEquip(unit,equipment):
 
 #根据Dept_Uper查询单位信息,并返回
 def selectUnitInfoByDeptUper(Unit_Uper):
-    sql = "select * from posengin_unit_directory where Unit_Uper = '" + Unit_Uper + "'"
-    cur.execute(sql)
-    result = cur.fetchall()
-    # 测试结果
-    # print(result)
-    return result
+    if gradeInUnit(Unit_Uper) < 3:
+        conn, cur = connectSqlite()
+        sql = "select * from unit where Unit_Uper = '" + Unit_Uper + "'"
+        cur.execute(sql)
+        result = cur.fetchall()
+        # 测试结果
+        # print(result)
+        return result
+    else:
+        return []
+
+#根据Dept_Uper查询单位信息,并返回
+def findBases(unitId):
+    result = []
+    grade = gradeInUnit(unitId)
+    if grade == 2:
+        result.extend(findChildInUnit(unitId))
+        return result
+    elif grade < 2:
+        children = findChildInUnit(unitId)
+        for child in children:
+            result.extend(findBases(child))
+        return result
+    elif grade == 3:
+        result.append(unitId)
+        return result
+    elif grade > 3:
+        return result
+
 
 '''
     功能：
@@ -364,7 +328,6 @@ def gradeOfUnit(UnitId):
 def gradeInUnit(UnitId):
     sql = "select Unit_Uper from unit where Unit_ID='%s'"%UnitId
     data = selectOne(sql)
-    print(data)
     if data != None:
         return gradeInUnit(data['Unit_Uper']) + 1
     else:
@@ -380,24 +343,32 @@ def findUperUnit(unitId):
         return data['Unit_Uper']
     else:
         return None
+
+def findUperUnitInUnit(unitId):
+    sql =  "select Unit_Uper from unit where Unit_ID='%s'"%unitId
+    data = selectOne(sql)
+    if data != None:
+        return data['Unit_Uper']
+    else:
+        return None
 '''
     功能：
         找寻一个单位的基地
 '''
 def findBase(unitID):
-    if gradeOfUnit(unitID) < 3:
+    if gradeInUnit(unitID) < 3:
         pass
-    elif gradeOfUnit(unitID) == 3 : #基地
+    elif gradeInUnit(unitID) == 3 : #基地
         return unitID
-    elif gradeOfUnit(unitID) == 4:  #旅团
-        return  findUperUnit(unitID)
-    elif gradeOfUnit(unitID) == 5:  #阵地
-        uperId = findUperUnit(unitID)
-        while gradeOfUnit(uperId) != 3:
-            newUperId = findUperUnit(uperId)
+    elif gradeInUnit(unitID) == 4:  #旅团
+        return  findUperUnitInUnit(unitID)
+    elif gradeInUnit(unitID) == 5:  #阵地
+        uperId = findUperUnitInUnit(unitID)
+        while gradeInUnit(uperId) != 3:
+            newUperId = findUperUnitInUnit(uperId)
             uperId = newUperId
         return  uperId
-    elif gradeOfUnit(unitID) > 5:
+    elif gradeInUnit(unitID) > 5:
         return None
 
 '''
@@ -433,76 +404,35 @@ def findChildInUnit(unitId):
         if len(result) > 0:
             return result
         else:
-            return None
+            return []
     else:
-        return None
+        return []
 '''
     功能：
         判断武器是否为最末级武器
 '''
 
 def isLastLevelEquipment(equipmentId):
-    sql = "select Equip_ID from posengin_equipment_directory where Unit_ID='专用装备'  and Equip_Type='逐号录入' and Equip_ID=%s"%equipmentId
+    sql = "select Equip_ID from equip where Equip_Type='专用装备'  and length (Input_Type) > 3 and Equip_ID=%s"%equipmentId
     result = executeSql(sql)
     if result != None:
         return True
     else:
-        False
+        return False
 
 '''
     功能：
         根据装备Id获取装备名称
 '''
 def getEquipmentNameById(equipmentId):
-    sql = "select Equip_Name from posengin_equipment_directory where Equip_ID='%s'"%equipmentId
+    sql = "select Equip_Name from equip where Equip_ID='%s'"%equipmentId
     result = selectOne(sql)
     if result != None:
         return result['Equip_Name']
 
-'''
-    功能：
-        得到装备的单位型号
-'''
-def getEquipmentUnitName(equipment):
-    sql = "select unit from posengin_equipment_directory where Equip_ID='%s'"%equipment
-    result = selectOne(sql)
-    if result != None:
-        return result['unit']
-
-#根据Dept_Uper查询单位信息,并返回
-def selectPosenginUnitInfoByDeptUper(Unit_Uper):
-    sql = "select * from posengin_unit_directory where Unit_Uper = '" + Unit_Uper + "'"
-    cur.execute(sql)
-    result = cur.fetchall()
-    # 测试结果
-    # print(result)
-    return result
-
-# 返回posengin_unit_directory单位表的所有数据
-def selectAllDataAboutPosenginUnit():
-    sql = "select * from posengin_unit_directory order by Unit_ID"
-    cur.execute(sql)
-    result = cur.fetchall()
-    # 测试结果
-    # print(result)
-    return result
-
-
-# 返回equip装备表的所有数据
-def selectAllDataAboutEquip():
-
-    sql = "select * from posengin_equipment_directory"
-
-    cur.execute(sql)
-    result = cur.fetchall()
-
-
-    # 测试结果
-    # print(result)
-
-    return result
 # 单位表disturbplanunit中删除一条数据
 def delDataInPosenginUnit(Unit_ID):
+    conn, cur = connectSqlite()
     # 插入的sql语句
     UnitIDList = []
     findChildPosenginUnit(Unit_ID, UnitIDList, cur)
@@ -533,23 +463,27 @@ def findChildPosenginUnit(Unit_ID, childUnitList, cur):
         return
 # 按装备ID列表从unit表复制数据至disturbplanunit表
 def insertIntoPosenginUnitFromList(UnitList):
+    conn,cur = connectSqlite()
     for i in UnitList:
         sql = "insert into posengin_unit_directory select * from unit where Unit_ID = '" + i + "'"
         cur.execute(sql)
     conn.commit()
 
+
 # 返回disturbplanunit单位表的所有数据
 def selectAllDataAboutPosenginUnit():
+    conn, cur = connectSqlite()
     sql = "select * from posengin_unit_directory order by Unit_ID"
     cur.execute(sql)
     result = cur.fetchall()
     # 测试结果
-    # print(result)
+
     return result
 
 
 # 按装备ID列表从unit表复制数据至disturbplanunit表
 def insertIntoPosenginUnitFromList(UnitList):
+    conn,cur = connectSqlite()
     for i in UnitList:
         sql = "insert into posengin_unit_directory select * from unit where Unit_ID = '" + i + "'"
         cur.execute(sql)
@@ -565,22 +499,7 @@ def deleteEquipmentById(equipmentId):
     sqls.append(sql)
     excuteupdata(sql)
 
-# 装备表equip中删除一条数据
-def delDataInEquip(Equip_ID):
-    # 插入的sql语句
-    EquipIDList = []
-    findChildEquip(Equip_ID, EquipIDList, cur)
 
-    for EquipID in EquipIDList:
-        sql = "delete from posengin_equipment_directory where Equip_ID='%s'" % (EquipID)
-        # print(sql)
-        # 执行sql语句，并发送给数据库
-        cur.execute(sql)
-
-        sql = "delete from posengin_statistics where Equip_ID='%s'"%EquipID
-        # print(sql)
-        cur.execute(sql)
-    conn.commit()
 
 
 def findChildEquip(Equip_ID, childEquipList, cur):
@@ -593,28 +512,67 @@ def findChildEquip(Equip_ID, childEquipList, cur):
 
 # 根据Equip_Uper查询单位信息,并返回
 def selectEquipInfoByEquipUper(Equip_Uper):
-    sql = "select * from posengin_equipment_directory where Equip_Uper = '" + Equip_Uper + "'"
+    conn, cur = connectSqlite()
+
+    sql = "select * from equip where Equip_Uper = '" + Equip_Uper + "'"
 
     cur.execute(sql)
     result = cur.fetchall()
-
     return result
 
-#返回阵地工程装备目录所有信息
-def selectAllPoseginDirectory():
+'''
+    功能：
+        返回武器的单位
+'''
+def getEquipmentTypeById(equipmentId):
+    sql = "select unit from equip where Equip_ID='%s'"%equipmentId
+    data = selectOne(sql)
+    if data != None:
+        return data['unit']
+    else:
+        return '无'
 
-    sql = "select * from posengin_equipment_directory"
 
-    cur.execute(sql)
-    result = cur.fetchall()
+'''
+    功能：
+        获取对应装备对应单位的statistics表的数据
+'''
+def getStatictsResult(unitId,equipemntId):
+    result = []
+    sql = "select statistics_Id,Unit_ID,Equip_ID,count,status from  posengin_statistics where Unit_ID='%s' and Equip_ID='%s'"%(unitId,equipemntId)
+    data = selectData(sql)
+    if len(data) > 0:
+        return data[0]
+    else:
+        return result
+'''
+    功能：
+        修改一行数据
+'''
+def alterData(statisticsId,cout,status):
+    sql = "update posengin_statistics set count='%d',status='%s' where statistics_Id='%s'"%(cout,status,statisticsId)
+    executeCommit(sql)
+    return True
+'''
+    功能：
+        删除条数据
+'''
+def deleteData(statisticsId):
+    sql = "delete from posengin_statistics where statistics_Id='%s'"%statisticsId
+    executeCommit(sql)
+    return True
 
-    # 测试结果
-    # print(result)
-
-    return result
+'''
+    功能：
+        插入一条数据
+'''
+def insertData(equipmentId,unitId,count,status):
+    sql = "insert into posengin_statistics(Unit_ID,Equip_ID,count,status) values ('%s','%s','%d','%s')"%(unitId,equipmentId,count,status)
+    executeCommit(sql)
+    return True
 
 if __name__ == '__main__':
     data = ['3','003','钢铁雄心基地','xxxx',1,'准备到位','2020-06','2020-12',150,'未到位','未运行','无']
-    print(gradeInUnit('8'))
+    print(type([]) == list)
     pass
 

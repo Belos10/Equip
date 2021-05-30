@@ -201,7 +201,7 @@ class retirement(QWidget, Widget_Retirement):
             self.tw_result.setRowCount(2)
             return
         self.pb_save.setDisabled(False)
-        print("装备：", self.currentCheckedEquipList)
+        # print("装备：", self.currentCheckedEquipList)
         self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList,
                                                         self.currentYear)
     '''
@@ -331,7 +331,6 @@ class retirement(QWidget, Widget_Retirement):
                 parent_item.setCheckState(num, 1)
 
     def _initTableWidgetByUnitListAndEquipList(self, currentCheckedUnitList, currentCheckedEquipList,currentYear):
-        print(currentCheckedUnitList, currentCheckedEquipList, currentYear)
         currentClass = 0
         self.tw_result.clear()
         self.tw_result.setRowCount(0)
@@ -343,57 +342,79 @@ class retirement(QWidget, Widget_Retirement):
         self.tw_result.verticalHeader().setVisible(False)
         self.currentInquiryResult.clear()
 
-        self.tw_result.setColumnCount(9)
+        self.tw_result.setColumnCount(10)
         self.tw_result.setRowCount(2)
         item = QTableWidgetItem()
         item.setText(currentYear + "年装备补充及退役需求表")
+        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
         self.tw_result.setItem(0, 0, item)
-        self.tw_result.setSpan(0, 0, 1, 9)
+        self.tw_result.setSpan(0, 0, 1, 10)
 
         item = QTableWidgetItem()
         item.setText("序号")
-        self.tw_result.setItem(1, 0, item)
+        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+        self.tw_result.setItem(1, 0, item)
+
 
         item = QTableWidgetItem()
         item.setText("装备名称")
-        self.tw_result.setItem(1, 1, item)
+        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+        self.tw_result.setItem(1, 1, item)
 
         item = QTableWidgetItem()
         item.setText("单位")
-        self.tw_result.setItem(1, 2, item)
+        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+        self.tw_result.setItem(1, 2, item)
+
+        item = QTableWidgetItem('实力数')
+        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+        self.tw_result.setItem(1, 3, item)
 
         item = QTableWidgetItem()
         item.setText("编制数")
-        self.tw_result.setItem(1, 3, item)
+        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+        self.tw_result.setItem(1, 4, item)
+
 
         item = QTableWidgetItem()
         item.setText("拟退役数")
-        self.tw_result.setItem(1, 4, item)
+        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+        self.tw_result.setItem(1, 5, item)
+
 
         item = QTableWidgetItem()
         item.setText("现有数")
-        self.tw_result.setItem(1, 5, item)
+        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+        self.tw_result.setItem(1, 6, item)
+
 
         item = QTableWidgetItem()
         item.setText("超/缺编制数")
-        self.tw_result.setItem(1, 6, item)
+        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+        self.tw_result.setItem(1, 7, item)
+
 
         item = QTableWidgetItem()
         item.setText("申请需求")
-        self.tw_result.setItem(1, 7, item)
+        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+        self.tw_result.setItem(1, 8, item)
+
 
         item = QTableWidgetItem()
         item.setText("备注")
-        self.tw_result.setItem(1, 8, item)
+        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+        self.tw_result.setItem(1, 9, item)
         self.resultList = selectAboutRetireByEquipShow(currentCheckedUnitList, currentCheckedEquipList, currentYear)
 
         self.tw_result.setRowCount(len(self.resultList) + 2)
@@ -411,30 +432,47 @@ class retirement(QWidget, Widget_Retirement):
                 else:
                     ID = str(classID)
                     classID = classID + 1
-
             item = QTableWidgetItem(ID)
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.tw_result.setItem(i + 2, 0, item)
+            #名称
             item = QTableWidgetItem(LineInfo[3])
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.tw_result.setItem(i + 2, 1, item)
+            #单位
             item = QTableWidgetItem(LineInfo[4])
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.tw_result.setItem(i + 2, 2, item)
-            item = QTableWidgetItem(LineInfo[5])
+
+            #实力数
+            item = QTableWidgetItem(str(LineInfo[5]))
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.tw_result.setItem(i + 2, 3, item)
-            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+
+            #编制数
             item = QTableWidgetItem(LineInfo[6])
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.tw_result.setItem(i + 2, 4, item)
+
+            #拟退役数
             item = QTableWidgetItem(LineInfo[7])
+            # item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.tw_result.setItem(i + 2, 5, item)
-            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+
+            #现有数
             item = QTableWidgetItem(LineInfo[8])
-            self.tw_result.setItem(i + 2, 6, item)
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.tw_result.setItem(i + 2, 6, item)
+            #超缺编数
             item = QTableWidgetItem(LineInfo[9])
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.tw_result.setItem(i + 2, 7, item)
+
+            #申请需求
             item = QTableWidgetItem(LineInfo[10])
+            self.tw_result.setItem(i + 2, 8, item)
+            #备注
+            item = QTableWidgetItem(LineInfo[11])
             self.tw_result.setItem(i + 2, 8, item)
             self.currentInquiryResult[i] = LineInfo
 
@@ -445,7 +483,7 @@ class retirement(QWidget, Widget_Retirement):
                                                         self.currentYear)
             return
         for i, result in self.currentInquiryResult.items():
-            num = self.tw_result.item(i + 2, 4).text()
+            num = self.tw_result.item(i + 2, 5).text()
             apply = self.tw_result.item(i + 2, 7).text()
             other = self.tw_result.item(i + 2, 8).text()
             updateRetireAboutRetire(num, apply, other, result)

@@ -1,71 +1,5 @@
-from pymysql.cursors import DictCursor
 from database.connectAndDisSql import *
-
-def selectData(sql):
-    cur.execute(sql)
-    data = cur.fetchall()
-    cur.close()
-    conn.close()
-    return data
-
-def selectDateDict(sql):
-    cur = conn.cursor(DictCursor)
-    cur.execute(sql)
-    dataDict = cur.fetchall()
-    cur.close()
-    conn.close()
-    return dataDict
-'''
-    功能：
-        执行查找一条数据的sql语句，以字典的形式返回结果
-'''
-def selectOne(sql):
-    cur = conn.cursor(DictCursor)
-    cur.execute(sql)
-    data = cur.fetchone()
-    cur.close()
-    conn.close()
-    return data
-
-
- #执行多条更新语句
-def excuteupdata(sqls):
-    if sqls is None or len(sqls) == 0:
-        return False
-    for sql in sqls:
-       executeCommit(sql)
-    cur.close()
-    conn.close()
-'''
-    功能：
-        执行查询语句，以元组的方式返回查询到的数据
-'''
-def executeSql(sql):
-    """执行sql语句，针对读操作返回结果集
-
-        args：
-            sql  ：sql语句
-    """
-    try:
-        cur.execute(sql)
-        records = cur.fetchall()
-        return records
-    except BaseException  as e:
-        error = 'MySQL execute failed! ERROR (%s): %s' %(e.args[0],e.args[1])
-        print(error)
-
-def executeCommit(sql=''):
-    """执行数据库sql语句，针对更新,删除,事务等操作失败时回滚
-
-    """
-    try:
-        cur.execute(sql)
-        conn.commit()
-    except BaseException  as e:
-        conn.rollback()
-        error = 'MySQL execute failed! ERROR (%s): %s' %(e.args[0],e.args[1])
-        print("error:", error)
-        return error
+import operator
 
 '''
     功能：
@@ -104,12 +38,31 @@ def exists(tableName,fieldName,fieldItem):
 
 #根据Dept_Uper查询单位信息,并返回
 def selectUnitInfoByDeptUper(Unit_Uper):
-    sql = "select * from dangergoods_unit_directory where Unit_Uper = '" + Unit_Uper + "'"
-    cur.execute(sql)
-    result = cur.fetchall()
-    # 测试结果
-    # print(result)
-    return result
+    if gradeInUnit(Unit_Uper) < 3:
+        conn, cur = connectSqlite()
+        sql = "select * from unit where Unit_Uper = '" + Unit_Uper + "'"
+        cur.execute(sql)
+        result = cur.fetchall()
+        # 测试结果
+        # print(result)
+        return result
+    else:
+        return []
+
+
+
+
+'''
+    功能：
+        判断单位的为几级单位
+'''
+def gradeInUnit(UnitId):
+    sql = "select Unit_Uper from unit where Unit_ID='%s'"%UnitId
+    data = selectOne(sql)
+    if data != None:
+        return gradeInUnit(data['Unit_Uper']) + 1
+    else:
+        return 0
 '''
     功能：
         根据单位Id从dangergoods表获取数据
@@ -123,9 +76,9 @@ def getDataByUnit(unit):
         return None
 
 def getUnitNameById(UnitID):
-    sql = "select Unit_Name from dangergoods_unit_directory where Unit_ID=%s"%UnitID
+    sql = "select Unit_Name from unit where Unit_ID=%s"%UnitID
     result = selectOne(sql)
-    if result != None or len(result) != 0:
+    if result != None :
         return result['Unit_Name']
     else:
         return None
@@ -168,11 +121,11 @@ def updataOneDataInDangerGood(rowData):
         向表中插入一条数据
 '''
 def insertOneDataIntDangerGoods(rowData):
-    sql = "insert into dangergoods(Unit_ID,type,unit,count," \
+    sql = "insert into dangergoods(Unit_ID,type,name,unit,count," \
           "new_product,waste_product,delivery_time,storage_time,source,radioactivity,notes) " \
-          "values('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')"%(rowData[0],rowData[1],rowData[2],rowData[3],rowData[4],
+          "values('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')"%(rowData[0],rowData[1],rowData[2],rowData[3],rowData[4],
                                                           rowData[5],rowData[6],rowData[7],rowData[8],rowData[9],
-                                                          rowData[10])
+                                                          rowData[10],rowData[11])
     executeCommit(sql)
     return True
 '''
@@ -183,6 +136,60 @@ def deleteByDangerGoodsId(dangerGoodsId):
     sql = "delete from dangergoods where goods_Id='%s'"%dangerGoodsId
     executeCommit(sql)
     return True
+'''
+    获取某基地所属的旅团
+'''
+def getBrigadesByBaseId(baseId):
+    children = findChildUnit(baseId)
+    brigades = []
+    for child in children:
+        if gradeInUnit(child) == 4:
+            temp = getUnit(child)
+            if len(temp) > 1:
+                brigades.append(temp.copy())
+    return brigades
+
+'''
+    功能：
+        寻找一个单位的一级子单位
+'''
+def findChildUnit(unitId):
+    result = []
+    sql = "select Unit_ID from unit where Unit_Uper=%s"%unitId
+    data = executeSql(sql)
+    if data != None:
+        for item in data:
+            result.append(item[0])
+    return result
+
+'''
+    功能：
+        根据单位号返回单位的信息
+'''
+def getUnit(unitId):
+    result = {}
+    sql = "select Unit_ID,Unit_Name from unit where Unit_ID='%s'"%unitId
+    data =selectOne(sql)
+    if data != None:
+        result['Unit_ID'] = data['Unit_ID']
+        result['Unit_Name'] = data['Unit_Name']
+    return result
+'''
+    功能：
+        返回某个旅团的所有阵地
+'''
+def getpositionsByPositionId(PositionId):
+    children = findChildUnit(PositionId)
+    Positions = []
+    for child in children:
+        if gradeInUnit(child) == 5:
+            temp = getUnit(child)
+            if len(temp) > 1:
+                Positions.append(temp.copy())
+    return Positions
+
+    pass
+
 if __name__ == '__main__':
-    print(type(getCountOfUnit('1')))
+    print(getpositionsByPositionId('6'))
     pass
