@@ -3,6 +3,7 @@ import re
 from PyQt5.QtWidgets import QDialog,QLineEdit
 from widgets.login.login import Widget_Login
 from database.loginSql import findAllLoginAccontList
+from PyQt5.Qt import Qt
 
 class login(QDialog, Widget_Login):
 
@@ -14,6 +15,9 @@ class login(QDialog, Widget_Login):
         self.le_pswd.setEchoMode(QLineEdit.Password)
         self.le_accont.setText("root")
         self.le_pswd.setText("123456")
+        flags = Qt.Dialog
+        flags = flags | Qt.WindowTitleHint | Qt.CustomizeWindowHint | Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint
+        self.setWindowFlags(flags)
 
     def initLoginWidget(self):
         self.le_accont.setPlaceholderText("请输入账号")

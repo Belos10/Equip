@@ -59,6 +59,7 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
     '''
 
     def initStrenInquiry(self):
+        self.inquiry_result.tw_inquiryResult.clear()
         self.initUserInfo()
         self.tw_first.clear()
         self.tw_first.header().setVisible(False)
@@ -82,7 +83,6 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
 
         #初始化年份选择列表
         self._initSelectYear_()
-        #self.cb_yearAll = QCheckBox(self.sa_yearChoose)
 
     '''
         功能：
@@ -102,8 +102,6 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         self.tw_first.setDisabled(False)
         self.tw_second.setDisabled(False)
         self.inquiry_result.setDisabled(True)
-#        self.tb_inqury.setDisabled(True)
-#        self.tb_rechoose.setDisabled(False)
 
         self.currentYear = self.lw_chooseYear.currentItem().text()
         print("currentYear :", self.currentYear)
@@ -169,10 +167,6 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
 
         # 当前装备目录被点击
         self.tw_second.itemChanged.connect(self.slotInquryStrengthResult)
-
-        # 设置单位目录级联选中
-        # self.tw_first.itemChanged.connect(self.slotCheckedChange)
-        # self.tw_second.itemChanged.connect(self.slotCheckedChange)
 
         # 双击某行进入录入界面
         self.inquiry_result.tw_inquiryResult.doubleClicked.connect(self.slotInputStrengthInfo)
@@ -281,95 +275,71 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         currentRowNum = self.add_strenth_info.tableWidget.rowCount()
         columnNum = self.add_strenth_info.tableWidget.columnCount()
         allYear = selectAllStrengthYear()
-        for i in range(currentRowNum):
-            for j in range(columnNum):
-                if self.add_strenth_info.tableWidget.item(i, j):
-                    pass
-                else:
-                    reply = QMessageBox.question(self, '保存', '数据不能为空，保存失败', QMessageBox.Yes,
-                                                 QMessageBox.Cancel)
-                    return
-                if self.add_strenth_info.tableWidget.item(i, j).text() == '':
-                    reply = QMessageBox.question(self, '保存', '数据不能为空，保存失败', QMessageBox.Yes,
-                                                 QMessageBox.Cancel)
-                    return
         if columnNum == 8:
             for i in range(currentRowNum - orginRowNum):
-                print("data:", Unit_ID, Equip_ID,
-                      self.add_strenth_info.tableWidget.item(i + orginRowNum, 0).text(),
-                      self.add_strenth_info.tableWidget.item(i + orginRowNum, 1).text(),
-                      self.add_strenth_info.tableWidget.item(i + orginRowNum, 2).text(),
-                      self.add_strenth_info.tableWidget.item(i + orginRowNum, 3).text(),
-                      self.add_strenth_info.tableWidget.item(i + orginRowNum, 4).text(),
-                      self.add_strenth_info.tableWidget.item(i + orginRowNum, 5).text(),
-                      self.add_strenth_info.tableWidget.item(i + orginRowNum, 6).text(),
-                      self.add_strenth_info.tableWidget.item(i + orginRowNum, 7).text(),
-                      self.currentYear)
                 # 添加新增的数据
-                year = self.add_strenth_info.tableWidget.item(i + orginRowNum, 2).text()
-                num = self.add_strenth_info.tableWidget.item(i + orginRowNum, 1).text()
-                if year.isdigit() == False:
-                    reply = QMessageBox.question(self, '增加', '第' + str(i + orginRowNum + 1) + "行年份不是整数，添加失败",QMessageBox.Yes)
-                    continue
-
-                if num.isdigit() == False:
-                    reply = QMessageBox.question(self, '增加', '第' + str(i + orginRowNum + 1) + "行数量不是整数，添加失败",
-                                                 QMessageBox.Yes)
-                    continue
-                allID = selectIDFromInputInfo(Equip_ID, Unit_ID, self.currentYear)
+                year = self.add_strenth_info.tableWidget.cellWidget(i + orginRowNum, 2).currentText()
+                num = self.add_strenth_info.tableWidget.cellWidget(i + orginRowNum, 1).text()
                 ID = self.add_strenth_info.tableWidget.item(i + orginRowNum, 0).text()
-                haveID = False
-                for IDinfo in allID:
-                    if ID == IDinfo[0]:
-                        reply = QMessageBox.question(self, '增加', '第' + str(i + orginRowNum + 1) + "行当前装备当前单位当前实力年该序号已存在，添加失败",
-                                                     QMessageBox.Yes)
-                        haveID = True
-                        break
-                if haveID:
+                haveID = selectIDWhetherExitFromInputInfo(Equip_ID, Unit_ID, self.currentYear, ID)
+                if ID == "":
+                    QMessageBox.information(self, "增加", "第 " + currentRowNum + " 添加失败，批次号不能为空", QMessageBox.Yes)
                     continue
-                addDataIntoInputInfo(Unit_ID, Equip_ID,
-                                        self.add_strenth_info.tableWidget.item(i + orginRowNum, 0).text(),
-                                        self.add_strenth_info.tableWidget.item(i + orginRowNum, 1).text(),
-                                        self.add_strenth_info.tableWidget.item(i + orginRowNum, 2).text(),
-                                        self.add_strenth_info.tableWidget.item(i + orginRowNum, 3).text(),
-                                        self.add_strenth_info.tableWidget.item(i + orginRowNum, 4).text(),
-                                        self.add_strenth_info.tableWidget.item(i + orginRowNum, 5).text(),
-                                        self.add_strenth_info.tableWidget.item(i + orginRowNum, 6).text(),
-                                        self.add_strenth_info.tableWidget.item(i + orginRowNum, 7).text(),
+                if haveID:
+                    QMessageBox.information(self, "增加", "第 " + currentRowNum + " 添加失败，批次号重复", QMessageBox.Yes)
+                    continue
+                factory = self.add_strenth_info.tableWidget.cellWidget(i + orginRowNum, 3).currentText()
+                state = self.add_strenth_info.tableWidget.cellWidget(i + orginRowNum, 4).currentText()
+                arrive = self.add_strenth_info.tableWidget.cellWidget(i + orginRowNum, 5).currentText()
+                confirm = self.add_strenth_info.tableWidget.cellWidget(i + orginRowNum, 6).currentText()
+                other = self.add_strenth_info.tableWidget.item(i + orginRowNum, 7).text()
+                addSuccess = addDataIntoInputInfo(Unit_ID, Equip_ID,
+                                        ID,
+                                        num,
+                                        year,
+                                        factory,
+                                        state,
+                                        arrive,
+                                        confirm,
+                                        other,
                                         self.currentYear)
-
+                if addSuccess != True:
+                    QMessageBox.information(self, "增加", "第 " + currentRowNum + " 添加失败，由于:" + addSuccess, QMessageBox.Yes)
+                    continue
             self.sw_strenSelectMan.setCurrentIndex(0)
             self.slotInquryStrengthResult()
         elif columnNum == 7:
             # 添加新增的数据
             for i in range(currentRowNum - orginRowNum):
-                year = self.add_strenth_info.tableWidget.item(i + orginRowNum, 1).text()
-                if year.isdigit() == False:
-                    reply = QMessageBox.question(self, '增加', '第' + str(i + orginRowNum + 1) + "行年份不是整数，添加失败",QMessageBox.Yes)
-                    continue
-                allID = selectIDFromInputInfo(Equip_ID, Unit_ID, self.currentYear)
+                # 添加新增的数据
+                year = self.add_strenth_info.tableWidget.cellWidget(i + orginRowNum, 1).currentText()
                 ID = self.add_strenth_info.tableWidget.item(i + orginRowNum, 0).text()
-                haveID= False
-
-                for IDinfo in allID:
-                    if ID == IDinfo[0]:
-                        reply = QMessageBox.question(self, '增加',
-                                                     '第' + str(i + orginRowNum + 1) + "行当前装备当前单位当前实力年该序号已存在，添加失败",
-                                                     QMessageBox.Yes)
-                        haveID = True
-                        break
-                if haveID:
+                haveID = selectIDWhetherExitFromInputInfo(Equip_ID, Unit_ID, self.currentYear, ID)
+                if ID == "":
+                    QMessageBox.information(self, "增加", "第 " + currentRowNum + " 添加失败，批次号不能为空", QMessageBox.Yes)
                     continue
-                addDataIntoInputInfo(Unit_ID, Equip_ID,
-                                     self.add_strenth_info.tableWidget.item(i + orginRowNum, 0).text(),
-                                     "1",
-                                     self.add_strenth_info.tableWidget.item(i + orginRowNum, 1).text(),
-                                     self.add_strenth_info.tableWidget.item(i + orginRowNum, 2).text(),
-                                     self.add_strenth_info.tableWidget.item(i + orginRowNum, 3).text(),
-                                     self.add_strenth_info.tableWidget.item(i + orginRowNum, 4).text(),
-                                     self.add_strenth_info.tableWidget.item(i + orginRowNum, 5).text(),
-                                     self.add_strenth_info.tableWidget.item(i + orginRowNum, 6).text(),
-                                     self.currentYear)
+                if haveID:
+                    QMessageBox.information(self, "增加", "第 " + currentRowNum + " 添加失败，批次号重复", QMessageBox.Yes)
+                    continue
+                factory = self.add_strenth_info.tableWidget.cellWidget(i + orginRowNum, 2).currentText()
+                state = self.add_strenth_info.tableWidget.cellWidget(i + orginRowNum, 3).currentText()
+                arrive = self.add_strenth_info.tableWidget.cellWidget(i + orginRowNum, 4).currentText()
+                confirm = self.add_strenth_info.tableWidget.cellWidget(i + orginRowNum, 5).currentText()
+                other = self.add_strenth_info.tableWidget.item(i + orginRowNum, 6).text()
+                addSuccess = addDataIntoInputInfo(Unit_ID, Equip_ID,
+                                                  ID,
+                                                  "1",
+                                                  year,
+                                                  factory,
+                                                  state,
+                                                  arrive,
+                                                  confirm,
+                                                  other,
+                                                  self.currentYear)
+                if addSuccess != True:
+                    QMessageBox.information(self, "增加", "第 " + currentRowNum + " 添加失败，由于:" + addSuccess,
+                                            QMessageBox.Yes)
+                    continue
             self.sw_strenSelectMan.setCurrentIndex(0)
             self.slotInquryStrengthResult()
         self.groupBox.setDisabled(False)
@@ -402,21 +372,25 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         if self.currentColumn != 2:
             for i, resultRowInfo in self.inquiry_result.currentInquiryResult.items():
                 if i == self.currentRow:
-                    unitHaveChild = selectUnitIsHaveChild(resultRowInfo[0])
-                    equipHaveChild = selectEquipIsHaveChild(resultRowInfo[1])
+                    unitHaveChild = selectUnitIsHaveChild(resultRowInfo[1])
+                    equipHaveChild = selectEquipIsHaveChild(resultRowInfo[0])
                     equipInfo = selectEquipInfoByEquipID(resultRowInfo[0])
                     if unitHaveChild or equipHaveChild:
                         reply = QMessageBox.information(self, '录入', '该单位或装备不是末级，无法录入', QMessageBox.Yes)
                         return
                     if equipInfo:
-
+                        print("--------", equipInfo)
                         if equipInfo[0][3] == "空":
                             reply = QMessageBox.information(self, '录入', '请设置该装备录入类型，无法录入', QMessageBox.Yes)
                             return
+                        elif equipInfo[0][3] == "逐批录入信息":
+                            self.add_strenth_info.isMutilInput = True
+                            print("''''''''''''''", self.add_strenth_info.isMutilInput)
+                        elif equipInfo[0][3] == "逐号录入信息":
+                            self.add_strenth_info.isMutilInput = False
                     if self.inquiry_result.chooseFactoryYear.selectAll:
                         self.sw_strenSelectMan.setCurrentIndex(1)
-                        #print("=====================", resultRowInfo, self.currentYear, self.inquiry_result.currentFactoryYear)
-                        self.add_strenth_info._initTableWidget_(resultRowInfo, self.currentYear, self.inquiry_result.currentFactoryYear)
+                        self.add_strenth_info._initTableWidget_(resultRowInfo, self.currentYear)
                         self.groupBox.setDisabled(True)
                         self.groupBox_2.setDisabled(True)
                         break
@@ -433,7 +407,6 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
     '''
     def slotInquryStrengthResult(self):
         self.inquiry_result.setDisabled(False)
-        self.yearList = ['2001']
         self.currentCheckedUnitList = []
         self.currentCheckedEquipList = []
         for unitID, unitItem in self.first_treeWidget_dict.items():
@@ -445,6 +418,11 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
                 self.currentCheckedEquipList.append(equipID)
 
         if self.currentCheckedUnitList == [] or self.currentCheckedEquipList == []:
+            headerlist = ['单位名称', '装备名称', '实力数', '编制数', '现有数', '偏差', '准备退役数', '未到位数', '提前退役', '待核查无实物', '待核查无实力',
+                          '单独建账',
+                          '正常到位']
+            self.inquiry_result.tw_inquiryResult.setHorizontalHeaderLabels(headerlist)
+            self.inquiry_result.tw_inquiryResult.setColumnCount(len(headerlist))
             self.inquiry_result.tw_inquiryResult.setRowCount(0)
             return
 

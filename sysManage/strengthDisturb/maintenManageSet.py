@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, QAbstractItemView, QMessageBox
+from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, QAbstractItemView, QMessageBox,QHeaderView
 from widgets.strengthDisturb.maintenManageSet import Widget_Mainten_Manage_Set
 from database.strengthDisturbSql import *
 from PyQt5.Qt import Qt
@@ -23,6 +23,9 @@ class maintenManageSet(QWidget, Widget_Mainten_Manage_Set):
         self.startInfo = None
         self.currentUnitTableResult = []
         self.orignUnitResult = {}
+
+        self.tw_publicEquip.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.tw_unit.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
     def _initAll_(self):
         self.orignUnitResult = {}
@@ -168,11 +171,13 @@ class maintenManageSet(QWidget, Widget_Mainten_Manage_Set):
         更新当前是否为旅团
     '''
     def slotUpdateIsGroup(self):
-        if self.currentRow < 0:
+        if self.tw_unit.currentRow() < 0:
             return
         if self.tw_unit.item(self.currentRow, 2).text() != self.cb_isGroup.currentText():
-            updateUnitIsGroupFromUnit(self.lb_unitID.text(), self.cb_isGroup.currentText())
-
+            updateSuccess = updateUnitIsGroupFromUnit(self.lb_unitID.text(), self.cb_isGroup.currentText())
+            if updateSuccess != True:
+                QMessageBox.information(self, "更新", str(updateSuccess) + '，更新失败', QMessageBox.Yes)
+                return
             self.first_treeWidget_dict = {}
             self.tw_first.clear()
             self._initAll_()

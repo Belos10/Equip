@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QDialog,QLineEdit,QTableWidgetItem,QAbstractItemView,QMessageBox
+from PyQt5.QtWidgets import QDialog,QLineEdit,QTableWidgetItem,QAbstractItemView,QMessageBox,QHeaderView
 from widgets.login.loginSet import Widget_LoginSet
 from database.strengthDisturbSql import selectAllDataAboutUnit
 from database.loginSql import selectAllDataAboutLogin,insertIntoLogin,delFromLogin,findAllLoginAccontList,updateUserInfo
@@ -18,6 +18,8 @@ class loginSet(QDialog, Widget_LoginSet):
 
         self.tw_unitResult.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.tw_userInfo.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.tw_userInfo.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.tw_unitResult.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
         self.tw_userInfo.verticalHeader().hide()
         self.tw_unitResult.verticalHeader().hide()
@@ -36,9 +38,11 @@ class loginSet(QDialog, Widget_LoginSet):
     def initWidgets(self):
         self.tw_unitResult.clear()
         self.tw_userInfo.clear()
-
-        self.unitResult = selectAllDataAboutUnit()
-        print(self.unitResult)
+        self.unitResult = []
+        selectSuccess = selectAllDataAboutUnit(self.unitResult)
+        if selectSuccess != True:
+            QMessageBox.information(self, "初始化", "初始化登录界面失败")
+            return
         self.userInfo = selectAllDataAboutLogin()
 
         userInfoTitle = ['账号', '名字', '密码', '权限', '单位根单位的上级单位']
