@@ -19,6 +19,11 @@ class DisturbPlan(QWidget, yearList_Form):
         super(DisturbPlan, self).__init__(parent)
         # Stren_Inquiry._initUnitTreeWidget()
         self.setupUi(self)
+        self.first_treeWidget_dict = {}
+        self.second_treeWidget_dict = {}
+        self.currentUnitDisturbPlanNum = {}
+        self.unitDisturbPlanList = {}
+        self.unitFlag = 0
         self.initAll()
         # initDisturbPlanDatabase()
         self.inputProof = InputProof()
@@ -27,10 +32,7 @@ class DisturbPlan(QWidget, yearList_Form):
 
 
     def initAll(self):
-        self.first_treeWidget_dict = {}
-        self.second_treeWidget_dict = {}
-        self.currentUnitDisturbPlanNum = {}
-        self.unitDisturbPlanList = {}
+
         self.tw_first.header().setVisible(False)
         self.tw_second.header().setVisible(False)
         self.le_first.setDisabled(1)
@@ -272,19 +274,22 @@ class DisturbPlan(QWidget, yearList_Form):
         #self.currentEquipdict.clear()
         self.currentEquipdict={}
         self.currentUnitChilddict = {}
+        self.unitFlag = 0
         self.disturbResult.clear()
         # 获取子单位名
         j = 0
         for unitID, unitItem in self.first_treeWidget_dict.items():
             if unitItem == self.tw_first.currentItem():
                 if selectUnitIfBase(unitID):
+                    self.unitFlag = 2
                     result = findDisturbPlanUnitChildInfo(unitID)
                 else:
+                    self.unitFlag = 1
                     result = selectDisturbPlanChooseUnit()
                 for resultInfo in result:
                     self.currentUnitChilddict[j] = resultInfo
                     j=j+1
-        #print("unit", self.currentUnitChilddict)
+        print("currentUnitChilddict", self.currentUnitChilddict)
         # 获取当前装备名
         j = 0
         for equipID, equipItem in self.second_treeWidget_dict.items():
@@ -310,47 +315,99 @@ class DisturbPlan(QWidget, yearList_Form):
         self.disturbResult.setRowCount(0)
         self.lenCurrentUnitChilddict=len(self.currentUnitChilddict)
         self.lenCurrentEquipdict=len(self.currentEquipdict)
-
-        headerlist = ['装备名称及规格型号', '单位', '机关分配计划数', '此次分配合计数']
-        if len(self.currentUnitChilddict):
-            for i in self.currentUnitChilddict.values():
-                headerlist.append(i[1])
-        headerlist.append('备注')
-        self.lenHeaderList=len(headerlist)
-        self.disturbResult.setColumnCount(self.lenHeaderList)
-        self.disturbResult.setRowCount(len(self.currentEquipdict))
-        self.disturbResult.setHorizontalHeaderLabels(headerlist)
-        self.disturbResult.setColumnWidth(0, 200)
-        i = 0
-        for LineInfo in self.currentEquipdict.values():
-            currentRowResult = []
-            item = QTableWidgetItem(LineInfo[1])
-            item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-            currentRowResult.append(item)
-            self.disturbResult.setItem(i, 0, item)
-            item = QTableWidgetItem("")
-            item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-            currentRowResult.append(item)
-            self.disturbResult.setItem(i, 1, item)
-            item = QTableWidgetItem("0")
-            item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-            currentRowResult.append(item)
-            self.disturbResult.setItem(i, 2, item)
-            item = QTableWidgetItem("")
-            item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-            currentRowResult.append(item)
-            self.disturbResult.setItem(i, 3, item)
-            for x in range(0, self.lenCurrentUnitChilddict):
+        # 选择机关或其他
+        if self.unitFlag == 1:
+            headerlist = ['装备名称及规格型号', '单位', '陆军调拨单开具数', '机关分配计划数', '此次分配合计数']
+            if len(self.currentUnitChilddict):
+                for i in self.currentUnitChilddict.values():
+                    headerlist.append(i[1])
+            headerlist.append('备注')
+            self.lenHeaderList=len(headerlist)
+            self.disturbResult.setColumnCount(self.lenHeaderList)
+            self.disturbResult.setRowCount(len(self.currentEquipdict))
+            self.disturbResult.setHorizontalHeaderLabels(headerlist)
+            self.disturbResult.setColumnWidth(0, 200)
+            i = 0
+            for LineInfo in self.currentEquipdict.values():
+                currentRowResult = []
+                item = QTableWidgetItem(LineInfo[1])
+                item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                currentRowResult.append(item)
+                self.disturbResult.setItem(i, 0, item)
                 item = QTableWidgetItem("")
                 item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-                self.disturbResult.setItem(i, x + 4, item)
                 currentRowResult.append(item)
-            item = QTableWidgetItem("")
-            item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-            self.disturbResult.setItem(i, 4 + self.lenCurrentUnitChilddict, item)
-            currentRowResult.append(item)
-            i = i + 1
+                self.disturbResult.setItem(i, 1, item)
+                item = QTableWidgetItem("")
+                item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                currentRowResult.append(item)
+                self.disturbResult.setItem(i, 2, item)
+                item = QTableWidgetItem("")
+                item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                currentRowResult.append(item)
+                self.disturbResult.setItem(i, 3, item)
+                item = QTableWidgetItem("")
+                item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                currentRowResult.append(item)
+                self.disturbResult.setItem(i, 4, item)
+                for x in range(0, self.lenCurrentUnitChilddict):
+                    item = QTableWidgetItem("")
+                    item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                    self.disturbResult.setItem(i, x + 5, item)
+                    currentRowResult.append(item)
+                item = QTableWidgetItem("")
+                item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                self.disturbResult.setItem(i, 5 + self.lenCurrentUnitChilddict, item)
+                currentRowResult.append(item)
+                i = i + 1
+        # 选择各基地
+        elif self.unitFlag == 2:
+            headerlist = ['装备名称及规格型号', '单位', '火箭军调拨单开具数', '此次机关分配数', '此次分配合计数']
+            if len(self.currentUnitChilddict):
+                for i in self.currentUnitChilddict.values():
+                    headerlist.append(i[1])
+            headerlist.append('备注')
+            self.lenHeaderList = len(headerlist)
+            self.disturbResult.setColumnCount(self.lenHeaderList)
+            self.disturbResult.setRowCount(len(self.currentEquipdict))
+            self.disturbResult.setHorizontalHeaderLabels(headerlist)
+            self.disturbResult.setColumnWidth(0, 200)
+            i = 0
+            for LineInfo in self.currentEquipdict.values():
+                currentRowResult = []
+                item = QTableWidgetItem(LineInfo[1])
+                item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                currentRowResult.append(item)
+                self.disturbResult.setItem(i, 0, item)
+                item = QTableWidgetItem("")
+                item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                currentRowResult.append(item)
+                self.disturbResult.setItem(i, 1, item)
+                item = QTableWidgetItem("")
+                item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                currentRowResult.append(item)
+                self.disturbResult.setItem(i, 2, item)
+                item = QTableWidgetItem("")
+                item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                currentRowResult.append(item)
+                self.disturbResult.setItem(i, 3, item)
+                item = QTableWidgetItem("")
+                item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                currentRowResult.append(item)
+                self.disturbResult.setItem(i, 4, item)
+                for x in range(0, self.lenCurrentUnitChilddict):
+                    item = QTableWidgetItem("")
+                    item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                    self.disturbResult.setItem(i, x + 5, item)
+                    currentRowResult.append(item)
+                item = QTableWidgetItem("")
+                item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                self.disturbResult.setItem(i, 5 + self.lenCurrentUnitChilddict, item)
+                currentRowResult.append(item)
+                i = i + 1
         #self.disturbResult.setRowCount(n)
+        #self.disturbResult.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        #self.disturbResult.horizontalHeader().setSectionResizeMode(20, QHeaderView.Interactive)
         self.initDisturbPlanNum()
         self.initDisturbPlanNote()
         self.initDisturbPlanOther()
@@ -378,7 +435,7 @@ class DisturbPlan(QWidget, yearList_Form):
         num=0
         for i in range(0,len(self.currentUnitChilddict)):
             for j in range(0,len(self.currentEquipdict)):
-                item = self.disturbResult.item(j, 4 + i)
+                item = self.disturbResult.item(j, 5 + i)
                 if self.unitDisturbPlanList[num]!='-1':
                     item.setText(self.unitDisturbPlanList[num])
                 item.setFlags(Qt.ItemIsEnabled|Qt.ItemIsSelectable|Qt.ItemIsEditable)
@@ -393,12 +450,12 @@ class DisturbPlan(QWidget, yearList_Form):
         for i in self.currentEquipdict:
             if not selectEquipIsHaveChild(self.currentEquipdict[i][0]):
                 for j in range(0, len(self.currentUnitChilddict)):
-                    num = self.disturbResult.item(i, 4 + j).text()
+                    num = self.disturbResult.item(i, 5 + j).text()
                     if num == '-1' or num == '':
                         sum = sum + 0
                     else:
                         sum = sum + int(num)
-                self.disturbResult.item(i,3).setText(str(sum))
+                self.disturbResult.item(i,4).setText(str(sum))
             sum = 0
 
 
@@ -468,10 +525,10 @@ class DisturbPlan(QWidget, yearList_Form):
     def slotItemChange(self):
         self.currentRow = self.disturbResult.currentRow()
         self.currentColumn = self.disturbResult.currentColumn()
-        if 4 <= self.currentColumn <= self.lenHeaderList-2:
-            updateDisturbPlanNum(self.currentEquipdict[self.currentRow][0],self.currentUnitChilddict[self.currentColumn-4][0],
+        if 5 <= self.currentColumn <= self.lenHeaderList-2:
+            updateDisturbPlanNum(self.currentEquipdict[self.currentRow][0],self.currentUnitChilddict[self.currentColumn-5][0],
                                  self.currentYear,self.disturbResult.item(self.currentRow,self.currentColumn).text())
-            updateOneEquipmentBalanceData(self.currentYear,self.currentEquipdict[self.currentRow][0],self.currentUnitChilddict[self.currentColumn-4][0])
+            updateOneEquipmentBalanceData(self.currentYear,self.currentEquipdict[self.currentRow][0],self.currentUnitChilddict[self.currentColumn-5][0])
             self.initDisturbPlanSum()
         if self.currentColumn == self.lenHeaderList-1:
             updateDisturbPlanNote(self.currentEquipdict[self.currentRow][0],self.currentYear,self.disturbResult.item(self.currentRow,self.currentColumn).text())
@@ -497,44 +554,43 @@ class DisturbPlan(QWidget, yearList_Form):
             item.setFlags(Qt.ItemIsEnabled|Qt.ItemIsSelectable|Qt.ItemIsEditable)
 
 
-        # 读取机关计划数与装备单位
+        # 读取调拨单开具数计划数与装备单位
     def initDisturbPlanOther(self):
         self.unitDisturbPlanOtherList = selectDisturbPlanOther(self.currentEquipdict, self.currentYear)
 
-
+        # 装备单位
         for i in range(0, len(self.currentEquipdict)):
             item = self.disturbResult.item(i, 1)
             if self.unitDisturbPlanOtherList[i]:
                 item.setText(str(self.unitDisturbPlanOtherList[i][0]))
             else:
                 item.setText("")
-
-        for unitID, unitItem in self.first_treeWidget_dict.items():
-            if unitItem == self.tw_first.currentItem():
-                if selectUnitIfUppermost(unitID):
-                    for i in range(0, len(self.currentEquipdict)):
-
-                        if self.unitDisturbPlanOtherList[i]:
+        if self.unitFlag == 1:
+            # 调拨单开具数
+            for unitID, unitItem in self.first_treeWidget_dict.items():
+                if unitItem == self.tw_first.currentItem():
+                    if selectUnitIfUppermost(unitID):
+                        for i in range(0, len(self.currentEquipdict)):
                             item = self.disturbResult.item(i, 2)
-                            item.setText(str(self.unitDisturbPlanOtherList[i][1]))
-                        else:
+                            if self.unitDisturbPlanOtherList[i]:
+                                item.setText(str(self.unitDisturbPlanOtherList[i][1]))
+                            else:
+                                item.setText("0")
+                        for childRow, equipInfo in self.currentEquipdict.items():
+                            uperInfoList = selectUperInfoByEquipID(equipInfo[0])
+                            childNum = self.disturbResult.item(childRow, 2).text()
+                            for uperInfo in uperInfoList:
+                                for row, uperInfoRow in self.currentEquipdict.items():
+                                    if uperInfo[0] == uperInfoRow[0]:
+                                        num = self.disturbResult.item(row, 2).text()
+                                        totalNum = int(childNum) + int(num)
+                                        self.disturbResult.item(row, 2).setText(str(totalNum))
+                    else:
+                        for i in self.currentEquipdict:
                             item = self.disturbResult.item(i, 2)
-                            item.setText("0")
-                    for childRow, equipInfo in self.currentEquipdict.items():
-                        uperInfoList = selectUperInfoByEquipID(equipInfo[0])
-                        childNum = self.disturbResult.item(childRow, 2).text()
-                        for uperInfo in uperInfoList:
-                            for row, uperInfoRow in self.currentEquipdict.items():
-                                if uperInfo[0] == uperInfoRow[0]:
-                                    num = self.disturbResult.item(row, 2).text()
-                                    totalNum = int(childNum) + int(num)
-                                    self.disturbResult.item(row, 2).setText(str(totalNum))
-                else:
-                    for i in self.currentEquipdict:
-                        item = self.disturbResult.item(i, 2)
-                        result = selectDisturbPlanNum({0: [unitID]}, self.currentEquipdict, self.currentYear)
-                        if result:
-                            item.setText(str(result[i]))
-                        else:
-                            item.setText("0")
+                            result = selectDisturbPlanNum({0: [unitID]}, self.currentEquipdict, self.currentYear)
+                            if result:
+                                item.setText(str(result[i]))
+                            else:
+                                item.setText("0")
 

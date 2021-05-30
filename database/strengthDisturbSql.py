@@ -465,10 +465,9 @@ def addDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type):
         for strengthYearInfo in strengthYearInfoTuple:
             for factoryYearInfo in factoryYearInfoTuple:
                 sql = "INSERT INTO strength (Equip_ID, Unit_ID, Equip_Name, Unit_Name, Strength, Work, Now, Error, Retire, Delay, Pre, NonObject," \
-                      "NonStrength, Single, Arrive, year, equipYear) VALUES" \
+                      "NonStrength, Single, Arrive, year) VALUES" \
                       + "('" + Equip_ID + "','" + unitInfo[0] + "','" + Equip_Name + "','" + unitInfo[1] + "', '0'," \
-                      + " '0', '0', '0','0', '0', '0', '0', '0', '0', '0'" + ",'" + strengthYearInfo[1] + "', '" + \
-                      factoryYearInfo[1] + "')"
+                      + " '0', '0', '0','0', '0', '0', '0', '0', '0', '0'" + ",'" + strengthYearInfo[1] + "')"
                 cur.execute(sql)
 
             sql = "INSERT INTO weave (Unit_ID, Equip_ID, Unit_Name, Equip_Name, Strength, Work, Now, year) VALUES" \
@@ -478,10 +477,9 @@ def addDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type):
             cur.execute(sql)
 
             sql = "INSERT INTO strength (Equip_ID, Unit_ID, Equip_Name, Unit_Name, Strength, Work, Now, Error, Retire, Delay, Pre, NonObject," \
-                  "NonStrength, Single, Arrive, year, equipYear) VALUES" \
+                  "NonStrength, Single, Arrive, year) VALUES" \
                   + "('" + Equip_ID + "','" + unitInfo[0] + "','" + Equip_Name + "','" + unitInfo[1] + "', '0'," \
-                  + " '0', '0', '0','0', '0', '0', '0', '0', '0', '0'" + ",'" + strengthYearInfo[1] + "', '" + \
-                  "" + "')"
+                  + " '0', '0', '0','0', '0', '0', '0', '0', '0', '0'" + ",'" + strengthYearInfo[1] + "')"
             # print(sql)
             cur.execute(sql)
 
@@ -1349,7 +1347,7 @@ def findEquipUperIDList(Equip_ID, EquipIDList):
 def seletNumAboutStrength(Unit_ID, Equip_ID, year, equipYear):
     conn, cur = connectMySql()
     sql = "select * from strength where Equip_ID = '" + Equip_ID \
-          + "' and Unit_ID = '" + Unit_ID + "' and year = '" + year + "' and equipYear = '" + equipYear + "'"
+          + "' and Unit_ID = '" + Unit_ID + "' and year = '" + year +  "'"
     cur.execute(sql)
     result = cur.fetchall()
     disconnectMySql(conn, cur)
