@@ -947,7 +947,17 @@ def delDataInEquip(Equip_ID):
             pass
         else:
             findChildNode.append(equipID[0])
+    endUnitList = selectAllEndUnit()
     for equipID in findChildNode:
+        for year in yearInfoList:
+            for unit in endUnitList:
+                inputInfoTuple = selectInputInfoByEquipUnit(unit[0], equipID, year[1])
+                for inputInfo in inputInfoTuple:
+                    delSuccess = delFromInputInfo(unit[0], equipID, inputInfo[2], inputInfo[3], inputInfo[4], inputInfo[10])
+                    if delSuccess != True:
+                        conn.rollback()
+                        return delSuccess
+
         # 对于每一个最根节点找到所有上级节点
         uperIDList = []
         findEquipUperIDList(equipID, uperIDList)
@@ -1706,6 +1716,11 @@ def selectInputInfoByEquipUnit(Unit_ID, Equip_ID, inputYear):
     result = cur.fetchall()
     return result
 
+def selectInputInfoByIDAndUnitEquipYear(Unit_ID, Equip_ID, inputYear, ID):
+    sql = "select * from inputinfo where Equip_ID = '" + Equip_ID + "' and Unit_ID = '" + Unit_ID + "' and inputYear = '" + inputYear + "' and ID = '" + ID + "'"
+    cur.execute(sql)
+    result = cur.fetchall()
+    return result
 # 删除某条录入信息
 def delFromInputInfo(Unit_ID, Equip_ID, ID, num, year, inputYear):
     EquipIDList = []
@@ -1749,20 +1764,21 @@ def delFromInputInfo(Unit_ID, Equip_ID, ID, num, year, inputYear):
             except Exception as e:
                 return e
             for lastYear in findLastYear:
-                sql = "Update strength set Now = Now - " + str(delNum) + " where Equip_ID = '" + \
+                if selectInputInfoByIDAndUnitEquipYear(Unit_ID, Equip_ID, lastYear, ID):
+                    sql = "Update strength set Now = Now - " + str(delNum) + " where Equip_ID = '" + \
                       EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + lastYear + "'"
-                try:
-                    cur.execute(sql)
-                except Exception as e:
-                    return e
+                    try:
+                        cur.execute(sql)
+                    except Exception as e:
+                        return e
 
-                sql = "update weave set Now = Now - " + str(delNum) + " where Unit_ID = '" \
+                    sql = "update weave set Now = Now - " + str(delNum) + " where Unit_ID = '" \
                       + UnitID + "' and Equip_ID = '" + EquipID + "' and year = '" + lastYear + "'"
                 # print(sql)
-                try:
-                    cur.execute(sql)
-                except Exception as e:
-                    return e
+                    try:
+                        cur.execute(sql)
+                    except Exception as e:
+                        return e
 
     for lastYear in findLastYear:
         sql = "delete from inputinfo where Unit_ID = '" + Unit_ID + "' and Equip_ID = '" + \
@@ -2252,8 +2268,18 @@ def selectAllEndEquip():
             resultList.append(equipInfo)
     return resultList
 
-
+def selectAllEndUnit():
+    resultList = []
+    allEquipTuple = []
+    selectAllDataAboutUnit(allEquipTuple)
+    for unitInfo in allEquipTuple:
+        if selectUnitIsHaveChild(unitInfo[0]):
+            pass
+        else:
+            resultList.append(unitInfo)
+    return resultList
 # 查找实力查询所有年份名字
+
 def selectAllStrengthYear():
     yearList = []
     sql = "SELECT * from strengthyear ORDER BY year"
