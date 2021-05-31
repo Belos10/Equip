@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="MySQL - @localhost" uuid="4a618801-b4ab-42a5-bfc1-532945286a65">
+    <data-source source="LOCAL" name="@localhost" uuid="4a618801-b4ab-42a5-bfc1-532945286a65">
       <driver-ref>mysql.8</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
@@ -10,11 +10,11 @@
         <property name="serverTimezone" value="GMT" />
       </driver-properties>
     </data-source>
-    <data-source source="LOCAL" name="NuclearManageSystem.db" uuid="d5ca6d47-cbaa-48dc-af4a-64a079ca11ee">
+    <data-source source="LOCAL" name="NuclearManageSystem.db" uuid="7c50faff-511a-4ed8-aa1a-273ec39c3e9e">
       <driver-ref>sqlite.xerial</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/database/NuclearManageSystem.db</jdbc-url>
+      <jdbc-url>jdbc:sqlite:F:\CodeRepository\PythonProject\PycharmProject\Equip\database\NuclearManageSystem.db</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>

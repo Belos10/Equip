@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, QAbstractItemView, \
-    QMessageBox, QListWidgetItem,QInputDialog
+    QMessageBox, QListWidgetItem, QInputDialog, QHeaderView
 from widgets.strengthDisturb.retirement import Widget_Retirement
 from database.strengthDisturbSql import *
 from PyQt5.Qt import Qt
@@ -56,7 +56,7 @@ class retirement(QWidget, Widget_Retirement):
         self.tb_add.clicked.connect(self.slotAddNewYear)
         self.tb_del.clicked.connect(self.slotDelYear)
         self.pb_firstSelect.clicked.connect(self.slotSelectUnit)
-
+        self.tw_result.itemChanged.connect(self.soltCheckData)
         self.pb_secondSelect.clicked.connect(self.slotSelectEquip)
 
     def slotSelectUnit(self):
@@ -201,7 +201,6 @@ class retirement(QWidget, Widget_Retirement):
             self.tw_result.setRowCount(2)
             return
         self.pb_save.setDisabled(False)
-        # print("装备：", self.currentCheckedEquipList)
         self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList,
                                                         self.currentYear)
     '''
@@ -331,6 +330,7 @@ class retirement(QWidget, Widget_Retirement):
                 parent_item.setCheckState(num, 1)
 
     def _initTableWidgetByUnitListAndEquipList(self, currentCheckedUnitList, currentCheckedEquipList,currentYear):
+        self.tw_result.itemChanged.disconnect(self.soltCheckData)
         currentClass = 0
         self.tw_result.clear()
         self.tw_result.setRowCount(0)
@@ -338,6 +338,7 @@ class retirement(QWidget, Widget_Retirement):
         self.equipList = currentCheckedEquipList
         self.year = currentYear
         self.resultList = []
+        self.tw_result.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.tw_result.horizontalHeader().setVisible(False)
         self.tw_result.verticalHeader().setVisible(False)
         self.currentInquiryResult.clear()
@@ -419,77 +420,131 @@ class retirement(QWidget, Widget_Retirement):
 
         self.tw_result.setRowCount(len(self.resultList) + 2)
         classID = 1
-
+        plannedRetirementCount = 0
+        applyCount = 0
         for i, LineInfo in enumerate(self.resultList):
             m_isSecond = isSecondDict(LineInfo[2])
             if m_isSecond:
                 currentClass = currentClass + 1
                 ID = chinese[currentClass]
                 classID = 1
+                LineInfo.append(False)
             else:
                 if selectEquipIsHaveChild(LineInfo[2]):
                     ID = ""
+                    LineInfo.append(False)
                 else:
                     ID = str(classID)
                     classID = classID + 1
+                    if len(LineInfo[7]) == 0:
+                        plannedRetirementCount = plannedRetirementCount + 0
+                    else:
+                        plannedRetirementCount = plannedRetirementCount + int(LineInfo[7])
+                    if len(LineInfo[10]) == 0:
+                        applyCount = applyCount + 0
+                    else:
+                        applyCount = applyCount + int(LineInfo[10])
+                    LineInfo.append(True)
+
             item = QTableWidgetItem(ID)
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.tw_result.setItem(i + 2, 0, item)
-            #名称
+            # 名称
             item = QTableWidgetItem(LineInfo[3])
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.tw_result.setItem(i + 2, 1, item)
-            #单位
+            # 单位
             item = QTableWidgetItem(LineInfo[4])
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.tw_result.setItem(i + 2, 2, item)
 
-            #实力数
+            # 实力数
             item = QTableWidgetItem(str(LineInfo[5]))
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.tw_result.setItem(i + 2, 3, item)
-
-            #编制数
+            # 现有数
+            item = QTableWidgetItem(LineInfo[8])
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.tw_result.setItem(i + 2, 6, item)
+            # 超缺编数
+            item = QTableWidgetItem(LineInfo[9])
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.tw_result.setItem(i + 2, 7, item)
+            # 编制数
             item = QTableWidgetItem(LineInfo[6])
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.tw_result.setItem(i + 2, 4, item)
 
-            #拟退役数
-            item = QTableWidgetItem(LineInfo[7])
-            # item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-            self.tw_result.setItem(i + 2, 5, item)
-
-            #现有数
-            item = QTableWidgetItem(LineInfo[8])
-            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-            self.tw_result.setItem(i + 2, 6, item)
-            #超缺编数
-            item = QTableWidgetItem(LineInfo[9])
-            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-            self.tw_result.setItem(i + 2, 7, item)
-
-            #申请需求
-            item = QTableWidgetItem(LineInfo[10])
-            self.tw_result.setItem(i + 2, 8, item)
-            #备注
-            item = QTableWidgetItem(LineInfo[11])
-            self.tw_result.setItem(i + 2, 8, item)
+            if len(ID) == 0 or ID.isdigit() == False:
+                #拟退役数
+                item = QTableWidgetItem(LineInfo[7])
+                item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+                self.tw_result.setItem(i + 2, 5, item)
+                #申请需求
+                item = QTableWidgetItem(LineInfo[10])
+                item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+                self.tw_result.setItem(i + 2, 8, item)
+                #备注
+                item = QTableWidgetItem(LineInfo[11])
+                item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+                self.tw_result.setItem(i + 2, 9, item)
+            else:
+                # 拟退役数
+                item = QTableWidgetItem(LineInfo[7])
+                # item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+                self.tw_result.setItem(i + 2, 5, item)
+                # 申请需求
+                item = QTableWidgetItem(LineInfo[10])
+                # item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+                self.tw_result.setItem(i + 2, 8, item)
+                # 备注
+                item = QTableWidgetItem(LineInfo[11])
+                # item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+                self.tw_result.setItem(i + 2, 9, item)
             self.currentInquiryResult[i] = LineInfo
+        for i in range(2,self.tw_result.rowCount()):
+            item = self.tw_result.item(i,5)
+            if item != None:
+                if len(item.text()) == 0:
+                    item.setText(str(plannedRetirementCount))
+            item = self.tw_result.item(i, 8)
+            if item != None:
+                if len(item.text()) == 0:
+                    item.setText(str(applyCount))
+        self.tw_result.itemChanged.connect(self.soltCheckData)
 
     def slotSaveRetire(self):
         reply = QMessageBox.question(self, '修改', '是否保存修改？', QMessageBox.Cancel, QMessageBox.Yes)
         if reply == QMessageBox.Cancel:
+            self.tw_result.itemChanged.disconnect(self.soltCheckData)
             self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList,
                                                         self.currentYear)
             return
         for i, result in self.currentInquiryResult.items():
-            num = self.tw_result.item(i + 2, 5).text()
-            apply = self.tw_result.item(i + 2, 7).text()
-            other = self.tw_result.item(i + 2, 8).text()
-            updateRetireAboutRetire(num, apply, other, result)
-
+            if result[13] == True:
+                num = self.tw_result.item(i + 2, 5).text()
+                apply = self.tw_result.item(i + 2, 8).text()
+                other = self.tw_result.item(i + 2, 9).text()
+                updateRetireAboutRetire(num, apply, other, result)
         reply = QMessageBox.question(self, '修改', '修改成功', QMessageBox.Yes)
+        self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList,
+                                                   self.currentYear)
         return
+
+    def soltCheckData(self,item):
+        if item != None:
+            input = item.text()
+            column = item.column()
+            if input != None and (column == 5 or column == 8):
+                if input.isdigit() == True:
+                    return
+                else:
+                    reply = QMessageBox.question(self, '警告', '请输入正确的数字！', QMessageBox.Yes)
+                    self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList,
+                                                                self.currentCheckedEquipList,
+                                                                self.currentYear)
+
+
 
 
 
