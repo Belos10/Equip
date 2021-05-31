@@ -1,3 +1,4 @@
+import xlwt
 from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, \
     QAbstractItemView, QMessageBox,QInputDialog,QLineEdit,QFileDialog,QHeaderView
 from database.strengthDisturbSql import *
@@ -159,6 +160,137 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
             导出到excel表格中
     '''
     def slotOutputDataIntoExcel(self):
+        # self.setDisabled(True)
+        # self.showInputResult.setDisabled(False)
+        if self.cb_setChoose.currentIndex() == 0:
+            directoryPath = QFileDialog.getExistingDirectory(self, "请选择导出文件夹",  "c:/")
+            if len(directoryPath)  > 0:
+                if len(self.resultList) > 0:
+                    workBook = xlwt.Workbook(encoding='utf-8')
+                    workSheet = workBook.add_sheet('Sheet1')
+                    titileStyle = xlwt.XFStyle()  # 初始化样式
+                    font = xlwt.Font()  # 为样式创建字体
+                    font.name = '宋体'
+                    font.bold = True
+                    font.height = 20 * 11  # 字体大小，11为字号，20为衡量单位
+                    alignment = xlwt.Alignment()  ## Create Alignment
+                    alignment.horz = xlwt.Alignment.HORZ_CENTER
+                    alignment.vert = xlwt.Alignment.VERT_CENTER
+                    borders = xlwt.Borders()
+                    borders.left = 2  # 设置为细实线
+                    borders.right = 2
+                    borders.top = 2
+                    borders.bottom = 2
+                    titileStyle.font = font  # 设定样式
+                    titileStyle.alignment = alignment
+                    titileStyle.borders = borders
+                    workSheet.col(0).width = 4000
+                    workSheet.col(1).width = 4000
+                    workSheet.col(2).width = 4000
+                    workSheet.col(3).width = 4000
+                    workSheet.col(4).width = 4000
+
+                    contentStyle = xlwt.XFStyle()  # 初始化样式
+                    font = xlwt.Font()  # 为样式创建字体
+                    font.name = '宋体'
+                    font.height = 20 * 11  # 字体大小，11为字号，20为衡量单位
+                    alignment = xlwt.Alignment()  ## Create Alignment
+                    alignment.horz = xlwt.Alignment.HORZ_CENTER
+                    alignment.vert = xlwt.Alignment.VERT_CENTER
+                    borders = xlwt.Borders()
+                    borders.left = 1  # 设置为细实线
+                    borders.right = 1
+                    borders.top = 1
+                    borders.bottom = 1
+                    contentStyle.font = font  # 设定样式
+                    contentStyle.alignment = alignment
+                    contentStyle.borders = borders
+                    workSheet.write(0, 0, '单位编号', titileStyle)
+                    workSheet.write(0, 1, '单位名称', titileStyle)
+                    workSheet.write(0, 2, '上级单位编号', titileStyle)
+                    workSheet.write(0, 3, '单位别名', titileStyle)
+                    for i,item in enumerate(self.resultList):
+                        workSheet.write(i + 1,0,item[0],contentStyle)
+                        workSheet.write(i + 1, 1, item[1],contentStyle)
+                        workSheet.write(i + 1, 2, item[2],contentStyle)
+                        workSheet.write(i + 1, 3, item[3],contentStyle)
+                    try:
+                        workBook.save("%s/单位目录表.xls"%directoryPath)
+                        QMessageBox.about(self, "导出成功", "导出成功！")
+                        return
+                    except Exception as e:
+                        QMessageBox.about(self, "导出失败", "导出表格被占用，请关闭正在使用的Execl！")
+                        return
+                else:
+                    QMessageBox.about(self, "未选中任何数据", "导出失败！")
+                    return
+        else:
+            directoryPath = QFileDialog.getExistingDirectory(self, "请选择导出文件夹", "c:/")
+            if len(directoryPath) > 0:
+                if len(self.equipResultList) > 0:
+                    workBook = xlwt.Workbook(encoding='utf-8')
+                    workSheet = workBook.add_sheet('Sheet1')
+                    titileStyle = xlwt.XFStyle()  # 初始化样式
+                    font = xlwt.Font()  # 为样式创建字体
+                    font.name = '宋体'
+                    font.bold = True
+                    font.height = 20 * 11  # 字体大小，11为字号，20为衡量单位
+                    alignment = xlwt.Alignment()  ## Create Alignment
+                    alignment.horz = xlwt.Alignment.HORZ_CENTER
+                    alignment.vert = xlwt.Alignment.VERT_CENTER
+                    borders = xlwt.Borders()
+                    borders.left = 2  # 设置为细实线
+                    borders.right = 2
+                    borders.top = 2
+                    borders.bottom = 2
+                    titileStyle.font = font  # 设定样式
+                    titileStyle.alignment = alignment
+                    titileStyle.borders = borders
+                    workSheet.col(0).width = 4000
+                    workSheet.col(1).width = 4000
+                    workSheet.col(2).width = 4000
+                    workSheet.col(3).width = 4000
+                    workSheet.col(4).width = 4000
+                    workSheet.col(5).width = 4000
+                    contentStyle = xlwt.XFStyle()  # 初始化样式
+                    font = xlwt.Font()  # 为样式创建字体
+                    font.name = '宋体'
+                    font.height = 20 * 11  # 字体大小，11为字号，20为衡量单位
+                    alignment = xlwt.Alignment()  ## Create Alignment
+                    alignment.horz = xlwt.Alignment.HORZ_CENTER
+                    alignment.vert = xlwt.Alignment.VERT_CENTER
+                    borders = xlwt.Borders()
+                    borders.left = 1  # 设置为细实线
+                    borders.right = 1
+                    borders.top = 1
+                    borders.bottom = 1
+                    contentStyle.font = font  # 设定样式
+                    contentStyle.alignment = alignment
+                    contentStyle.borders = borders
+
+                    workSheet.write(0, 0, '装备编号', titileStyle)
+                    workSheet.write(0, 1, '装备名称', titileStyle)
+                    workSheet.write(0, 2, '上级装备号', titileStyle)
+                    workSheet.write(0, 3, '录入类型', titileStyle)
+                    workSheet.write(0, 4, '装备类型', titileStyle)
+                    workSheet.write(0, 5, '装备单位', titileStyle)
+                    for i, item in enumerate(self.equipResultList):
+                        workSheet.write(i + 1, 0, item[0],contentStyle)
+                        workSheet.write(i + 1, 1, item[1],contentStyle)
+                        workSheet.write(i + 1, 2, item[2],contentStyle)
+                        workSheet.write(i + 1, 3, item[3],contentStyle)
+                        workSheet.write(i + 1, 4, item[4],contentStyle)
+                        workSheet.write(i + 1, 5, item[5],contentStyle)
+                    try:
+                        workBook.save("%s/装备目录表.xls"%directoryPath)
+                        QMessageBox.about(self, "导出成功", "导出成功！")
+                        return
+                    except Exception as e:
+                        QMessageBox.about(self, "导出失败", "导出表格被占用，请关闭正在使用的Execl！")
+                        return
+                else:
+                    QMessageBox.about(self, "未选中任何数据", "导出失败！")
+                    return
         pass
 
 
@@ -341,14 +473,14 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
         header = ['单位编号', '单位名称', '上级单位编号','单位别名']
         self.tb_result.setColumnCount(len(header))
         self.tb_result.setHorizontalHeaderLabels(header)
-        resultList = []
-        selectSuccess = selectAllDataAboutUnit(resultList)
+        self.resultList = []
+        selectSuccess = selectAllDataAboutUnit(self.resultList)
         if selectSuccess != True:
             QMessageBox.information(self, "初始化", "初始化单位表失败", QMessageBox.Yes)
             return
 
-        self.tb_result.setRowCount(len(resultList))
-        for i, data in enumerate(resultList):
+        self.tb_result.setRowCount(len(self.resultList))
+        for i, data in enumerate(self.resultList):
             item = QTableWidgetItem(data[0])
             self.tb_result.setItem(i, 0, item)
             item = QTableWidgetItem(data[1])
@@ -393,10 +525,11 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
         header = ['装备编号', '装备名称', '上级装备编号', '录入类型', '装备类型', '装备单位']
         self.tb_result.setColumnCount(len(header))
         self.tb_result.setHorizontalHeaderLabels(header)
-        resultList = selectAllDataAboutEquip()
-        if resultList:
-            self.tb_result.setRowCount(len(resultList))
-            for i, data in enumerate(resultList):
+        self.equipResultList = []
+        self.equipResultList = selectAllDataAboutEquip()
+        if self.equipResultList:
+            self.tb_result.setRowCount(len(self.equipResultList))
+            for i, data in enumerate(self.equipResultList):
                 item = QTableWidgetItem(data[0])
                 self.tb_result.setItem(i, 0, item)
                 item = QTableWidgetItem(data[1])
