@@ -78,7 +78,7 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         # 当前选中的单位列表和装备列表
         self.currentCheckedUnitList = []
         self.currentCheckedEquipList = []
-
+        self.inquiry_result.tw_inquiryResult.setRowCount(0)
         self.yearList = []
 
         #初始化年份选择列表

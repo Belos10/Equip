@@ -96,6 +96,3 @@ class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
         if self.tb_ManageWidget.currentWidget() == self.setLogin:
             self.setLogin.initWidgets()
 
-
-
-

@@ -11,16 +11,6 @@ cur = conn.cursor()
 '''
 def connectSqlite():
     return conn, cur
-#new
-'''
-    功能：
-        断开数据库的连接，需要传入conn以及cur
-'''
-def disconnectSqlite():
-    cur.close()
-    conn.commit()
-    conn.close()
-    return
 
 def selectData(sql):
     conn, cur = connectSqlite()
