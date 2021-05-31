@@ -200,7 +200,6 @@ class retirement(QWidget, Widget_Retirement):
         if self.currentCheckedEquipList == [] or self.currentCheckedUnitList == []:
             self.tw_result.setRowCount(2)
             return
-        self.pb_save.setDisabled(False)
         self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList,
                                                         self.currentYear)
     '''
@@ -331,6 +330,7 @@ class retirement(QWidget, Widget_Retirement):
 
     def _initTableWidgetByUnitListAndEquipList(self, currentCheckedUnitList, currentCheckedEquipList,currentYear):
         self.tw_result.itemChanged.disconnect(self.soltCheckData)
+        self.pb_save.setDisabled(True)
         currentClass = 0
         self.tw_result.clear()
         self.tw_result.setRowCount(0)
@@ -471,6 +471,7 @@ class retirement(QWidget, Widget_Retirement):
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.tw_result.setItem(i + 2, 7, item)
             # 编制数
+
             item = QTableWidgetItem(LineInfo[6])
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.tw_result.setItem(i + 2, 4, item)
@@ -514,9 +515,9 @@ class retirement(QWidget, Widget_Retirement):
         self.tw_result.itemChanged.connect(self.soltCheckData)
 
     def slotSaveRetire(self):
+        item = self.tw_result.currentItem()
         reply = QMessageBox.question(self, '修改', '是否保存修改？', QMessageBox.Cancel, QMessageBox.Yes)
         if reply == QMessageBox.Cancel:
-            self.tw_result.itemChanged.disconnect(self.soltCheckData)
             self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList,
                                                         self.currentYear)
             return
@@ -532,10 +533,12 @@ class retirement(QWidget, Widget_Retirement):
         return
 
     def soltCheckData(self,item):
+
         if item != None:
             input = item.text()
             column = item.column()
             if input != None and (column == 5 or column == 8):
+                self.pb_save.setDisabled(False)
                 if input.isdigit() == True:
                     return
                 else:

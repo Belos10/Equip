@@ -73,6 +73,7 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
         self.pb_firstSelect.clicked.connect(self.slotSelectUnit)
         self.pb_secondSelect.clicked.connect(self.slotSelectEquip)
         self.pb_input.clicked.connect(self.slotInputDataByExcel)
+        self.pb_output.clicked.connect(self.slotOutputDataIntoExcel)
         self.showInputResult.pb_confirm.clicked.connect(self.slotInputIntoMysql)
         self.showInputResult.pb_cancel.clicked.connect(self.slotCancelInputIntoMysql)
 
@@ -110,7 +111,6 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
         self.showInputResult.setDisabled(False)
         if self.cb_setChoose.currentIndex() == 0:
             filename, _ = QFileDialog.getOpenFileName(self, "选中文件", '', "Excel files(*.xlsx, *.xls)")
-            print(filename)
             try:
                 self.rdfile = xlrd.open_workbook(filename)
                 self.tablename = "unit"
@@ -153,6 +153,15 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
                 self.setDisabled(False)
         else:
             pass
+
+    '''
+        功能：
+            导出到excel表格中
+    '''
+    def slotOutputDataIntoExcel(self):
+        pass
+
+
 
     def slotSelectEquip(self):
         findText = self.le_second.text()

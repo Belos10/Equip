@@ -99,6 +99,7 @@ class strengthDisturb(QMainWindow, Strength_Disturb_Widget):
 
         self.slotDisconnect()
         self.stackedWidget.setCurrentIndex(3)
+        self.applyRetire._initAll_()
         self.connectSignal()
 
 

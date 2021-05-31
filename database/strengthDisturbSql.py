@@ -1082,6 +1082,8 @@ def delDataInEquip(Equip_ID):
         except Exception as e:
             conn.rollback()
             return e
+
+
     try:
         conn.commit()
         return True
@@ -2618,12 +2620,12 @@ def selectAboutRetireByEquipShow(UnitList, EquipList, year):
             else:
                 equipUnit = ""
             if weaveInfo:
-                weave = weaveInfo[0][5]
+                weave = str(weaveInfo[0][5])
             else:
                 weave = '0'
             num = ''
             if strengthInfo:
-                now = strengthInfo[0][6]
+                now = str(strengthInfo[0][6])
                 strength = strengthInfo[0][4]
             else:
                 strength = '0'

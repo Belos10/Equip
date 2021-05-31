@@ -181,13 +181,13 @@ def updateOneEquipmentBalanceData(year,equipmentId,unitId):
     item['equipmentBalanceKey'] = str(year) + item['Equip_ID'] + item['Unit_ID']
     item['year'] = str(year)
 
-    sql = "select Equip_ID,Unit_ID,Work from strength where year=%s and Equip_ID =%s and Unit_ID=%s and equipYear='' " % (str(int(year)), equipmentId,unitId)
+    sql = "select Equip_ID,Unit_ID,Work from strength where year=%s and Equip_ID =%s and Unit_ID=%s " % (str(int(year)), equipmentId,unitId)
     workEquipment = selectOne(sql)
 
     if workEquipment is not None:
         OrignalAuthorizedValue = int(workEquipment.get('Work', 0))
         item['OrignalAuthorizedValue'] = OrignalAuthorizedValue
-    sql = "select Equip_ID,Unit_ID,Strength from strength where year=%s and Equip_ID=%s and Unit_ID=%s and equipYear='' " % (str(int(year) - 1), equipmentId, unitId)
+    sql = "select Equip_ID,Unit_ID,Strength from strength where year=%s and Equip_ID=%s and Unit_ID=%s " % (str(int(year) - 1), equipmentId, unitId)
     StrengthEquipment =selectOne(sql)
     if StrengthEquipment is not None:
         originalValue = int(StrengthEquipment.get('Strength', 0))
@@ -273,7 +273,7 @@ def initEquipmentBalance(year):
     item = {}
 
 
-    sql = "select Equip_ID,Unit_ID,Work from strength where year=%s and equipYear='' "%(str(year))
+    sql = "select Equip_ID,Unit_ID,Work from strength where year=%s  "%(str(year))
     equipmentsWork = selectDateDict(sql)
     if(equipmentsWork is not None): #添加
         orderedEquipmentWork = sorted(equipmentsWork,key=operator.itemgetter('Equip_ID'))
@@ -289,7 +289,7 @@ def initEquipmentBalance(year):
             itemDict[key] = item.copy()
             item.clear()
 
-    sql = "select Equip_ID,Unit_ID,Strength from strength where year=%s and equipYear='' " % (str(int(year) - 1))
+    sql = "select Equip_ID,Unit_ID,Strength from strength where year=%s " % (str(int(year) - 1))
     equipmentsLastYearWork = selectDateDict(sql)
     if(equipmentsLastYearWork is not None):
         orderedEquipmentsLastYearWork = sorted(equipmentsLastYearWork,key=operator.itemgetter('Equip_ID'))
