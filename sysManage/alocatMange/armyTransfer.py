@@ -219,8 +219,8 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
             else:
                 Equip_Unit = ""
 
-            if self.tw_result.item(i + addRow, 16):
-                Equip_Quity = self.tw_result.item(i + addRow, 16).text()
+            if self.tw_result.cellWidget(i + addRow, 16):
+                Equip_Quity = self.tw_result.cellWidget(i + addRow, 16).currentText()
             else:
                 Equip_Quity = ""
 
@@ -573,6 +573,13 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
                 item.addItem("自提")
                 item.addItem("厂家交付")
                 self.tw_result.setCellWidget(currentRow,i,item)
+            elif i == 16:
+                item = QComboBox()
+                item.addItem("新品")
+                item.addItem("堪用品")
+                item.addItem("待修品")
+                item.addItem("废品")
+                self.tw_result.setCellWidget(currentRow, i, item)
             else:
                 item = QTableWidgetItem()
                 item.setText("")

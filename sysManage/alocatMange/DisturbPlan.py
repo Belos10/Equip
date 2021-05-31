@@ -303,7 +303,7 @@ class DisturbPlan(QWidget, yearList_Form):
                 equipInfo = findEquipInfo(equipID)
                 self.currentEquipdict[j] = equipInfo[0]
                 j=j+1
-        #print("self.currentEquipdict",self.currentEquipdict)
+        print("self.currentEquipdict",self.currentEquipdict)
 
         self._initDisturbPlanByUnitListAndEquipList()
 
@@ -463,7 +463,7 @@ class DisturbPlan(QWidget, yearList_Form):
 
     # 若装备含子装备，则该行不可选中
     def ifEquipHaveChild(self):
-        print("self.currentEquipdict",self.currentEquipdict)
+        #print("self.currentEquipdict",self.currentEquipdict)
         for i in self.currentEquipdict:
             if selectEquipIsHaveChild(self.currentEquipdict[i][0]):
                 for j in range(1,self.disturbResult.columnCount()):
@@ -527,7 +527,7 @@ class DisturbPlan(QWidget, yearList_Form):
     def slotItemChange(self):
         self.currentRow = self.disturbResult.currentRow()
         self.currentColumn = self.disturbResult.currentColumn()
-        if 5 <= self.currentColumn <= self.lenHeaderList-2:
+        if 5 <= self.currentColumn <= self.lenHeaderList-1:
             updateDisturbPlanNum(self.currentEquipdict[self.currentRow][0],self.currentUnitChilddict[self.currentColumn-5][0],
                                  self.currentYear,self.disturbResult.item(self.currentRow,self.currentColumn).text())
             updateOneEquipmentBalanceData(self.currentYear,self.currentEquipdict[self.currentRow][0],self.currentUnitChilddict[self.currentColumn-5][0])
