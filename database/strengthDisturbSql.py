@@ -2778,24 +2778,82 @@ def updateEquipUnit(unit, Equip_ID):
 
     conn.commit()
 
-
+#查找某个年份的所有inputinfo
+def selectInputInfoByYear(year):
+    sql = "select * from inputinfo where year = '" + year + "'"
+    cur.execute(sql)
+    result = cur.fetchall()
+    return result
 
 def delStrengthYearByYear(year):
-
+    equipInfoList = selectAllDataAboutEquip()
+    unitInfoList = []
+    selectAllDataAboutUnit(unitInfoList)
+    lastYearList = findBigOtherYear(year)
+    for equipInfo in equipInfoList:
+        for unitInfo in unitInfoList:
+            strengthInfo = selectStrengthInfo(unitInfo[0], equipInfo[0], year)
+            if strengthInfo:
+                for lastYear in lastYearList:
+                    sql = "update strength set Strength = Strength - " + str(strengthInfo[0][4]) \
+                      + ", Work = Work - " + str(strengthInfo[0][5]) + ", Now = Now - " + str(strengthInfo[0][6]) + " where Equip_ID = '" + equipInfo[0]\
+                      + "' and Unit_ID = '" + unitInfo[0] + "' and year = '" + lastYear + "'"
+                    try:
+                        cur.execute(sql)
+                    except Exception as e:
+                        conn.rollback()
+                        return e
+                    sql = "update weave set Strength = Strength - " + str(strengthInfo[0][4]) \
+                          + ", Work = Work - " + str(strengthInfo[0][5]) + ", Now = Now - " + str(strengthInfo[0][
+                              6]) + " where Equip_ID = '" + equipInfo[0] \
+                          + "' and Unit_ID = '" + unitInfo[0] + "' and year = '" + lastYear + "'"
+                    try:
+                        cur.execute(sql)
+                    except Exception as e:
+                        conn.rollback()
+                        return e
+    inputInfoTuple = selectInputInfoByYear(year)
+    for inputInfo in inputInfoTuple:
+        sql = "delete from inputinfo where ID = '" + inputInfo[2] + "'"
+        try:
+            cur.execute(sql)
+        except Exception as e:
+            conn.rollback()
+            return e
     sql = "delete from weave where year = '" + year + "'"
-    print(sql)
-    cur.execute(sql)
+    try:
+        cur.execute(sql)
+    except Exception as e:
+        conn.rollback()
+        return e
 
     sql = "delete from strength where year = '" + year + "'"
-    cur.execute(sql)
+    try:
+        cur.execute(sql)
+    except Exception as e:
+        conn.rollback()
+        return e
 
     sql = "delete from inputinfo where inputYear = '" + year + "'"
-    cur.execute(sql)
+    try:
+        cur.execute(sql)
+    except Exception as e:
+        conn.rollback()
+        return e
 
     sql = "delete from strengthyear where year = '" + year + "'"
-    cur.execute(sql)
+    try:
+        cur.execute(sql)
+    except Exception as e:
+        conn.rollback()
+        return e
 
-    conn.commit()
+    try:
+        conn.commit()
+        return True
+    except Exception as e:
+        conn.rollback()
+        return e
 def selectAllIDFromUnit():
     sql = "select Unit_ID from unit "
     cur.execute(sql)

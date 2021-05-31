@@ -202,19 +202,17 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
 
     def slotDelYear(self):
         currentRow = self.lw_chooseYear.currentRow()
-        if currentRow == 0:
-            reply = QMessageBox.question(self, '删除', '是否删除所有年份以及年份下所有数据？', QMessageBox.Yes, QMessageBox.Cancel)
-            if reply == QMessageBox.Cancel:
-                return
         if currentRow < 0:
             return
         else:
             currentYear = self.lw_chooseYear.currentItem().text()
             reply = QMessageBox.question(self, '删除', '是否删除当前年份以及当前年份下所有数据？', QMessageBox.Yes, QMessageBox.Cancel)
             if reply == QMessageBox.Yes:
-                delStrengthYearByYear(currentYear)
-                deleteByYear(currentYear)
-                deleteByYear(str(int(currentYear) + 1))
+                delSuccess = delStrengthYearByYear(currentYear)
+                if delSuccess != True:
+                    reply = QMessageBox.information(self, '删除', str(delSuccess) + ',删除失败', QMessageBox.Yes)
+                    return
+                QMessageBox.information(self, '删除', '删除成功', QMessageBox.Yes)
                 self._initSelectYear_()
             else:
                 return
