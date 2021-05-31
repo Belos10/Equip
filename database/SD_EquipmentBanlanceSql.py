@@ -273,7 +273,7 @@ def initEquipmentBalance(year):
     item = {}
 
 
-    sql = "select Equip_ID,Unit_ID,Work from strength where year=%s  "%(str(year))
+    sql = "select Equip_ID,Unit_ID,Work from strength where year=%s "%(str(year))
     equipmentsWork = selectDateDict(sql)
     if(equipmentsWork is not None): #添加
         orderedEquipmentWork = sorted(equipmentsWork,key=operator.itemgetter('Equip_ID'))

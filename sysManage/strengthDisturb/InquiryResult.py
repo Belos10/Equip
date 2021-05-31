@@ -35,7 +35,6 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                       '正常到位']
         self.tw_inquiryResult.setHorizontalHeaderLabels(headerlist)
         self.tw_inquiryResult.setColumnCount(len(headerlist))
-        self.tw_inquiryResult.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
     '''
         信号和槽连接
@@ -67,6 +66,8 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         self.chooseFactoryYear.tb_cancel.clicked.connect(self.slotCancelChooseFactoryYear)
 
         self.chooseFactoryYear.tb_yes.clicked.connect(self.slotChangeSeeMethod)
+
+        self.tw_inquiryResult.currentItemChanged.connect(self.slotItemChange)
 
     def slotChangeSeeMethod(self):
         if self.chooseFactoryYear.selectAll:
@@ -209,22 +210,6 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                                 reply = QMessageBox.question(self, '修改失败', '只能修改为整数', QMessageBox.Yes)
                                 self.tw_inquiryResult.cellWidget(currentRow, currentColumn).setText(str(resultInfo[4]))
                                 return
-        elif currentColumn == 0:
-            for i, resultInfo in self.currentInquiryResult.items():
-                if i == currentRow:
-                    print(resultInfo)
-                    self.tw_inquiryResult.item(currentRow, currentColumn).setText(resultInfo[3])
-        elif currentColumn == 1:
-            for i, resultInfo in self.currentInquiryResult.items():
-                if i == currentRow:
-                    print(resultInfo)
-                    self.tw_inquiryResult.item(currentRow, currentColumn).setText(resultInfo[2])
-        else:
-            for i, resultInfo in self.currentInquiryResult.items():
-                if i == currentRow:
-                    print(resultInfo)
-                    self.tw_inquiryResult.item(currentRow, currentColumn).setText(resultInfo[currentColumn + 2])
-
     #当某个单击按钮被选中时
     def slotClickedRB(self):
         self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)

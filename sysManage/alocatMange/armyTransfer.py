@@ -73,6 +73,7 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
         初始化当前界面，设置当前查询结果界面为灰
     '''
     def _initSelf_(self):
+        self.tw_result.clear()
         self.groupBox_2.setDisabled(True)
         #初始化年份listwidget
         self._initYearWidget_()
@@ -164,8 +165,8 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
                 Trans = self.tw_result.item(i + addRow, 4).text()
             else:
                 Trans = ""
-            if self.tw_result.item(i + addRow, 5):
-                Trans_Way = self.tw_result.item(i + addRow, 5).text()
+            if self.tw_result.cellWidget(i + addRow, 5):
+                Trans_Way = self.tw_result.cellWidget(i + addRow, 5).currentText()
             else:
                 Trans_Way = ""
 
@@ -218,8 +219,8 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
             else:
                 Equip_Unit = ""
 
-            if self.tw_result.item(i + addRow, 16):
-                Equip_Quity = self.tw_result.item(i + addRow, 16).text()
+            if self.tw_result.cellWidget(i + addRow, 16):
+                Equip_Quity = self.tw_result.cellWidget(i + addRow, 16).currentText()
             else:
                 Equip_Quity = ""
 
@@ -567,6 +568,18 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
                 item = QTableWidgetItem()
                 item.setText(ArmyTransferSendUnit['联系电话'])
                 self.tw_result.setItem(currentRow, i, item)
+            elif i == 5:
+                item = QComboBox()
+                item.addItem("自提")
+                item.addItem("厂家交付")
+                self.tw_result.setCellWidget(currentRow,i,item)
+            elif i == 16:
+                item = QComboBox()
+                item.addItem("新品")
+                item.addItem("堪用品")
+                item.addItem("待修品")
+                item.addItem("废品")
+                self.tw_result.setCellWidget(currentRow, i, item)
             else:
                 item = QTableWidgetItem()
                 item.setText("")

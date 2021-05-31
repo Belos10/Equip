@@ -23,7 +23,6 @@ class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
         self.contractMange = QWidget()
         self.dangerGoods = QWidget()
         self.PosEngin = QWidget()
-        #self.PosEngin = QWidget()
         self.dictSelect = dictSelect()
         self.sysConfig = QWidget()
 
@@ -96,7 +95,4 @@ class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
     def slotCurrentChange(self):
         if self.tb_ManageWidget.currentWidget() == self.setLogin:
             self.setLogin.initWidgets()
-
-
-
 

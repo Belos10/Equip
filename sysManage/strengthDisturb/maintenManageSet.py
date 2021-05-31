@@ -17,6 +17,8 @@ class maintenManageSet(QWidget, Widget_Mainten_Manage_Set):
         self.tw_unit.setSelectionBehavior(QAbstractItemView.SelectRows)
         # 设置整行选中
         self.tw_publicEquip.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tw_publicEquip.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.tw_unit.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
         self.signalConnect()
         self.result = []
