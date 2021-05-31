@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QApplication
 from sysManage.MainWindowManage import Manage_Widgets
 from PyQt5 import sip
 from sysManage.login.login import login
-sys.setrecursionlimit(100000)
+from icons.readQss import readQss
 '''
     显示主界面
 '''
@@ -31,6 +31,8 @@ class mainManage(QObject):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     widget = Manage_Widgets()
+    #qss = readQss()
+    #widget.setStyleSheet(qss)
     sys.exit(app.exec_())
 
 

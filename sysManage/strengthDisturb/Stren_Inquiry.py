@@ -78,7 +78,7 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         # 当前选中的单位列表和装备列表
         self.currentCheckedUnitList = []
         self.currentCheckedEquipList = []
-
+        self.inquiry_result.tw_inquiryResult.setRowCount(0)
         self.yearList = []
 
         #初始化年份选择列表
@@ -202,19 +202,17 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
 
     def slotDelYear(self):
         currentRow = self.lw_chooseYear.currentRow()
-        if currentRow == 0:
-            reply = QMessageBox.question(self, '删除', '是否删除所有年份以及年份下所有数据？', QMessageBox.Yes, QMessageBox.Cancel)
-            if reply == QMessageBox.Cancel:
-                return
         if currentRow < 0:
             return
         else:
             currentYear = self.lw_chooseYear.currentItem().text()
             reply = QMessageBox.question(self, '删除', '是否删除当前年份以及当前年份下所有数据？', QMessageBox.Yes, QMessageBox.Cancel)
             if reply == QMessageBox.Yes:
-                delStrengthYearByYear(currentYear)
-                deleteByYear(currentYear)
-                deleteByYear(str(int(currentYear) + 1))
+                delSuccess = delStrengthYearByYear(currentYear)
+                if delSuccess != True:
+                    reply = QMessageBox.information(self, '删除', str(delSuccess) + ',删除失败', QMessageBox.Yes)
+                    return
+                QMessageBox.information(self, '删除', '删除成功', QMessageBox.Yes)
                 self._initSelectYear_()
             else:
                 return
@@ -269,10 +267,13 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
                 ID = self.add_strenth_info.tableWidget.item(i + orginRowNum, 0).text()
                 haveID = selectIDWhetherExitFromInputInfo(Equip_ID, Unit_ID, self.currentYear, ID)
                 if ID == "":
-                    QMessageBox.information(self, "增加", "第 " + currentRowNum + " 添加失败，批次号不能为空", QMessageBox.Yes)
+                    QMessageBox.information(self, "增加", "第 " + str(currentRowNum) + " 添加失败，批次号不能为空", QMessageBox.Yes)
                     continue
                 if haveID:
-                    QMessageBox.information(self, "增加", "第 " + currentRowNum + " 添加失败，批次号重复", QMessageBox.Yes)
+                    QMessageBox.information(self, "增加", "第 " + str(currentRowNum) + " 添加失败，批次号重复", QMessageBox.Yes)
+                    continue
+                if num == "":
+                    QMessageBox.information(self, "增加", "第 " + str(currentRowNum) + " 添加失败，数量不能为空", QMessageBox.Yes)
                     continue
                 factory = self.add_strenth_info.tableWidget.cellWidget(i + orginRowNum, 3).currentText()
                 state = self.add_strenth_info.tableWidget.cellWidget(i + orginRowNum, 4).currentText()
