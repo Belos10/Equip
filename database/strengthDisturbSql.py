@@ -185,8 +185,8 @@ def selectEquipNameByEquipID(Equip_ID):
         判断装备是否是最底层装备
 '''
 def EquipNotHaveChild(Equip_ID):
-    conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="test")
-    cur = conn.cursor()
+    #conn = pymysql.connect(host='localhost', port=3306, user='root', password="123456", db="test")
+    #cur = conn.cursor()
     # 插入的sql语句
     sql = "select * from equip where Equip_Uper = '" + Equip_ID + "'"
     # 执行sql语句，并发送给数据库
