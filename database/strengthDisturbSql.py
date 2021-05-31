@@ -1241,14 +1241,14 @@ def selectAboutWeaveByUnitShow(UnitList, EquipList, yearList):
             for childUnitID in UnitIDChildList:
                 sql = "select * from weave where Unit_ID = '" + childUnitID[0] + \
                             "' and Equip_ID = '" + Equip_ID + "' and year = '" + yearList + "'"
-                #print("==================", sql)
+                print("==================", sql)
                 cur.execute(sql)
                 result = cur.fetchall()
                 for resultInfo in result:
                     weave = list(resultInfo)
                     weave[2] = childUnitID[1]
                     resultList.append(weave)
-    #print("===================",resultList)
+    print("===================",resultList)
     return resultList
 
 #实力查询展开到末级
@@ -1461,6 +1461,7 @@ def selectFromInputInfo(EquipID, UnitID, strengthYear):
     新增一个实力查询年份
 '''
 def insertIntoStrengthYear(year):
+    pass
     year = str(year)
     sql = "insert into strengthyear(ID, year) values ('" + year + "', '" + year + "')"
     # print(sql)
@@ -2537,13 +2538,11 @@ def selectWeaveInfo(UnitID, EquipID, year):
 
 
 # 插入退休表
-def insertIntoRetire(ID, Unit_ID, EquipID, Equip_Name,Equip_Unit,Weave, Num, Now, Super, Apply, Other, year):
-    sql = "insert into retire (ID, Unit_ID, Equip_ID, Equip_Name, Equip_Unit, Weave, Num, Now, Super, Apply, Other, year) VALUES" \
-          + "('" + ID + "', '" + Unit_ID + "', '" + EquipID + "', '" + Equip_Name + "', '" + Equip_Unit + "', '" + Weave + "', '"\
-          + Num + "', '" + Now + "', '" + Super + "', '" + Apply + "', '" + Other + "','" + year + "')"
+def insertIntoRetire(ID, Unit_ID, EquipID, Equip_Name,Equip_Unit,strength,Weave, Num, Now, Super, Apply, Other, year):
+    sql = "insert into retire (ID, Unit_ID, Equip_ID, Equip_Name, Equip_Unit, Strenth, Weave, Num, Now, Super, Apply, Other, year) " \
+          "VALUES('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')"%(ID, Unit_ID, EquipID, Equip_Name,Equip_Unit,strength,Weave, Num, Now, Super, Apply, Other, year)
     #print(sql)
     cur.execute(sql)
-    conn.commit()
 
 # 查询退休信息
 def selectInfoFromRetire(unitID, equipID, year):
@@ -2553,7 +2552,7 @@ def selectInfoFromRetire(unitID, equipID, year):
     cur.execute(sql)
     result = cur.fetchall()
     if result:
-        return result[0]
+        return list(result[0])
     else:
         return ''
 
@@ -2564,7 +2563,6 @@ def selectInfoFromRetire(unitID, equipID, year):
 def selectStrengthInfo(unitID, EquipID, year):
     sql = "select * from strength where Equip_ID = '" + \
           EquipID + "' and Unit_ID = '" + unitID + "' and year = '" + year + "'"
-    print(sql)
     cur.execute(sql)
     result = cur.fetchall()
     return result
@@ -2577,7 +2575,6 @@ def findUnitNameFromID(UnitID):
     result = cur.fetchall()
     return result
 
-
 # 查询前更新退休表
 def selectUpdateIntoRetire(unitID, EquipID, year):
     weaveInfo = selectWeaveInfo(unitID, EquipID, year)
@@ -2587,15 +2584,15 @@ def selectUpdateIntoRetire(unitID, EquipID, year):
     else:
         weave = '0'
     if strengthInfo:
+        strength = strengthInfo[0][4]
         now = strengthInfo[0][6]
     else:
         now = '0'
+        strength = '0'
+
     super = str(int(now) - int(weave))
-    sql = "update retire set Weave = '" + weave + "', Now = '" + now + "', Super = '" + super + "' where Equip_ID = '" + \
-          EquipID + "' and Unit_ID = '" + unitID + "' and year = '" + year + "'"
-    print(sql)
+    sql = "update retire set Strenth='%s', Weave='%s',Now='%s',Super='%s' where Equip_ID='%s' and Unit_ID='%s' and year='%s'"%(strength, weave, now, super, EquipID, unitID, year)
     cur.execute(sql)
-    conn.commit()
 
 
 # 查询退休表
@@ -2627,19 +2624,18 @@ def selectAboutRetireByEquipShow(UnitList, EquipList, year):
             num = ''
             if strengthInfo:
                 now = strengthInfo[0][6]
+                strength = strengthInfo[0][4]
             else:
+                strength = '0'
                 now = '0'
             super = str(int(now) - int(weave))
             apply = ''
             other = ''
-            print("'''''''''''''''''''", ID, unitID, EquipID, equipName, equipUnit, weave, num, now, super, other, year)
             haveChild = selectEquipIsHaveChild(EquipID)
-            insertIntoRetire(ID, unitID, EquipID, equipName, equipUnit, weave, num, now, super, apply, other, year)
-            currentResultInfo = [ID, unitID, EquipID, equipName, equipUnit, weave, num, now, super, apply, other, year]
+            insertIntoRetire(ID, unitID, EquipID, equipName, equipUnit, strength,weave, num, now, super, apply, other, year)
+            currentResultInfo = [ID, unitID, EquipID, equipName, equipUnit, strength,weave, num, now, super, apply, other, year]
             result.append(currentResultInfo)
-    print(result)
     return result
-
 
 
 
@@ -2673,12 +2669,11 @@ def updateRetireAboutRetire(num, apply, other, orginInfo):
     print("原来的数据：", orginInfo)
     if orginInfo:
         sql = "update retire set Num = '" + num + "', Apply = '" + apply + "', Other = '" + other +\
-              "' where Equip_ID = '" + orginInfo[2] + "' and Unit_ID = '" + orginInfo[1] + "' and year = '" + orginInfo[11] + "'"
+              "' where Equip_ID = '" + orginInfo[2] + "' and Unit_ID = '" + orginInfo[1] + "' and year = '" + orginInfo[12] + "'"
     else:
         return
     cur.execute(sql)
     conn.commit()
-
 
 # 退役年份表中添加年份
 def insertIntoRetireYear(year):
