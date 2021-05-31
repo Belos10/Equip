@@ -261,15 +261,6 @@ def del_Equip_And_Child(Equip_ID, Equip_Uper):
     conn.commit()
 
 
-# 删除装备目录
-def del_Equip_Dict(Equip_ID):
-    # 插入的sql语句
-    sql = "delete from equip where Equip_ID = '" + Equip_ID + "'"
-    # print(sql)
-    # 执行sql语句，并发送给数据库
-    cur.execute(sql)
-    conn.commit()
-
 #根据Dept_Uper查询单位信息,并返回
 def selectUnitInfoByDeptUper(Unit_Uper):
     sql = "select * from unit where Unit_Uper = '" + Unit_Uper + "'"
@@ -780,8 +771,6 @@ def findAllUperByEquipID(equipID, uperList):
 def delDataInUnit(Unit_ID):
     # 插入的sql语句
     UnitIDList = []
-    equipInfoList = []
-    yearInfoList = []
     #找到所有孩子节点
     findSuccess = findChildUnit(Unit_ID, UnitIDList, "")
     if findSuccess != True:
@@ -795,9 +784,18 @@ def delDataInUnit(Unit_ID):
             pass
         else:
             findChildNode.append(unitID[0])
-
+    endEquipList = selectAllEndEquip()
     for UnitID in findChildNode:
         #对于每一个最根节点找到所有上级节点
+        for year in yearInfoList:
+            for equip in endEquipList:
+                inputInfoTuple = selectInputInfoByEquipUnit(UnitID, equip[0], year[1])
+                print("==================eeee", inputInfoTuple)
+                for inputInfo in inputInfoTuple:
+                    delSuccess = delFromInputInfo(UnitID, equip[0], inputInfo[2], inputInfo[3], inputInfo[4], inputInfo[10])
+                    if delSuccess != True:
+                        conn.rollback()
+                        return delSuccess
         uperIDList = []
         findUnitUperIDList(UnitID, uperIDList)
         uperIDList.reverse()
@@ -805,7 +803,6 @@ def delDataInUnit(Unit_ID):
             for unitID in uperIDList[0: -1]:
                 for strengthYear in yearInfoList:
                     for equipInfo in equipInfoList:
-                        print("===============", UnitID)
                         nodeStrengthInfo = selectStrengthInfo(UnitID, equipInfo[0], strengthYear[1])
                         nodeWeaveInfo = selectWeaveInfo(UnitID, equipInfo[0], strengthYear[1])
                         if nodeStrengthInfo:
@@ -1701,6 +1698,14 @@ def delFactoryYear(year):
     sql = "delete from factoryyear where year = '" + year + "'"
     cur.execute(sql)
     conn.commit()
+
+#查询某个装备某个单位某个年份的所有input信息
+def selectInputInfoByEquipUnit(Unit_ID, Equip_ID, inputYear):
+    sql = "select * from inputinfo where Equip_ID = '" + Equip_ID + "' and Unit_ID = '" + Unit_ID + "' and inputYear = '" + inputYear + "'"
+    cur.execute(sql)
+    result = cur.fetchall()
+    return result
+
 # 删除某条录入信息
 def delFromInputInfo(Unit_ID, Equip_ID, ID, num, year, inputYear):
     EquipIDList = []
@@ -1744,30 +1749,14 @@ def delFromInputInfo(Unit_ID, Equip_ID, ID, num, year, inputYear):
             except Exception as e:
                 return e
             for lastYear in findLastYear:
-                strengthAllYearInfo = seletNumAboutStrength(UnitID, EquipID, lastYear)
-                if strengthAllYearInfo:
-                    nowAllNum = strengthAllYearInfo[0][6]
-                else:
-                    nowAllNum = 0
-                    sql = "INSERT INTO strength (Equip_ID, Unit_ID, Equip_Name, Unit_Name, Strength, Work, Now, Error, Retire, Delay, Pre, NonObject," \
-                          "NonStrength, Single, Arrive, year) VALUES" \
-                          + "('" + EquipID + "','" + UnitID + "','" + equipName + "','" + unitName + "', 0," \
-                                                                                                     " 0, 0, 0,0, 0, 0, 0, 0, 0, 0," + "'" + \
-                          lastYear +  "')"
-                    try:
-                        cur.execute(sql)
-                    except Exception as e:
-                        return e
-                changeAllNowNum = int(nowAllNum) - delNum
-
-                sql = "Update strength set Now = " + str(changeAllNowNum) + " where Equip_ID = '" + \
+                sql = "Update strength set Now = Now - " + str(delNum) + " where Equip_ID = '" + \
                       EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + lastYear + "'"
                 try:
                     cur.execute(sql)
                 except Exception as e:
                     return e
 
-                sql = "update weave set Now = " + str(changeAllNowNum) + " where Unit_ID = '" \
+                sql = "update weave set Now = Now - " + str(delNum) + " where Unit_ID = '" \
                       + UnitID + "' and Equip_ID = '" + EquipID + "' and year = '" + lastYear + "'"
                 # print(sql)
                 try:
@@ -1776,7 +1765,7 @@ def delFromInputInfo(Unit_ID, Equip_ID, ID, num, year, inputYear):
                     return e
 
     sql = "delete from inputinfo where Unit_ID = '" + Unit_ID + "' and Equip_ID = '" +\
-          Equip_ID + "' and ID = '" + ID + "' and year = '" + year + "' and ID = '" + ID + "' and inputYear = '" + inputYear + "'"
+          Equip_ID + "' and ID = '" + ID + "' and year = '" + year + "' and ID = '" + ID + "'"
     try:
         cur.execute(sql)
     except Exception as e:

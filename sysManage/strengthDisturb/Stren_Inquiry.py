@@ -269,10 +269,13 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
                 ID = self.add_strenth_info.tableWidget.item(i + orginRowNum, 0).text()
                 haveID = selectIDWhetherExitFromInputInfo(Equip_ID, Unit_ID, self.currentYear, ID)
                 if ID == "":
-                    QMessageBox.information(self, "增加", "第 " + currentRowNum + " 添加失败，批次号不能为空", QMessageBox.Yes)
+                    QMessageBox.information(self, "增加", "第 " + str(currentRowNum) + " 添加失败，批次号不能为空", QMessageBox.Yes)
                     continue
                 if haveID:
-                    QMessageBox.information(self, "增加", "第 " + currentRowNum + " 添加失败，批次号重复", QMessageBox.Yes)
+                    QMessageBox.information(self, "增加", "第 " + str(currentRowNum) + " 添加失败，批次号重复", QMessageBox.Yes)
+                    continue
+                if num == "":
+                    QMessageBox.information(self, "增加", "第 " + str(currentRowNum) + " 添加失败，数量不能为空", QMessageBox.Yes)
                     continue
                 factory = self.add_strenth_info.tableWidget.cellWidget(i + orginRowNum, 3).currentText()
                 state = self.add_strenth_info.tableWidget.cellWidget(i + orginRowNum, 4).currentText()
