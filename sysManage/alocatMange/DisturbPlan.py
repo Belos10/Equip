@@ -408,13 +408,13 @@ class DisturbPlan(QWidget, yearList_Form):
                 self.disturbResult.setItem(i, 5 + self.lenCurrentUnitChilddict, item)
                 currentRowResult.append(item)
                 i = i + 1
-        #self.disturbResult.setRowCount(n)
-        #self.disturbResult.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
-        #self.disturbResult.horizontalHeader().setSectionResizeMode(20, QHeaderView.Interactive)
+        self.disturbResult.setColumnWidth(2, 150)
         self.initDisturbPlanNum()
         self.initDisturbPlanNote()
+        self.initDisturbPlanInputNum()
         self.initDisturbPlanOther()
         self.ifEquipHaveChild()
+
 
     # 初始化调拨依据
     def initDisturbPlanProof(self):
@@ -523,7 +523,7 @@ class DisturbPlan(QWidget, yearList_Form):
 
 
     '''
-        改变分配计划数与备注
+        改变 分配计划数、备注、自定义计划数
     '''
     def slotItemChange(self):
         self.currentRow = self.disturbResult.currentRow()
@@ -535,6 +535,11 @@ class DisturbPlan(QWidget, yearList_Form):
             self.initDisturbPlanSum()
         if self.currentColumn == self.lenHeaderList-1:
             updateDisturbPlanNote(self.currentEquipdict[self.currentRow][0],self.currentYear,self.disturbResult.item(self.currentRow,self.currentColumn).text())
+        if self.currentColumn == 3:
+            if self.unitFlag == 1:
+                updateDisturbPlanInputNumUpmost(self.currentEquipdict[self.currentRow][0],self.currentYear,self.disturbResult.item(self.currentRow,self.currentColumn).text())
+            elif self.unitFlag == 2:
+                updateDisturbPlanInputNumBase(self.currentEquipdict[self.currentRow][0],self.currentYear,self.disturbResult.item(self.currentRow,self.currentColumn).text())
 
     # 初始化分配计划年份
     def setDisturbPlanTitle(self):
@@ -544,6 +549,24 @@ class DisturbPlan(QWidget, yearList_Form):
         self.txt_disturbPlanYear.setTextInteractionFlags(Qt.NoTextInteraction)
         self.txt_disturbPlanYear.setFontPointSize(15)
         self.txt_disturbPlanYear.setText(txt)
+
+
+    # 初始化自定义计划数
+    def initDisturbPlanInputNum(self):
+        if self.unitFlag == 1:
+            unitDisturbPlanInputNumList = selectDisturbPlanInputNumUpmost(self.currentEquipdict, self.currentYear)
+            for i in range(0, len(self.currentEquipdict)):
+                item = self.disturbResult.item(i, 3)
+                if unitDisturbPlanInputNumList[i] is not None:
+                    item.setText(str(unitDisturbPlanInputNumList[i]))
+                item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable)
+        elif self.unitFlag == 2:
+            unitDisturbPlanInputNumList = selectDisturbPlanInputNumBase(self.currentEquipdict, self.currentYear)
+            for i in range(0, len(self.currentEquipdict)):
+                item = self.disturbResult.item(i, 3)
+                if unitDisturbPlanInputNumList[i] is not None:
+                    item.setText(str(unitDisturbPlanInputNumList[i]))
+                item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable)
 
 
     # 读取初始分配计划备注
@@ -560,7 +583,7 @@ class DisturbPlan(QWidget, yearList_Form):
         # 读取调拨单开具数计划数与装备单位
     def initDisturbPlanOther(self):
         self.unitDisturbPlanOtherList = selectDisturbPlanOther(self.currentEquipdict, self.currentYear)
-
+        unitRocketOther = selectRocketOther(self.currentEquipdict, self.currentYear)
         # 装备单位
         for i in range(0, len(self.currentEquipdict)):
             item = self.disturbResult.item(i, 1)
@@ -569,31 +592,59 @@ class DisturbPlan(QWidget, yearList_Form):
             else:
                 item.setText("")
         if self.unitFlag == 1:
-            # 调拨单开具数
+            # 陆军调拨单开具数
             for unitID, unitItem in self.first_treeWidget_dict.items():
                 if unitItem == self.tw_first.currentItem():
-                    if selectUnitIfUppermost(unitID):
-                        for i in range(0, len(self.currentEquipdict)):
-                            item = self.disturbResult.item(i, 2)
-                            if self.unitDisturbPlanOtherList[i]:
-                                item.setText(str(self.unitDisturbPlanOtherList[i][1]))
-                            else:
-                                item.setText("0")
-                        for childRow, equipInfo in self.currentEquipdict.items():
-                            uperInfoList = selectUperInfoByEquipID(equipInfo[0])
-                            childNum = self.disturbResult.item(childRow, 2).text()
-                            for uperInfo in uperInfoList:
-                                for row, uperInfoRow in self.currentEquipdict.items():
-                                    if uperInfo[0] == uperInfoRow[0]:
-                                        num = self.disturbResult.item(row, 2).text()
-                                        totalNum = int(childNum) + int(num)
-                                        self.disturbResult.item(row, 2).setText(str(totalNum))
-                    else:
-                        for i in self.currentEquipdict:
-                            item = self.disturbResult.item(i, 2)
-                            result = selectDisturbPlanNum({0: [unitID]}, self.currentEquipdict, self.currentYear)
-                            if result:
-                                item.setText(str(result[i]))
-                            else:
-                                item.setText("0")
+                    #if selectUnitIfUppermost(unitID):
+                    for i in range(0, len(self.currentEquipdict)):
+                        item = self.disturbResult.item(i, 2)
+                        if self.unitDisturbPlanOtherList[i]:
+                            item.setText(str(self.unitDisturbPlanOtherList[i][1]))
+                        else:
+                            item.setText("0")
+                    for childRow, equipInfo in self.currentEquipdict.items():
+                        uperInfoList = selectUperInfoByEquipID(equipInfo[0])
+                        childNum = self.disturbResult.item(childRow, 2).text()
+                        for uperInfo in uperInfoList:
+                            for row, uperInfoRow in self.currentEquipdict.items():
+                                if uperInfo[0] == uperInfoRow[0]:
+                                    num = self.disturbResult.item(row, 2).text()
+                                    totalNum = int(childNum) + int(num)
+                                    self.disturbResult.item(row, 2).setText(str(totalNum))
+                    # else:
+                    #     for i in self.currentEquipdict:
+                    #         item = self.disturbResult.item(i, 2)
+                    #         result = selectDisturbPlanNum({0: [unitID]}, self.currentEquipdict, self.currentYear)
+                    #         if result:
+                    #             item.setText(str(result[i]))
+                    #         else:
+                    #             item.setText("0")
+        elif self.unitFlag == 2:
+            # 火箭军调拨单分配数
+            for unitID, unitItem in self.first_treeWidget_dict.items():
+                if unitItem == self.tw_first.currentItem():
+                    #if selectUnitIfUppermost(unitID):
+                    for i in range(0, len(self.currentEquipdict)):
+                        item = self.disturbResult.item(i, 2)
+                        if unitRocketOther[i]:
+                            item.setText(str(unitRocketOther[i][1]))
+                        else:
+                            item.setText("0")
+                    for childRow, equipInfo in self.currentEquipdict.items():
+                        uperInfoList = selectUperInfoByEquipID(equipInfo[0])
+                        childNum = self.disturbResult.item(childRow, 2).text()
+                        for uperInfo in uperInfoList:
+                            for row, uperInfoRow in self.currentEquipdict.items():
+                                if uperInfo[0] == uperInfoRow[0]:
+                                    num = self.disturbResult.item(row, 2).text()
+                                    totalNum = int(childNum) + int(num)
+                                    self.disturbResult.item(row, 2).setText(str(totalNum))
+                    # else:
+                    #     for i in self.currentEquipdict:
+                    #         item = self.disturbResult.item(i, 2)
+                    #         result = selectDisturbPlanNum({0: [unitID]}, self.currentEquipdict, self.currentYear)
+                    #         if result:
+                    #             item.setText(str(result[i]))
+                    #         else:
+                    #             item.setText("0")
 

@@ -16,6 +16,7 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
         self.baseNames = []
         self.signalConnection()
         self.init()
+
     result = []
     base = []
     designation = []
@@ -23,8 +24,7 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
     prepare = []
     currentLastRow = 0
 
-
-    #信号和槽连接
+    # 信号和槽连接
     def signalConnection(self):
         self.pb_select.clicked.connect(self.slotSelect)
         self.tb_input.clicked.connect(self.slotInput)
@@ -33,14 +33,14 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
         self.tb_del.clicked.connect(self.slotDelete)
         self.tw_result.itemChanged.connect(self.slotAlterAndSava)
 
-
     def initUserInfo(self):
         self.userInfo = get_value("totleUserInfo")
-    #信号和槽断开
+
+    # 信号和槽断开
     def slotDisconnect(self):
         pass
 
-    #定义初始化函数
+    # 定义初始化函数
     def init(self):
         self.initUserInfo()
         if self.userInfo:
@@ -52,13 +52,8 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
             stack.append(self.startInfo)
             self.initUnitComboxs(stack)
 
-
         self.displayData()
         pass
-
-
-
-
 
     '''
                 功能：
@@ -81,19 +76,20 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
         功能：
             根据下拉列表框以及文本框的内容，筛选数据。
     '''
+
     def slotSelect(self):
         self.base = []
         self.designation = []
         self.positionCode = []
         self.prepare = []
 
-        self.base  = self.cb_base.getCheckItem()
-        #更新对应基地名字的id
+        self.base = self.cb_base.getCheckItem()
+        # 更新对应基地名字的id
         for i in range(len(self.base)):
             self.base[i] = getUnitIdbyName(self.base[i])
 
-        if len(self.le_designation.text()) > 1 :
-            if len(self.designation ) == 0:
+        if len(self.le_designation.text()) > 1:
+            if len(self.designation) == 0:
                 self.designation.append(self.le_designation.text())
             else:
                 self.designation[0] = self.le_designation.text()
@@ -111,16 +107,18 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
                 self.prepare[0] = self.cb_prepare.currentText()
 
         self.displayData()
+
     '''
         功能：
             将列表数据展示在表中
     '''
+
     def displayData(self):
         self.result = getResult(self.base, self.designation, self.positionCode, self.prepare)
         self.tw_result.clear()
         self.tw_result.setColumnCount(13)
         dataList = self.result
-        if dataList == None or len(dataList) == 0:
+        if dataList is None or len(dataList) == 0:
             self.tw_result.setRowCount(3)
             self.initTableHeader()
         else:
@@ -149,11 +147,11 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
 
                 if dataList[i][5] == 1:
                     comboBox = QComboBox()
-                    comboBox.addItems(['是','否'])
+                    comboBox.addItems(['是', '否'])
 
                 else:
                     comboBox = QComboBox()
-                    comboBox.addItems(['否','是'])
+                    comboBox.addItems(['否', '是'])
                 self.tw_result.setCellWidget(3 + i, 5, comboBox)
 
                 item = QTableWidgetItem(dataList[i][6])
@@ -172,13 +170,12 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
                 item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
                 self.tw_result.setItem(3 + i, 9, item)
 
-
                 if dataList[i][10] == '已到位':
                     comboBox = QComboBox()
-                    comboBox.addItems(['已到位','未到位'])
+                    comboBox.addItems(['已到位', '未到位'])
                 else:
                     comboBox = QComboBox()
-                    comboBox.addItems(['未到位','已到位'])
+                    comboBox.addItems(['未到位', '已到位'])
                 self.tw_result.setCellWidget(3 + i, 10, comboBox)
 
                 item = QTableWidgetItem(dataList[i][11])
@@ -191,13 +188,11 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
 
     pass
 
-
-
-
     '''
         功能：
             画表头,行数至少有3行
     '''
+
     def initTableHeader(self):
         self.tw_result.verticalHeader().setVisible(False)
         self.tw_result.horizontalHeader().setVisible(False)
@@ -207,7 +202,7 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
         self.tw_result.resizeColumnsToContents()
         self.tw_result.resizeRowsToContents()
 
-        #绘制表头
+        # 绘制表头
         item = QTableWidgetItem("阵地工程XXX防护装备安装情况")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.tw_result.setItem(0, 0, item)
@@ -293,11 +288,11 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
         self.tw_result.setItem(1, 12, item)
         self.tw_result.setSpan(1, 12, 2, 1)
 
-
     '''
         功能：
             新增一行的数据
     '''
+
     def slotAlterAndSava(self):
         selectRow = self.tw_result.selectedItems()
         if len(selectRow) != 0:
@@ -307,18 +302,17 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
             else:
                 self.alterRowData(currentRow)
 
-
-    def savaRowData(self,row):
+    def savaRowData(self, row):
         # print('保存一行')
         rowData = []
-        for i in range(1,self.tw_result.columnCount()):
+        for i in range(1, self.tw_result.columnCount()):
             if i == 5:
                 item = self.tw_result.cellWidget(row, i)
                 if item.currentText() == '是':
                     rowData.append(1)
                 else:
                     rowData.append(0)
-            elif i == 10 :
+            elif i == 10:
                 item = self.tw_result.cellWidget(row, i)
                 rowData.append(item.currentText())
             elif i == 1:
@@ -338,7 +332,7 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
             QMessageBox.warning(self, "注意", "插入成功！", QMessageBox.Yes, QMessageBox.Yes)
             self.displayData()
 
-    def alterRowData(self,row):
+    def alterRowData(self, row):
         # print("修改一行数据")
         rowData = []
         for i in range(self.tw_result.columnCount()):
@@ -383,23 +377,21 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
             updataOneDataIntInstallation(rowData)
         pass
 
-
-
-
-
-    #组件
+    # 组件
     def slotInput(self):
         pass
 
     def slotOutput(self):
         pass
+
     '''
         功能：
             新增按钮槽函数
     '''
+
     def slotAdd(self):
         if self.tw_result.rowCount() <= 3 + len(self.result):
-            rowCount =  self.tw_result.rowCount()
+            rowCount = self.tw_result.rowCount()
             self.currentLastRow = rowCount
             self.tw_result.insertRow(rowCount)
             comboBox = QComboBox()
@@ -414,8 +406,6 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
         else:
             QMessageBox.warning(self, "注意", "请先将数据补充完整！", QMessageBox.Yes, QMessageBox.Yes)
 
-
-
     def slotDelete(self):
 
         rowCount = self.tw_result.currentRow()
@@ -427,15 +417,12 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
         if rowCount < 3:
             QMessageBox.warning(self, "注意", "请选中有效单元格！", QMessageBox.Yes, QMessageBox.Yes)
         elif rowCount >= 3 and rowCount < 3 + resultCount:
-            item = self.tw_result.item(rowCount,0)
+            item = self.tw_result.item(rowCount, 0)
             if item != None and int(item.text()) > 0:
                 deleteDataByInstallationId(item.text())
                 self.tw_result.removeRow(rowCount)
         else:
             self.tw_result.removeRow(rowCount)
-
-
-
 
 
 if __name__ == "__main__":
