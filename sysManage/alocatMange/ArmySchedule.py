@@ -1,6 +1,5 @@
 import sys
 from PyQt5.QtWidgets import *
-from sysManage.alocatMange.AllotSchedule import AllotSchedule
 from widgets.alocatMange.armySche import widget_armySchedule
 from database.strengthDisturbSql import *
 from PyQt5.Qt import Qt
