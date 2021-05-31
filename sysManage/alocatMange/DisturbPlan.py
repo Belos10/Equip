@@ -280,7 +280,6 @@ class DisturbPlan(QWidget, yearList_Form):
         self.disturbResult.clear()
         # 获取子单位名
         j = 0
-
         for unitID, unitItem in self.first_treeWidget_dict.items():
             if unitItem == self.tw_first.currentItem():
                 if selectUnitIfBase(unitID):
