@@ -1764,8 +1764,15 @@ def delFromInputInfo(Unit_ID, Equip_ID, ID, num, year, inputYear):
                 except Exception as e:
                     return e
 
+    for lastYear in findLastYear:
+        sql = "delete from inputinfo where Unit_ID = '" + Unit_ID + "' and Equip_ID = '" + \
+              Equip_ID + "' and ID = '" + ID + "' and year = '" + year + "' and ID = '" + ID + "' and inputYear = '" + lastYear + "'"
+        try:
+            cur.execute(sql)
+        except Exception as e:
+            return e
     sql = "delete from inputinfo where Unit_ID = '" + Unit_ID + "' and Equip_ID = '" +\
-          Equip_ID + "' and ID = '" + ID + "' and year = '" + year + "' and ID = '" + ID + "'"
+          Equip_ID + "' and ID = '" + ID + "' and year = '" + year + "' and ID = '" + ID + "' and inputYear = '" + inputYear + "'"
     try:
         cur.execute(sql)
     except Exception as e:
