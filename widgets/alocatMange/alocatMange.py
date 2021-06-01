@@ -59,10 +59,18 @@ class Widget_Alocat_Mange(object):
         self.tb_alocatSet.setObjectName("tb_alocatSet")
         self.tb_alocatSet.setToolButtonStyle(Qt.Qt.ToolButtonTextUnderIcon)
 
+        self.tb_retirePlan = QtWidgets.QToolButton(MainWindow)
+        icon5 = QtGui.QIcon()
+        icon5.addPixmap(QtGui.QPixmap(":/pic/retire.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.tb_retirePlan.setIcon(icon5)
+        self.tb_retirePlan.setObjectName("tb_retirePlan")
+        self.tb_retirePlan.setToolButtonStyle(Qt.Qt.ToolButtonTextUnderIcon)
+
         self.toolBar.addWidget(self.tb_disturbPlan)
         self.toolBar.addWidget(self.tb_disturbSchedule)
         self.toolBar.addWidget(self.tb_disturbManage)
         self.toolBar.addWidget(self.tb_alocatSet)
+        self.toolBar.addWidget(self.tb_retirePlan)
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -77,6 +85,4 @@ class Widget_Alocat_Mange(object):
         self.tb_disturbSchedule.setText(_translate("MainWindow", "调拨进度"))
         self.tb_disturbManage.setText(_translate("MainWindow", "调拨单管理"))
         self.tb_alocatSet.setText(_translate("MainWindow", "调配管理设置"))
-
-import icons.resource_rc
-
+        self.tb_retirePlan.setText(_translate("MainWindow", "退役报废计划"))
