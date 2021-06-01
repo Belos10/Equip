@@ -574,14 +574,14 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
             elif i == 9:
                 item = QTableWidgetItem()
                 if self.factoryInfoList:
-                    item.setText(self.factoryInfoList[0][2])
+                    item.setText(self.factoryInfoList[0][3])
                 else:
                     item.setText("")
                 self.tw_result.setItem(currentRow, i, item)
             elif i == 10:
                 item = QTableWidgetItem()
                 if self.factoryInfoList:
-                    item.setText(self.factoryInfoList[0][3])
+                    item.setText(self.factoryInfoList[0][4])
                 else:
                     item.setText("")
                 self.tw_result.setItem(currentRow, i, item)
@@ -608,7 +608,7 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
         if row < 0 or column < 0:
             return
         if self.tw_result.item(row, 9):
-            self.tw_result.item(row, 9).setText(self.factoryInfoList[index][2])
+            self.tw_result.item(row, 9).setText(self.factoryInfoList[index][3])
         if self.tw_result.item(row, 10):
-            self.tw_result.item(row, 10).setText(self.factoryInfoList[index][3])
+            self.tw_result.item(row, 10).setText(self.factoryInfoList[index][4])
         return
