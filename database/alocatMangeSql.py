@@ -622,24 +622,24 @@ def selectRetirePlanNote(EquipList, YearList):
     #disconnectMySql(conn, cur)
     return resultList
 
-# 读取分配计划军委计划数与装备单位
-def selectRetirePlanOther(EquipList, YearList):
-    #conn, cur = connectMySql()
-    resultList = []
-    for Equip_ID in EquipList.values():
-        sql = "select Equip_Unit,Equip_Num from armytransfer where Equip_Id = '" + Equip_ID[0] + "' and year = '" + YearList + "'"
-        cur.execute(sql)
-        result = cur.fetchall()
-        #print("other result",result)
-        if result:
-            pass
-        else:
-            resultList.append([])
-        for resultInfo in result:
-            resultList.append(resultInfo)
-    print("Other", resultList)
-    #disconnectMySql(conn, cur)
-    return resultList
+# # 读取分配计划军委计划数与装备单位
+# def selectRetirePlanOther(EquipList, YearList):
+#     #conn, cur = connectMySql()
+#     resultList = []
+#     for Equip_ID in EquipList.values():
+#         sql = "select Equip_Unit,Equip_Num from equip where Equip_Id = '" + Equip_ID[0] + "'"
+#         cur.execute(sql)
+#         result = cur.fetchall()
+#         #print("other result",result)
+#         if result:
+#             pass
+#         else:
+#             resultList.append([])
+#         for resultInfo in result:
+#             resultList.append(resultInfo)
+#     print("Other", resultList)
+#     #disconnectMySql(conn, cur)
+#     return resultList
 
 # 按list读取批量分配计划数
 def selectRetirePlanNum(UnitList, EquipList, YearList):

@@ -405,40 +405,11 @@ class retirePlan(QWidget, retirePlan_Form):
 
     # 读取机关计划数与装备单位
     def initRetirePlanOther(self):
-        self.unitRetirePlanOtherList = selectRetirePlanOther(self.currentEquipdict, self.currentYear)
 
         for i in range(0, len(self.currentEquipdict)):
             item = self.retirePlanResult.item(i, 1)
-            if self.unitRetirePlanOtherList[i]:
-                item.setText(str(self.unitRetirePlanOtherList[i][0]))
-            else:
-                item.setText("")
+            # if self.unitRetirePlanOtherList[i]:
+            item.setText(str(self.currentEquipdict[i][5]))
+            # else:
+            #     item.setText("")
 
-        for unitID, unitItem in self.first_treeWidget_dict.items():
-            if unitItem == self.tw_first.currentItem():
-                if selectUnitIfUppermost(unitID):
-                    for i in range(0, len(self.currentEquipdict)):
-
-                        if self.unitRetirePlanOtherList[i]:
-                            item = self.retirePlanResult.item(i, 2)
-                            item.setText(str(self.unitRetirePlanOtherList[i][1]))
-                        else:
-                            item = self.retirePlanResult.item(i, 2)
-                            item.setText("0")
-                    for childRow, equipInfo in self.currentEquipdict.items():
-                        uperInfoList = selectUperInfoByEquipID(equipInfo[0])
-                        childNum = self.retirePlanResult.item(childRow, 2).text()
-                        for uperInfo in uperInfoList:
-                            for row, uperInfoRow in self.currentEquipdict.items():
-                                if uperInfo[0] == uperInfoRow[0]:
-                                    num = self.retirePlanResult.item(row, 2).text()
-                                    totalNum = int(childNum) + int(num)
-                                    self.retirePlanResult.item(row, 2).setText(str(totalNum))
-                else:
-                    for i in self.currentEquipdict:
-                        item = self.retirePlanResult.item(i, 2)
-                        result = selectRetirePlanNum({0: [unitID]}, self.currentEquipdict, self.currentYear)
-                        if result:
-                            item.setText(str(result[i]))
-                        else:
-                            item.setText("0")
