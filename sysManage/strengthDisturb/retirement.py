@@ -1,5 +1,7 @@
 from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, QAbstractItemView, \
     QMessageBox, QListWidgetItem, QInputDialog, QHeaderView
+
+from utills.utillsComponent import CheckableComboBox
 from widgets.strengthDisturb.retirement import Widget_Retirement
 from database.strengthDisturbSql import *
 from PyQt5.Qt import Qt
@@ -330,6 +332,7 @@ class retirement(QWidget, Widget_Retirement):
 
     def _initTableWidgetByUnitListAndEquipList(self, currentCheckedUnitList, currentCheckedEquipList,currentYear):
         self.tw_result.itemChanged.disconnect(self.soltCheckData)
+        self.checkBoxListItems = {}
         self.pb_save.setDisabled(True)
         currentClass = 0
         self.tw_result.clear()
@@ -476,6 +479,8 @@ class retirement(QWidget, Widget_Retirement):
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.tw_result.setItem(i + 2, 4, item)
 
+            if len(LineInfo[7]) < 1:
+                LineInfo[7] = '0'
             if len(ID) == 0 or ID.isdigit() == False:
                 #拟退役数
                 item = QTableWidgetItem(LineInfo[7])
@@ -490,10 +495,22 @@ class retirement(QWidget, Widget_Retirement):
                 item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                 self.tw_result.setItem(i + 2, 9, item)
             else:
+                checkBox = CheckableComboBox()
+                checkBox.addItem(LineInfo[7], LineInfo[7])
+                from PyQt5.QtCore import QVariant
+                v = QVariant(0)
+                checkBox.setItemData(0, v, Qt.UserRole - 1)
+                checkBox.setItemData(0, Qt.lightGray, Qt.BackgroundRole)
                 # 拟退役数
-                item = QTableWidgetItem(LineInfo[7])
-                # item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-                self.tw_result.setItem(i + 2, 5, item)
+                planToRetireItems = findPlanToRetireItem(LineInfo[1], LineInfo[2], LineInfo[12])
+                if planToRetireItems != None:
+                    for index,element in enumerate(planToRetireItems):
+                            checkBox.addItem(element['ID'],element['num'] )
+                            cell = checkBox.model().item(index + 1, 0)
+                            cell.setCheckState(Qt.Unchecked)
+                    checkBox.activated.connect(self.soltCheckData)
+                self.tw_result.setCellWidget(i + 2, 5, checkBox)
+
                 # 申请需求
                 item = QTableWidgetItem(LineInfo[10])
                 # item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
@@ -523,7 +540,8 @@ class retirement(QWidget, Widget_Retirement):
             return
         for i, result in self.currentInquiryResult.items():
             if result[13] == True:
-                num = self.tw_result.item(i + 2, 5).text()
+                checkbox = self.tw_result.cellWidget(i + 2, 5)
+                num = checkbox.itemText(0)
                 apply = self.tw_result.item(i + 2, 8).text()
                 other = self.tw_result.item(i + 2, 9).text()
                 updateRetireAboutRetire(num, apply, other, result)
@@ -533,12 +551,12 @@ class retirement(QWidget, Widget_Retirement):
         return
 
     def soltCheckData(self,item):
-
-        if item != None:
-            input = item.text()
+        if item != None and type(item) != int:
             column = item.column()
-            if input != None and (column == 5 or column == 8):
+            row = item.row()
+            if  column == 8:
                 self.pb_save.setDisabled(False)
+                input = item.text()
                 if input.isdigit() == True:
                     return
                 else:
@@ -546,9 +564,25 @@ class retirement(QWidget, Widget_Retirement):
                     self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList,
                                                                 self.currentCheckedEquipList,
                                                                 self.currentYear)
-
-
-
-
+        elif item != None and type(item) == int:
+            column = self.tw_result.currentColumn()
+            row = self.tw_result.currentRow()
+            if column == 5:
+                comboxCheck = self.tw_result.cellWidget(row,column)
+                checkItems = comboxCheck.checkedItems()
+                planToRetire = 0
+                if len(checkItems) > 0:
+                    for i,item in enumerate(checkItems):
+                        print(item.text())
+                        data = comboxCheck.itemData(i + 1,Qt.UserRole)
+                        planToRetire= int(data) + planToRetire
+                    comboxCheck.setItemText(0,str(planToRetire))
+                    comboxCheck.setCurrentIndex(0)
+                else:
+                    print(comboxCheck.itemData(0,Qt.UserRole))
+                    comboxCheck.setItemText(0, str(comboxCheck.itemData(0,Qt.UserRole)))
+                    comboxCheck.setCurrentIndex(0)
+                    return
+        self.pb_save.setDisabled(False)
 
 chinese = ['', '(一)', '(二)', '(三)', '(四)', '(五)','(六)','(七)', '']

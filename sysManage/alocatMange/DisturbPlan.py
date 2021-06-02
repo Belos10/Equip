@@ -544,7 +544,7 @@ class DisturbPlan(QWidget, yearList_Form):
     def setDisturbPlanTitle(self):
         txt=str(self.currentYear)+"年分配计划"
         self.txt_disturbPlanYear.setFont(QFont("Microsoft YaHei"))
-        self.txt_disturbPlanYear.setAlignment(Qt.AlignCenter)
+        self.txt_disturbPlanYear.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.txt_disturbPlanYear.setTextInteractionFlags(Qt.NoTextInteraction)
         self.txt_disturbPlanYear.setFontPointSize(15)
         self.txt_disturbPlanYear.setText(txt)

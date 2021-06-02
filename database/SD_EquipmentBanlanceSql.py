@@ -176,7 +176,8 @@ def updateOneEquipmentBalanceData(year,equipmentId,unitId):
     item['Unit_ID'] = unitId
     item['OrignalAuthorizedValue'] = 0
     item['authorizedValue'] = 0
-    item['authorizedValueChange'] = 0
+    item['authorizedValueIncrease'] = 0
+    item['authorizedValueDecrease'] = 0
     item['originalValue'] = 0
     item['equipmentBalanceKey'] = str(year) + item['Equip_ID'] + item['Unit_ID']
     item['year'] = str(year)
@@ -199,8 +200,24 @@ def updateOneEquipmentBalanceData(year,equipmentId,unitId):
             disturbValue = 0
         else:
             disturbValue = int(disturbEquipment['DisturbNum'])
-        item['authorizedValueChange'] = disturbValue
+        item['authorizedValueIncrease'] = disturbValue
         item['authorizedValue'] = item.get('OrignalAuthorizedValue') + disturbValue
+
+    # #获取退役计划退役数
+    # sql = "select Equip_Id,Unit_Id,DisturbNum from disturbplan where Year=%s and Equip_Id=%s and Unit_Id=%s" % (
+    # str(year), equipmentId, unitId)
+    # disturbEquipment = selectOne(sql)
+    # if disturbEquipment is not None:
+    #     if (disturbEquipment.get('DisturbNum', 0) == 0 or disturbEquipment['DisturbNum'] is None or len(
+    #             disturbEquipment['DisturbNum']) < 1):
+    #         disturbValue = 0
+    #     else:
+    #         disturbValue = int(disturbEquipment['DisturbNum'])
+    #     item['authorizedValueIncrease'] = disturbValue
+    #     item['authorizedValue'] = item.get('OrignalAuthorizedValue') + disturbValue
+
+
+
 
     sql = "select equip_balance_id from  equipment_balance where equip_balance_id=%s"%item['equipmentBalanceKey']
     equipmentBalance = selectOne(sql)
@@ -211,7 +228,7 @@ def updateOneEquipmentBalanceData(year,equipmentId,unitId):
 
 
 def alterOneEquipmentBalanceData(item):
-    sql = "update equipment_balance set original_authorized_value=%d, authorized_value=%d,authorized_value_change=%d,original_value=%d where equip_balance_id=%s"\
+    sql = "update equipment_balance set original_authorized_value=%d, authorized_value=%d,authorized_value_increase=%d,original_value=%d where equip_balance_id=%s"\
           %(item['OrignalAuthorizedValue'],item['authorizedValue'],item['authorizedValueChange'],item['originalValue'],item['equipmentBalanceKey'])
     executeCommit(sql)
 
@@ -243,7 +260,7 @@ def insertOneEquipmentBalanceData(tempItem):
     equipKey = tempItem['equipmentBalanceKey']
     year = tempItem['year']
     sql = "insert into equipment_balance(equip_balance_id,Equip_ID,Unit_ID,year,original_authorized_value," \
-          "authorized_value,authorized_value_change,original_value) values (%s,%s,%s,%s,%d,%d,%d,%d)" % (
+          "authorized_value,authorized_value_increase,original_value) values (%s,%s,%s,%s,%d,%d,%d,%d)" % (
               equipKey, tempItem['Equip_ID'], tempItem['Unit_ID'], str(year), tempItem['OrignalAuthorizedValue'],
               tempItem['authorizedValue'], tempItem['authorizedValueChange'], tempItem['originalValue'],)
     sqls.append(sql)
@@ -339,7 +356,7 @@ def initEquipmentBalance(year):
             tempItem = itemDict.get(key)
             equipKey = key
             sql = "insert into equipment_balance(equip_balance_id,Equip_ID,Unit_ID,year,original_authorized_value," \
-                  "authorized_value,authorized_value_change,original_value) values (%s,%s,%s,%s,%d,%d,%d,%d)" % (
+                  "authorized_value,authorized_value_increase,original_value) values (%s,%s,%s,%s,%d,%d,%d,%d)" % (
             equipKey, tempItem['Equip_ID'],tempItem['Unit_ID'],str(year), tempItem['OrignalAuthorizedValue'],
             tempItem['authorizedValue'],tempItem['authorizedValueChange'],tempItem['originalValue'],)
             sqls.append(sql)
@@ -388,7 +405,7 @@ def getEquipmentTypeByID(equipmentId):
                 return '辆'
             else:
                 return ''
-            
+
 
 def getUnitNameByID(unitId):
     if unitId is None:

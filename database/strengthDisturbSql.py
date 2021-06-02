@@ -2661,6 +2661,18 @@ def selectAboutRetireByEquipShow(UnitList, EquipList, year):
             result.append(currentResultInfo)
     return result
 
+'''
+    功能：
+        得到对应装备号和单位号的武器的信号和现有数
+'''
+def findPlanToRetireItem(unitId,quipmentId,year):
+    sql = "select ID,num from inputinfo where Unit_ID='%s' and Equip_ID='%s' and inputYear='%s'"%(unitId,quipmentId,year)
+    result = selectDateDict(sql)
+    if len(result) > 0:
+        return result
+    else:
+        return None
+
 
 
 
