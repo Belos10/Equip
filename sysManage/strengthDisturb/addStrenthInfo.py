@@ -251,7 +251,7 @@ class AddStrenthInfo(QWidget, Add_Strenth_Info):
     # 信息录入界面删除按钮
     def deleteNote(self):
         currentRow = self.tableWidget.currentRow()
-        if currentRow > len(self.currentResult) and currentRow != -1:
+        if (currentRow >= len(self.currentResult)) and currentRow != -1:
             self.tableWidget.removeRow(currentRow)
             return
         if currentRow < 0:

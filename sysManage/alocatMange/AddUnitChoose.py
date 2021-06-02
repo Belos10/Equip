@@ -23,7 +23,7 @@ class AddUnitChoose(QDialog, Widget_AddUnitChoose):
         self.pb_cancel.clicked.connect(self.close)
 
     def initWidget(self):
-        self.tb_unitChoose.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tb_unitChoose.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.initUnitList()
 
     # 获取装备列表

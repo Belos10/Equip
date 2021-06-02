@@ -5,6 +5,7 @@ from database.alocatMangeSql import *
 from database.strengthDisturbSql import *
 from sysManage.alocatMange.config import ArmyTransferReceiveUnit, ArmyTransferSendUnit
 from PyQt5.Qt import Qt
+from database.dictSelect.factorySetSql import *
 
 #new
 '''
@@ -180,10 +181,16 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
             else:
                 Effic_Date = ""
 
-            Send_UintID = '01'
-            if self.tw_result.item(i + addRow, 8):
-                Send_UnitName = self.tw_result.item(i + addRow, 8).text()
+            if self.tw_result.cellWidget(i + addRow, 8):
+                index = self.tw_result.cellWidget(i + addRow, 8).currentIndex()
+                if self.factoryInfoList:
+                    Send_UintID = self.factoryInfoList[index][0]
+                    Send_UnitName = self.factoryInfoList[index][1]
+                else:
+                    Send_UintID = ""
+                    Send_UnitName = ""
             else:
+                Send_UintID = ""
                 Send_UnitName = ""
 
             if self.tw_result.item(i + addRow, 9):
@@ -520,6 +527,7 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
         self.tw_result.setRowCount(currentRow + 1)
 
         for i in range(19):
+            self.factoryInfoList = selectAllDataAboutFactory()
             if i == 14:
                 self.currentEquipInfo = []
                 equipCombo = QComboBox()
@@ -557,16 +565,25 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
                 item.setText(ArmyTransferReceiveUnit['联系电话'])
                 self.tw_result.setItem(currentRow, i, item)
             elif i == 8:
-                item = QTableWidgetItem()
-                item.setText(ArmyTransferSendUnit['单位名称'])
-                self.tw_result.setItem(currentRow, i, item)
+
+                item = QComboBox()
+                for factoryInfo in self.factoryInfoList:
+                    item.addItem(factoryInfo[1])
+                item.currentIndexChanged.connect(self.slotChangeFactory)
+                self.tw_result.setCellWidget(currentRow, i, item)
             elif i == 9:
                 item = QTableWidgetItem()
-                item.setText(ArmyTransferSendUnit['联系人'])
+                if self.factoryInfoList:
+                    item.setText(self.factoryInfoList[0][3])
+                else:
+                    item.setText("")
                 self.tw_result.setItem(currentRow, i, item)
             elif i == 10:
                 item = QTableWidgetItem()
-                item.setText(ArmyTransferSendUnit['联系电话'])
+                if self.factoryInfoList:
+                    item.setText(self.factoryInfoList[0][4])
+                else:
+                    item.setText("")
                 self.tw_result.setItem(currentRow, i, item)
             elif i == 5:
                 item = QComboBox()
@@ -584,3 +601,14 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
                 item = QTableWidgetItem()
                 item.setText("")
                 self.tw_result.setItem(currentRow, i, item)
+
+    def slotChangeFactory(self, index):
+        row = self.tw_result.currentRow()
+        column = self.tw_result.currentColumn()
+        if row < 0 or column < 0:
+            return
+        if self.tw_result.item(row, 9):
+            self.tw_result.item(row, 9).setText(self.factoryInfoList[index][3])
+        if self.tw_result.item(row, 10):
+            self.tw_result.item(row, 10).setText(self.factoryInfoList[index][4])
+        return

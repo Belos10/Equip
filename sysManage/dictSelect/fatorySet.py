@@ -56,7 +56,7 @@ class factorySet(QWidget, Widget_Factory_Set):
     def signalConnect(self):
         self.tw_result.clicked.connect(self.slotClickedTableWidget)
         self.pb_add.clicked.connect(self.slotAddFactoryInfo)
-        #self.pb_update.clicked.connect(self.slotUpdateFactoryInfo)
+        self.pb_update.clicked.connect(self.slotUpdateFactoryInfo)
         #self.pb_del.clicked.connect(self.slotDelFactoryInfo)
         #self.pb_input.clicked.connect(self.slotInputFactoryInfo)
         #self.pb_output.clicked.connect(self.slotOutputFactoryInfo)
@@ -70,6 +70,9 @@ class factorySet(QWidget, Widget_Factory_Set):
             name = self.le_name.text()
             if name == "":
                 QMessageBox.information(self, "新增", "新增失败，厂家名字不能为空", QMessageBox.Yes)
+                return
+            if haveFactoryName(name) == True:
+                QMessageBox.information(self, "新增", "新增失败，厂家名字不能重复", QMessageBox.Yes)
                 return
             address = self.le_address.text()
             connect = self.le_connect.text()
@@ -86,6 +89,34 @@ class factorySet(QWidget, Widget_Factory_Set):
                 QMessageBox.information(self, "新增", str(addSuccess) + ",新增失败", QMessageBox.Yes)
                 return
 
+    def slotUpdateFactoryInfo(self):
+        if self.tw_result.currentRow() < 0:
+            return
+        else:
+            row = self.tw_result.currentRow()
+            if self.tw_result.item(row, 0):
+                if self.tw_result.item(row, 0).text() != self.le_id.text():
+                    QMessageBox.information(self, "修改", "修改失败, 厂家编号不可修改", QMessageBox.Yes)
+                    return
+            ID = self.le_id.text()
+            name = self.le_name.text()
+            if name != self.tw_result.item(row, 1).text():
+                QMessageBox.information(self, "新增", "新增失败，厂家名字不能修改", QMessageBox.Yes)
+                return
+            address = self.le_address.text()
+            connect = self.le_connect.text()
+            tel1 = self.le_tel1.text()
+            represent = self.le_represent.text()
+            tel2 = self.le_tel2.text()
+
+            addSuccess = updateInfoIntoFactory(ID, name, address, connect, tel1, represent, tel2)
+            if addSuccess == True:
+                QMessageBox.information(self, "新增", "新增成功", QMessageBox.Yes)
+                self.initTableWidget()
+                return
+            else:
+                QMessageBox.information(self, "新增", str(addSuccess) + ",新增失败", QMessageBox.Yes)
+                return
     def slotClickedTableWidget(self):
         row = self.tw_result.currentRow()
         if row < 0:
