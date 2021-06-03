@@ -539,21 +539,31 @@ class DisturbPlan(QWidget, yearList_Form):
         self.currentRow = self.disturbResult.currentRow()
         self.currentColumn = self.disturbResult.currentColumn()
         if 5 <= self.currentColumn <= self.lenHeaderList-1:
+            if self.disturbResult.item(self.currentRow, self.currentColumn).text() == '':
+                num = 0
+            else:
+                num = self.disturbResult.item(self.currentRow, self.currentColumn).text()
             originNum = selectDisturbPlanNum({0:self.currentUnitChilddict[self.currentColumn-5]},{0:self.currentEquipdict[self.currentRow]},self.currentYear)
             if originNum[0] != '':
                 updateDisturbPlanNum(self.currentEquipdict[self.currentRow][0],self.currentUnitChilddict[self.currentColumn-5][0],
-                                 self.currentYear,self.disturbResult.item(self.currentRow,self.currentColumn).text(),originNum[0])
+                                 self.currentYear,num,originNum[0])
                 updateOneEquipmentBalanceData(self.currentYear, self.currentEquipdict[self.currentRow][0], self.currentUnitChilddict[self.currentColumn-5][0])
                 self.initDisturbPlanSum()
             else:
                 QMessageBox.information(self,"提示","未填写实力数",QMessageBox.Yes)
+        # 备注
         if self.currentColumn == self.lenHeaderList-1:
-            updateDisturbPlanNote(self.currentEquipdict[self.currentRow][0],self.currentYear,self.disturbResult.item(self.currentRow,self.currentColumn).text())
+            updateDisturbPlanNote(self.currentEquipdict[self.currentRow][0],self.currentYear,self.disturbResult.item(self.currentRow, self.currentColumn).text())
+        # 自定义计划数
         if self.currentColumn == 3:
+            if self.disturbResult.item(self.currentRow, self.currentColumn).text() == '':
+                num = 0
+            else:
+                num = self.disturbResult.item(self.currentRow, self.currentColumn).text()
             if self.unitFlag == 1:
-                updateDisturbPlanInputNumUpmost(self.currentEquipdict[self.currentRow][0],self.currentYear,self.disturbResult.item(self.currentRow,self.currentColumn).text())
+                updateDisturbPlanInputNumUpmost(self.currentEquipdict[self.currentRow][0],self.currentYear,num)
             elif self.unitFlag == 2:
-                updateDisturbPlanInputNumBase(self.currentEquipdict[self.currentRow][0],self.currentYear,self.disturbResult.item(self.currentRow,self.currentColumn).text())
+                updateDisturbPlanInputNumBase(self.currentEquipdict[self.currentRow][0],self.currentYear,num)
 
     # 初始化分配计划年份
     def setDisturbPlanTitle(self):

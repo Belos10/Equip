@@ -207,7 +207,7 @@ def selectDisturbPlanNum(UnitList, EquipList, Year):
 # 更新分配计划数
 def updateDisturbPlanNum(Equip_Id,Unit_Id,Year,DisturbNum,originNum):
     #conn,cur=connectMySql()
-    sql="update disturbplan set DisturbNum='"+ DisturbNum + "'where Equip_Id='" + Equip_Id + "'and Unit_Id ='" \
+    sql="update disturbplan set DisturbNum='"+ str(DisturbNum) + "'where Equip_Id='" + Equip_Id + "'and Unit_Id ='" \
         + Unit_Id + "' and Year = '" + Year + "'"
     #print("===========", sql)
     cur.execute(sql)
