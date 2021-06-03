@@ -121,7 +121,7 @@ class transferModel(QDialog, Widget_Transfer_Model):
             page.tw_ditalModel.setItem(5, page.crtColumnCount + 1 + 1, item1)
             page.tw_ditalModel.setItem(5, 2*page.crtColumnCount + 2 + 1, item2)
 
-            # 交装联系人联系方式
+            # 交装联系人电话
             if page.tw_ditalModel.item(6, half + 2):
                 Send_Tel = page.tw_ditalModel.item(6, half + 2).text()
                 print("Send_Tel, ", Send_Tel)
@@ -314,14 +314,15 @@ class transferModel(QDialog, Widget_Transfer_Model):
         if reply == QMessageBox.Cancel:
             return
         else:
-
             self.pb_confirm.setDisabled(True)
             self.pb_saveSingle.setDisabled(True)
             self.pb_saveTotal.setDisabled(True)
             self.pb_input.setDisabled(True)
+            self.totalModel.setDisabled(True)
             self.totalModel.saveTotalModel()
             for key, page in self.currentSingelUnitPage.items():
                 page.saveSingleModel()
+                page.setDisabled(True)
             self.signal.emit('1')
 
     def setCurrentYear(self, year):

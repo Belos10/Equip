@@ -240,7 +240,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                                 if updateSuccess != True:
                                     QMessageBox.information(self, "修改", str(updateSuccess) + "修改失败", QMessageBox.Yes)
                                     # QMessageBox.information(self, "修改", "修改成功！", QMessageBox.Yes)
-                                    # self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
+                                self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
                                 # except ValueError:
                                 #     reply = QMessageBox.question(self, '修改失败', '只能修改为整数', QMessageBox.Yes)
                                 #     self.tw_inquiryResult.item(currentRow, currentColumn).setText(str(resultInfo[4]))

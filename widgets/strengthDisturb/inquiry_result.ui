@@ -101,13 +101,6 @@
          </spacer>
         </item>
         <item>
-         <widget class="QPushButton" name="pb_updateStrength">
-          <property name="text">
-           <string>编辑实力数</string>
-          </property>
-         </widget>
-        </item>
-        <item>
          <widget class="QLabel" name="lb_factoryYear">
           <property name="text">
            <string>当前显示的出厂年份：全部</string>
@@ -132,6 +125,13 @@
          <widget class="QPushButton" name="pb_clearAll">
           <property name="text">
            <string>清除全部装备</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pb_updateStrength">
+          <property name="text">
+           <string>编辑实力数</string>
           </property>
          </widget>
         </item>
