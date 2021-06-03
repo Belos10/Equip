@@ -460,6 +460,17 @@ class DisturbPlan(QWidget, yearList_Form):
                 self.disturbResult.item(i,4).setText(str(sum))
             sum = 0
 
+        for row in reversed(range(len(self.currentEquipdict))):
+            sum = 0
+            for childRow in reversed(range(len(self.currentEquipdict))):
+                # 第0个字段是EquipID,第二个字段是Equip_Uper
+                if self.currentEquipdict[row][0] == self.currentEquipdict[childRow][2]:
+                    num = self.disturbResult.item(childRow, 4).text()
+                    if num != '':
+                        sum = sum + int(num)
+            if sum != 0:
+                self.disturbResult.item(row, 4).setText(str(sum))
+
 
     # 若装备含子装备，则该行不可选中
     def ifEquipHaveChild(self):
@@ -604,15 +615,17 @@ class DisturbPlan(QWidget, yearList_Form):
                             item.setText(str(self.unitDisturbPlanOtherList[i][0][1]))
                         else:
                             item.setText("0")
-                    for childRow, equipInfo in self.currentEquipdict.items():
-                        uperInfoList = selectUperInfoByEquipID(equipInfo[0])
-                        childNum = self.disturbResult.item(childRow, 2).text()
-                        for uperInfo in uperInfoList:
-                            for row, uperInfoRow in self.currentEquipdict.items():
-                                if uperInfo[0] == uperInfoRow[0]:
-                                    num = self.disturbResult.item(row, 2).text()
-                                    totalNum = int(childNum) + int(num)
-                                    self.disturbResult.item(row, 2).setText(str(totalNum))
+
+                    for row in reversed(range(len(self.currentEquipdict))):
+                        sum = 0
+                        for childRow in reversed(range(len(self.currentEquipdict))):
+                            # 第0个字段是EquipID,第二个字段是Equip_Uper
+                            if self.currentEquipdict[row][0] == self.currentEquipdict[childRow][2]:
+                                num = self.disturbResult.item(childRow,2).text()
+                                if num != '':
+                                    sum = sum + int(num)
+                        if sum != 0:
+                            self.disturbResult.item(row,2).setText(str(sum))
                     # else:
                     #     for i in self.currentEquipdict:
                     #         item = self.disturbResult.item(i, 2)
