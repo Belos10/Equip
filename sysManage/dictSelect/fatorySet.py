@@ -101,7 +101,7 @@ class factorySet(QWidget, Widget_Factory_Set):
             ID = self.le_id.text()
             name = self.le_name.text()
             if name != self.tw_result.item(row, 1).text():
-                QMessageBox.information(self, "新增", "新增失败，厂家名字不能修改", QMessageBox.Yes)
+                QMessageBox.information(self, "修改", "修改失败，厂家名字不能修改", QMessageBox.Yes)
                 return
             address = self.le_address.text()
             connect = self.le_connect.text()
@@ -111,11 +111,11 @@ class factorySet(QWidget, Widget_Factory_Set):
 
             addSuccess = updateInfoIntoFactory(ID, name, address, connect, tel1, represent, tel2)
             if addSuccess == True:
-                QMessageBox.information(self, "新增", "新增成功", QMessageBox.Yes)
+                QMessageBox.information(self, "修改", "修改成功", QMessageBox.Yes)
                 self.initTableWidget()
                 return
             else:
-                QMessageBox.information(self, "新增", str(addSuccess) + ",新增失败", QMessageBox.Yes)
+                QMessageBox.information(self, "修改", str(addSuccess) + ",修改失败", QMessageBox.Yes)
                 return
     def slotClickedTableWidget(self):
         row = self.tw_result.currentRow()

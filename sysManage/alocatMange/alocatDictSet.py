@@ -119,6 +119,8 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
         # self.pb_add.setDisabled(1)
         self.pb_update.setDisabled(1)
         self.cb_equipUper.setDisabled(True)
+        self.pb_setUnit.setDisabled(True)
+        self.pb_setEquip.setDisabled(False)
         # 从数据库中单位表中获取数据初始化单位目录，tableWidget显示所有的单位表
         self._initUnitTreeWidget("", self.tw_first)
         self._initUnitTableWidget()
@@ -149,6 +151,8 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
         self.pb_update.setDisabled(0)
         self.cb_equipUper.setDisabled(False)
         self.le_equipUnit.setDisabled(False)
+        self.pb_setUnit.setDisabled(False)
+        self.pb_setEquip.setDisabled(True)
 
         self.cb_equipUper.clear()
         self.equipIDList = []

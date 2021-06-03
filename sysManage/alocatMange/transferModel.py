@@ -350,7 +350,7 @@ class transferModel(QDialog, Widget_Transfer_Model):
         self.totalModel.initTableWidget(self.unitInfoList, self.equipInfo, self.year, self.requireInfo)
         self.tw_transferModel.addTab(self.totalModel, "总单")
         print("require", self.requireInfo)
-        for unitInfo, num in zip(unitInfoList, requireInfo[2: -3]):
+        for unitInfo, num in zip(unitInfoList, requireInfo[2: -2]):
             if num == "" or num == "0":
                 continue
             page = singleModel()

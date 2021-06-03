@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Widget_Inquiry_Result(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(1194, 817)
+        Form.resize(963, 817)
         self.gridLayout_2 = QtWidgets.QGridLayout(Form)
         self.gridLayout_2.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_2.setSpacing(0)
@@ -45,6 +45,9 @@ class Widget_Inquiry_Result(object):
         self.horizontalLayout_2.addWidget(self.cb_showDistence)
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem)
+        self.pb_updateStrength = QtWidgets.QPushButton(self.widget)
+        self.pb_updateStrength.setObjectName("pb_updateStrength")
+        self.horizontalLayout_2.addWidget(self.pb_updateStrength)
         self.lb_factoryYear = QtWidgets.QLabel(self.widget)
         self.lb_factoryYear.setObjectName("lb_factoryYear")
         self.horizontalLayout_2.addWidget(self.lb_factoryYear)
@@ -83,6 +86,7 @@ class Widget_Inquiry_Result(object):
         self.rb_unitShow.setText(_translate("Form", "按单位展开显示"))
         self.cb_showLast.setText(_translate("Form", "展开到末级"))
         self.cb_showDistence.setText(_translate("Form", "只列存在偏差"))
+        self.pb_updateStrength.setText(_translate("Form", "编辑实力数"))
         self.lb_factoryYear.setText(_translate("Form", "当前显示的出厂年份：全部"))
         self.pb_factoryYear.setText(_translate("Form", "选择显示出厂年份"))
         self.pb_clearCheck.setText(_translate("Form", "清除选中装备"))
