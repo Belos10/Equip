@@ -211,8 +211,11 @@ def updateDisturbPlanNum(Equip_Id,Unit_Id,Year,DisturbNum,originNum):
         + Unit_Id + "' and Year = '" + Year + "'"
     #print("===========", sql)
     cur.execute(sql)
-    num = DisturbNum - originNum + selectStrengthNum(Unit_Id,Equip_Id,Year)
+    a=selectStrengthNum(Unit_Id,Equip_Id,Year)
+    print("a[0][0]",a[0][0],"originNum",originNum)
+    num = int(DisturbNum) - int(originNum) + int(a[0][0])
     sql="update strength set Strength= '%s' where Equip_ID = '%s' and Unit_ID = '%s' and year = '%s'"%(num,Equip_Id,Unit_Id,Year)
+    cur.execute(sql)
     conn.commit()
     #disconnectMySql(conn,cur)
 
