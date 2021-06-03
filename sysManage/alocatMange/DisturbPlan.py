@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtWidgets import *
 #new
-from database.SD_EquipmentBanlanceSql import initEquipmentBalance, updateOneEquipmentBalanceData, deleteByYear
+from database.SD_EquipmentBanlanceSql import  updateOneEquipmentBalanceData, deleteByYear
 from widgets.alocatMange.yearListForm import yearList_Form
 from database.strengthDisturbSql import *
 from PyQt5.Qt import Qt
@@ -528,6 +528,7 @@ class DisturbPlan(QWidget, yearList_Form):
         self.currentRow = self.disturbResult.currentRow()
         self.currentColumn = self.disturbResult.currentColumn()
         if 5 <= self.currentColumn <= self.lenHeaderList-1:
+            print('updateOneEquipmentBalanceData 被执行' )
             updateDisturbPlanNum(self.currentEquipdict[self.currentRow][0],self.currentUnitChilddict[self.currentColumn-5][0],
                                  self.currentYear,self.disturbResult.item(self.currentRow,self.currentColumn).text())
             updateOneEquipmentBalanceData(self.currentYear,self.currentEquipdict[self.currentRow][0],self.currentUnitChilddict[self.currentColumn-5][0])

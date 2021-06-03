@@ -217,6 +217,9 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
                     try:
                         workBook.save("%s/单位目录表.xls"%directoryPath)
                         QMessageBox.about(self, "导出成功", "导出成功！")
+                        import win32api
+                        win32api.ShellExecute(0, 'open', '%s/单位目录表.xls'%directoryPath, '', '', 1)
+
                         return
                     except Exception as e:
                         QMessageBox.about(self, "导出失败", "导出表格被占用，请关闭正在使用的Execl！")
@@ -283,6 +286,8 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
                         workSheet.write(i + 1, 5, item[5],contentStyle)
                     try:
                         workBook.save("%s/装备目录表.xls"%directoryPath)
+                        import win32api
+                        win32api.ShellExecute(0, 'open', '%s/装备目录表.xls' % directoryPath, '', '', 1)
                         QMessageBox.about(self, "导出成功", "导出成功！")
                         return
                     except Exception as e:

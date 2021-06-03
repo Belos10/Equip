@@ -132,11 +132,11 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
                                 self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
                                 return
                             else:
-                                self.tw_result.item(self.currentRow, 3).setText(resultRowInfo[5])
+                                self.tw_result.cellWidget(self.currentRow, 3).setText(str(resultRowInfo[5]))
                                 return
                         except ValueError:
                             reply = QMessageBox.question(self, '修改', '编制数只能修改为整数?', QMessageBox.Yes)
-                            self.tw_result.cellWidget(self.currentRow, 3).setText(resultRowInfo[5])
+                            self.tw_result.cellWidget(self.currentRow, 3).setText(str(resultRowInfo[5]))
                             return
         else:
             pass

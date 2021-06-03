@@ -1,3 +1,4 @@
+from PyQt5.QtCore import QVariant
 from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, QAbstractItemView, \
     QMessageBox, QListWidgetItem, QInputDialog, QHeaderView
 
@@ -29,6 +30,12 @@ class retirement(QWidget, Widget_Retirement):
         self.userInfo = get_value("totleUserInfo")
     def _initAll_(self):
         self.getUserInfo()
+        self.tw_result.setRowCount(0)
+        self.tw_result.setColumnCount(0)
+        self.tw_first.clear()
+        self.tw_second.clear()
+        self.le_first.clear()
+        self.le_second.clear()
         self.first_treeWidget_dict = {}
         self.tw_first.clear()
         self._initUnitTreeWidget('', self.tw_first)
@@ -161,6 +168,7 @@ class retirement(QWidget, Widget_Retirement):
             EquipInfo = stack.pop(0)
             item = QTreeWidgetItem(root.pop(0))
             item.setText(0, EquipInfo[1])
+            item.setData(0,Qt.UserRole,QVariant(EquipInfo[0]))
             item.setCheckState(0, Qt.Unchecked)
             self.second_treeWidget_dict[EquipInfo[0]] = item
             result = selectEquipInfoByEquipUper(EquipInfo[0])
@@ -195,12 +203,16 @@ class retirement(QWidget, Widget_Retirement):
                 self.currentCheckedUnitList.append(unitID)
                 break
 
-        for equipID, equipItem in self.second_treeWidget_dict.items():
-            if equipItem.checkState(0) == Qt.Checked or equipItem.checkState(0) == Qt.PartiallyChecked:
-                self.currentCheckedEquipList.append(equipID)
+        # for equipID, equipItem in self.second_treeWidget_dict.items():
+        #     if equipItem.checkState(0) == Qt.Checked or equipItem.checkState(0) == Qt.PartiallyChecked:
+        self.currentCheckedEquipList = self.get_checked(self.tw_second.topLevelItem(0))
+        # print('-----------------------------')
+        # print(self.currentCheckedEquipList)
 
         if self.currentCheckedEquipList == [] or self.currentCheckedUnitList == []:
             self.tw_result.setRowCount(2)
+            self.tw_result.horizontalHeader().setVisible(False)
+            self.tw_result.verticalHeader().setVisible(False)
             return
         self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList,
                                                         self.currentYear)
@@ -285,7 +297,7 @@ class retirement(QWidget, Widget_Retirement):
     '''
            功能：
                设置级目录联选中状态
-       '''
+    '''
 
     def slotCheckedChange(self, item, num):
         # 如果是顶部节点，只考虑Child：
@@ -349,7 +361,7 @@ class retirement(QWidget, Widget_Retirement):
         self.tw_result.setColumnCount(10)
         self.tw_result.setRowCount(2)
         item = QTableWidgetItem()
-        item.setText(currentYear + "年装备补充及退役需求表")
+        item.setText("%s年%s装备补充及退役需求表"%(self.year,selectUnitNameByUnitID(self.currentCheckedUnitList[0])))
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
         self.tw_result.setItem(0, 0, item)
@@ -423,8 +435,7 @@ class retirement(QWidget, Widget_Retirement):
 
         self.tw_result.setRowCount(len(self.resultList) + 2)
         classID = 1
-        plannedRetirementCount = 0
-        applyCount = 0
+
         for i, LineInfo in enumerate(self.resultList):
             m_isSecond = isSecondDict(LineInfo[2])
             if m_isSecond:
@@ -439,14 +450,6 @@ class retirement(QWidget, Widget_Retirement):
                 else:
                     ID = str(classID)
                     classID = classID + 1
-                    if len(LineInfo[7]) == 0:
-                        plannedRetirementCount = plannedRetirementCount + 0
-                    else:
-                        plannedRetirementCount = plannedRetirementCount + int(LineInfo[7])
-                    if len(LineInfo[10]) == 0:
-                        applyCount = applyCount + 0
-                    else:
-                        applyCount = applyCount + int(LineInfo[10])
                     LineInfo.append(True)
 
             item = QTableWidgetItem(ID)
@@ -520,15 +523,6 @@ class retirement(QWidget, Widget_Retirement):
                 # item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                 self.tw_result.setItem(i + 2, 9, item)
             self.currentInquiryResult[i] = LineInfo
-        for i in range(2,self.tw_result.rowCount()):
-            item = self.tw_result.item(i,5)
-            if item != None:
-                if len(item.text()) == 0:
-                    item.setText(str(plannedRetirementCount))
-            item = self.tw_result.item(i, 8)
-            if item != None:
-                if len(item.text()) == 0:
-                    item.setText(str(applyCount))
         self.tw_result.itemChanged.connect(self.soltCheckData)
 
     def slotSaveRetire(self):
@@ -585,4 +579,17 @@ class retirement(QWidget, Widget_Retirement):
                     return
         self.pb_save.setDisabled(False)
 
+    def get_checked(self, node: QTreeWidgetItem) -> list:
+        """ 得到当前节点选中的所有分支， 返回一个 list """
+        temp_list = []
+        # 此处看下方注释 1
+        for item in node.takeChildren():
+            # 判断是否选中
+            if item.checkState(0) == Qt.Checked or item.checkState(0) == Qt.PartiallyChecked:
+                temp_list.append(str(item.data(0,Qt.UserRole)))
+                # 判断是否还有子分支
+                if item.childCount():
+                    temp_list.extend(self.get_checked(item))
+            node.addChild(item)
+        return temp_list
 chinese = ['', '(一)', '(二)', '(三)', '(四)', '(五)','(六)','(七)', '']

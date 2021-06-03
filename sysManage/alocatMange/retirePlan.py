@@ -6,7 +6,7 @@ from PyQt5.QtGui import QColor, QBrush,QFont
 from widgets.alocatMange.retirePlan import retirePlan_Form
 from sysManage.userInfo import get_value
 from sysManage.alocatMange.InputProof import InputProof
-from database.SD_EquipmentBanlanceSql import initEquipmentBalance, updateOneEquipmentBalanceData, deleteByYear
+from database.SD_EquipmentBanlanceSql import updateOneEquipmentBalanceData, deleteByYear
 from database.alocatMangeSql import *
 
 
