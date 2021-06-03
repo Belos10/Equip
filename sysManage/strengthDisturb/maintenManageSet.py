@@ -151,7 +151,7 @@ class maintenManageSet(QWidget, Widget_Mainten_Manage_Set):
     '''
     def _initPublicEquipTableWidget_(self):
         self.tw_publicEquip.clear()
-        header = ['装备编号', '旅团编号', '编制数']
+        header = ['装备编号', '旅团编号']
         self.tw_publicEquip.setColumnCount(len(header))
         self.tw_publicEquip.setHorizontalHeaderLabels(header)
 
@@ -164,9 +164,7 @@ class maintenManageSet(QWidget, Widget_Mainten_Manage_Set):
             item = QTableWidgetItem()
             item.setText(publicEquipInfo[1])
             self.tw_publicEquip.setItem(i, 1, item)
-            item = QTableWidgetItem()
-            item.setText(publicEquipInfo[2])
-            self.tw_publicEquip.setItem(i, 2, item)
+
 
 
     '''

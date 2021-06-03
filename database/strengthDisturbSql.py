@@ -1089,6 +1089,8 @@ def delDataInEquip(Equip_ID):
         except Exception as e:
             conn.rollback()
             return e
+
+
     try:
         conn.commit()
         return True
@@ -2671,12 +2673,12 @@ def selectAboutRetireByEquipShow(UnitList, EquipList, year):
             else:
                 equipUnit = ""
             if weaveInfo:
-                weave = weaveInfo[0][5]
+                weave = str(weaveInfo[0][5])
             else:
                 weave = '0'
             num = ''
             if strengthInfo:
-                now = strengthInfo[0][6]
+                now = str(strengthInfo[0][6])
                 strength = strengthInfo[0][4]
             else:
                 strength = '0'
@@ -2689,6 +2691,18 @@ def selectAboutRetireByEquipShow(UnitList, EquipList, year):
             currentResultInfo = [ID, unitID, EquipID, equipName, equipUnit, strength,weave, num, now, super, apply, other, year]
             result.append(currentResultInfo)
     return result
+
+'''
+    功能：
+        得到对应装备号和单位号的武器的信号和现有数
+'''
+def findPlanToRetireItem(unitId,quipmentId,year):
+    sql = "select ID,num from inputinfo where Unit_ID='%s' and Equip_ID='%s' and inputYear='%s'"%(unitId,quipmentId,year)
+    result = selectDateDict(sql)
+    if len(result) > 0:
+        return result
+    else:
+        return None
 
 
 

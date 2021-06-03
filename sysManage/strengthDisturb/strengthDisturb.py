@@ -1,10 +1,10 @@
+from sysManage.strengthDisturb.equipmentBalacne import equipmentBalance
 from widgets.strengthDisturb.StrengthDisturb import Strength_Disturb_Widget
 import sys
 from PyQt5.QtWidgets import QMainWindow,QApplication,QWidget
 from sysManage.strengthDisturb.Stren_Inquiry import Stren_Inquiry
 from sysManage.strengthDisturb.strengthDisturbSet import strengthDisturbSet
 from sysManage.strengthDisturb.maintenMange import maintenManage
-from sysManage.strengthDisturb.equipmentBalanceControl import Equip_Balance_Control
 from sysManage.strengthDisturb.retirement import retirement
 from sysManage.userInfo import get_value
 #new
@@ -16,7 +16,7 @@ class strengthDisturb(QMainWindow, Strength_Disturb_Widget):
         self.strenSelect = Stren_Inquiry(self)
         self.strenSelect.initStrenInquiry()
         self.maintenMange = maintenManage(self)
-        self.equipBalance = Equip_Balance_Control(self)
+        self.equipBalance = equipmentBalance(self)
         self.applyRetire = retirement(self)
         self.strengthDisturbSet = strengthDisturbSet(self)
         self.userInfo = None
@@ -88,8 +88,7 @@ class strengthDisturb(QMainWindow, Strength_Disturb_Widget):
         self.slotDisconnect()
         self.stackedWidget.setCurrentIndex(2)
         self.connectSignal()
-        self.equipBalance.main.initYear()
-        self.equipBalance.stack.setCurrentIndex(0)
+        self.equipBalance._initAll_()
 
     def slotApplyRetire(self):
         self.tb_strengthSelect.setDisabled(False)
@@ -100,6 +99,7 @@ class strengthDisturb(QMainWindow, Strength_Disturb_Widget):
 
         self.slotDisconnect()
         self.stackedWidget.setCurrentIndex(3)
+        self.applyRetire._initAll_()
         self.connectSignal()
 
 

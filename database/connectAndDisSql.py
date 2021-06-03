@@ -50,9 +50,15 @@ def selectOne(sql):
 def excuteupdata(sqls):
     if sqls is None or len(sqls) == 0:
         return False
-    conn, cur = connectSqlite()
-    for sql in sqls:
-       executeCommit(sql)
+    try:
+        for sql in sqls:
+           cur.execute(sql)
+        conn.commit()
+        return True
+    except sqlite3.Error as error:
+        conn.rollback()
+        print(error)
+        return False
 
 '''
     功能：
@@ -79,7 +85,11 @@ def executeCommit(sql=''):
     conn, cur = connectSqlite()
     try:
         cur.execute(sql)
+        conn.commit()
     except sqlite3.Error as error:
         conn.rollback()
         print(error)
         return error
+if __name__ == '__main__':
+    # executeCommit("delete into equipment_balance(equip_balance_id) values('001')")
+    pass
