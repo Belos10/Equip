@@ -186,13 +186,13 @@ def insertIntoRocketTransferYear(year):
 
 
 # 按list读取批量分配计划数
-def selectDisturbPlanNum(UnitList, EquipList, YearList):
+def selectDisturbPlanNum(UnitList, EquipList, Year):
     # conn, cur = connectMySql()
     resultList = []
     for Unit_ID in UnitList.values():
         for Equip_ID in EquipList.values():
             sql = "select DisturbNum from disturbplan where Unit_Id = '" + Unit_ID[0] + \
-                  "' and Equip_Id = '" + Equip_ID[0] + "' and Year = '" + YearList + "'"
+                  "' and Equip_Id = '" + Equip_ID[0] + "' and Year = '" + Year + "'"
             cur.execute(sql)
             result = cur.fetchall()
             if len(result)!=0:
@@ -205,12 +205,14 @@ def selectDisturbPlanNum(UnitList, EquipList, YearList):
 
 
 # 更新分配计划数
-def updateDisturbPlanNum(Equip_Id,Unit_Id,Year,DisturbNum):
+def updateDisturbPlanNum(Equip_Id,Unit_Id,Year,DisturbNum,originNum):
     #conn,cur=connectMySql()
     sql="update disturbplan set DisturbNum='"+ DisturbNum + "'where Equip_Id='" + Equip_Id + "'and Unit_Id ='" \
         + Unit_Id + "' and Year = '" + Year + "'"
-    print("===========", sql)
+    #print("===========", sql)
     cur.execute(sql)
+    num = DisturbNum - originNum + selectStrengthNum(Unit_Id,Equip_Id,Year)
+    sql="update strength set Strength= '%s' where Equip_ID = '%s' and Unit_ID = '%s' and year = '%s'"%(num,Equip_Id,Unit_Id,Year)
     conn.commit()
     #disconnectMySql(conn,cur)
 
@@ -340,33 +342,34 @@ def selectDisturbPlanOther(EquipList, YearList):
         sql = "select Equip_Unit,Equip_Num from armytransfer where Equip_Id = '" + Equip_ID[0] + "' and year = '" + YearList + "'"
         cur.execute(sql)
         result = cur.fetchall()
-        print("other result",result)
+        #print("other result",result)
         if result:
-            pass
+            resultList.append(result)
         else:
             resultList.append([])
-        for resultInfo in result:
-            resultList.append(resultInfo)
-    print("Other", resultList)
+        # for resultInfo in result:
+        #     resultList.append(resultInfo)
+    print("陆军调拨单resultList", resultList)
     # disconnectMySql(conn, cur)
     return resultList
 
 # 读取火箭军计划数
-def selectRocketOther(EquipList, YearList):
+def selectRocketOther(EquipList, YearList,UnitID):
     # conn, cur = connectMySql()
     resultList = []
     for Equip_ID in EquipList.values():
-        sql = "select Equip_Num from rockettransfer where Equip_Id = '" + Equip_ID[0] + "' and year = '" + YearList + "'"
+        sql = "select Equip_Num from rockettransfer where Equip_Id = '" + Equip_ID[0] + "' and year = '" + YearList \
+              + "' and "
         cur.execute(sql)
         result = cur.fetchall()
-        #print("other result",result)
+        #print("火箭军 result",result)
         if result:
-            pass
+            resultList.append(result)
         else:
             resultList.append([])
-        for resultInfo in result:
-            resultList.append(resultInfo)
-    print("火箭军调拨", resultList)
+        # for resultInfo in result:
+        #     resultList.append(resultInfo)
+    print("火箭军调拨resultList", resultList)
     # disconnectMySql(conn, cur)
     return resultList
 

@@ -2579,6 +2579,12 @@ def selectInfoFromRetire(unitID, equipID, year):
         return ''
 
 
+def selectStrengthNum(unitID, EquipID, year):
+    sql = "select Strength from strength where Equip_ID = '" + \
+          EquipID + "' and Unit_ID = '" + unitID + "' and year = '" + year + "'"
+    cur.execute(sql)
+    result = cur.fetchall()
+    return result
 
 
 # 查询实力信息
