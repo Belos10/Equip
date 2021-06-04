@@ -4,7 +4,7 @@ from sysManage.userInfo import get_value
 from widgets.positionEngineer.posEngneerInstallationUI import PosEngneerInstallationUI
 import sys
 from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QTableWidget, QHeaderView, QTableWidgetItem, QComboBox, \
-    QMessageBox
+    QMessageBox, QFileDialog
 
 
 class InstallationSituation(QWidget, PosEngneerInstallationUI):
@@ -28,10 +28,11 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
     def signalConnection(self):
         self.pb_select.clicked.connect(self.slotSelect)
         self.tb_input.clicked.connect(self.slotInput)
-        self.tb_output.clicked.connect(self.slotOutput)
+        self.pb_output.clicked.connect(self.slotOutput)
         self.tb_add.clicked.connect(self.slotAdd)
         self.tb_del.clicked.connect(self.slotDelete)
         self.tw_result.itemChanged.connect(self.slotAlterAndSava)
+        self.tb_outputToExcel.clicked.connect(self.slotOutputToExcel)
 
     def initUserInfo(self):
         self.userInfo = get_value("totleUserInfo")
@@ -424,6 +425,116 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
         else:
             self.tw_result.removeRow(rowCount)
 
+
+    #导出至Excel
+    def slotOutputToExcel(self):
+        if len(self.result) < 1:
+            reply = QMessageBox.warning(self, '警告', '未选中任何数据，无法导出', QMessageBox.Yes)
+            return
+        reply = QMessageBox.question(self, '修改导出Excel', '是否保存修改并导出Excel？', QMessageBox.Cancel, QMessageBox.Yes)
+        if reply == QMessageBox.Cancel:
+            self.displayData()
+            return
+        self.displayData()
+        directoryPath = QFileDialog.getExistingDirectory(self, "请选择导出文件夹", "c:/")
+        if len(directoryPath) > 0:
+            import xlwt
+            workBook = xlwt.Workbook(encoding='utf-8')
+            workSheet = workBook.add_sheet('Sheet1')
+            titileStyle = xlwt.XFStyle()  # 初始化样式
+            font = xlwt.Font()  # 为样式创建字体
+            font.name = '宋体'
+            font.bold = True
+            font.height = 20 * 11  # 字体大小，11为字号，20为衡量单位
+            alignment = xlwt.Alignment()  ## Create Alignment
+            alignment.horz = xlwt.Alignment.HORZ_CENTER
+            alignment.vert = xlwt.Alignment.VERT_CENTER
+            borders = xlwt.Borders()
+            borders.left = 2  # 设置为细实线
+            borders.right = 2
+            borders.top = 2
+            borders.bottom = 2
+            titileStyle.font = font  # 设定样式
+            titileStyle.alignment = alignment
+            titileStyle.borders = borders
+            for i in range(13):
+                workSheet.col(i).width = 5000
+            contentStyle = xlwt.XFStyle()  # 初始化样式
+            font = xlwt.Font()  # 为样式创建字体
+            font.name = '宋体'
+            font.height = 20 * 11  # 字体大小，11为字号，20为衡量单位
+            alignment = xlwt.Alignment()  ## Create Alignment
+            alignment.horz = xlwt.Alignment.HORZ_CENTER
+            alignment.vert = xlwt.Alignment.VERT_CENTER
+            borders = xlwt.Borders()
+            borders.left = 1  # 设置为细实线
+            borders.right = 1
+            borders.top = 1
+            borders.bottom = 1
+            contentStyle.font = font  # 设定样式
+            contentStyle.alignment = alignment
+            contentStyle.borders = borders
+
+            workSheet.write_merge(0, 0, 0, 12, "阵地工程x生化防护装备安装情况",titileStyle)
+            workSheet.write_merge(1, 2, 0, 0,'序号', titileStyle)
+            workSheet.write_merge(1, 1, 1, 2, '单位', titileStyle)
+            workSheet.write(2, 1, "基地", titileStyle)
+            workSheet.write(2, 2, "番号", titileStyle)
+            workSheet.write_merge(1, 2, 3, 3, '阵地代号', titileStyle)
+            workSheet.write_merge(1, 2, 4, 4, '具体位置', titileStyle)
+            workSheet.write_merge(1, 2, 5, 5, '是否具备安装新型装备条件', titileStyle)
+            workSheet.write_merge(1, 1, 6, 10, '安装情况', titileStyle)
+            workSheet.write(2, 6, "目前安装情况", titileStyle)
+            workSheet.write(2, 7, "安装时间", titileStyle)
+            workSheet.write(2, 8, "计划安装时间", titileStyle)
+            workSheet.write(2, 9, "数量（套）", titileStyle)
+            workSheet.write(2, 10, "装备到位情况", titileStyle)
+            workSheet.write_merge(1, 2, 11, 11, '装备运行状态', titileStyle)
+            workSheet.write_merge(1, 2, 12, 12, '备注', titileStyle)
+
+            #填表数据
+            dataList = self.result
+            if dataList is None or len(dataList) == 0:
+                self.tw_result.setRowCount(3)
+                self.initTableHeader()
+            else:
+                self.tw_result.setRowCount(3 + len(dataList))
+                self.initTableHeader()
+                for i in range(len(dataList)):
+                    workSheet.write(3 + i, 0, str(dataList[i][0]), contentStyle)
+                    workSheet.write(3 + i, 1, getUnitNameById(dataList[i][1]), contentStyle)
+                    workSheet.write(3 + i, 2, dataList[i][2], contentStyle)
+                    workSheet.write(3 + i, 3, dataList[i][3], contentStyle)
+                    workSheet.write(3 + i, 4, dataList[i][4], contentStyle)
+                    if dataList[i][5] == 1:
+                        workSheet.write(3 + i, 5, '是', contentStyle)
+                    else:
+                        workSheet.write(3 + i, 5, '否', contentStyle)
+                    workSheet.write(3 + i, 6, dataList[i][6], contentStyle)
+                    workSheet.write(3 + i, 7, dataList[i][7], contentStyle)
+                    workSheet.write(3 + i, 8, dataList[i][8], contentStyle)
+                    workSheet.write(3 + i, 9, dataList[i][9], contentStyle)
+                    workSheet.write(3 + i, 10, dataList[i][10], contentStyle)
+                    workSheet.write(3 + i, 11, dataList[i][11], contentStyle)
+                    workSheet.write(3 + i, 12, dataList[i][12], contentStyle)
+
+            try:
+                pathName = "%s/阵地工程x生化防护装备安装情况.xls" % (directoryPath)
+                workBook.save(pathName)
+                import win32api
+                win32api.ShellExecute(0, 'open', pathName, '', '', 1)
+                QMessageBox.about(self, "导出成功", "导出成功！")
+                return
+            except Exception as e:
+                QMessageBox.about(self, "导出失败", "导出表格被占用，请关闭正在使用的Execl！")
+                return
+
+        pass
+
+
+
+
+        pass
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

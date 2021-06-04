@@ -134,11 +134,11 @@ def insertOneDateIntoEquipmentDirectory(Equip_ID,Equip_Name,Equip_Uper,Equip_Typ
         查找某单位id所对应的单位数据
 '''
 def getUnitById(UnitID):
-    sql = "select Unit_ID,Unit_Name,Unit_Uper from posengin_unit_directory where Unit_ID=%s"%UnitID
+    sql = "select Unit_ID,Unit_Name,Unit_Uper from unit where Unit_ID=%s"%UnitID
     return selectOne(sql)
 
 def getUnitNameById(UnitID):
-    sql = "select Unit_Name from posengin_unit_directory where Unit_ID=%s"%UnitID
+    sql = "select Unit_Name from unit where Unit_ID=%s"%UnitID
     result = selectOne(sql)
     if result:
         return result['Unit_Name']
@@ -220,7 +220,7 @@ def findAllInstallactionData():
         根据单位名称获取对应单位id
 '''
 def getUnitIdbyName(unitName):
-    sql = "select Unit_ID from posengin_unit_directory where Unit_Name='%s'"%unitName
+    sql = "select Unit_ID from unit where Unit_Name='%s'"%unitName
     result = selectOne(sql)
     if result != None:
         return result['Unit_ID']

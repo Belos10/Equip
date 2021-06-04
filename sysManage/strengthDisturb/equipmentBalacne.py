@@ -944,225 +944,222 @@ class equipmentBalance(QWidget, Widget_Retirement):
 
         directoryPath = QFileDialog.getExistingDirectory(self, "请选择导出文件夹", "c:/")
         if len(directoryPath) > 0:
-            if len(self.resultList) > 0:
-                import xlwt
-                workBook = xlwt.Workbook(encoding='utf-8')
-                workSheet = workBook.add_sheet('Sheet1')
 
-                headTitleStyle = xlwt.XFStyle()  # 初始化样式
-                font = xlwt.Font()  # 为样式创建字体
-                font.name = '宋体'
-                font.bold = True
-                font.height = 20 * 20  # 字体大小，11为字号，20为衡量单位
-                alignment = xlwt.Alignment()  ## Create Alignment
-                alignment.horz = xlwt.Alignment.HORZ_CENTER
-                alignment.vert = xlwt.Alignment.VERT_CENTER
-                borders = xlwt.Borders()
-                borders.left = 3  # 设置为细实线
-                borders.right = 3
-                borders.top = 3
-                borders.bottom = 3
-                headTitleStyle.font = font  # 设定样式
-                headTitleStyle.alignment = alignment
-                headTitleStyle.borders = borders
+            import xlwt
+            workBook = xlwt.Workbook(encoding='utf-8')
+            workSheet = workBook.add_sheet('Sheet1')
 
-                titileStyle = xlwt.XFStyle()  # 初始化样式
-                font = xlwt.Font()  # 为样式创建字体
-                font.name = '宋体'
-                font.bold = True
-                font.height = 20 * 11  # 字体大小，11为字号，20为衡量单位
-                alignment = xlwt.Alignment()  ## Create Alignment
-                alignment.horz = xlwt.Alignment.HORZ_CENTER
-                alignment.vert = xlwt.Alignment.VERT_CENTER
-                borders = xlwt.Borders()
-                borders.left = 2  # 设置为细实线
-                borders.right = 2
-                borders.top = 2
-                borders.bottom = 2
-                titileStyle.font = font  # 设定样式
-                titileStyle.alignment = alignment
-                titileStyle.borders = borders
-                for i in range(66):
-                    workSheet.col(0).width = 4000
-                contentStyle = xlwt.XFStyle()  # 初始化样式
-                font = xlwt.Font()  # 为样式创建字体
-                font.name = '宋体'
-                font.height = 20 * 11  # 字体大小，11为字号，20为衡量单位
-                alignment = xlwt.Alignment()  ## Create Alignment
-                alignment.horz = xlwt.Alignment.HORZ_CENTER
-                alignment.vert = xlwt.Alignment.VERT_CENTER
-                borders = xlwt.Borders()
-                borders.left = 1  # 设置为细实线
-                borders.right = 1
-                borders.top = 1
-                borders.bottom = 1
-                contentStyle.font = font  # 设定样式
-                contentStyle.alignment = alignment
-                contentStyle.borders = borders
+            headTitleStyle = xlwt.XFStyle()  # 初始化样式
+            font = xlwt.Font()  # 为样式创建字体
+            font.name = '宋体'
+            font.bold = True
+            font.height = 20 * 20  # 字体大小，11为字号，20为衡量单位
+            alignment = xlwt.Alignment()  ## Create Alignment
+            alignment.horz = xlwt.Alignment.HORZ_CENTER
+            alignment.vert = xlwt.Alignment.VERT_CENTER
+            borders = xlwt.Borders()
+            borders.left = 3  # 设置为细实线
+            borders.right = 3
+            borders.top = 3
+            borders.bottom = 3
+            headTitleStyle.font = font  # 设定样式
+            headTitleStyle.alignment = alignment
+            headTitleStyle.borders = borders
 
-                #画Excel表头
-                workSheet.write_merge(0, 0, 0, 66, "%s年%s装备平衡表" % (self.year, selectUnitNameByUnitID(self.currentCheckedUnitList[0])), headTitleStyle)
-                workSheet.write_marge(1, 0, 3, 2,"装备名称", titileStyle)
-                workSheet.write_marge(1, 1, 3, 2, "原有编制数", titileStyle)
-                workSheet.write_marge(1, 2, 3, 2, "编制数", titileStyle)
-                workSheet.write_marge(1, 3, 3, 3, "编制增数", titileStyle)
-                workSheet.write_marge(1, 4, 3, 4, "编制减数", titileStyle)
-                workSheet.write_marge(1, 5, 3, 5, "原有数", titileStyle)
-                workSheet.write_marge(1, 6, 0, 13, "质量状况", titileStyle)
-                workSheet.write_marge(2, 6, 2, 9, "下发", titileStyle)
-                workSheet.write_marge(2, 10, 2, 13, "上报", titileStyle)
-                workSheet.write(3, 6, "新品", titileStyle)
-                workSheet.write(3, 7, "堪品", titileStyle)
-                workSheet.write(3, 8, "待修", titileStyle)
-                workSheet.write(3, 9, "待退役", titileStyle)
-                workSheet.write(3, 10, "新品", titileStyle)
-                workSheet.write(3, 11, "堪品", titileStyle)
-                workSheet.write(3, 12, "待修", titileStyle)
-                workSheet.write(3, 13, "待退役", titileStyle)
-                workSheet.write_marge(1, 14, 3, 14, "变化数", titileStyle)
-                workSheet.write_marge(1, 15, 3, 15, "现有数", titileStyle)
-                workSheet.write_marge(1, 16, 2, 22, "变化项目（增）", titileStyle)
-                workSheet.write_marge(1, 23, 2, 30, "变化项目（减）", titileStyle)
-                workSheet.write(3, 16, "合计", titileStyle)
-                workSheet.write(3, 17, "上级补充", titileStyle)
-                workSheet.write(3, 18, "型号更正", titileStyle)
-                workSheet.write(3, 19, "漏报", titileStyle)
-                workSheet.write(3, 20, "自购", titileStyle)
-                workSheet.write(3, 21, "调入", titileStyle)
-                workSheet.write(3, 22, "其他增加", titileStyle)
-                workSheet.write(3, 23, "合计", titileStyle)
-                workSheet.write(3, 24, "型号更正", titileStyle)
-                workSheet.write(3, 25, "调出", titileStyle)
-                workSheet.write(3, 26, "训练消耗", titileStyle)
-                workSheet.write(3, 27, "重报", titileStyle)
-                workSheet.write(3, 28, "退役", titileStyle)
-                workSheet.write(3, 29, "报废", titileStyle)
-                workSheet.write(3, 30, "其他减少", titileStyle)
-                workSheet.write_marge(1, 31, 3, 31, "未到位数", titileStyle)
-                workSheet.write_marge(1, 32, 3, 32, "未到配套数", titileStyle)
-                workSheet.write_marge(1, 33, 3, 33, "未削减数", titileStyle)
-                workSheet.write_marge(1, 34, 2, 40, "携带数", titileStyle)
-                workSheet.write(3, 34, "合计", titileStyle)
-                workSheet.write(3, 35, "携带新品数", titileStyle)
-                workSheet.write(3, 36, "携带堪品数", titileStyle)
-                workSheet.write(3, 37, "携带待修数", titileStyle)
-                workSheet.write(3, 38, "携带退役数", titileStyle)
-                workSheet.write(3, 39, "未到位数", titileStyle)
-                workSheet.write(3, 40, "未削减数", titileStyle)
-                workSheet.write_marge(1, 41, 2, 47, "库存", titileStyle)
-                workSheet.write(3, 41, "合计", titileStyle)
-                workSheet.write(3, 42, "新品", titileStyle)
-                workSheet.write(3, 43, "堪品", titileStyle)
-                workSheet.write(3, 44, "待修", titileStyle)
-                workSheet.write(3, 45, "带退役", titileStyle)
-                workSheet.write(3, 46, "未到位数", titileStyle)
-                workSheet.write(3, 47, "未削减数", titileStyle)
-                workSheet.write_marge(1, 48, 2, 52, "管理情况", titileStyle)
-                workSheet.write(3, 48, "满编率", titileStyle)
-                workSheet.write(3, 49, "配套率", titileStyle)
-                workSheet.write(3, 50, "入库率", titileStyle)
-                workSheet.write(3, 51, "到位率", titileStyle)
-                workSheet.write(3, 52, "完好率", titileStyle)
-                workSheet.write_marge(1, 53, 2, 57, "大修次数", titileStyle)
-                workSheet.write(3, 53, "未修", titileStyle)
-                workSheet.write(3, 54, "一次", titileStyle)
-                workSheet.write(3, 55, "二次", titileStyle)
-                workSheet.write(3, 56, "三次", titileStyle)
-                workSheet.write(3, 57, "三次以上", titileStyle)
-                workSheet.write_marge(1, 58, 2, 66, "出厂年限", titileStyle)
-                workSheet.write(3, 58, "70年以前", titileStyle)
-                workSheet.write(3, 59, "71至75年", titileStyle)
-                workSheet.write(3, 60, "76至80年", titileStyle)
-                workSheet.write(3, 61, "81至85年", titileStyle)
-                workSheet.write(3, 62, "86至90年", titileStyle)
-                workSheet.write(3, 63, "91至95年", titileStyle)
-                workSheet.write(3, 64, "96至2000年", titileStyle)
-                workSheet.write(3, 65, "2001至2005年", titileStyle)
-                workSheet.write(3, 66, "2006年以后", titileStyle)
+            titileStyle = xlwt.XFStyle()  # 初始化样式
+            font = xlwt.Font()  # 为样式创建字体
+            font.name = '宋体'
+            font.bold = True
+            font.height = 20 * 11  # 字体大小，11为字号，20为衡量单位
+            alignment = xlwt.Alignment()  ## Create Alignment
+            alignment.horz = xlwt.Alignment.HORZ_CENTER
+            alignment.vert = xlwt.Alignment.VERT_CENTER
+            borders = xlwt.Borders()
+            borders.left = 2  # 设置为细实线
+            borders.right = 2
+            borders.top = 2
+            borders.bottom = 2
+            titileStyle.font = font  # 设定样式
+            titileStyle.alignment = alignment
+            titileStyle.borders = borders
+            for i in range(66):
+                workSheet.col(0).width = 4000
+            contentStyle = xlwt.XFStyle()  # 初始化样式
+            font = xlwt.Font()  # 为样式创建字体
+            font.name = '宋体'
+            font.height = 20 * 11  # 字体大小，11为字号，20为衡量单位
+            alignment = xlwt.Alignment()  ## Create Alignment
+            alignment.horz = xlwt.Alignment.HORZ_CENTER
+            alignment.vert = xlwt.Alignment.VERT_CENTER
+            borders = xlwt.Borders()
+            borders.left = 1  # 设置为细实线
+            borders.right = 1
+            borders.top = 1
+            borders.bottom = 1
+            contentStyle.font = font  # 设定样式
+            contentStyle.alignment = alignment
+            contentStyle.borders = borders
 
-                #填写表格
-                for row in range(len(self.resultList)):
-                    workSheet.write(row + 4, 0, self.resultList[row].get('Equip_Name'), contentStyle)
-                    workSheet.write(row + 4, 1, self.resultList[row].get('original_authorized_value'), contentStyle)
-                    workSheet.write(row + 4, 2, self.resultList[row].get('authorized_value'), contentStyle)
-                    workSheet.write(row + 4, 3, self.resultList[row].get('authorized_value_increase'), contentStyle)
-                    workSheet.write(row + 4, 4, self.resultList[row].get('authorized_value_decrease'), contentStyle)
-                    workSheet.write(row + 4, 5, self.resultList[row].get('original_value'), contentStyle)
-                    workSheet.write(row + 4, 6, self.resultList[row].get('authorized_value'), contentStyle)
-                    workSheet.write(row + 4, 7, self.resultList[row].get('issue_inferior_product','0'), contentStyle)
-                    workSheet.write(row + 4, 8, self.resultList[row].get('issue_need_repaired','0'), contentStyle)
-                    workSheet.write(row + 4, 9, self.resultList[row].get('issue_need_retire','0'), contentStyle)
-                    workSheet.write(row + 4, 10, self.resultList[row].get('report_new_product','0'), contentStyle)
-                    workSheet.write(row + 4, 11, self.resultList[row].get('report_inferior_product','0'), contentStyle)
-                    workSheet.write(row + 4, 12, self.resultList[row].get('report_need_repaired','0'), contentStyle)
-                    workSheet.write(row + 4, 13, self.resultList[row].get('report_need_retire','0'), contentStyle)
-                    workSheet.write(row + 4, 14, self.resultList[row].get('change_value','0'), contentStyle)
-                    workSheet.write(row + 4, 15, self.resultList[row].get('existing_value','0'), contentStyle)
-                    workSheet.write(row + 4, 16, self.resultList[row].get('increase_count','0'), contentStyle)
-                    workSheet.write(row + 4, 17, self.resultList[row].get('increase_superior_supplement','0'), contentStyle)
-                    workSheet.write(row + 4, 18, self.resultList[row].get('increase_model_change','0'), contentStyle)
-                    workSheet.write(row + 4, 19, self.resultList[row].get('increase_missing_reports','0'), contentStyle)
-                    workSheet.write(row + 4, 20, self.resultList[row].get('increase_self_purchase','0'), contentStyle)
-                    workSheet.write(row + 4, 21, self.resultList[row].get('increase_transfer_in','0'), contentStyle)
-                    workSheet.write(row + 4, 22, self.resultList[row].get('increase_other','0'), contentStyle)
-                    workSheet.write(row + 4, 23, self.resultList[row].get('reduce_count','0'), contentStyle)
-                    workSheet.write(row + 4, 24, self.resultList[row].get('reduce_model_change','0'), contentStyle)
-                    workSheet.write(row + 4, 25, self.resultList[row].get('reduce_callout','0'), contentStyle)
-                    workSheet.write(row + 4, 26, self.resultList[row].get('reduce_train_consumption','0'), contentStyle)
-                    workSheet.write(row + 4, 27, self.resultList[row].get('reduce_train_consumption','0'), contentStyle)
-                    workSheet.write(row + 4, 28, self.resultList[row].get('reduce_retire','0'), contentStyle)
-                    workSheet.write(row + 4, 29, self.resultList[row].get('reduce_scrap','0'), contentStyle)
-                    workSheet.write(row + 4, 30, self.resultList[row].get('reduce_other','0'), contentStyle)
-                    workSheet.write(row + 4, 31, self.resultList[row].get('unprepared_value','0'), contentStyle)
-                    workSheet.write(row + 4, 32, self.resultList[row].get('unmatched_value','0'), contentStyle)
-                    workSheet.write(row + 4, 33, self.resultList[row].get('uncutdown_value','0'), contentStyle)
-                    workSheet.write(row + 4, 34, self.resultList[row].get('carry_count','0'), contentStyle)
-                    workSheet.write(row + 4, 35, self.resultList[row].get('carry_new_product','0'), contentStyle)
-                    workSheet.write(row + 4, 36, self.resultList[row].get('carry_inferior_product','0'), contentStyle)
-                    workSheet.write(row + 4, 37, self.resultList[row].get('carry_need_repaired','0'), contentStyle)
-                    workSheet.write(row + 4, 38, self.resultList[row].get('carry_need_retire','0'), contentStyle)
-                    workSheet.write(row + 4, 39, self.resultList[row].get('carry_unprepared_value','0'), contentStyle)
-                    workSheet.write(row + 4, 40, self.resultList[row].get('carryUn_cutdown_value','0'), contentStyle)
-                    workSheet.write(row + 4, 41, self.resultList[row].get('stock_count','0'), contentStyle)
-                    workSheet.write(row + 4, 42, self.resultList[row].get('stock_new_product','0'), contentStyle)
-                    workSheet.write(row + 4, 43, self.resultList[row].get('stock_inferior_product','0'), contentStyle)
-                    workSheet.write(row + 4, 44, self.resultList[row].get('stock_need_repaired','0'), contentStyle)
-                    workSheet.write(row + 4, 45, self.resultList[row].get('stock_need_retire','0'), contentStyle)
-                    workSheet.write(row + 4, 46, self.resultList[row].get('stock_unprepared_value','0'), contentStyle)
-                    workSheet.write(row + 4, 47, self.resultList[row].get('stockUn_cutdown_value','0'), contentStyle)
-                    workSheet.write(row + 4, 48, self.resultList[row].get('authorized_rate','0'), contentStyle)
-                    workSheet.write(row + 4, 49, self.resultList[row].get('matched_rate','0'), contentStyle)
-                    workSheet.write(row + 4, 50, self.resultList[row].get('instock_rate','0'), contentStyle)
-                    workSheet.write(row + 4, 51, self.resultList[row].get('prepared_rate','0'), contentStyle)
-                    workSheet.write(row + 4, 52, self.resultList[row].get('intact_rate','0'), contentStyle)
-                    workSheet.write(row + 4, 53, self.resultList[row].get('never_repair','0'), contentStyle)
-                    workSheet.write(row + 4, 54, self.resultList[row].get('once','0'), contentStyle)
-                    workSheet.write(row + 4, 55, self.resultList[row].get('twice','0'), contentStyle)
-                    workSheet.write(row + 4, 56, self.resultList[row].get('three_times','0'), contentStyle)
-                    workSheet.write(row + 4, 57, self.resultList[row].get('More_than_three','0'), contentStyle)
-                    workSheet.write(row + 4, 58, self.resultList[row].get('before1970','0'), contentStyle)
-                    workSheet.write(row + 4, 59, self.resultList[row].get('between1971and1975','0'), contentStyle)
-                    workSheet.write(row + 4, 60, self.resultList[row].get('between1976and1980','0'), contentStyle)
-                    workSheet.write(row + 4, 61, self.resultList[row].get('between1981and1985','0'), contentStyle)
-                    workSheet.write(row + 4, 62, self.resultList[row].get('between1986and1990','0'), contentStyle)
-                    workSheet.write(row + 4, 63, self.resultList[row].get('between1991and1995','0'), contentStyle)
-                    workSheet.write(row + 4, 64, self.resultList[row].get('between1996and2000','0'), contentStyle)
-                    workSheet.write(row + 4, 65, self.resultList[row].get('between2001and2005','0'), contentStyle)
-                    workSheet.write(row + 4, 66, self.resultList[row].get('after2006','0'), contentStyle)
+            #画Excel表头
+            workSheet.write_merge(0, 0, 0, 66, "%s年%s装备平衡表" % (self.year, selectUnitNameByUnitID(self.currentCheckedUnitList[0])), headTitleStyle)
+            workSheet.write_marge(1, 3, 0, 0,"装备名称", titileStyle)
+            workSheet.write_marge(1, 3, 1, 1, "原有编制数", titileStyle)
+            workSheet.write_marge(1, 3, 2, 2, "编制数", titileStyle)
+            workSheet.write_marge(1, 3, 3, 3, "编制增数", titileStyle)
+            workSheet.write_marge(1, 3, 4, 4, "编制减数", titileStyle)
+            workSheet.write_marge(1, 3, 5, 5, "原有数", titileStyle)
+            workSheet.write_marge(1, 1, 6, 13, "质量状况", titileStyle)
+            workSheet.write_marge(2, 2, 6, 9, "下发", titileStyle)
+            workSheet.write_marge(2, 2, 10, 13, "上报", titileStyle)
+            workSheet.write(3, 6, "新品", titileStyle)
+            workSheet.write(3, 7, "堪品", titileStyle)
+            workSheet.write(3, 8, "待修", titileStyle)
+            workSheet.write(3, 9, "待退役", titileStyle)
+            workSheet.write(3, 10, "新品", titileStyle)
+            workSheet.write(3, 11, "堪品", titileStyle)
+            workSheet.write(3, 12, "待修", titileStyle)
+            workSheet.write(3, 13, "待退役", titileStyle)
+            workSheet.write_marge(1, 3, 14, 14, "变化数", titileStyle)
+            workSheet.write_marge(1, 3, 15, 15, "现有数", titileStyle)
+            workSheet.write_marge(1, 2, 16, 22, "变化项目（增）", titileStyle)
+            workSheet.write_marge(1, 2, 23, 30, "变化项目（减）", titileStyle)
+            workSheet.write(3, 16, "合计", titileStyle)
+            workSheet.write(3, 17, "上级补充", titileStyle)
+            workSheet.write(3, 18, "型号更正", titileStyle)
+            workSheet.write(3, 19, "漏报", titileStyle)
+            workSheet.write(3, 20, "自购", titileStyle)
+            workSheet.write(3, 21, "调入", titileStyle)
+            workSheet.write(3, 22, "其他增加", titileStyle)
+            workSheet.write(3, 23, "合计", titileStyle)
+            workSheet.write(3, 24, "型号更正", titileStyle)
+            workSheet.write(3, 25, "调出", titileStyle)
+            workSheet.write(3, 26, "训练消耗", titileStyle)
+            workSheet.write(3, 27, "重报", titileStyle)
+            workSheet.write(3, 28, "退役", titileStyle)
+            workSheet.write(3, 29, "报废", titileStyle)
+            workSheet.write(3, 30, "其他减少", titileStyle)
+            workSheet.write_marge(1, 3, 31, 31, "未到位数", titileStyle)
+            workSheet.write_marge(1, 3, 32, 32, "未到配套数", titileStyle)
+            workSheet.write_marge(1, 3, 33, 33, "未削减数", titileStyle)
+            workSheet.write_marge(1, 2, 34, 40, "携带数", titileStyle)
+            workSheet.write(3, 34, "合计", titileStyle)
+            workSheet.write(3, 35, "携带新品数", titileStyle)
+            workSheet.write(3, 36, "携带堪品数", titileStyle)
+            workSheet.write(3, 37, "携带待修数", titileStyle)
+            workSheet.write(3, 38, "携带退役数", titileStyle)
+            workSheet.write(3, 39, "未到位数", titileStyle)
+            workSheet.write(3, 40, "未削减数", titileStyle)
+            workSheet.write_marge(1, 2, 41, 47, "库存", titileStyle)
+            workSheet.write(3, 41, "合计", titileStyle)
+            workSheet.write(3, 42, "新品", titileStyle)
+            workSheet.write(3, 43, "堪品", titileStyle)
+            workSheet.write(3, 44, "待修", titileStyle)
+            workSheet.write(3, 45, "带退役", titileStyle)
+            workSheet.write(3, 46, "未到位数", titileStyle)
+            workSheet.write(3, 47, "未削减数", titileStyle)
+            workSheet.write_marge(1, 2, 48, 52, "管理情况", titileStyle)
+            workSheet.write(3, 48, "满编率", titileStyle)
+            workSheet.write(3, 49, "配套率", titileStyle)
+            workSheet.write(3, 50, "入库率", titileStyle)
+            workSheet.write(3, 51, "到位率", titileStyle)
+            workSheet.write(3, 52, "完好率", titileStyle)
+            workSheet.write_marge(1, 2, 53, 57, "大修次数", titileStyle)
+            workSheet.write(3, 53, "未修", titileStyle)
+            workSheet.write(3, 54, "一次", titileStyle)
+            workSheet.write(3, 55, "二次", titileStyle)
+            workSheet.write(3, 56, "三次", titileStyle)
+            workSheet.write(3, 57, "三次以上", titileStyle)
+            workSheet.write_marge(1, 2, 58, 66, "出厂年限", titileStyle)
+            workSheet.write(3, 58, "70年以前", titileStyle)
+            workSheet.write(3, 59, "71至75年", titileStyle)
+            workSheet.write(3, 60, "76至80年", titileStyle)
+            workSheet.write(3, 61, "81至85年", titileStyle)
+            workSheet.write(3, 62, "86至90年", titileStyle)
+            workSheet.write(3, 63, "91至95年", titileStyle)
+            workSheet.write(3, 64, "96至2000年", titileStyle)
+            workSheet.write(3, 65, "2001至2005年", titileStyle)
+            workSheet.write(3, 66, "2006年以后", titileStyle)
+
+            #填写表格
+            for row in range(len(self.resultList)):
+                workSheet.write(row + 4, 0, self.resultList[row].get('Equip_Name'), contentStyle)
+                workSheet.write(row + 4, 1, self.resultList[row].get('original_authorized_value'), contentStyle)
+                workSheet.write(row + 4, 2, self.resultList[row].get('authorized_value'), contentStyle)
+                workSheet.write(row + 4, 3, self.resultList[row].get('authorized_value_increase'), contentStyle)
+                workSheet.write(row + 4, 4, self.resultList[row].get('authorized_value_decrease'), contentStyle)
+                workSheet.write(row + 4, 5, self.resultList[row].get('original_value'), contentStyle)
+                workSheet.write(row + 4, 6, self.resultList[row].get('authorized_value'), contentStyle)
+                workSheet.write(row + 4, 7, self.resultList[row].get('issue_inferior_product','0'), contentStyle)
+                workSheet.write(row + 4, 8, self.resultList[row].get('issue_need_repaired','0'), contentStyle)
+                workSheet.write(row + 4, 9, self.resultList[row].get('issue_need_retire','0'), contentStyle)
+                workSheet.write(row + 4, 10, self.resultList[row].get('report_new_product','0'), contentStyle)
+                workSheet.write(row + 4, 11, self.resultList[row].get('report_inferior_product','0'), contentStyle)
+                workSheet.write(row + 4, 12, self.resultList[row].get('report_need_repaired','0'), contentStyle)
+                workSheet.write(row + 4, 13, self.resultList[row].get('report_need_retire','0'), contentStyle)
+                workSheet.write(row + 4, 14, self.resultList[row].get('change_value','0'), contentStyle)
+                workSheet.write(row + 4, 15, self.resultList[row].get('existing_value','0'), contentStyle)
+                workSheet.write(row + 4, 16, self.resultList[row].get('increase_count','0'), contentStyle)
+                workSheet.write(row + 4, 17, self.resultList[row].get('increase_superior_supplement','0'), contentStyle)
+                workSheet.write(row + 4, 18, self.resultList[row].get('increase_model_change','0'), contentStyle)
+                workSheet.write(row + 4, 19, self.resultList[row].get('increase_missing_reports','0'), contentStyle)
+                workSheet.write(row + 4, 20, self.resultList[row].get('increase_self_purchase','0'), contentStyle)
+                workSheet.write(row + 4, 21, self.resultList[row].get('increase_transfer_in','0'), contentStyle)
+                workSheet.write(row + 4, 22, self.resultList[row].get('increase_other','0'), contentStyle)
+                workSheet.write(row + 4, 23, self.resultList[row].get('reduce_count','0'), contentStyle)
+                workSheet.write(row + 4, 24, self.resultList[row].get('reduce_model_change','0'), contentStyle)
+                workSheet.write(row + 4, 25, self.resultList[row].get('reduce_callout','0'), contentStyle)
+                workSheet.write(row + 4, 26, self.resultList[row].get('reduce_train_consumption','0'), contentStyle)
+                workSheet.write(row + 4, 27, self.resultList[row].get('reduce_train_consumption','0'), contentStyle)
+                workSheet.write(row + 4, 28, self.resultList[row].get('reduce_retire','0'), contentStyle)
+                workSheet.write(row + 4, 29, self.resultList[row].get('reduce_scrap','0'), contentStyle)
+                workSheet.write(row + 4, 30, self.resultList[row].get('reduce_other','0'), contentStyle)
+                workSheet.write(row + 4, 31, self.resultList[row].get('unprepared_value','0'), contentStyle)
+                workSheet.write(row + 4, 32, self.resultList[row].get('unmatched_value','0'), contentStyle)
+                workSheet.write(row + 4, 33, self.resultList[row].get('uncutdown_value','0'), contentStyle)
+                workSheet.write(row + 4, 34, self.resultList[row].get('carry_count','0'), contentStyle)
+                workSheet.write(row + 4, 35, self.resultList[row].get('carry_new_product','0'), contentStyle)
+                workSheet.write(row + 4, 36, self.resultList[row].get('carry_inferior_product','0'), contentStyle)
+                workSheet.write(row + 4, 37, self.resultList[row].get('carry_need_repaired','0'), contentStyle)
+                workSheet.write(row + 4, 38, self.resultList[row].get('carry_need_retire','0'), contentStyle)
+                workSheet.write(row + 4, 39, self.resultList[row].get('carry_unprepared_value','0'), contentStyle)
+                workSheet.write(row + 4, 40, self.resultList[row].get('carryUn_cutdown_value','0'), contentStyle)
+                workSheet.write(row + 4, 41, self.resultList[row].get('stock_count','0'), contentStyle)
+                workSheet.write(row + 4, 42, self.resultList[row].get('stock_new_product','0'), contentStyle)
+                workSheet.write(row + 4, 43, self.resultList[row].get('stock_inferior_product','0'), contentStyle)
+                workSheet.write(row + 4, 44, self.resultList[row].get('stock_need_repaired','0'), contentStyle)
+                workSheet.write(row + 4, 45, self.resultList[row].get('stock_need_retire','0'), contentStyle)
+                workSheet.write(row + 4, 46, self.resultList[row].get('stock_unprepared_value','0'), contentStyle)
+                workSheet.write(row + 4, 47, self.resultList[row].get('stockUn_cutdown_value','0'), contentStyle)
+                workSheet.write(row + 4, 48, self.resultList[row].get('authorized_rate','0'), contentStyle)
+                workSheet.write(row + 4, 49, self.resultList[row].get('matched_rate','0'), contentStyle)
+                workSheet.write(row + 4, 50, self.resultList[row].get('instock_rate','0'), contentStyle)
+                workSheet.write(row + 4, 51, self.resultList[row].get('prepared_rate','0'), contentStyle)
+                workSheet.write(row + 4, 52, self.resultList[row].get('intact_rate','0'), contentStyle)
+                workSheet.write(row + 4, 53, self.resultList[row].get('never_repair','0'), contentStyle)
+                workSheet.write(row + 4, 54, self.resultList[row].get('once','0'), contentStyle)
+                workSheet.write(row + 4, 55, self.resultList[row].get('twice','0'), contentStyle)
+                workSheet.write(row + 4, 56, self.resultList[row].get('three_times','0'), contentStyle)
+                workSheet.write(row + 4, 57, self.resultList[row].get('More_than_three','0'), contentStyle)
+                workSheet.write(row + 4, 58, self.resultList[row].get('before1970','0'), contentStyle)
+                workSheet.write(row + 4, 59, self.resultList[row].get('between1971and1975','0'), contentStyle)
+                workSheet.write(row + 4, 60, self.resultList[row].get('between1976and1980','0'), contentStyle)
+                workSheet.write(row + 4, 61, self.resultList[row].get('between1981and1985','0'), contentStyle)
+                workSheet.write(row + 4, 62, self.resultList[row].get('between1986and1990','0'), contentStyle)
+                workSheet.write(row + 4, 63, self.resultList[row].get('between1991and1995','0'), contentStyle)
+                workSheet.write(row + 4, 64, self.resultList[row].get('between1996and2000','0'), contentStyle)
+                workSheet.write(row + 4, 65, self.resultList[row].get('between2001and2005','0'), contentStyle)
+                workSheet.write(row + 4, 66, self.resultList[row].get('after2006','0'), contentStyle)
 
 
-                try:
-                    pathName = "%s/%s年%s装备补充及退役需求表.xls" % (directoryPath, self.year, selectUnitNameByUnitID(self.currentCheckedUnitList[0]))
-                    workBook.save(pathName)
-                    import win32api
-                    win32api.ShellExecute(0, 'open', pathName, '', '', 1)
-                    QMessageBox.about(self, "导出成功", "导出成功！")
-                    return
-                except Exception as e:
-                    QMessageBox.about(self, "导出失败", "导出表格被占用，请关闭正在使用的Execl！")
-                    return
-            else:
-                QMessageBox.about(self, "未选中导出目录", "导出失败！")
+            try:
+                pathName = "%s/%s年%s装备补充及退役需求表.xls" % (directoryPath, self.year, selectUnitNameByUnitID(self.currentCheckedUnitList[0]))
+                workBook.save(pathName)
+                import win32api
+                win32api.ShellExecute(0, 'open', pathName, '', '', 1)
+                QMessageBox.about(self, "导出成功", "导出成功！")
+                return
+            except Exception as e:
+                QMessageBox.about(self, "导出失败", "导出表格被占用，请关闭正在使用的Execl！")
                 return
         pass
 

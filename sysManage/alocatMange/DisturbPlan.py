@@ -695,8 +695,7 @@ class DisturbPlan(QWidget, yearList_Form):
             return
         reply = QMessageBox.question(self, '修改导出Excel', '是否保存修改并导出Excel？', QMessageBox.Cancel, QMessageBox.Yes)
         if reply == QMessageBox.Cancel:
-            self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList,
-                                                        self.currentYear)
+            self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList, self.currentYear)
             return
 
         pass
