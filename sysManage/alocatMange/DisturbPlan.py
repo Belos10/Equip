@@ -471,6 +471,7 @@ class DisturbPlan(QWidget, yearList_Form):
                 self.disturbResult.item(row, 4).setText(str(sum))
 
 
+
     # 若装备含子装备，则该行不可选中
     def ifEquipHaveChild(self):
         #print("self.currentEquipdict",self.currentEquipdict)
@@ -565,6 +566,7 @@ class DisturbPlan(QWidget, yearList_Form):
                 updateDisturbPlanInputNumUpmost(self.currentEquipdict[self.currentRow][0],self.currentYear,num)
             elif self.unitFlag == 2:
                 updateDisturbPlanInputNumBase(self.currentEquipdict[self.currentRow][0],self.currentYear,num)
+        #self._initDisturbPlanByUnitListAndEquipList()
 
     # 初始化分配计划年份
     def setDisturbPlanTitle(self):

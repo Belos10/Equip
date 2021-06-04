@@ -212,6 +212,8 @@ def updateDisturbPlanNum(Equip_Id,Unit_Id,Year,DisturbNum,originNum,originalDist
     #print("===========", sql)
     cur.execute(sql)
     #print("a[0][0]",a[0][0],"originNum",originNum)
+    if originalDisturbPlanNum == '':
+        originalDisturbPlanNum = 0
     num = int(originNum[0]) + int(DisturbNum) - int(originalDisturbPlanNum)
     sql="update strength set Strength= '%s' where Equip_ID = '%s' and Unit_ID = '%s' and year = '%s'"%(num,Equip_Id,Unit_Id,Year)
     cur.execute(sql)
