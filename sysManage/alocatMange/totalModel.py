@@ -1,9 +1,10 @@
 from widgets.alocatMange.ditalModel import Widget_Dital_Model
 from sysManage.alocatMange.rocketTransfer import rocketTransfer
 import sys
-from PyQt5.QtWidgets import QDialog,QApplication,QWidget, QTableWidgetItem, QDateEdit
+from PyQt5.QtWidgets import QDialog,QApplication,QWidget, QTableWidgetItem, QDateEdit,QComboBox
 from sysManage.alocatMange.armyTransfer import armyTransfer
 from PyQt5.Qt import Qt
+from database.dictSelect.factorySetSql import *
 from database.alocatMangeSql import *
 
 '''
@@ -192,7 +193,10 @@ class totalModel(QDialog, Widget_Dital_Model):
         self.tw_ditalModel.item(10, 1).setText("陈燕栋")
         half = int((self.crtColumnCount - 2) / 2)
         self.initNinethRow('调拨方式:', '运输方式:', 11)
-
+        self.tw_ditalModel.item(6, 1).setText(str(self.factoryInfoList[0][3]))
+        self.tw_ditalModel.item(6, half+2).setText(str(self.factoryInfoList[0][4]))
+        self.tw_ditalModel.item(7, 1).setText(str(self.factoryInfoList[0][5]))
+        self.tw_ditalModel.item(7, half+2).setText(str(self.factoryInfoList[0][6]))
         self.tw_ditalModel.item(10, half + 2).setText("15311997201")
 
         item = QTableWidgetItem()
@@ -307,6 +311,7 @@ class totalModel(QDialog, Widget_Dital_Model):
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.tw_ditalModel.setItem(13, i, item)
 
+    # 初始化前9行
     def initNinethRow(self, first, second, row):
         item = QTableWidgetItem()
         item.setText(first)
@@ -325,7 +330,7 @@ class totalModel(QDialog, Widget_Dital_Model):
         item.setText(second)
         item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
         self.tw_ditalModel.setItem(row, half + 1, item)
-
+        self.factoryInfoList = selectAllDataAboutFactory()
         if row == 3:
             item = QDateEdit()
             half = int((self.crtColumnCount - 4) / 2)
@@ -338,11 +343,44 @@ class totalModel(QDialog, Widget_Dital_Model):
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.tw_ditalModel.setItem(row, half + 2, item)
             self.tw_ditalModel.setSpan(row, half + 2, 1, self.crtColumnCount - half - 2)
+        elif row == 5:
+            item = QComboBox()
+            for factoryInfo in self.factoryInfoList:
+                item.addItem(factoryInfo[1])
+            item.currentIndexChanged.connect(self.slotChangeFactory)
+            self.tw_ditalModel.setCellWidget(row, 1, item)
+            item = QTableWidgetItem()
+            item.setText(self.factoryInfoList[0][2])
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.tw_ditalModel.setItem(row, half + 2, item)
+            self.tw_ditalModel.setSpan(row, half + 2, 1, self.crtColumnCount - half - 2)
+
+
+
         else:
             item = QTableWidgetItem()
             item.setText("")
             self.tw_ditalModel.setItem(row, half + 2, item)
             self.tw_ditalModel.setSpan(row, half + 2, 1, self.crtColumnCount - half - 2)
+
+    def slotChangeFactory(self,index):
+        half = int((self.crtColumnCount - 2) / 2)
+        row = self.tw_ditalModel.currentRow()
+        column = self.tw_ditalModel.currentColumn()
+        if row < 0 or column < 0:
+            return
+        if self.tw_ditalModel.item(row, half+2):
+            self.tw_ditalModel.item(row, half+2).setText(self.factoryInfoList[index][2])
+        if self.tw_ditalModel.item(row+1, 1):
+            self.tw_ditalModel.item(row+1, 1).setText(self.factoryInfoList[index][3])
+        if self.tw_ditalModel.item(row + 1, half+2):
+            self.tw_ditalModel.item(row + 1, half+2).setText(self.factoryInfoList[index][4])
+        if self.tw_ditalModel.item(row + 2, 1):
+            self.tw_ditalModel.item(row + 2, 1).setText(self.factoryInfoList[index][5])
+        if self.tw_ditalModel.item(row + 2, half+2):
+            self.tw_ditalModel.item(row + 2, half+2).setText(self.factoryInfoList[index][6])
+        return
+
 
     def initLastFourRow(self, first, second, third, fourth, row):
         item = QTableWidgetItem()
