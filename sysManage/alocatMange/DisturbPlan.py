@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtWidgets import *
 #new
-from database.SD_EquipmentBanlanceSql import initEquipmentBalance, updateOneEquipmentBalanceData, deleteByYear
+from database.SD_EquipmentBanlanceSql import updateOneEquipmentBalanceData, deleteByYear
 from widgets.alocatMange.yearListForm import yearList_Form
 from database.strengthDisturbSql import *
 from PyQt5.Qt import Qt

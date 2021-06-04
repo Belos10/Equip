@@ -1,6 +1,6 @@
 from PyQt5.QtCore import QVariant
 from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, QAbstractItemView, \
-    QMessageBox, QListWidgetItem, QInputDialog, QHeaderView
+    QMessageBox, QListWidgetItem, QInputDialog, QHeaderView, QFileDialog
 
 from utills.utillsComponent import CheckableComboBox
 from widgets.strengthDisturb.retirement import Widget_Retirement
@@ -67,6 +67,7 @@ class retirement(QWidget, Widget_Retirement):
         self.pb_firstSelect.clicked.connect(self.slotSelectUnit)
         self.tw_result.itemChanged.connect(self.soltCheckData)
         self.pb_secondSelect.clicked.connect(self.slotSelectEquip)
+        self.pb_outputToExcel.clicked.connect(self.slotOutputToExcel)
 
     def slotSelectUnit(self):
         findText = self.le_first.text()
@@ -592,4 +593,143 @@ class retirement(QWidget, Widget_Retirement):
                     temp_list.extend(self.get_checked(item))
             node.addChild(item)
         return temp_list
+
+    #导出到Excel表格
+    def slotOutputToExcel(self):
+        if len(self.resultList) < 1:
+            reply = QMessageBox.warning(self, '警告', '未选中任何数据，无法导出', QMessageBox.Yes)
+            return
+        reply = QMessageBox.question(self, '修改导出Excel', '是否保存修改并导出Excel？', QMessageBox.Cancel, QMessageBox.Yes)
+        if reply == QMessageBox.Cancel:
+            self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList,
+                                                        self.currentYear)
+            return
+        for i, result in self.currentInquiryResult.items():
+            if result[13] == True:
+                checkbox = self.tw_result.cellWidget(i + 2, 5)
+                num = checkbox.itemText(0)
+                apply = self.tw_result.item(i + 2, 8).text()
+                other = self.tw_result.item(i + 2, 9).text()
+                updateRetireAboutRetire(num, apply, other, result)
+        self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList,
+                                                    self.currentYear)
+        currentClass = 0
+        directoryPath = QFileDialog.getExistingDirectory(self, "请选择导出文件夹", "c:/")
+        if len(directoryPath) > 0:
+            if len(self.resultList) > 0:
+                import xlwt
+                workBook = xlwt.Workbook(encoding='utf-8')
+                workSheet = workBook.add_sheet('Sheet1')
+                titileStyle = xlwt.XFStyle()  # 初始化样式
+                font = xlwt.Font()  # 为样式创建字体
+                font.name = '宋体'
+                font.bold = True
+                font.height = 20 * 11  # 字体大小，11为字号，20为衡量单位
+                alignment = xlwt.Alignment()  ## Create Alignment
+                alignment.horz = xlwt.Alignment.HORZ_CENTER
+                alignment.vert = xlwt.Alignment.VERT_CENTER
+                borders = xlwt.Borders()
+                borders.left = 2  # 设置为细实线
+                borders.right = 2
+                borders.top = 2
+                borders.bottom = 2
+                titileStyle.font = font  # 设定样式
+                titileStyle.alignment = alignment
+                titileStyle.borders = borders
+                workSheet.col(0).width = 4000
+                workSheet.col(1).width = 4000
+                workSheet.col(2).width = 4000
+                workSheet.col(3).width = 4000
+                workSheet.col(4).width = 4000
+                workSheet.col(5).width = 4000
+                workSheet.col(6).width = 4000
+                workSheet.col(7).width = 4000
+                workSheet.col(8).width = 4000
+                workSheet.col(9).width = 4000
+                contentStyle = xlwt.XFStyle()  # 初始化样式
+                font = xlwt.Font()  # 为样式创建字体
+                font.name = '宋体'
+                font.height = 20 * 11  # 字体大小，11为字号，20为衡量单位
+                alignment = xlwt.Alignment()  ## Create Alignment
+                alignment.horz = xlwt.Alignment.HORZ_CENTER
+                alignment.vert = xlwt.Alignment.VERT_CENTER
+                borders = xlwt.Borders()
+                borders.left = 1  # 设置为细实线
+                borders.right = 1
+                borders.top = 1
+                borders.bottom = 1
+                contentStyle.font = font  # 设定样式
+                contentStyle.alignment = alignment
+                contentStyle.borders = borders
+
+
+                workSheet.write_merge(0, 0, 0, 9, "%s年%s装备补充及退役需求表" % (self.year, selectUnitNameByUnitID(self.currentCheckedUnitList[0])), titileStyle)
+                workSheet.write(1,0,"序号",titileStyle)
+                workSheet.write(1, 1, "装备名称",titileStyle)
+                workSheet.write(1, 2, "单位",titileStyle)
+                workSheet.write(1, 3, "实力数",titileStyle)
+                workSheet.write(1, 4, "编制数",titileStyle)
+                workSheet.write(1, 5, "拟退役数",titileStyle)
+                workSheet.write(1, 6, "现有数",titileStyle)
+                workSheet.write(1, 7, "超/缺编制数", titileStyle)
+                workSheet.write(1, 8, "申请需求", titileStyle)
+                workSheet.write(1, 9, "备注", titileStyle)
+
+                for i, LineInfo in enumerate(self.resultList):
+                    m_isSecond = isSecondDict(LineInfo[2])
+                    if m_isSecond:
+                        currentClass = currentClass + 1
+                        ID = chinese[currentClass]
+                        classID = 1
+                        LineInfo.append(False)
+                    else:
+                        if selectEquipIsHaveChild(LineInfo[2]):
+                            ID = ""
+                            LineInfo.append(False)
+                        else:
+                            ID = str(classID)
+                            classID = classID + 1
+                            LineInfo.append(True)
+
+                    workSheet.write(i + 2, 0,ID, contentStyle)
+                    # 名称
+                    workSheet.write(i + 2, 1, LineInfo[3], contentStyle)
+                    # 单位
+                    workSheet.write(i + 2, 2, LineInfo[4],contentStyle)
+
+                    # 实力数
+                    workSheet.write(i + 2, 3,str(LineInfo[5]), contentStyle)
+                    # 现有数
+                    workSheet.write(i + 2, 6, LineInfo[8], contentStyle)
+                    # 超缺编数
+                    workSheet.write(i + 2, 7, LineInfo[9], contentStyle)
+                    # 编制数
+                    workSheet.write(i + 2, 4, LineInfo[6], contentStyle)
+
+                    if len(LineInfo[7]) < 1:
+                        LineInfo[7] = '0'
+                    # 拟退役数
+                    workSheet.write(i + 2, 5, LineInfo[7], contentStyle)
+                    # 申请需求
+                    workSheet.write(i + 2, 8, LineInfo[10], contentStyle)
+                    # 备注
+                    workSheet.write(i + 2, 9, LineInfo[11], contentStyle)
+
+                try:
+                    pathName = "%s/%s年%s装备补充及退役需求表.xls" % (directoryPath,self.year, selectUnitNameByUnitID(self.currentCheckedUnitList[0]))
+                    workBook.save(pathName)
+                    import win32api
+                    win32api.ShellExecute(0, 'open', pathName, '', '', 1)
+                    QMessageBox.about(self, "导出成功", "导出成功！")
+                    return
+                except Exception as e:
+                    QMessageBox.about(self, "导出失败", "导出表格被占用，请关闭正在使用的Execl！")
+                    return
+            else:
+                QMessageBox.about(self, "未选中导出目录", "导出失败！")
+                return
+        pass
+
+
+
 chinese = ['', '(一)', '(二)', '(三)', '(四)', '(五)','(六)','(七)', '']
