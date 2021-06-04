@@ -114,6 +114,7 @@ class DisturbPlan(QWidget, yearList_Form):
         self.pb_secondSelect.clicked.disconnect(self.slotSelectEquip)
 
         self.inputProof.signal.disconnect(self.initDisturbPlanProof)
+        self.pb_outputToExcel.clicked.connect(self.slotOutputToExcel)
 
 
     # 新增年份
@@ -291,7 +292,6 @@ class DisturbPlan(QWidget, yearList_Form):
                 for resultInfo in result:
                     self.currentUnitChilddict[j] = resultInfo
                     j=j+1
-        print("currentUnitChilddict", self.currentUnitChilddict)
         # 获取当前装备名
         j = 0
         for equipID, equipItem in self.second_treeWidget_dict.items():
@@ -303,7 +303,6 @@ class DisturbPlan(QWidget, yearList_Form):
                 equipInfo = findEquipInfo(equipID)
                 self.currentEquipdict[j] = equipInfo[0]
                 j=j+1
-        print("self.currentEquipdict",self.currentEquipdict)
 
         self._initDisturbPlanByUnitListAndEquipList()
 
@@ -687,3 +686,18 @@ class DisturbPlan(QWidget, yearList_Form):
                                     sum = sum + int(num)
                         if sum != 0:
                             self.disturbResult.item(row,2).setText(str(sum))
+
+
+    #导出到Excel表格
+    def slotOutputToExcel(self):
+        if len(self.resultList) < 1:
+            reply = QMessageBox.warning(self, '警告', '未选中任何数据，无法导出', QMessageBox.Yes)
+            return
+        reply = QMessageBox.question(self, '修改导出Excel', '是否保存修改并导出Excel？', QMessageBox.Cancel, QMessageBox.Yes)
+        if reply == QMessageBox.Cancel:
+            self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList,
+                                                        self.currentYear)
+            return
+
+        pass
+
