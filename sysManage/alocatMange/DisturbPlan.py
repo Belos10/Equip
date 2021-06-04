@@ -407,11 +407,12 @@ class DisturbPlan(QWidget, yearList_Form):
                 currentRowResult.append(item)
                 i = i + 1
         self.disturbResult.setColumnWidth(2, 150)
-        self.initDisturbPlanNum()
-        self.initDisturbPlanNote()
-        self.initDisturbPlanInputNum()
-        self.initDisturbPlanOther()
-        self.ifEquipHaveChild()
+        if self.currentEquipdict and self.currentUnitChilddict:
+            self.initDisturbPlanNum()
+            self.initDisturbPlanNote()
+            self.initDisturbPlanInputNum()
+            self.initDisturbPlanOther()
+            self.ifEquipHaveChild()
 
 
     # 初始化调拨依据
@@ -566,7 +567,7 @@ class DisturbPlan(QWidget, yearList_Form):
                 updateDisturbPlanInputNumUpmost(self.currentEquipdict[self.currentRow][0],self.currentYear,num)
             elif self.unitFlag == 2:
                 updateDisturbPlanInputNumBase(self.currentEquipdict[self.currentRow][0],self.currentYear,num)
-        #self._initDisturbPlanByUnitListAndEquipList()
+
 
     # 初始化分配计划年份
     def setDisturbPlanTitle(self):

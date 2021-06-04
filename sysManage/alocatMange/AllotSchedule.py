@@ -334,11 +334,12 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                 currentRowResult.append(item)
                 i = i + 1
         self.disturbResult.setColumnWidth(2, 150)
-        self.initDisturbPlanNum()
-        self.initDisturbPlanNote()
-        self.initDisturbPlanInputNum()
-        self.initDisturbPlanOther()
-        self.ifEquipHaveChild()
+        if self.currentUnitChilddict and self.currentEquipdict:
+            self.initDisturbPlanNum()
+            self.initDisturbPlanNote()
+            self.initDisturbPlanInputNum()
+            self.initDisturbPlanOther()
+            self.ifEquipHaveChild()
 
     # 初始化自定义计划数
     def initDisturbPlanInputNum(self):
@@ -437,7 +438,16 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                         sum = sum + int(num)
                 self.disturbResult.item(i, 4).setText(str(sum))
             sum = 0
-
+        for row in reversed(range(len(self.currentEquipdict))):
+            sum = 0
+            for childRow in reversed(range(len(self.currentEquipdict))):
+                # 第0个字段是EquipID,第二个字段是Equip_Uper
+                if self.currentEquipdict[row][0] == self.currentEquipdict[childRow][2]:
+                    num = self.disturbResult.item(childRow, 4).text()
+                    if num != '':
+                        sum = sum + int(num)
+            if sum != 0:
+                self.disturbResult.item(row, 4).setText(str(sum))
 
 
     '''
