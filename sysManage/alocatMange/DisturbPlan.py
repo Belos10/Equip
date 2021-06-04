@@ -68,7 +68,7 @@ class DisturbPlan(QWidget, yearList_Form):
         self.pb_firstSelect.clicked.connect(self.slotSelectUnit)
         self.pb_secondSelect.clicked.connect(self.slotSelectEquip)
         self.inputProof.signal.connect(self.initDisturbPlanProof)
-
+        self.pb_outputToExcel.clicked.connect(self.slotOutputToExcel)
 
     def slotSelectUnit(self):
         findText = self.le_first.text()
@@ -114,7 +114,7 @@ class DisturbPlan(QWidget, yearList_Form):
         self.pb_secondSelect.clicked.disconnect(self.slotSelectEquip)
 
         self.inputProof.signal.disconnect(self.initDisturbPlanProof)
-        self.pb_outputToExcel.clicked.connect(self.slotOutputToExcel)
+
 
 
     # 新增年份
@@ -542,10 +542,12 @@ class DisturbPlan(QWidget, yearList_Form):
                 num = 0
             else:
                 num = self.disturbResult.item(self.currentRow, self.currentColumn).text()
-            originNum = selectDisturbPlanNum({0:self.currentUnitChilddict[self.currentColumn-5]},{0:self.currentEquipdict[self.currentRow]},self.currentYear)
-            if originNum[0] != '':
+            originDisturbPlanNum = selectDisturbPlanNum({0:self.currentUnitChilddict[self.currentColumn-5]},{0:self.currentEquipdict[self.currentRow]},self.currentYear)
+            originStrengthNum = selectStrengthNum(self.currentUnitChilddict[self.currentColumn-5][0],self.currentEquipdict[self.currentRow][0],self.currentYear)
+            print("originDisturbPlanNum",originDisturbPlanNum,"originStrengthNum",originStrengthNum)
+            if originStrengthNum[0] != '':
                 updateDisturbPlanNum(self.currentEquipdict[self.currentRow][0],self.currentUnitChilddict[self.currentColumn-5][0],
-                                 self.currentYear,num,originNum[0])
+                                 self.currentYear,num,originStrengthNum[0],originDisturbPlanNum[0])
                 updateOneEquipmentBalanceData(self.currentYear, self.currentEquipdict[self.currentRow][0], self.currentUnitChilddict[self.currentColumn-5][0])
                 self.initDisturbPlanSum()
             else:
@@ -690,13 +692,21 @@ class DisturbPlan(QWidget, yearList_Form):
 
     #导出到Excel表格
     def slotOutputToExcel(self):
-        if len(self.resultList) < 1:
-            reply = QMessageBox.warning(self, '警告', '未选中任何数据，无法导出', QMessageBox.Yes)
-            return
-        reply = QMessageBox.question(self, '修改导出Excel', '是否保存修改并导出Excel？', QMessageBox.Cancel, QMessageBox.Yes)
-        if reply == QMessageBox.Cancel:
-            self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList, self.currentYear)
-            return
+        print("执行1111111")
+        self.disturbPlanList={}
+        for i in range(self.disturbResult.rowCount()):
+            columnList = []
+            for j in range(self.disturbResult.columnCount()):
+                columnList.append(self.disturbResult.item(i,j).text())
+            self.disturbPlanList[i] = columnList
+        print("所有数据按字典self.disturbPlanList",self.disturbPlanList)
+        # if len(self.resultList) < 1:
+        #     reply = QMessageBox.warning(self, '警告', '未选中任何数据，无法导出', QMessageBox.Yes)
+        #     return
+        # reply = QMessageBox.question(self, '修改导出Excel', '是否保存修改并导出Excel？', QMessageBox.Cancel, QMessageBox.Yes)
+        # if reply == QMessageBox.Cancel:
+        #     self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList, self.currentYear)
+        #     return
 
-        pass
+
 
