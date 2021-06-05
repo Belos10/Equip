@@ -52,6 +52,8 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
         self.pb_del.clicked.connect(self.slotDelCurrentRow)
         #删除某年
         self.tb_del.clicked.connect(self.slotDelCurrentYear)
+        #导出至Excel
+
 
     '''
         关闭信号

@@ -695,7 +695,8 @@ class DisturbPlan(QWidget, yearList_Form):
 
     #导出到Excel表格
     def slotOutputToExcel(self):
-        if len(self.disturbResult) < 1:
+        self.disturbPlanList = {}
+        if self.disturbResult.rowCount() <= 0:
             reply = QMessageBox.warning(self, '警告', '未选中任何数据，无法导出', QMessageBox.Yes)
             return
         reply = QMessageBox.question(self, '修改导出Excel', '是否保存修改并导出Excel？', QMessageBox.Cancel, QMessageBox.Yes)
@@ -789,7 +790,7 @@ class DisturbPlan(QWidget, yearList_Form):
                         headerlist.append(i[1])
                 headerlist.append('备注')
             for i in range(len(headerlist)):
-                workSheet.col(i).width = 4000
+                workSheet.col(i).width = 5500
             workSheet.write_merge(0, 0, 0, len(headerlist) - 1, "%s年分配调整计划" % (self.currentYear), headTitleStyle)
             proof = selectDisturbPlanProof(self.currentYear)
             proofText = proof[0][0]
@@ -803,7 +804,7 @@ class DisturbPlan(QWidget, yearList_Form):
                 for j in range(self.disturbResult.columnCount()):
                     columnList.append(self.disturbResult.item(i, j).text())
                 self.disturbPlanList[i] = columnList
-
+            print("self.disturbPlanList",self.disturbPlanList)
             #填表
             for key in self.disturbPlanList.keys():
                 for index in range(len(headerlist)):

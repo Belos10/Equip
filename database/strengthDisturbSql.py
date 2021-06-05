@@ -882,7 +882,6 @@ def delDataInUnit(Unit_ID):
             return False
 
         sql = "Delete from strength where Unit_ID = '" + UnitID[0] + "'"
-        # print(sql)
         try:
             cur.execute(sql)
         except Exception as e:
@@ -932,7 +931,6 @@ def delDataInUnit(Unit_ID):
             return False
 
         sql = "Delete from retire where Unit_ID = '" + UnitID[0] + "'"
-        # print(sql)
         try:
             cur.execute(sql)
         except Exception as e:
