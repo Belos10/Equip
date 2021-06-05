@@ -8,7 +8,7 @@ from database.dictSelect.factorySetSql import *
 from database.alocatMangeSql import *
 
 '''
-   调拨单管理界面
+   总单调拨单管理界面
 '''
 class totalModel(QDialog, Widget_Dital_Model):
     def __init__(self, parent=None):
@@ -46,7 +46,7 @@ class totalModel(QDialog, Widget_Dital_Model):
         #调拨依据
         if self.tw_ditalModel.item(4, 1):
             Trans_Reason = self.tw_ditalModel.item(4, 1).text()
-            print("Trans_Reason, ", Trans_Reason)
+            print("总单Trans_Reason, ", Trans_Reason)
         else:
             Trans_Reason = ""
 
@@ -88,9 +88,9 @@ class totalModel(QDialog, Widget_Dital_Model):
 
         Send_UnitID = ""
         # 交装单位
-        if self.tw_ditalModel.item(5, 1):
-            Send_UnitName = self.tw_ditalModel.item(5, 1).text()
-            print("Send_UnitName, ", Send_UnitName)
+        if self.tw_ditalModel.cellWidget(5, 1):
+            Send_UnitName = self.tw_ditalModel.cellWidget(5, 1).currentText()
+            print("总单Send_UnitName, ", Send_UnitName)
         else:
             Send_UnitName = ""
 
@@ -354,9 +354,6 @@ class totalModel(QDialog, Widget_Dital_Model):
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.tw_ditalModel.setItem(row, half + 2, item)
             self.tw_ditalModel.setSpan(row, half + 2, 1, self.crtColumnCount - half - 2)
-
-
-
         else:
             item = QTableWidgetItem()
             item.setText("")

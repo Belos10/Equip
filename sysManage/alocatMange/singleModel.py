@@ -7,7 +7,7 @@ from database.alocatMangeSql import insertIntoRocketTransfer
 from PyQt5.Qt import Qt
 
 '''
-   调拨单管理界面
+   分单调拨单管理界面
 '''
 class singleModel(QDialog, Widget_Dital_Model):
     def __init__(self, parent=None):

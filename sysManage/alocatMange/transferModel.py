@@ -39,6 +39,7 @@ class transferModel(QDialog, Widget_Transfer_Model):
         pass
 
     def slotSaveSingle(self):
+        print("保存分单")
         for key, page in self.currentSingelUnitPage.items():
             half = int((page.crtColumnCount - 2) / 2)
             # 调拨单号
@@ -187,7 +188,7 @@ class transferModel(QDialog, Widget_Transfer_Model):
 
 
     def slotClickedSaveTotal(self):
-        print("curent, ", self.currentSingelUnitPage)
+        print("保存总单, ", self.currentSingelUnitPage)
         half = int((self.totalModel.crtColumnCount - 4) / 2)
         if self.totalModel.tw_ditalModel.cellWidget(3,  half + 3):
             Trans_Date = self.totalModel.tw_ditalModel.cellWidget(3, half + 3).text()
@@ -207,8 +208,8 @@ class transferModel(QDialog, Widget_Transfer_Model):
         else:
             Trans = ""
 
-        if self.totalModel.tw_ditalModel.item(5, 1):
-            Send_Unit = self.totalModel.tw_ditalModel.item(5, 1).text()
+        if self.totalModel.tw_ditalModel.cellWidget(5, 1):
+            Send_Unit = self.totalModel.tw_ditalModel.cellWidget(5, 1).currentText()
             print("Send_Unit, ", Send_Unit)
         else:
             Send_Unit = ""
@@ -357,7 +358,6 @@ class transferModel(QDialog, Widget_Transfer_Model):
             page = singleModel()
             self.tw_transferModel.addTab(page, unitInfo[0])
             self.currentSingelUnitPage[unitInfo[0]] = page
-
             page.initTableWidget(unitInfo, self.equipInfo,self.year)
 
 if __name__ == "__main__":
