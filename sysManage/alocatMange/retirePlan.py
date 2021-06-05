@@ -57,7 +57,7 @@ class retirePlan(QWidget, retirePlan_Form):
         # 修改查询依据
         self.pb_firstSelect.clicked.connect(self.slotSelectUnit)
         self.pb_secondSelect.clicked.connect(self.slotSelectEquip)
-        #self.pb_outputToExcel.clicked.connect(self.slotOutputToExcel)
+        # self.pb_outputToExcel.clicked.connect(self.slotOutputToExcel)
 
     def slotSelectUnit(self):
         findText = self.le_first.text()

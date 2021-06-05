@@ -143,7 +143,6 @@ class DisturbPlan(QWidget, yearList_Form):
         reply = QMessageBox.question(self, "删除", "是否删除所有？", QMessageBox.Yes, QMessageBox.Cancel)
         if reply == QMessageBox.Yes:
             currentYear=self.lw_yearChoose.currentItem()
-            #print("currentYear.text()",currentYear.text())
             deleteDisturbPlanYear(currentYear.text())
             deleteByYear(currentYear.text())
             self._initYearWidget_()
@@ -181,7 +180,7 @@ class DisturbPlan(QWidget, yearList_Form):
         self.first_treeWidget_dict = {}
         self.second_treeWidget_dict = {}
         self.currentYear = self.lw_yearChoose.currentItem().text()
-        #startEquipIDInfo = findUperEquipIDByName("通用装备")
+
 
         startInfo = selectDisturbPlanUnitInfoByUnitID(self.userInfo[0][4])
         stack = []
@@ -191,7 +190,7 @@ class DisturbPlan(QWidget, yearList_Form):
             root.append(self.tw_first)
             self._initUnitTreeWidget(stack,root)
 
-        #equipInfo = None
+
         equipInfo = findUperEquipIDByName("通用装备")
         stack = []
         root = []
@@ -199,43 +198,17 @@ class DisturbPlan(QWidget, yearList_Form):
             stack.append(equipInfo[0])
             root.append(self.tw_second)
             self._initEquipTreeWidget(stack,root)
-            # 从数据库中单位表中获取数据初始化单位目录，tableWidget显示所有的单位表
-            # self._initUnitTreeWidget("", self.tw_first)
 
-        # for startEquipInfo in startEquipIDInfo:
-        #     #self.second_treeWidget_dict[0] = startEquipInfo
-        #     item = QTreeWidgetItem(self.tw_second)
-        #     item.setText(0, startEquipInfo[1])
-        #     item.setCheckState(0, Qt.Unchecked)
-        #     self.second_treeWidget_dict[startEquipInfo[0]] = item
-        #     self._initEquipTreeWidget(startEquipInfo[0], item)
-        #     break
-        # self._initUnitTreeWidget("", self.tw_first)
 
     def initUserInfo(self):
         self.userInfo = get_value("totleUserInfo")
 
 
     def _initUnitTreeWidget(self, stack,root):
-        # if root == '':
-        #     result = selectDisturbPlanUnitInfoByDeptUper('')
-        # else:
-        #     result = selectDisturbPlanUnitInfoByDeptUper(root)
-        #
-        # # rowData: (单位编号，单位名称，上级单位编号)
-        # for rowData in result:
-        #     item = QTreeWidgetItem(mother)
-        #     item.setText(0, rowData[1])
-        #     #item.setCheckState(0, Qt.Unchecked)
-        #     self.first_treeWidget_dict[rowData[0]] = item
-        #     if rowData[0] != '':
-        #         self._initUnitTreeWidget(rowData[0], item)
-        # # print("...", self.first_treeWidget_dict)
         while stack:
             UnitInfo = stack.pop(0)
             item = QTreeWidgetItem(root.pop(0))
             item.setText(0, UnitInfo[1])
-            #item.setCheckState(0, Qt.Unchecked)
             self.first_treeWidget_dict[UnitInfo[0]] = item
             result = selectUnitInfoByDeptUper(UnitInfo[0])
             for resultInfo in result:
@@ -245,18 +218,6 @@ class DisturbPlan(QWidget, yearList_Form):
 
 
     def _initEquipTreeWidget(self,stack, root):
-        # if root == '':
-        #     result = selectEquipInfoByEquipUper('')
-        # else:
-        #     result = selectEquipInfoByEquipUper(root)
-        # # rowData: (装备编号，装备名称，上级装备编号, 录入类型, 装备类型)
-        # for rowData in result:
-        #     item = QTreeWidgetItem(mother)
-        #     item.setText(0, rowData[1])
-        #     item.setCheckState(0, Qt.Unchecked)
-        #     self.second_treeWidget_dict[rowData[0]] = item
-        #     if rowData[0] != '':
-        #         self._initEquipTreeWidget(rowData[0], item)
         while stack:
             EquipInfo = stack.pop(0)
             item = QTreeWidgetItem(root.pop(0))
@@ -267,7 +228,7 @@ class DisturbPlan(QWidget, yearList_Form):
             for resultInfo in result:
                 stack.append(resultInfo)
                 root.append(item)
-        #print("first_treeWidget_dict", self.first_treeWidget_dict)
+
 
 
 
@@ -291,10 +252,10 @@ class DisturbPlan(QWidget, yearList_Form):
                 else:
                     self.unitFlag = 1
                     result = selectDisturbPlanChooseUnit()
+
                 for resultInfo in result:
                     self.currentUnitChilddict[j] = resultInfo
                     j=j+1
-        print("self.currentUnitChilddict",self.currentUnitChilddict)
         # 获取当前装备名
         j = 0
         for equipID, equipItem in self.second_treeWidget_dict.items():
@@ -306,7 +267,6 @@ class DisturbPlan(QWidget, yearList_Form):
                 equipInfo = findEquipInfo(equipID)
                 self.currentEquipdict[j] = equipInfo[0]
                 j=j+1
-        print("self.currentEquipdict", self.currentEquipdict)
         self._initDisturbPlanByUnitListAndEquipList()
 
 
