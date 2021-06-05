@@ -257,6 +257,57 @@ def alterOneEquipmentBalanceData(item):
     sqls.append(sql)
     excuteupdata(sqls)
 
+#根据单位Id号删除一天数据
+def deleteEquipmentBalanceDataByUnitID(unitId):
+    sql = "select equip_balance_id from equipment_balance where Unit_ID='%s'"%unitId
+    equipmentbalanceIdList = selectData(sql)
+    if equipmentbalanceIdList != None:
+        for equipmentbalanceKey in equipmentbalanceIdList:
+            sqls = []
+            sql = "delete from eb_carry where equip_balance_id=%s" % equipmentbalanceKey[0]
+            sqls.append(sql)
+            sql = "delete from eb_change_project where equip_balance_id=%s" % equipmentbalanceKey[0]
+            sqls.append(sql)
+            sql = "delete from eb_management where equip_balance_id=%s" % equipmentbalanceKey[0]
+            sqls.append(sql)
+            sql = "delete from eb_production_year where equip_balance_id=%s" % equipmentbalanceKey[0]
+            sqls.append(sql)
+            sql = "delete from eb_quality_status where equip_balance_id=%s" % equipmentbalanceKey[0]
+            sqls.append(sql)
+            sql = "delete from eb_repair_time where equip_balance_id=%s" % equipmentbalanceKey[0]
+            sqls.append(sql)
+            sql = "delete from eb_stock where equip_balance_id=%s" % equipmentbalanceKey[0]
+            sqls.append(sql)
+            sql = "delete from equipment_balance where equip_balance_id=%s" % equipmentbalanceKey[0]
+            sqls.append(sql)
+            excuteupdata(sqls)
+    return True
+
+#根据装备Id号删除一天数据
+def deleteEquipmentBalanceDataByEquipmentID(equipmentId):
+    sql = "select equip_balance_id from equipment_balance where Equip_ID='%s'"%equipmentId
+    equipmentbalanceIdList = selectData(sql)
+    if equipmentbalanceIdList != None:
+        for equipmentbalanceKey in equipmentbalanceIdList:
+            sqls = []
+            sql = "delete from eb_carry where equip_balance_id=%s" % equipmentbalanceKey[0]
+            sqls.append(sql)
+            sql = "delete from eb_change_project where equip_balance_id=%s" % equipmentbalanceKey[0]
+            sqls.append(sql)
+            sql = "delete from eb_management where equip_balance_id=%s" % equipmentbalanceKey[0]
+            sqls.append(sql)
+            sql = "delete from eb_production_year where equip_balance_id=%s" % equipmentbalanceKey[0]
+            sqls.append(sql)
+            sql = "delete from eb_quality_status where equip_balance_id=%s" % equipmentbalanceKey[0]
+            sqls.append(sql)
+            sql = "delete from eb_repair_time where equip_balance_id=%s" % equipmentbalanceKey[0]
+            sqls.append(sql)
+            sql = "delete from eb_stock where equip_balance_id=%s" % equipmentbalanceKey[0]
+            sqls.append(sql)
+            sql = "delete from equipment_balance where equip_balance_id=%s" % equipmentbalanceKey[0]
+            sqls.append(sql)
+            excuteupdata(sqls)
+    return True
 
 
 def deleteOneEquipmentBalanceData(year, equipmentId, unitId):
@@ -391,9 +442,10 @@ def saveEquipmentBalanceByRow(dataList,unit,year):
 
 
 if __name__ == "__main__":
-    date = selectOne("select Equip_Id,Unit_Id,RetireNum from retireplan where Year=2000 and Equip_Id='1' and Unit_Id='1'")
-    print(date)
-    print(date.get('RetireNum'))
+    EquipID = '5'
+    sql = "select equip_balance_id from equipment_balance where Equip_ID='%s'" % EquipID
+    equipmentbalanceIdList = selectData(sql)
+    print(equipmentbalanceIdList)
 
     pass
 

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>992</width>
-    <height>677</height>
+    <width>1527</width>
+    <height>774</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -69,7 +69,7 @@
           <number>5</number>
          </property>
          <property name="bottomMargin">
-          <number>0</number>
+          <number>10</number>
          </property>
          <item>
           <widget class="QListWidget" name="lw_yearChoose">
@@ -113,322 +113,349 @@
      <property name="title">
       <string>查询结果</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout_3">
-      <property name="leftMargin">
-       <number>5</number>
-      </property>
-      <property name="topMargin">
-       <number>11</number>
-      </property>
-      <property name="rightMargin">
-       <number>5</number>
-      </property>
-      <property name="bottomMargin">
-       <number>0</number>
-      </property>
-      <property name="spacing">
-       <number>0</number>
-      </property>
-      <item row="0" column="0">
-       <layout class="QVBoxLayout" name="verticalLayout_2">
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QTableWidget" name="tw_result">
+        <property name="layoutDirection">
+         <enum>Qt::LeftToRight</enum>
+        </property>
+        <row>
+         <property name="text">
+          <string>New Row</string>
+         </property>
+        </row>
+        <row>
+         <property name="text">
+          <string>New Row</string>
+         </property>
+        </row>
+        <column>
+         <property name="text">
+          <string>New Column</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>New Column</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>New Column</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>New Column</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>New Column</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>New Column</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>New Column</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>New Column</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>New Column</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>New Column</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>New Column</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>New Column</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>New Column</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>New Column</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>New Column</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>New Column</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>New Column</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>New Column</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>New Column</string>
+         </property>
+        </column>
+        <item row="0" column="0">
+         <property name="text">
+          <string>序号</string>
+         </property>
+        </item>
+        <item row="0" column="1">
+         <property name="text">
+          <string>调拨单信息</string>
+         </property>
+        </item>
+        <item row="0" column="2">
+         <property name="text">
+          <string/>
+         </property>
+        </item>
+        <item row="0" column="8">
+         <property name="text">
+          <string>交装单位</string>
+         </property>
+        </item>
+        <item row="0" column="9">
+         <property name="text">
+          <string/>
+         </property>
+        </item>
+        <item row="0" column="11">
+         <property name="text">
+          <string>接装单位</string>
+         </property>
+        </item>
+        <item row="0" column="12">
+         <property name="text">
+          <string/>
+         </property>
+        </item>
+        <item row="0" column="14">
+         <property name="text">
+          <string>装备名称</string>
+         </property>
+        </item>
+        <item row="0" column="15">
+         <property name="text">
+          <string>计量单位</string>
+         </property>
+        </item>
+        <item row="0" column="16">
+         <property name="text">
+          <string>应发数</string>
+         </property>
+        </item>
+        <item row="0" column="17">
+         <property name="text">
+          <string/>
+         </property>
+        </item>
+        <item row="0" column="18">
+         <property name="text">
+          <string>备注</string>
+         </property>
+        </item>
+        <item row="1" column="1">
+         <property name="text">
+          <string>调拨单号</string>
+         </property>
+        </item>
+        <item row="1" column="2">
+         <property name="text">
+          <string>调拨日期</string>
+         </property>
+        </item>
+        <item row="1" column="3">
+         <property name="text">
+          <string>调拨依据</string>
+         </property>
+        </item>
+        <item row="1" column="4">
+         <property name="text">
+          <string>调拨</string>
+         </property>
+        </item>
+        <item row="1" column="5">
+         <property name="text">
+          <string>调拨方式</string>
+         </property>
+        </item>
+        <item row="1" column="6">
+         <property name="text">
+          <string>运输方式</string>
+         </property>
+        </item>
+        <item row="1" column="7">
+         <property name="text">
+          <string>有效日期</string>
+         </property>
+        </item>
+        <item row="1" column="8">
+         <property name="text">
+          <string>单位名称</string>
+         </property>
+        </item>
+        <item row="1" column="9">
+         <property name="text">
+          <string>联系人</string>
+         </property>
+        </item>
+        <item row="1" column="10">
+         <property name="text">
+          <string>联系电话</string>
+         </property>
+        </item>
+        <item row="1" column="11">
+         <property name="text">
+          <string>单位名称</string>
+         </property>
+        </item>
+        <item row="1" column="12">
+         <property name="text">
+          <string>联系人</string>
+         </property>
+        </item>
+        <item row="1" column="13">
+         <property name="text">
+          <string>联系电话</string>
+         </property>
+        </item>
+        <item row="1" column="14">
+         <property name="text">
+          <string/>
+         </property>
+        </item>
+        <item row="1" column="15">
+         <property name="text">
+          <string/>
+         </property>
+        </item>
+        <item row="1" column="16">
+         <property name="text">
+          <string>质量</string>
+         </property>
+        </item>
+        <item row="1" column="17">
+         <property name="text">
+          <string>数量</string>
+         </property>
+        </item>
+        <item row="1" column="18">
+         <property name="text">
+          <string/>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <property name="topMargin">
+         <number>5</number>
+        </property>
+        <property name="bottomMargin">
+         <number>5</number>
+        </property>
         <item>
-         <widget class="QTableWidget" name="tw_result">
-          <property name="layoutDirection">
-           <enum>Qt::LeftToRight</enum>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
           </property>
-          <row>
-           <property name="text">
-            <string>New Row</string>
-           </property>
-          </row>
-          <row>
-           <property name="text">
-            <string>New Row</string>
-           </property>
-          </row>
-          <column>
-           <property name="text">
-            <string>New Column</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>New Column</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>New Column</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>New Column</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>New Column</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>New Column</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>New Column</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>New Column</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>New Column</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>New Column</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>New Column</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>New Column</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>New Column</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>New Column</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>New Column</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>New Column</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>New Column</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>New Column</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>New Column</string>
-           </property>
-          </column>
-          <item row="0" column="0">
-           <property name="text">
-            <string>序号</string>
-           </property>
-          </item>
-          <item row="0" column="1">
-           <property name="text">
-            <string>调拨单信息</string>
-           </property>
-          </item>
-          <item row="0" column="2">
-           <property name="text">
-            <string/>
-           </property>
-          </item>
-          <item row="0" column="8">
-           <property name="text">
-            <string>交装单位</string>
-           </property>
-          </item>
-          <item row="0" column="9">
-           <property name="text">
-            <string/>
-           </property>
-          </item>
-          <item row="0" column="11">
-           <property name="text">
-            <string>接装单位</string>
-           </property>
-          </item>
-          <item row="0" column="12">
-           <property name="text">
-            <string/>
-           </property>
-          </item>
-          <item row="0" column="14">
-           <property name="text">
-            <string>装备名称</string>
-           </property>
-          </item>
-          <item row="0" column="15">
-           <property name="text">
-            <string>计量单位</string>
-           </property>
-          </item>
-          <item row="0" column="16">
-           <property name="text">
-            <string>应发数</string>
-           </property>
-          </item>
-          <item row="0" column="17">
-           <property name="text">
-            <string/>
-           </property>
-          </item>
-          <item row="0" column="18">
-           <property name="text">
-            <string>备注</string>
-           </property>
-          </item>
-          <item row="1" column="1">
-           <property name="text">
-            <string>调拨单号</string>
-           </property>
-          </item>
-          <item row="1" column="2">
-           <property name="text">
-            <string>调拨日期</string>
-           </property>
-          </item>
-          <item row="1" column="3">
-           <property name="text">
-            <string>调拨依据</string>
-           </property>
-          </item>
-          <item row="1" column="4">
-           <property name="text">
-            <string>调拨</string>
-           </property>
-          </item>
-          <item row="1" column="5">
-           <property name="text">
-            <string>调拨方式</string>
-           </property>
-          </item>
-          <item row="1" column="6">
-           <property name="text">
-            <string>运输方式</string>
-           </property>
-          </item>
-          <item row="1" column="7">
-           <property name="text">
-            <string>有效日期</string>
-           </property>
-          </item>
-          <item row="1" column="8">
-           <property name="text">
-            <string>单位名称</string>
-           </property>
-          </item>
-          <item row="1" column="9">
-           <property name="text">
-            <string>联系人</string>
-           </property>
-          </item>
-          <item row="1" column="10">
-           <property name="text">
-            <string>联系电话</string>
-           </property>
-          </item>
-          <item row="1" column="11">
-           <property name="text">
-            <string>单位名称</string>
-           </property>
-          </item>
-          <item row="1" column="12">
-           <property name="text">
-            <string>联系人</string>
-           </property>
-          </item>
-          <item row="1" column="13">
-           <property name="text">
-            <string>联系电话</string>
-           </property>
-          </item>
-          <item row="1" column="14">
-           <property name="text">
-            <string/>
-           </property>
-          </item>
-          <item row="1" column="15">
-           <property name="text">
-            <string/>
-           </property>
-          </item>
-          <item row="1" column="16">
-           <property name="text">
-            <string>质量</string>
-           </property>
-          </item>
-          <item row="1" column="17">
-           <property name="text">
-            <string>数量</string>
-           </property>
-          </item>
-          <item row="1" column="18">
-           <property name="text">
-            <string/>
-           </property>
-          </item>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pb_input">
+          <property name="text">
+           <string>导入</string>
+          </property>
          </widget>
         </item>
         <item>
-         <layout class="QGridLayout" name="gridLayout">
-          <item row="0" column="2">
-           <spacer name="horizontalSpacer_2">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item row="0" column="1">
-           <widget class="QPushButton" name="pb_output">
-            <property name="text">
-             <string>导出</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <spacer name="horizontalSpacer">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
+         <spacer name="horizontalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pb_output">
+          <property name="text">
+           <string>导出</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pb_outputToExcel">
+          <property name="text">
+           <string>导出至Excel</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
         </item>
        </layout>
       </item>

@@ -937,6 +937,33 @@ def delDataInUnit(Unit_ID):
             conn.rollback()
             return False
 
+        sql = "select equip_balance_id from equipment_balance where Unit_ID='%s'" % UnitID[0]
+        equipmentbalanceIdList = selectData(sql)
+        if equipmentbalanceIdList != None:
+            for equipmentbalanceKey in equipmentbalanceIdList:
+                sqls = []
+                sql = "delete from eb_carry where equip_balance_id=%s" % equipmentbalanceKey[0]
+                sqls.append(sql)
+                sql = "delete from eb_change_project where equip_balance_id=%s" % equipmentbalanceKey[0]
+                sqls.append(sql)
+                sql = "delete from eb_management where equip_balance_id=%s" % equipmentbalanceKey[0]
+                sqls.append(sql)
+                sql = "delete from eb_production_year where equip_balance_id=%s" % equipmentbalanceKey[0]
+                sqls.append(sql)
+                sql = "delete from eb_quality_status where equip_balance_id=%s" % equipmentbalanceKey[0]
+                sqls.append(sql)
+                sql = "delete from eb_repair_time where equip_balance_id=%s" % equipmentbalanceKey[0]
+                sqls.append(sql)
+                sql = "delete from eb_stock where equip_balance_id=%s" % equipmentbalanceKey[0]
+                sqls.append(sql)
+                sql = "delete from equipment_balance where equip_balance_id=%s" % equipmentbalanceKey[0]
+                sqls.append(sql)
+                try:
+                    for sql in sqls:
+                        cur.execute(sql)
+                except Exception as e:
+                    conn.rollback()
+                    return False
     try:
         conn.commit()
         return True
@@ -1108,7 +1135,33 @@ def delDataInEquip(Equip_ID):
             conn.rollback()
             return e
 
-
+        sql = "select equip_balance_id from equipment_balance where Equip_ID='%s'" % EquipID[0]
+        equipmentbalanceIdList = selectData(sql)
+        if equipmentbalanceIdList != None:
+            for equipmentbalanceKey in equipmentbalanceIdList:
+                sqls = []
+                sql = "delete from eb_carry where equip_balance_id=%s" % equipmentbalanceKey[0]
+                sqls.append(sql)
+                sql = "delete from eb_change_project where equip_balance_id=%s" % equipmentbalanceKey[0]
+                sqls.append(sql)
+                sql = "delete from eb_management where equip_balance_id=%s" % equipmentbalanceKey[0]
+                sqls.append(sql)
+                sql = "delete from eb_production_year where equip_balance_id=%s" % equipmentbalanceKey[0]
+                sqls.append(sql)
+                sql = "delete from eb_quality_status where equip_balance_id=%s" % equipmentbalanceKey[0]
+                sqls.append(sql)
+                sql = "delete from eb_repair_time where equip_balance_id=%s" % equipmentbalanceKey[0]
+                sqls.append(sql)
+                sql = "delete from eb_stock where equip_balance_id=%s" % equipmentbalanceKey[0]
+                sqls.append(sql)
+                sql = "delete from equipment_balance where equip_balance_id=%s" % equipmentbalanceKey[0]
+                sqls.append(sql)
+                try:
+                    for sql in sqls:
+                        cur.execute(sql)
+                except Exception as e:
+                    conn.rollback()
+                    return False
     try:
         conn.commit()
         return True
