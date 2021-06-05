@@ -132,6 +132,8 @@ class DisturbPlan(QWidget, yearList_Form):
                 return
 
             insertIntoDisturbPlanYear(year)
+            if not selectIfExistsStrengthYear(year):
+                insertIntoStrengthYear(year)
             self._initYearWidget_()
             return
 
@@ -695,7 +697,6 @@ class DisturbPlan(QWidget, yearList_Form):
 
     #导出到Excel表格
     def slotOutputToExcel(self):
-        print("执行1111111")
         self.disturbPlanList={}
         for i in range(self.disturbResult.rowCount()):
             columnList = []

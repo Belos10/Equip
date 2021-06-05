@@ -11,6 +11,7 @@ class InputProof(QDialog,widget_inputProof):
         super(InputProof, self).__init__(parent)
         self.setupUi(self)
         self.currentYear = ''
+        self.setWindowTitle("设置调拨依据")
         self.signalConnect()
 
 

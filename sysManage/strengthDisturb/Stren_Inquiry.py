@@ -250,7 +250,10 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
             item = QListWidgetItem()
             item.setText(year)
             self.lw_chooseYear.addItem(item)
-
+        if self.yearList:
+            self.tb_add.setDisabled(1)
+        else:
+            self.tb_add.setDisabled(0)
     #当信息录入界面点击保存按钮时
     def slotSaveUpdate(self):
         Unit_ID = self.add_strenth_info.strgenthInfo[1]
