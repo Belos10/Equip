@@ -1,5 +1,4 @@
 from database.connectAndDisSql import *
-import operator
 tableInformation = {
         '6':{'tableName':'eb_quality_status','fieldName':'issue_new_product'},
         '7':{'tableName':'eb_quality_status','fieldName':'issue_inferior_product'},

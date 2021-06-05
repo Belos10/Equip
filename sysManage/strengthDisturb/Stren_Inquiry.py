@@ -27,7 +27,8 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
 
         self.first_treeWidget_dict = {}
         self.second_treeWidget_dict = {}
-
+        self.tb_input.setDisabled(True)
+        self.tb_input.setVisible(False)
         self.inquiry_result = Inquiry_Result()  # 右边显示查询结果
         self.add_strenth_info = AddStrenthInfo()  # 录入数据
 
