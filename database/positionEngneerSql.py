@@ -432,7 +432,7 @@ def delDataInPosenginUnit(Unit_ID):
     # 插入的sql语句
     UnitIDList = []
     findChildPosenginUnit(Unit_ID, UnitIDList, cur)
-    print(UnitIDList)
+    # print(UnitIDList)
     for UnitID in UnitIDList:
         if UnitID != '':
             sql = "Delete from posengin_unit_directory where Unit_ID = '" + UnitID + "'"

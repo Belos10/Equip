@@ -218,9 +218,10 @@ def updateOneEquipmentBalanceData(year,equipmentId,unitId):
         str(year), equipmentId, unitId)
     retirePlanEquipment = selectOne(sql)
     RetireNum = 0
+
     if retirePlanEquipment is not None:
         if (retirePlanEquipment.get('RetireNum', 0) == 0 or retirePlanEquipment['RetireNum'] is None or len(
-                disturbEquipment['RetireNum']) < 1):
+                retirePlanEquipment['RetireNum']) < 1):
             pass
         else:
             RetireNum = int(retirePlanEquipment['RetireNum'])
@@ -390,6 +391,10 @@ def saveEquipmentBalanceByRow(dataList,unit,year):
 
 
 if __name__ == "__main__":
+    date = selectOne("select Equip_Id,Unit_Id,RetireNum from retireplan where Year=2000 and Equip_Id='1' and Unit_Id='1'")
+    print(date)
+    print(date.get('RetireNum'))
+
     pass
 
     # deleteOneEquipmentBalanceData('2008','2','5')

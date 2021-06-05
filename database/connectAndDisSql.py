@@ -52,7 +52,7 @@ def excuteupdata(sqls):
         return False
     try:
         for sql in sqls:
-           cur.execute(sql)
+            cur.execute(sql)
         conn.commit()
         return True
     except sqlite3.Error as error:

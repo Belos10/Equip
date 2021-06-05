@@ -1,10 +1,11 @@
 from widgets.strengthDisturb.inputStrength import widget_inputStrength
 from PyQt5.QtWidgets import QWidget,QDialog
+from PyQt5.Qt import QRegExp,QRegExpValidator,Qt
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QMessageBox,QPushButton
 from database.alocatMangeSql import updateDisturbPlanProof
 
-
+regx = QRegExp("[0-9]*")
 class InputStrength(QDialog,widget_inputStrength):
     signal = QtCore.pyqtSignal(str)
     def __init__(self, parent=None):
@@ -13,6 +14,12 @@ class InputStrength(QDialog,widget_inputStrength):
         self.NewStrength = None
         # self.currentYear = ''
         self.signalConnect()
+        validator = QRegExpValidator(regx)
+        self.le_inputText.setValidator(validator)
+        self.setWindowTitle("修改实力数")
+        flags = Qt.Dialog
+        flags = flags | Qt.WindowTitleHint | Qt.CustomizeWindowHint | Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint
+        self.setWindowFlags(flags)
 
 
     def signalConnect(self):

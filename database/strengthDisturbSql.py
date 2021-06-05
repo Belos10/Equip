@@ -330,7 +330,15 @@ def selectEquipInfoByEquipUper(Equip_Uper):
 
     return result
 
-
+# 返回equip装备表的所有数据
+def selectAllDataAboutPublicEquip():
+    resultList = []
+    sql = "select * from pubilcequip"
+    cur.execute(sql)
+    result = cur.fetchall()
+    for resultInfo in result:
+        resultList.append(resultInfo)
+    return resultList
 
 
 # 返回equip装备表的所有数据
@@ -463,6 +471,7 @@ def addDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type, E
         return e
     strengthYearInfoTuple = []
     unitInfoTuple = []
+    publicequipList = selectAllDataAboutPublicEquip()
     strengthYearInfoTuple = selectAllDataAboutStrengthYear()
     selectSuccess = selectAllDataAboutUnit(unitInfoTuple)
     if selectSuccess != True:
@@ -470,6 +479,17 @@ def addDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type, E
     disturbplanYearInfoTuple = selectAllDataAboutDisturbPlan()
 
     print(unitInfoTuple)
+    for publicequip in publicequipList:
+        for strengthYearInfo in strengthYearInfoTuple:
+            sql = "INSERT INTO weave (Unit_ID, Equip_ID, Unit_Name, Equip_Name, Strength, Work, Now, year) VALUES" \
+                  + "('" + publicequip[0] + "','" + Equip_ID + "','" + "公用装备" + "','" + Equip_Name + "', 0, 0, 0, '" + \
+                  strengthYearInfo[1] + "')"
+            try:
+                cur.execute(sql)
+            except Exception as e:
+                conn.rollback()
+                return e
+
     for unitInfo in unitInfoTuple:
         for strengthYearInfo in strengthYearInfoTuple:
             sql = "INSERT INTO strength (Equip_ID, Unit_ID, Equip_Name, Unit_Name, Strength, Work, Now, Error, Retire, Delay, Pre, NonObject," \
@@ -1482,6 +1502,7 @@ def insertIntoStrengthYear(year):
     equipList = selectAllDataAboutEquip()
     unitList = []
     selectAllDataAboutUnit(unitList)
+    publiequipList = selectAllDataAboutPublicEquip()
 
     sql = "select * from strengthyear where year = '" + str(int(year) - 1) + "'"
     cur.execute(sql)
@@ -1547,6 +1568,44 @@ def insertIntoStrengthYear(year):
                     except Exception as e:
                         conn.rollback()
                         return e
+
+            for publiequip in publiequipList:
+
+                sql = "INSERT INTO strength (Equip_ID, Unit_ID, Equip_Name, Unit_Name, Strength, Work, Now, Error, Retire, Delay, Pre, NonObject," \
+                      "NonStrength, Single, Arrive, year) VALUES" \
+                      + "('" + equipInfo[0] + "', '" + publiequip[0] + "', '" + equipInfo[1] + "', '" \
+                      + "公用装备" + "', " + str(0) + ", " + str(0) + ", " \
+                      + str(0) + ", " + str(0) + ", " + str(0) + ", " \
+                      + str(0) + ", " + str(0) + ", " + str(0) + ", " + str(0) + "," + str(0) + ", " + str(
+                    0) + ", '" + year + "')"
+
+                try:
+                    cur.execute(sql)
+                except Exception as e:
+                    conn.rollback()
+                    return e
+                weaveInfo = selectWeaveInfo(publiequip[0], equipInfo[0], str(int(year) - 1))
+
+                if weaveInfo:
+                    sql = "INSERT INTO weave (Unit_ID, Equip_ID, Unit_Name, Equip_Name, Strength, Work, Now, year) VALUES" \
+                      + "('" + publiequip[0] + "','" + equipInfo[0] + "','" + "公用装备" + "','" + equipInfo[
+                          1] + "'," + str(weaveInfo[0][4]) + "," + str(weaveInfo[0][5]) + "," + str(
+                        weaveInfo[0][6]) + ", '" + year + "')"
+
+                    try:
+                        cur.execute(sql)
+                    except Exception as e:
+                        conn.rollback()
+                        return e
+                else:
+                    sql = "INSERT INTO weave (Unit_ID, Equip_ID, Unit_Name, Equip_Name, Strength, Work, Now, year) VALUES" \
+                      + "('" + publiequip[0] + "','" + equipInfo[0] + "','" + "公用装备" + "','" + equipInfo[
+                          1] + "'," + str(0) + "," + str(0) + "," + str(0) + ", '" + year + "')"
+                    try:
+                        cur.execute(sql)
+                    except Exception as e:
+                        conn.rollback()
+                        return e
     else:
         for equipInfo in equipList:
             for unitInfo in unitList:
@@ -1565,6 +1624,28 @@ def insertIntoStrengthYear(year):
                     return e
                 sql = "INSERT INTO weave (Unit_ID, Equip_ID, Unit_Name, Equip_Name, Strength, Work, Now, year) VALUES" \
                       + "('" + unitInfo[0] + "','" + equipInfo[0] + "','" + unitInfo[1] + "','" + equipInfo[
+                          1] + "'," + str(0) + "," + str(0) + "," + str(0) + ", '" + year + "')"
+                try:
+                    cur.execute(sql)
+                except Exception as e:
+                    conn.rollback()
+                    return e
+            for publiequip in publiequipList:
+                sql = "INSERT INTO strength (Equip_ID, Unit_ID, Equip_Name, Unit_Name, Strength, Work, Now, Error, Retire, Delay, Pre, NonObject," \
+                      "NonStrength, Single, Arrive, year) VALUES" \
+                      + "('" + equipInfo[0] + "', '" + publiequip[0] + "', '" + equipInfo[1] + "', '" \
+                      + "公用装备" + "', " + str(0) + ", " + str(0) + ", " \
+                      + str(0) + ", " + str(0) + ", " + str(0) + ", " \
+                      + str(0) + ", " + str(0) + ", " + str(0) + ", " + str(0) + "," + str(0) + ", " + str(
+                    0) + ", '" + year + "')"
+
+                try:
+                    cur.execute(sql)
+                except Exception as e:
+                    conn.rollback()
+                    return e
+                sql = "INSERT INTO weave (Unit_ID, Equip_ID, Unit_Name, Equip_Name, Strength, Work, Now, year) VALUES" \
+                      + "('" + publiequip[0] + "','" + equipInfo[0] + "','" + "公用装备" + "','" + equipInfo[
                           1] + "'," + str(0) + "," + str(0) + "," + str(0) + ", '" + year + "')"
                 try:
                     cur.execute(sql)
@@ -1892,6 +1973,7 @@ def isHaveFactoryYear(year):
 #     equipList = selectAllDataAboutEquip()
 #     unitList = selectAllDataAboutUnit()
 #     strengthYearInfo = selectAllDataAboutStrengthYear()
+
 #
 #     for equipInfo in equipList:
 #         for unitInfo in unitList:
@@ -2199,7 +2281,6 @@ def findBigOtherYear(year):
 
 # 根据单位号，装备号修改某年的实力数，strengthNum为修改后的实力数，orginStrengthNum为原来的实力数
 def updateStrengthAboutStrengrh(Unit_ID, Equip_ID, year, strengthNum, orginStrengthNum):
-    print("==================updateStrengthAboutStrengrh===============", Unit_ID, Equip_ID, year, strengthNum, orginStrengthNum)
     EquipIDList = []
     UnitIDList = []
     findUnitUperIDList(Unit_ID, UnitIDList)

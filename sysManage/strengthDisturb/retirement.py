@@ -724,8 +724,8 @@ class retirement(QWidget, Widget_Retirement):
             except Exception as e:
                 QMessageBox.about(self, "导出失败", "导出表格被占用，请关闭正在使用的Execl！")
                 return
-
-        pass
+        else:
+            QMessageBox.about(self, "选取文件夹失败！", "请选择正确的文件夹！")
 
 
 

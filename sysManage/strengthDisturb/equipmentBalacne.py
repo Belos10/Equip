@@ -1,3 +1,4 @@
+import xlwt
 from PyQt5.QtCore import QVariant
 from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, QAbstractItemView, \
     QMessageBox, QListWidgetItem, QInputDialog, QHeaderView, QFileDialog
@@ -943,9 +944,7 @@ class equipmentBalance(QWidget, Widget_Retirement):
                                                     self.currentYear)
 
         directoryPath = QFileDialog.getExistingDirectory(self, "请选择导出文件夹", "c:/")
-        if len(directoryPath) > 0:
-
-            import xlwt
+        if len(directoryPath) > 0 and '.' not in directoryPath:
             workBook = xlwt.Workbook(encoding='utf-8')
             workSheet = workBook.add_sheet('Sheet1')
 
@@ -1002,15 +1001,15 @@ class equipmentBalance(QWidget, Widget_Retirement):
 
             #画Excel表头
             workSheet.write_merge(0, 0, 0, 66, "%s年%s装备平衡表" % (self.year, selectUnitNameByUnitID(self.currentCheckedUnitList[0])), headTitleStyle)
-            workSheet.write_marge(1, 3, 0, 0,"装备名称", titileStyle)
-            workSheet.write_marge(1, 3, 1, 1, "原有编制数", titileStyle)
-            workSheet.write_marge(1, 3, 2, 2, "编制数", titileStyle)
-            workSheet.write_marge(1, 3, 3, 3, "编制增数", titileStyle)
-            workSheet.write_marge(1, 3, 4, 4, "编制减数", titileStyle)
-            workSheet.write_marge(1, 3, 5, 5, "原有数", titileStyle)
-            workSheet.write_marge(1, 1, 6, 13, "质量状况", titileStyle)
-            workSheet.write_marge(2, 2, 6, 9, "下发", titileStyle)
-            workSheet.write_marge(2, 2, 10, 13, "上报", titileStyle)
+            workSheet.write_merge(1, 3, 0, 0, "装备名称" , titileStyle)
+            workSheet.write_merge(1, 3, 1, 1, "原有编制数", titileStyle)
+            workSheet.write_merge(1, 3, 2, 2, "编制数", titileStyle)
+            workSheet.write_merge(1, 3, 3, 3, "编制增数", titileStyle)
+            workSheet.write_merge(1, 3, 4, 4, "编制减数", titileStyle)
+            workSheet.write_merge(1, 3, 5, 5, "原有数", titileStyle)
+            workSheet.write_merge(1, 1, 6, 13, "质量状况", titileStyle)
+            workSheet.write_merge(2, 2, 6, 9, "下发", titileStyle)
+            workSheet.write_merge(2, 2, 10, 13, "上报", titileStyle)
             workSheet.write(3, 6, "新品", titileStyle)
             workSheet.write(3, 7, "堪品", titileStyle)
             workSheet.write(3, 8, "待修", titileStyle)
@@ -1019,10 +1018,10 @@ class equipmentBalance(QWidget, Widget_Retirement):
             workSheet.write(3, 11, "堪品", titileStyle)
             workSheet.write(3, 12, "待修", titileStyle)
             workSheet.write(3, 13, "待退役", titileStyle)
-            workSheet.write_marge(1, 3, 14, 14, "变化数", titileStyle)
-            workSheet.write_marge(1, 3, 15, 15, "现有数", titileStyle)
-            workSheet.write_marge(1, 2, 16, 22, "变化项目（增）", titileStyle)
-            workSheet.write_marge(1, 2, 23, 30, "变化项目（减）", titileStyle)
+            workSheet.write_merge(1, 3, 14, 14, "变化数", titileStyle)
+            workSheet.write_merge(1, 3, 15, 15, "现有数", titileStyle)
+            workSheet.write_merge(1, 2, 16, 22, "变化项目（增）", titileStyle)
+            workSheet.write_merge(1, 2, 23, 30, "变化项目（减）", titileStyle)
             workSheet.write(3, 16, "合计", titileStyle)
             workSheet.write(3, 17, "上级补充", titileStyle)
             workSheet.write(3, 18, "型号更正", titileStyle)
@@ -1038,10 +1037,10 @@ class equipmentBalance(QWidget, Widget_Retirement):
             workSheet.write(3, 28, "退役", titileStyle)
             workSheet.write(3, 29, "报废", titileStyle)
             workSheet.write(3, 30, "其他减少", titileStyle)
-            workSheet.write_marge(1, 3, 31, 31, "未到位数", titileStyle)
-            workSheet.write_marge(1, 3, 32, 32, "未到配套数", titileStyle)
-            workSheet.write_marge(1, 3, 33, 33, "未削减数", titileStyle)
-            workSheet.write_marge(1, 2, 34, 40, "携带数", titileStyle)
+            workSheet.write_merge(1, 3, 31, 31, "未到位数", titileStyle)
+            workSheet.write_merge(1, 3, 32, 32, "未到配套数", titileStyle)
+            workSheet.write_merge(1, 3, 33, 33, "未削减数", titileStyle)
+            workSheet.write_merge(1, 2, 34, 40, "携带数", titileStyle)
             workSheet.write(3, 34, "合计", titileStyle)
             workSheet.write(3, 35, "携带新品数", titileStyle)
             workSheet.write(3, 36, "携带堪品数", titileStyle)
@@ -1049,7 +1048,7 @@ class equipmentBalance(QWidget, Widget_Retirement):
             workSheet.write(3, 38, "携带退役数", titileStyle)
             workSheet.write(3, 39, "未到位数", titileStyle)
             workSheet.write(3, 40, "未削减数", titileStyle)
-            workSheet.write_marge(1, 2, 41, 47, "库存", titileStyle)
+            workSheet.write_merge(1, 2, 41, 47, "库存", titileStyle)
             workSheet.write(3, 41, "合计", titileStyle)
             workSheet.write(3, 42, "新品", titileStyle)
             workSheet.write(3, 43, "堪品", titileStyle)
@@ -1057,19 +1056,19 @@ class equipmentBalance(QWidget, Widget_Retirement):
             workSheet.write(3, 45, "带退役", titileStyle)
             workSheet.write(3, 46, "未到位数", titileStyle)
             workSheet.write(3, 47, "未削减数", titileStyle)
-            workSheet.write_marge(1, 2, 48, 52, "管理情况", titileStyle)
+            workSheet.write_merge(1, 2, 48, 52, "管理情况", titileStyle)
             workSheet.write(3, 48, "满编率", titileStyle)
             workSheet.write(3, 49, "配套率", titileStyle)
             workSheet.write(3, 50, "入库率", titileStyle)
             workSheet.write(3, 51, "到位率", titileStyle)
             workSheet.write(3, 52, "完好率", titileStyle)
-            workSheet.write_marge(1, 2, 53, 57, "大修次数", titileStyle)
+            workSheet.write_merge(1, 2, 53, 57, "大修次数", titileStyle)
             workSheet.write(3, 53, "未修", titileStyle)
             workSheet.write(3, 54, "一次", titileStyle)
             workSheet.write(3, 55, "二次", titileStyle)
             workSheet.write(3, 56, "三次", titileStyle)
             workSheet.write(3, 57, "三次以上", titileStyle)
-            workSheet.write_marge(1, 2, 58, 66, "出厂年限", titileStyle)
+            workSheet.write_merge(1, 2, 58, 66, "出厂年限", titileStyle)
             workSheet.write(3, 58, "70年以前", titileStyle)
             workSheet.write(3, 59, "71至75年", titileStyle)
             workSheet.write(3, 60, "76至80年", titileStyle)
@@ -1152,7 +1151,7 @@ class equipmentBalance(QWidget, Widget_Retirement):
 
 
             try:
-                pathName = "%s/%s年%s装备补充及退役需求表.xls" % (directoryPath, self.year, selectUnitNameByUnitID(self.currentCheckedUnitList[0]))
+                pathName = "%s/%s年%s装备平衡表.xls" % (directoryPath, self.year,selectUnitNameByUnitID(self.currentCheckedUnitList[0]))
                 workBook.save(pathName)
                 import win32api
                 win32api.ShellExecute(0, 'open', pathName, '', '', 1)
@@ -1161,5 +1160,6 @@ class equipmentBalance(QWidget, Widget_Retirement):
             except Exception as e:
                 QMessageBox.about(self, "导出失败", "导出表格被占用，请关闭正在使用的Execl！")
                 return
-        pass
+        else:
+            QMessageBox.about(self, "选取文件夹失败！", "请选择正确的文件夹！")
 
