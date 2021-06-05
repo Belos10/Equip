@@ -1,6 +1,5 @@
 from PyQt5.QtCore import QRegExp
 from PyQt5.QtGui import QRegExpValidator
-regx = QRegExp("[0-9]*")
 from widgets.strengthDisturb.inputStrength import widget_inputStrength
 from PyQt5.QtWidgets import QWidget,QDialog
 from PyQt5.Qt import QRegExp,QRegExpValidator,Qt
@@ -15,9 +14,9 @@ class InputStrength(QDialog,widget_inputStrength):
         super(InputStrength, self).__init__(parent)
         self.setupUi(self)
         self.NewStrength = None
-        self.setWindowTitle("设置实力数")
-        # self.currentYear = ''
-        self.le_inputText.setValidator(QRegExpValidator(regx))
+        # self.setWindowTitle("设置实力数")
+        # # self.currentYear = ''
+        # self.le_inputText.setValidator(QRegExpValidator(regx))
         self.signalConnect()
         validator = QRegExpValidator(regx)
         self.le_inputText.setValidator(validator)

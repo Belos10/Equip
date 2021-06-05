@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import *
 from database.SD_EquipmentBanlanceSql import updateOneEquipmentBalanceData, deleteByYear
 from widgets.alocatMange.yearListForm import yearList_Form
 from database.strengthDisturbSql import *
-from PyQt5.Qt import Qt
+from PyQt5.Qt import Qt,QRegExpValidator,QRegExp
 from PyQt5.QtGui import QColor, QBrush,QFont
 from database.alocatMangeSql import *
 from sysManage.userInfo import get_value
@@ -294,6 +294,7 @@ class DisturbPlan(QWidget, yearList_Form):
                 for resultInfo in result:
                     self.currentUnitChilddict[j] = resultInfo
                     j=j+1
+        print("self.currentUnitChilddict",self.currentUnitChilddict)
         # 获取当前装备名
         j = 0
         for equipID, equipItem in self.second_treeWidget_dict.items():
@@ -305,7 +306,7 @@ class DisturbPlan(QWidget, yearList_Form):
                 equipInfo = findEquipInfo(equipID)
                 self.currentEquipdict[j] = equipInfo[0]
                 j=j+1
-
+        print("self.currentEquipdict", self.currentEquipdict)
         self._initDisturbPlanByUnitListAndEquipList()
 
 
@@ -542,20 +543,26 @@ class DisturbPlan(QWidget, yearList_Form):
         self.currentRow = self.disturbResult.currentRow()
         self.currentColumn = self.disturbResult.currentColumn()
         if 5 <= self.currentColumn <= self.lenHeaderList-1:
-            if self.disturbResult.item(self.currentRow, self.currentColumn).text() == '':
-                num = 0
-            else:
-                num = self.disturbResult.item(self.currentRow, self.currentColumn).text()
-            originDisturbPlanNum = selectDisturbPlanNum({0:self.currentUnitChilddict[self.currentColumn-5]},{0:self.currentEquipdict[self.currentRow]},self.currentYear)
-            originStrengthNum = selectStrengthNum(self.currentUnitChilddict[self.currentColumn-5][0],self.currentEquipdict[self.currentRow][0],self.currentYear)
-            print("originDisturbPlanNum",originDisturbPlanNum,"originStrengthNum",originStrengthNum)
-            if originStrengthNum[0] != '':
-                updateDisturbPlanNum(self.currentEquipdict[self.currentRow][0],self.currentUnitChilddict[self.currentColumn-5][0],
-                                 self.currentYear,num,originStrengthNum[0],originDisturbPlanNum[0])
-                updateOneEquipmentBalanceData(self.currentYear, self.currentEquipdict[self.currentRow][0], self.currentUnitChilddict[self.currentColumn-5][0])
+            try:
+                if self.disturbResult.item(self.currentRow, self.currentColumn).text() == '':
+                    num = 0
+                else:
+                    num = self.disturbResult.item(self.currentRow, self.currentColumn).text()
                 self.initDisturbPlanSum()
-            else:
-                QMessageBox.information(self,"提示","未填写实力数",QMessageBox.Yes)
+                originDisturbPlanNum = selectDisturbPlanNum({0:self.currentUnitChilddict[self.currentColumn-5]},{0:self.currentEquipdict[self.currentRow]},self.currentYear)
+                originStrengthNum = selectStrengthNum(self.currentUnitChilddict[self.currentColumn-5][0],self.currentEquipdict[self.currentRow][0],self.currentYear)
+                print("originDisturbPlanNum",originDisturbPlanNum,"originStrengthNum",originStrengthNum)
+                if originStrengthNum[0] != '':
+                    updateDisturbPlanNum(self.currentEquipdict[self.currentRow][0],self.currentUnitChilddict[self.currentColumn-5][0],
+                                     self.currentYear,num,originStrengthNum[0],originDisturbPlanNum[0])
+                    updateOneEquipmentBalanceData(self.currentYear, self.currentEquipdict[self.currentRow][0], self.currentUnitChilddict[self.currentColumn-5][0])
+                    # self.initDisturbPlanSum()
+                else:
+                    QMessageBox.information(self,"提示","未填写实力数",QMessageBox.Yes)
+            except ValueError:
+                QMessageBox.information(self,"提示","请输入数字",QMessageBox.Yes)
+                self.disturbResult.item(self.currentRow, self.currentColumn).setText("")
+
         # 备注
         if self.currentColumn == self.lenHeaderList-1:
             updateDisturbPlanNote(self.currentEquipdict[self.currentRow][0],self.currentYear,self.disturbResult.item(self.currentRow, self.currentColumn).text())
