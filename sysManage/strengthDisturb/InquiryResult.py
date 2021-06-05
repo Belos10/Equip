@@ -39,7 +39,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                       '正常到位']
         self.tw_inquiryResult.setHorizontalHeaderLabels(headerlist)
         self.tw_inquiryResult.setColumnCount(len(headerlist))
-
+        self.tw_inquiryResult.setSelectionBehavior(QAbstractItemView.SelectRows)
     '''
         信号和槽连接
     '''
@@ -180,7 +180,8 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
     def slotItemChange(self):
         self.NewStrength = self.inputStrength.NewStrength
         currentRow = self.tw_inquiryResult.currentRow()
-        currentColumn = self.tw_inquiryResult.currentColumn()
+        # currentColumn = self.tw_inquiryResult.currentColumn()
+        currentColumn = 2
         if self.NewStrength is not None:
             if currentRow < 0:
                 reply = QMessageBox.information(self, "修改", "请选中某行", QMessageBox.Yes)
@@ -313,6 +314,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                     # item.setValidator(validator)
                     # self.tw_inquiryResult.setCellWidget(i, 2, item)
                     item = QTableWidgetItem(str(LineInfo[4]))
+
                     item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                     self.tw_inquiryResult.setItem(i, 2, item)
 
