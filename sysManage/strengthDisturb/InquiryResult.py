@@ -67,7 +67,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         self.pb_factoryYear.clicked.connect(self.slotChooseFactoryYear)
 
         self.pb_updateStrength.clicked.connect(self.slotUpdateStrength)
-        self.inputStrength.signal.connect(self.slotItemChange)
+        self.inputStrength.pb_yes.clicked.connect(self.slotItemChange)
 
         self.chooseFactoryYear.tb_cancel.clicked.connect(self.slotCancelChooseFactoryYear)
 
@@ -183,7 +183,10 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         # currentColumn = self.tw_inquiryResult.currentColumn()
         currentColumn = 2
         if self.NewStrength is not None:
-            if currentColumn == 2:
+            if currentRow < 0:
+                reply = QMessageBox.information(self, "修改", "请选中某行", QMessageBox.Yes)
+                return
+            if currentColumn > 0:
                 for i, resultInfo in self.currentInquiryResult.items():
                     if i == currentRow:
                         Unit_ID = resultInfo[1]

@@ -697,20 +697,141 @@ class DisturbPlan(QWidget, yearList_Form):
 
     #导出到Excel表格
     def slotOutputToExcel(self):
-        self.disturbPlanList={}
-        for i in range(self.disturbResult.rowCount()):
-            columnList = []
-            for j in range(self.disturbResult.columnCount()):
-                columnList.append(self.disturbResult.item(i,j).text())
-            self.disturbPlanList[i] = columnList
-        print("所有数据按字典self.disturbPlanList",self.disturbPlanList)
-        # if len(self.resultList) < 1:
-        #     reply = QMessageBox.warning(self, '警告', '未选中任何数据，无法导出', QMessageBox.Yes)
-        #     return
-        # reply = QMessageBox.question(self, '修改导出Excel', '是否保存修改并导出Excel？', QMessageBox.Cancel, QMessageBox.Yes)
-        # if reply == QMessageBox.Cancel:
-        #     self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList, self.currentYear)
-        #     return
+        self.disturbPlanList = {}
+        if self.disturbResult.rowCount() <= 0:
+            reply = QMessageBox.warning(self, '警告', '未选中任何数据，无法导出', QMessageBox.Yes)
+            return
+        reply = QMessageBox.question(self, '修改导出Excel', '是否保存修改并导出Excel？', QMessageBox.Cancel, QMessageBox.Yes)
+        if reply == QMessageBox.Cancel:
+            self._initDisturbPlanByUnitListAndEquipList()
+            return
+
+        directoryPath = QFileDialog.getExistingDirectory(self, "请选择导出文件夹", "c:/")
+        if len(directoryPath) > 0 and '.' not in directoryPath:
+            import xlwt
+            workBook = xlwt.Workbook(encoding='utf-8')
+            workSheet = workBook.add_sheet('Sheet1')
+
+            headTitleStyle2 = xlwt.XFStyle()  # 初始化样式
+            font = xlwt.Font()  # 为样式创建字体
+            font.name = '宋体'
+            font.bold = True
+            font.height = 20 * 11  # 字体大小，11为字号，20为衡量单位
+            alignment = xlwt.Alignment()  ## Create Alignment
+            alignment.horz = xlwt.Alignment.HORZ_RIGHT
+            alignment.vert = xlwt.Alignment.VERT_CENTER
+            borders = xlwt.Borders()
+            borders.left = 1  # 设置为细实线
+            borders.right = 1
+            borders.top = 1
+            borders.bottom = 1
+            headTitleStyle2.font = font  # 设定样式
+            headTitleStyle2.alignment = alignment
+            headTitleStyle2.borders = borders
+
+            headTitleStyle = xlwt.XFStyle()  # 初始化样式
+            font = xlwt.Font()  # 为样式创建字体
+            font.name = '宋体'
+            font.bold = True
+            font.height = 20 * 20  # 字体大小，11为字号，20为衡量单位
+            alignment = xlwt.Alignment()  ## Create Alignment
+            alignment.horz = xlwt.Alignment.HORZ_CENTER
+            alignment.vert = xlwt.Alignment.VERT_CENTER
+            borders = xlwt.Borders()
+            borders.left = 3  # 设置为细实线
+            borders.right = 3
+            borders.top = 3
+            borders.bottom = 3
+            headTitleStyle.font = font  # 设定样式
+            headTitleStyle.alignment = alignment
+            headTitleStyle.borders = borders
+
+            titileStyle = xlwt.XFStyle()  # 初始化样式
+            font = xlwt.Font()  # 为样式创建字体
+            font.name = '宋体'
+            font.bold = True
+            font.height = 20 * 11  # 字体大小，11为字号，20为衡量单位
+            alignment = xlwt.Alignment()  ## Create Alignment
+            alignment.horz = xlwt.Alignment.HORZ_CENTER
+            alignment.vert = xlwt.Alignment.VERT_CENTER
+            borders = xlwt.Borders()
+            borders.left = 2  # 设置为细实线
+            borders.right = 2
+            borders.top = 2
+            borders.bottom = 2
+            titileStyle.font = font  # 设定样式
+            titileStyle.alignment = alignment
+            titileStyle.borders = borders
+            contentStyle = xlwt.XFStyle()  # 初始化样式
+            font = xlwt.Font()  # 为样式创建字体
+            font.name = '宋体'
+            font.height = 20 * 11  # 字体大小，11为字号，20为衡量单位
+            alignment = xlwt.Alignment()  ## Create Alignment
+            alignment.horz = xlwt.Alignment.HORZ_CENTER
+            alignment.vert = xlwt.Alignment.VERT_CENTER
+            borders = xlwt.Borders()
+            borders.left = 1  # 设置为细实线
+            borders.right = 1
+            borders.top = 1
+            borders.bottom = 1
+            contentStyle.font = font  # 设定样式
+            contentStyle.alignment = alignment
+            contentStyle.borders = borders
+
+            # 画Excel表头
+            if self.unitFlag == 1:
+                headerlist = ['装备名称及规格型号', '单位', '陆军调拨单开具数', '机关分配计划数', '此次分配合计数']
+                if len(self.currentUnitChilddict):
+                    for i in self.currentUnitChilddict.values():
+                        headerlist.append(i[1])
+                headerlist.append('备注')
+            elif self.unitFlag == 2:
+                headerlist = ['装备名称及规格型号', '单位', '火箭军调拨单开具数', '此次机关分配数', '此次分配合计数']
+                if len(self.currentUnitChilddict):
+                    for i in self.currentUnitChilddict.values():
+                        headerlist.append(i[1])
+                headerlist.append('备注')
+            for i in range(len(headerlist)):
+                workSheet.col(i).width = 5500
+            workSheet.write_merge(0, 0, 0, len(headerlist) - 1, "%s年分配调整计划" % (self.currentYear), headTitleStyle)
+            proof = selectDisturbPlanProof(self.currentYear)
+            proofText = proof[0][0]
+            workSheet.write_merge(1, 1, 0, len(headerlist) - 1, proofText, headTitleStyle2)
+            #画表头
+            for i in range(len(headerlist)):
+                workSheet.write(2, i, headerlist[i], titileStyle)
+            #获取表数据
+            for i in range(self.disturbResult.rowCount()):
+                columnList = []
+                for j in range(self.disturbResult.columnCount()):
+                    columnList.append(self.disturbResult.item(i, j).text())
+                self.disturbPlanList[i] = columnList
+            print("self.disturbPlanList",self.disturbPlanList)
+            #填表
+            for key in self.disturbPlanList.keys():
+                for index in range(len(headerlist)):
+                    rowData = self.disturbPlanList.get(key)
+                    workSheet.write(3 + key, index, rowData[index], contentStyle)
+            try:
+                pathName = "%s/%s年通用装备分配调整计划.xls" % (directoryPath, self.currentYear)
+                workBook.save(pathName)
+                import win32api
+                win32api.ShellExecute(0, 'open', pathName, '', '', 1)
+                QMessageBox.about(self, "导出成功", "导出成功！")
+                return
+            except Exception as e:
+                QMessageBox.about(self, "导出失败", "导出表格被占用，请关闭正在使用的Execl！")
+                return
+        else:
+            QMessageBox.about(self, "选取文件夹失败！", "请选择正确的文件夹！")
+
+
+
+
+
+
+
+
 
 
 
