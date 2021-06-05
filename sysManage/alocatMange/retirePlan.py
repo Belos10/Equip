@@ -17,6 +17,7 @@ class retirePlan(QWidget, retirePlan_Form):
     def __init__(self, parent=None):
         super(retirePlan, self).__init__(parent)
         self.setupUi(self)
+        self.unitFlag = 0
         self.initAll()
         self.inputProof = InputProof()
         self.signalConnect()
@@ -56,7 +57,7 @@ class retirePlan(QWidget, retirePlan_Form):
         # 修改查询依据
         self.pb_firstSelect.clicked.connect(self.slotSelectUnit)
         self.pb_secondSelect.clicked.connect(self.slotSelectEquip)
-        self.pb_outputToExcel.clicked.connect(self.slotOutputToExcel)
+        #self.pb_outputToExcel.clicked.connect(self.slotOutputToExcel)
 
     def slotSelectUnit(self):
         findText = self.le_first.text()
@@ -200,15 +201,22 @@ class retirePlan(QWidget, retirePlan_Form):
         self.yearList = []
         self.currentEquipdict={}
         self.currentUnitChilddict = {}
+        self.unitFlag = 0
         self.retirePlanResult.clear()
         # 获取子单位名
         j = 0
         for unitID, unitItem in self.first_treeWidget_dict.items():
             if unitItem == self.tw_first.currentItem():
-                result = findRetirePlanUnitChildInfo(unitID)
+                if selectUnitIfBase(unitID):
+                    self.unitFlag = 2
+                    result = findDisturbPlanUnitChildInfo(unitID)
+                else:
+                    self.unitFlag = 1
+                    result = selectDisturbPlanChooseUnit()
                 for resultInfo in result:
                     self.currentUnitChilddict[j] = resultInfo
-                    j=j+1
+                    j = j + 1
+
         # 获取当前装备名
         j = 0
         for equipID, equipItem in self.second_treeWidget_dict.items():
@@ -219,13 +227,13 @@ class retirePlan(QWidget, retirePlan_Form):
             elif equipItem.checkState(0) == Qt.PartiallyChecked:
                 equipInfo = findEquipInfo(equipID)
                 self.currentEquipdict[j] = equipInfo[0]
-                j=j+1
+                j = j + 1
 
         self._initRetirePlanByUnitListAndEquipList()
 
 
     '''
-        初始化分配计划结果
+        初始化退役报废计划结果
     '''
     def _initRetirePlanByUnitListAndEquipList(self):
         self.retirePlanResult.clear()
@@ -233,50 +241,99 @@ class retirePlan(QWidget, retirePlan_Form):
         self.lenCurrentUnitChilddict=len(self.currentUnitChilddict)
         self.lenCurrentEquipdict=len(self.currentEquipdict)
 
-        headerlist = ['装备名称及规格型号', '单位', '退役报废合计数']
-        if len(self.currentUnitChilddict):
-            for i in self.currentUnitChilddict.values():
-                headerlist.append(i[1])
-        headerlist.append('备注')
-        self.lenHeaderList=len(headerlist)
-        self.retirePlanResult.setColumnCount(self.lenHeaderList)
-        self.retirePlanResult.setRowCount(len(self.currentEquipdict))
-        self.retirePlanResult.setHorizontalHeaderLabels(headerlist)
-        self.retirePlanResult.setColumnWidth(0, 200)
-        i = 0
-        for LineInfo in self.currentEquipdict.values():
-            currentRowResult = []
-            item = QTableWidgetItem(LineInfo[1])
-            item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-            currentRowResult.append(item)
-            self.retirePlanResult.setItem(i, 0, item)
-            item = QTableWidgetItem("")
-            item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-            currentRowResult.append(item)
-            self.retirePlanResult.setItem(i, 1, item)
-            item = QTableWidgetItem("0")
-            item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-            currentRowResult.append(item)
-            self.retirePlanResult.setItem(i, 2, item)
-            item = QTableWidgetItem("")
-            item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-            currentRowResult.append(item)
-            self.retirePlanResult.setItem(i, 3, item)
-            for x in range(0, self.lenCurrentUnitChilddict):
+        # 选择机关或其他
+        if self.unitFlag == 1:
+            headerlist = ['装备名称及规格型号', '单位', '退役报废合计数']
+            if len(self.currentUnitChilddict):
+                for i in self.currentUnitChilddict.values():
+                    headerlist.append(i[1])
+            headerlist.append('备注')
+            self.lenHeaderList = len(headerlist)
+            self.retirePlanResult.setColumnCount(self.lenHeaderList)
+            self.retirePlanResult.setRowCount(len(self.currentEquipdict))
+            self.retirePlanResult.setHorizontalHeaderLabels(headerlist)
+            self.retirePlanResult.setColumnWidth(0, 200)
+            i = 0
+            for LineInfo in self.currentEquipdict.values():
+                currentRowResult = []
+                item = QTableWidgetItem(LineInfo[1])
+                item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                currentRowResult.append(item)
+                self.retirePlanResult.setItem(i, 0, item)
                 item = QTableWidgetItem("")
                 item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-                self.retirePlanResult.setItem(i, x + 4, item)
                 currentRowResult.append(item)
-            item = QTableWidgetItem("")
-            item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-            self.retirePlanResult.setItem(i, 4 + self.lenCurrentUnitChilddict, item)
-            currentRowResult.append(item)
-            i = i + 1
-
-        self.initRetirePlanNum()
-        self.initRetirePlanNote()
-        self.initRetirePlanOther()
-        self.ifEquipHaveChild()
+                self.retirePlanResult.setItem(i, 1, item)
+                item = QTableWidgetItem("0")
+                item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                currentRowResult.append(item)
+                self.retirePlanResult.setItem(i, 2, item)
+                item = QTableWidgetItem("")
+                item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                currentRowResult.append(item)
+                self.retirePlanResult.setItem(i, 3, item)
+                for x in range(0, self.lenCurrentUnitChilddict):
+                    item = QTableWidgetItem("")
+                    item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                    self.retirePlanResult.setItem(i, x + 4, item)
+                    currentRowResult.append(item)
+                item = QTableWidgetItem("")
+                item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                self.retirePlanResult.setItem(i, 4 + self.lenCurrentUnitChilddict, item)
+                currentRowResult.append(item)
+                i = i + 1
+        # 选择各基地
+        elif self.unitFlag == 2:
+            headerlist = ['装备名称及规格型号', '单位', '退役报废合计数']
+            if len(self.currentUnitChilddict):
+                for i in self.currentUnitChilddict.values():
+                    headerlist.append(i[1])
+            headerlist.append('备注')
+            self.lenHeaderList = len(headerlist)
+            self.retirePlanResult.setColumnCount(self.lenHeaderList)
+            self.retirePlanResult.setRowCount(len(self.currentEquipdict))
+            self.retirePlanResult.setHorizontalHeaderLabels(headerlist)
+            self.retirePlanResult.setColumnWidth(0, 200)
+            i = 0
+            for LineInfo in self.currentEquipdict.values():
+                currentRowResult = []
+                item = QTableWidgetItem(LineInfo[1])
+                item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                currentRowResult.append(item)
+                self.retirePlanResult.setItem(i, 0, item)
+                item = QTableWidgetItem("")
+                item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                currentRowResult.append(item)
+                self.retirePlanResult.setItem(i, 1, item)
+                item = QTableWidgetItem("")
+                item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                currentRowResult.append(item)
+                self.retirePlanResult.setItem(i, 2, item)
+                item = QTableWidgetItem("")
+                item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                currentRowResult.append(item)
+                self.retirePlanResult.setItem(i, 3, item)
+                item = QTableWidgetItem("")
+                item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                currentRowResult.append(item)
+                self.retirePlanResult.setItem(i, 4, item)
+                for x in range(0, self.lenCurrentUnitChilddict):
+                    item = QTableWidgetItem("")
+                    item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                    self.retirePlanResult.setItem(i, x + 5, item)
+                    currentRowResult.append(item)
+                item = QTableWidgetItem("")
+                item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                self.retirePlanResult.setItem(i, 5 + self.lenCurrentUnitChilddict, item)
+                currentRowResult.append(item)
+                i = i + 1
+        self.retirePlanResult.setColumnWidth(2, 150)
+        if self.currentEquipdict and self.currentUnitChilddict:
+            self.initRetirePlanNum()
+            self.initRetirePlanNote()
+            # self.initRetirePlanInputNum()
+            self.initRetirePlanOther()
+            self.ifEquipHaveChild()
 
 
     # 读取初始分配计划数
@@ -286,14 +343,14 @@ class retirePlan(QWidget, retirePlan_Form):
                                                         self.currentEquipdict, self.currentYear)
         print("self.unitDisturbPlanList", self.unitRetirePlanList)
         # 显示每个单位分配计划数
-        num=0
+        num = 0
         for i in range(0,len(self.currentUnitChilddict)):
             for j in range(0,len(self.currentEquipdict)):
-                item = self.retirePlanResult.item(j, 4 + i)
+                item = self.retirePlanResult.item(j, 3 + i)
                 if self.unitRetirePlanList[num]!='-1':
                     item.setText(self.unitRetirePlanList[num])
                 item.setFlags(Qt.ItemIsEnabled|Qt.ItemIsSelectable|Qt.ItemIsEditable)
-                num=num+1
+                num = num + 1
         self.initRetirePlanSum()
 
     # 初始化此次分配数
@@ -301,15 +358,42 @@ class retirePlan(QWidget, retirePlan_Form):
         # 显示此次分配计划数
         sum = 0
         for i in self.currentEquipdict:
-            if not selectEquipIsHaveChild(self.currentEquipdict[i][0]):
+             if not selectEquipIsHaveChild(self.currentEquipdict[i][0]):
                 for j in range(0, len(self.currentUnitChilddict)):
-                    num = self.retirePlanResult.item(i, 4 + j).text()
+                    num = self.retirePlanResult.item(i, 3 + j).text()
                     if num == '-1' or num == '':
                         sum = sum + 0
                     else:
                         sum = sum + int(num)
-                self.retirePlanResult.item(i,3).setText(str(sum))
+                self.retirePlanResult.item(i, 2).setText(str(sum))
+             sum = 0
+
+        for row in reversed(range(len(self.currentEquipdict))):
             sum = 0
+            for childRow in reversed(range(len(self.currentEquipdict))):
+                # 第0个字段是EquipID,第二个字段是Equip_Uper
+                if self.currentEquipdict[row][0] == self.currentEquipdict[childRow][2]:
+                    num = self.retirePlanResult.item(childRow, 2).text()
+                    if num != '':
+                        sum = sum + int(num)
+            if sum != 0:
+                self.retirePlanResult.item(row, 2).setText(str(sum))
+
+
+    # # 初始化此次分配数
+    # def initRetirePlanSum(self):
+    #     # 显示此次分配计划数
+    #     sum = 0
+    #     for i in self.currentEquipdict:
+    #         if not selectEquipIsHaveChild(self.currentEquipdict[i][0]):
+    #             for j in range(0, len(self.currentUnitChilddict)):
+    #                 num = self.retirePlanResult.item(i, 4 + j).text()
+    #                 if num == '-1' or num == '':
+    #                     sum = sum + 0
+    #                 else:
+    #                     sum = sum + int(num)
+    #             self.retirePlanResult.item(i,2).setText(str(sum))
+    #         sum = 0
 
     # 若装备含子装备，则该行不可选中
     def ifEquipHaveChild(self):
@@ -375,10 +459,10 @@ class retirePlan(QWidget, retirePlan_Form):
     def slotItemChange(self):
         self.currentRow = self.retirePlanResult.currentRow()
         self.currentColumn = self.retirePlanResult.currentColumn()
-        if 4 <= self.currentColumn <= self.lenHeaderList-2:
-            updateRetirePlanNum(self.currentEquipdict[self.currentRow][0],self.currentUnitChilddict[self.currentColumn-4][0],
+        if 3 <= self.currentColumn <= self.lenHeaderList-2:
+            updateRetirePlanNum(self.currentEquipdict[self.currentRow][0],self.currentUnitChilddict[self.currentColumn-3][0],
                                  self.currentYear,self.retirePlanResult.item(self.currentRow,self.currentColumn).text())
-            updateOneEquipmentBalanceData(self.currentYear,self.currentEquipdict[self.currentRow][0],self.currentUnitChilddict[self.currentColumn-4][0])
+            updateOneEquipmentBalanceData(self.currentYear,self.currentEquipdict[self.currentRow][0],self.currentUnitChilddict[self.currentColumn-3][0])
             self.initRetirePlanSum()
         if self.currentColumn == self.lenHeaderList-1:
             updateRetirePlanNote(self.currentEquipdict[self.currentRow][0],self.currentYear,self.retirePlanResult.item(self.currentRow,self.currentColumn).text())
@@ -395,144 +479,14 @@ class retirePlan(QWidget, retirePlan_Form):
     # 读取初始分配计划备注
     def initRetirePlanNote(self):
         self.unitRetirePlanNoteList = selectRetirePlanNote(self.currentEquipdict, self.currentYear)
-
         for i in range(0,len(self.currentEquipdict)):
-            #print("''''''''''''''''''", i)
             item=self.retirePlanResult.item(i,self.lenHeaderList-1)
             if self.unitRetirePlanNoteList[i] is not None:
                 item.setText(str(self.unitRetirePlanNoteList[i]))
             item.setFlags(Qt.ItemIsEnabled|Qt.ItemIsSelectable|Qt.ItemIsEditable)
-            #print("************")
 
     # 读取机关计划数与装备单位
     def initRetirePlanOther(self):
-
         for i in range(0, len(self.currentEquipdict)):
             item = self.retirePlanResult.item(i, 1)
-            # if self.unitRetirePlanOtherList[i]:
             item.setText(str(self.currentEquipdict[i][5]))
-            # else:
-            #     item.setText("")
-
-
-
-
-
-
-    def slotOutputToExcel(self):
-        return
-        self.retirePlanList = {}
-        if self.retirePlanResult.rowCount() <= 0:
-            reply = QMessageBox.warning(self, '警告', '未选中任何数据，无法导出', QMessageBox.Yes)
-            return
-        reply = QMessageBox.question(self, '修改导出Excel', '是否保存修改并导出Excel？', QMessageBox.Cancel, QMessageBox.Yes)
-        if reply == QMessageBox.Cancel:
-            self._initRetirePlanByUnitListAndEquipList()
-            return
-
-        directoryPath = QFileDialog.getExistingDirectory(self, "请选择导出文件夹", "c:/")
-        if len(directoryPath) > 0 and '.' not in directoryPath:
-            import xlwt
-            workBook = xlwt.Workbook(encoding='utf-8')
-            workSheet = workBook.add_sheet('Sheet1')
-
-            headTitleStyle2 = xlwt.XFStyle()  # 初始化样式
-            font = xlwt.Font()  # 为样式创建字体
-            font.name = '宋体'
-            font.bold = True
-            font.height = 20 * 11  # 字体大小，11为字号，20为衡量单位
-            alignment = xlwt.Alignment()  ## Create Alignment
-            alignment.horz = xlwt.Alignment.HORZ_RIGHT
-            alignment.vert = xlwt.Alignment.VERT_CENTER
-            borders = xlwt.Borders()
-            borders.left = 1  # 设置为细实线
-            borders.right = 1
-            borders.top = 1
-            borders.bottom = 1
-            headTitleStyle2.font = font  # 设定样式
-            headTitleStyle2.alignment = alignment
-            headTitleStyle2.borders = borders
-
-            headTitleStyle = xlwt.XFStyle()  # 初始化样式
-            font = xlwt.Font()  # 为样式创建字体
-            font.name = '宋体'
-            font.bold = True
-            font.height = 20 * 20  # 字体大小，11为字号，20为衡量单位
-            alignment = xlwt.Alignment()  ## Create Alignment
-            alignment.horz = xlwt.Alignment.HORZ_CENTER
-            alignment.vert = xlwt.Alignment.VERT_CENTER
-            borders = xlwt.Borders()
-            borders.left = 3  # 设置为细实线
-            borders.right = 3
-            borders.top = 3
-            borders.bottom = 3
-            headTitleStyle.font = font  # 设定样式
-            headTitleStyle.alignment = alignment
-            headTitleStyle.borders = borders
-
-            titileStyle = xlwt.XFStyle()  # 初始化样式
-            font = xlwt.Font()  # 为样式创建字体
-            font.name = '宋体'
-            font.bold = True
-            font.height = 20 * 11  # 字体大小，11为字号，20为衡量单位
-            alignment = xlwt.Alignment()  ## Create Alignment
-            alignment.horz = xlwt.Alignment.HORZ_CENTER
-            alignment.vert = xlwt.Alignment.VERT_CENTER
-            borders = xlwt.Borders()
-            borders.left = 2  # 设置为细实线
-            borders.right = 2
-            borders.top = 2
-            borders.bottom = 2
-            titileStyle.font = font  # 设定样式
-            titileStyle.alignment = alignment
-            titileStyle.borders = borders
-            contentStyle = xlwt.XFStyle()  # 初始化样式
-            font = xlwt.Font()  # 为样式创建字体
-            font.name = '宋体'
-            font.height = 20 * 11  # 字体大小，11为字号，20为衡量单位
-            alignment = xlwt.Alignment()  ## Create Alignment
-            alignment.horz = xlwt.Alignment.HORZ_CENTER
-            alignment.vert = xlwt.Alignment.VERT_CENTER
-            borders = xlwt.Borders()
-            borders.left = 1  # 设置为细实线
-            borders.right = 1
-            borders.top = 1
-            borders.bottom = 1
-            contentStyle.font = font  # 设定样式
-            contentStyle.alignment = alignment
-            contentStyle.borders = borders
-
-            # 画Excel表头
-            headerlist = ['装备名称及规格型号', '单位', '退役报废合计数']
-            if len(self.currentUnitChilddict):
-                for i in self.currentUnitChilddict.values():
-                    headerlist.append(i[1])
-            headerlist.append('备注')
-            for i in range(len(headerlist)):
-                workSheet.col(i).width = 5500
-            workSheet.write_merge(0, 0, 0, len(headerlist) - 1, "%s年分配调整计划" % (self.currentYear), headTitleStyle)
-            proof = selectDisturbPlanProof(self.currentYear)
-            proofText = proof[0][0]
-            workSheet.write_merge(1, 1, 0, len(headerlist) - 1, proofText, headTitleStyle2)
-            # 画表头
-            for i in range(len(headerlist)):
-                workSheet.write(2, i, headerlist[i], titileStyle)
-            # 获取表数据
-
-
-            # 填表
-
-
-            try:
-                pathName = "%s/%s年通用装备分配调整计划.xls" % (directoryPath, self.currentYear)
-                workBook.save(pathName)
-                import win32api
-                win32api.ShellExecute(0, 'open', pathName, '', '', 1)
-                QMessageBox.about(self, "导出成功", "导出成功！")
-                return
-            except Exception as e:
-                QMessageBox.about(self, "导出失败", "导出表格被占用，请关闭正在使用的Execl！")
-                return
-        else:
-            QMessageBox.about(self, "选取文件夹失败！", "请选择正确的文件夹！")
-        pass
