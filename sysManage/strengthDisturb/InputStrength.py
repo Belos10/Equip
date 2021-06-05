@@ -18,8 +18,6 @@ class InputStrength(QDialog,widget_inputStrength):
         self.setWindowTitle("设置实力数")
         # self.currentYear = ''
         self.le_inputText.setValidator(QRegExpValidator(regx))
-
-
         self.signalConnect()
         validator = QRegExpValidator(regx)
         self.le_inputText.setValidator(validator)

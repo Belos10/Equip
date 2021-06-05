@@ -10,7 +10,7 @@
         <property name="serverTimezone" value="GMT" />
       </driver-properties>
     </data-source>
-    <data-source source="LOCAL" name="NuclearManageSystem.db" uuid="7c50faff-511a-4ed8-aa1a-273ec39c3e9e">
+    <data-source source="LOCAL" name="NuclearManageSystem.db" uuid="549e1e34-ba64-4504-82fa-57e904e9f731">
       <driver-ref>sqlite.xerial</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>

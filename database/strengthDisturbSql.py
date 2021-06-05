@@ -1273,18 +1273,18 @@ def selectAboutWeaveByUnitShow(UnitList, EquipList, yearList):
             # 查询当前单位ID的孩子序列
             UnitIDChildList = []
             findChildUnitByWeave(Unit_ID, UnitIDChildList, "")
-            print("==================", UnitIDChildList)
+            # print("==================", UnitIDChildList)
             for childUnitID in UnitIDChildList:
                 sql = "select * from weave where Unit_ID = '" + childUnitID[0] + \
                             "' and Equip_ID = '" + Equip_ID + "' and year = '" + yearList + "'"
-                print("==================", sql)
+                # print("==================", sql)
                 cur.execute(sql)
                 result = cur.fetchall()
                 for resultInfo in result:
                     weave = list(resultInfo)
                     weave[2] = childUnitID[1]
                     resultList.append(weave)
-    print("===================",resultList)
+    # print("===================",resultList)
     return resultList
 
 #实力查询展开到末级
@@ -1517,7 +1517,7 @@ def insertIntoStrengthYear(year):
         for equipInfo in equipList:
             for unitInfo in unitList:
                 strengthInfo = selectStrengthInfo(unitInfo[0], equipInfo[0], str(int(year) - 1))
-                print("0000000000    ", strengthInfo)
+                # print("0000000000    ", strengthInfo)
                 if strengthInfo:
                     sql = "INSERT INTO strength (Equip_ID, Unit_ID, Equip_Name, Unit_Name, Strength, Work, Now, Error, Retire, Delay, Pre, NonObject," \
                           "NonStrength, Single, Arrive, year) VALUES" \
@@ -1538,7 +1538,7 @@ def insertIntoStrengthYear(year):
                         return e
 
                 else:
-                    print("   ------------------------")
+                    # print("   ------------------------")
                     sql = "INSERT INTO strength (Equip_ID, Unit_ID, Equip_Name, Unit_Name, Strength, Work, Now, Error, Retire, Delay, Pre, NonObject," \
                           "NonStrength, Single, Arrive, year) VALUES" \
                           + "('" + equipInfo[0] + "', '" + unitInfo[0] + "', '" + equipInfo[1] + "', '" \
@@ -2270,7 +2270,7 @@ def updateWeaveNum(Unit_ID, Equip_ID, weaveNum, orginWeave, year):
                         conn.rollback()
                         return e
 
-                    print("******************")
+                   # print("******************")
         try:
             conn.commit()
             return True
@@ -2855,10 +2855,10 @@ def delRetireYearByYear(year):
     conn.commit()
 # 删除退休表所有年份
 def delRetireYearALLYear():
-    sql = "truncate table retireyear "
+    sql = "delete from retireyear "
     # print(sql)
     cur.execute(sql)
-    sql = "truncate table retire "
+    sql = "delete from retire "
     # print(sql)
     cur.execute(sql)
     conn.commit()
