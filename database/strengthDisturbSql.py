@@ -1,7 +1,8 @@
 import pymysql
 from database.connectAndDisSql import *
 #from database.alocatMangeSql import selectYearListAboutDisturbPlan
-from database.SD_EquipmentBanlanceSql import updateOneEquipmentBalanceData
+from database.SD_EquipmentBanlanceSql import updateOneEquipmentBalanceData, deleteByYear
+
 #new
 
 '''
@@ -2981,13 +2982,17 @@ def delStrengthYearByYear(year):
     except Exception as e:
         conn.rollback()
         return e
-
+    deleteByYear(year)
     try:
         conn.commit()
         return True
     except Exception as e:
         conn.rollback()
         return e
+
+
+
+
 def selectAllIDFromUnit():
     sql = "select Unit_ID from unit "
     cur.execute(sql)
