@@ -264,22 +264,22 @@ class retirePlan(QWidget, retirePlan_Form):
                 item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
                 currentRowResult.append(item)
                 self.retirePlanResult.setItem(i, 1, item)
-                item = QTableWidgetItem("0")
+                item = QTableWidgetItem("")
                 item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
                 currentRowResult.append(item)
                 self.retirePlanResult.setItem(i, 2, item)
-                item = QTableWidgetItem("")
-                item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-                currentRowResult.append(item)
-                self.retirePlanResult.setItem(i, 3, item)
+                # item = QTableWidgetItem("")
+                # item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                # currentRowResult.append(item)
+                # self.retirePlanResult.setItem(i, 3, item)
                 for x in range(0, self.lenCurrentUnitChilddict):
                     item = QTableWidgetItem("")
                     item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-                    self.retirePlanResult.setItem(i, x + 4, item)
+                    self.retirePlanResult.setItem(i, x + 3, item)
                     currentRowResult.append(item)
                 item = QTableWidgetItem("")
                 item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-                self.retirePlanResult.setItem(i, 4 + self.lenCurrentUnitChilddict, item)
+                self.retirePlanResult.setItem(i, 3 + self.lenCurrentUnitChilddict, item)
                 currentRowResult.append(item)
                 i = i + 1
         # 选择各基地
@@ -309,22 +309,22 @@ class retirePlan(QWidget, retirePlan_Form):
                 item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
                 currentRowResult.append(item)
                 self.retirePlanResult.setItem(i, 2, item)
-                item = QTableWidgetItem("")
-                item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-                currentRowResult.append(item)
-                self.retirePlanResult.setItem(i, 3, item)
-                item = QTableWidgetItem("")
-                item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-                currentRowResult.append(item)
-                self.retirePlanResult.setItem(i, 4, item)
+                # item = QTableWidgetItem("")
+                # item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                # currentRowResult.append(item)
+                # self.retirePlanResult.setItem(i, 3, item)
+                # item = QTableWidgetItem("")
+                # item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                # currentRowResult.append(item)
+                # self.retirePlanResult.setItem(i, 4, item)
                 for x in range(0, self.lenCurrentUnitChilddict):
                     item = QTableWidgetItem("")
                     item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-                    self.retirePlanResult.setItem(i, x + 5, item)
+                    self.retirePlanResult.setItem(i, x + 3, item)
                     currentRowResult.append(item)
                 item = QTableWidgetItem("")
                 item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-                self.retirePlanResult.setItem(i, 5 + self.lenCurrentUnitChilddict, item)
+                self.retirePlanResult.setItem(i, 3 + self.lenCurrentUnitChilddict, item)
                 currentRowResult.append(item)
                 i = i + 1
         self.retirePlanResult.setColumnWidth(2, 150)
@@ -336,7 +336,7 @@ class retirePlan(QWidget, retirePlan_Form):
             self.ifEquipHaveChild()
 
 
-    # 读取初始分配计划数
+    # 读取初始退役计划数
     def initRetirePlanNum(self):
         print("currentYear:", self.currentYear)
         self.unitRetirePlanList = selectRetirePlanNum(self.currentUnitChilddict,
