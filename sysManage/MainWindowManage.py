@@ -27,8 +27,6 @@ class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
         self.sysConfig = QWidget()
 
         self.setWindowTitle("核化装备管理系统")
-
-        self.tb_ManageWidget.addTab(self.setLogin, "登录设置")
         self.tb_ManageWidget.addTab(self.strengthDisturb, "实力分布")
         self.tb_ManageWidget.setCurrentIndex(0)
         self.tb_ManageWidget.addTab(self.alocatMange, "调配管理")
@@ -40,6 +38,7 @@ class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
         self.tb_ManageWidget.addTab(self.PosEngin, "阵地工程")
         self.tb_ManageWidget.addTab(self.dictSelect, "目录查询")
         self.tb_ManageWidget.addTab(self.sysConfig, "系统配置")
+        self.tb_ManageWidget.addTab(self.setLogin, "登录设置")
 
         self.login = login()
         self.login.show()

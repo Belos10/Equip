@@ -2645,7 +2645,7 @@ def findDisturbPlanUnitChildInfo(unitId):
     sql = "select * from disturbplanunit where Unit_Uper = '" + unitId + "'"
     cur.execute(sql)
     result = cur.fetchall()
-    #print("result",result)
+    print("findDisturbPlanUnitChildInfo   result",result)
     if result:
         return result
     else:
