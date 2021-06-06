@@ -69,8 +69,9 @@ class Widget_Alocat_Mange(object):
         self.toolBar.addWidget(self.tb_disturbPlan)
         self.toolBar.addWidget(self.tb_disturbSchedule)
         self.toolBar.addWidget(self.tb_disturbManage)
-        self.toolBar.addWidget(self.tb_alocatSet)
         self.toolBar.addWidget(self.tb_retirePlan)
+        self.toolBar.addWidget(self.tb_alocatSet)
+
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)

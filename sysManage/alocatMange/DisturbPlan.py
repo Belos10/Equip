@@ -766,7 +766,6 @@ class DisturbPlan(QWidget, yearList_Form):
                 for j in range(self.disturbResult.columnCount()):
                     columnList.append(self.disturbResult.item(i, j).text())
                 self.disturbPlanList[i] = columnList
-            print("self.disturbPlanList", self.disturbPlanList)
             # 填表
             for key in self.disturbPlanList.keys():
                 for index in range(len(headerlist)):

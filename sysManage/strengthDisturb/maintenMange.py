@@ -198,6 +198,8 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
 
     #当选择按单位展开或按装备展开或展开到末级按钮时
     def slotClickedRB(self):
+        if len(self.unitList) < 1 or len(self.equipList) < 1:
+            return
         self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
 
     '''
@@ -348,7 +350,7 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
             item = QLineEdit()
             item.setText(str(LineInfo[5]))
             item.textChanged.connect(self.slotResultItemChange)
-            item.setStyleSheet("background:transparent;border-width:0")
+            item.setStyleSheet("background:white;border-width:0;color:black")
             validator = QRegExpValidator(regx)
             item.setValidator(validator)
             self.tw_result.setCellWidget(i, 3, item)

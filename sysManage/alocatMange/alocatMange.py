@@ -20,16 +20,16 @@ class alocatMange(QMainWindow, Widget_Alocat_Mange):
         self.disturbPlan = DisturbPlan()            #分配调整计划
         self.allotSchedule = AllotSchedule()        #调拨进度
         self.transferManage = transferManage(self)  #调拨单管理
-        self.alocatSet = alocatManageSet(self)              #调配管理设置
         self.retirePlan = retirePlan(self)              #退役报废计划
+        self.alocatSet = alocatManageSet(self)  # 调配管理设置
         self.userInfo = None
 
         #添加页面
         self.stackedWidget.addWidget(self.disturbPlan)
         self.stackedWidget.addWidget(self.allotSchedule)
         self.stackedWidget.addWidget(self.transferManage)
-        self.stackedWidget.addWidget(self.alocatSet)
         self.stackedWidget.addWidget(self.retirePlan)
+        self.stackedWidget.addWidget(self.alocatSet)
 
         #初始化显示分配调整计划页面
         self.stackedWidget.setCurrentIndex(0)
@@ -106,7 +106,7 @@ class alocatMange(QMainWindow, Widget_Alocat_Mange):
         self.transferManage.slotArmyTransfer()
 
     def slotAlocatSet(self):
-        self.stackedWidget.setCurrentIndex(3)
+        self.stackedWidget.setCurrentIndex(4)
         self.tb_disturbPlan.setDisabled(False)
         self.tb_disturbSchedule.setDisabled(False)
         self.tb_disturbManage.setDisabled(False)
@@ -114,7 +114,7 @@ class alocatMange(QMainWindow, Widget_Alocat_Mange):
         self.tb_retirePlan.setDisabled(False)
 
     def slotSetEquip(self):
-        self.stackedWidget.setCurrentIndex(3)
+        self.stackedWidget.setCurrentIndex(4)
         self.tb_disturbPlan.setDisabled(False)
         self.tb_disturbSchedule.setDisabled(False)
         self.tb_disturbManage.setDisabled(False)
@@ -127,7 +127,7 @@ class alocatMange(QMainWindow, Widget_Alocat_Mange):
             点击退役报废计划按钮
     '''
     def slotRetirePlan(self):
-        self.stackedWidget.setCurrentIndex(4)
+        self.stackedWidget.setCurrentIndex(3)
         self.tb_disturbPlan.setDisabled(False)
         self.tb_disturbSchedule.setDisabled(False)
         self.tb_disturbManage.setDisabled(False)

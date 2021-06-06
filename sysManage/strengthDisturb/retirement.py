@@ -92,7 +92,7 @@ class retirement(QWidget, Widget_Retirement):
                 return
             else:
                 delRetireYearALLYear()
-                self._initSelectYear_()
+                self._initAll_()
                 return
         if currentRow < 0:
             reply = QMessageBox.question(self, '删除', '请选中某年进行删除', QMessageBox.Yes)
@@ -101,7 +101,8 @@ class retirement(QWidget, Widget_Retirement):
             reply = QMessageBox.question(self, '删除', '是否删除当前年份以及当前年份下所有数据？', QMessageBox.Yes, QMessageBox.Cancel)
             if reply == QMessageBox.Yes:
                 delRetireYearByYear(currentYear)
-                self._initSelectYear_()
+                # self._initSelectYear_()
+                self._initAll_()
             else:
                 return
 

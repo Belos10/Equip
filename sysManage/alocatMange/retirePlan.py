@@ -58,7 +58,7 @@ class retirePlan(QWidget, retirePlan_Form):
         # 修改查询依据
         self.pb_firstSelect.clicked.connect(self.slotSelectUnit)
         self.pb_secondSelect.clicked.connect(self.slotSelectEquip)
-        # self.pb_outputToExcel.clicked.connect(self.slotOutputToExcel)
+        self.pb_outputToExcel.clicked.connect(self.slotOutputToExcel)
 
     def slotSelectUnit(self):
         findText = self.le_first.text()
@@ -330,10 +330,10 @@ class retirePlan(QWidget, retirePlan_Form):
 
     # 读取初始退役计划数
     def initRetirePlanNum(self):
-        print("currentYear:", self.currentYear)
+
         self.unitRetirePlanList = selectRetirePlanNumByList(self.currentUnitChilddict,
                                                             self.currentEquipdict, self.currentYear)
-        print("self.unitRetirePlanList", self.unitRetirePlanList)
+        # print("self.unitRetirePlanList", self.unitRetirePlanList)
         # 显示每个单位分配计划数
         num = 0
         for i in range(0, len(self.currentUnitChilddict)):
@@ -383,7 +383,7 @@ class retirePlan(QWidget, retirePlan_Form):
 
     # 若装备含子装备，则该行不可选中
     def ifEquipHaveChild(self):
-        print("self.currentEquipdict", self.currentEquipdict)
+        # print("self.currentEquipdict", self.currentEquipdict)
         for i in self.currentEquipdict:
             if selectEquipIsHaveChild(self.currentEquipdict[i][0]):
                 for j in range(1, self.retirePlanResult.columnCount()):
@@ -454,7 +454,7 @@ class retirePlan(QWidget, retirePlan_Form):
                                                                 {0: self.currentEquipdict[self.currentRow]}, self.currentYear)
                 originStrengthNum = selectStrengthNum(self.currentUnitChilddict[self.currentColumn - 3][0],
                                                       self.currentEquipdict[self.currentRow][0], self.currentYear)
-                print("originRetirePlanNum", originRetirePlanNum, "originStrengthNum", originStrengthNum)
+                # print("originRetirePlanNum", originRetirePlanNum, "originStrengthNum", originStrengthNum)
                 if originStrengthNum[0] != '':
                     updateRetirePlanNum(self.currentEquipdict[self.currentRow][0],
                                         self.currentUnitChilddict[self.currentColumn - 3][0],
@@ -493,3 +493,134 @@ class retirePlan(QWidget, retirePlan_Form):
         for i in range(0, len(self.currentEquipdict)):
             item = self.retirePlanResult.item(i, 1)
             item.setText(str(self.currentEquipdict[i][5]))
+
+
+    '''
+        功能
+            导出数据到Excel
+    '''
+    def slotOutputToExcel(self):
+
+        self.retirePlanList = {}
+        if self.retirePlanResult.rowCount() <= 0:
+            reply = QMessageBox.warning(self, '警告', '未选中任何数据，无法导出', QMessageBox.Yes)
+            return
+        reply = QMessageBox.question(self, '导出Excel', '是否保存修改并导出Excel？', QMessageBox.Cancel, QMessageBox.Yes)
+        if reply == QMessageBox.Cancel:
+            self._initRetirePlanByUnitListAndEquipList()
+            return
+
+        directoryPath = QFileDialog.getExistingDirectory(self, "请选择导出文件夹", "c:/")
+        if len(directoryPath) > 0 and '.' not in directoryPath:
+            import xlwt
+            workBook = xlwt.Workbook(encoding='utf-8')
+            workSheet = workBook.add_sheet('Sheet1')
+
+            headTitleStyle2 = xlwt.XFStyle()  # 初始化样式
+            font = xlwt.Font()  # 为样式创建字体
+            font.name = '宋体'
+            font.bold = True
+            font.height = 20 * 11  # 字体大小，11为字号，20为衡量单位
+            alignment = xlwt.Alignment()  ## Create Alignment
+            alignment.horz = xlwt.Alignment.HORZ_RIGHT
+            alignment.vert = xlwt.Alignment.VERT_CENTER
+            borders = xlwt.Borders()
+            borders.left = 1  # 设置为细实线
+            borders.right = 1
+            borders.top = 1
+            borders.bottom = 1
+            headTitleStyle2.font = font  # 设定样式
+            headTitleStyle2.alignment = alignment
+            headTitleStyle2.borders = borders
+
+            headTitleStyle = xlwt.XFStyle()  # 初始化样式
+            font = xlwt.Font()  # 为样式创建字体
+            font.name = '宋体'
+            font.bold = True
+            font.height = 20 * 20  # 字体大小，11为字号，20为衡量单位
+            alignment = xlwt.Alignment()  ## Create Alignment
+            alignment.horz = xlwt.Alignment.HORZ_CENTER
+            alignment.vert = xlwt.Alignment.VERT_CENTER
+            borders = xlwt.Borders()
+            borders.left = 3  # 设置为细实线
+            borders.right = 3
+            borders.top = 3
+            borders.bottom = 3
+            headTitleStyle.font = font  # 设定样式
+            headTitleStyle.alignment = alignment
+            headTitleStyle.borders = borders
+
+            titileStyle = xlwt.XFStyle()  # 初始化样式
+            font = xlwt.Font()  # 为样式创建字体
+            font.name = '宋体'
+            font.bold = True
+            font.height = 20 * 11  # 字体大小，11为字号，20为衡量单位
+            alignment = xlwt.Alignment()  ## Create Alignment
+            alignment.horz = xlwt.Alignment.HORZ_CENTER
+            alignment.vert = xlwt.Alignment.VERT_CENTER
+            borders = xlwt.Borders()
+            borders.left = 2  # 设置为细实线
+            borders.right = 2
+            borders.top = 2
+            borders.bottom = 2
+            titileStyle.font = font  # 设定样式
+            titileStyle.alignment = alignment
+            titileStyle.borders = borders
+            contentStyle = xlwt.XFStyle()  # 初始化样式
+            font = xlwt.Font()  # 为样式创建字体
+            font.name = '宋体'
+            font.height = 20 * 11  # 字体大小，11为字号，20为衡量单位
+            alignment = xlwt.Alignment()  ## Create Alignment
+            alignment.horz = xlwt.Alignment.HORZ_CENTER
+            alignment.vert = xlwt.Alignment.VERT_CENTER
+            borders = xlwt.Borders()
+            borders.left = 1  # 设置为细实线
+            borders.right = 1
+            borders.top = 1
+            borders.bottom = 1
+            contentStyle.font = font  # 设定样式
+            contentStyle.alignment = alignment
+            contentStyle.borders = borders
+
+            #画表头
+            if self.unitFlag == 1:
+                headerlist = ['装备名称及规格型号', '单位', '退役报废合计数']
+                if len(self.currentUnitChilddict):
+                    for i in self.currentUnitChilddict.values():
+                        headerlist.append(i[1])
+                headerlist.append('备注')
+            elif self.unitFlag == 2:
+                headerlist = ['装备名称及规格型号', '单位', '退役报废合计数']
+                if len(self.currentUnitChilddict):
+                    for i in self.currentUnitChilddict.values():
+                        headerlist.append(i[1])
+                headerlist.append('备注')
+
+            for i in range(len(headerlist)):
+                workSheet.col(i).width = 5500
+            workSheet.write_merge(0, 0, 0, len(headerlist) - 1, "%s年退役报废计划" % str(self.currentYear), headTitleStyle)
+            for i in range(len(headerlist)):
+                workSheet.write(1, i, headerlist[i], titileStyle)
+            #填表数据
+            for i in range(self.retirePlanResult.rowCount()):
+                columnList = []
+                for j in range(self.retirePlanResult.columnCount()):
+                    columnList.append(self.retirePlanResult.item(i, j).text())
+                self.retirePlanList[i] = columnList
+            for key in self.retirePlanList.keys():
+                for index in range(len(headerlist)):
+                    rowData = self.retirePlanList.get(key)
+                    workSheet.write(2 + key, index, rowData[index], contentStyle)
+
+            try:
+                pathName = "%s/%s年退役报废计划.xls" % (directoryPath, str(self.currentYear))
+                workBook.save(pathName)
+                import win32api
+                win32api.ShellExecute(0, 'open', pathName, '', '', 1)
+                QMessageBox.about(self, "导出成功", "导出成功！")
+                return
+            except Exception as e:
+                QMessageBox.about(self, "导出失败", "导出表格被占用，请关闭正在使用的Execl！")
+                return
+        else:
+            QMessageBox.about(self, "选取文件夹失败！", "请选择正确的文件夹！")

@@ -258,6 +258,8 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
 
     #当某个单击按钮被选中时
     def slotClickedRB(self):
+        if len(self.unitList) < 1 or len(self.equipList) < 1:
+            return
         self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
 
     #初始化tableWidget

@@ -179,10 +179,10 @@ def updateOneEquipmentBalanceData(year,equipmentId,unitId):
     item['equipmentBalanceKey'] = str(year) + item['Equip_ID'] + item['Unit_ID']
     item['year'] = str(year)
     # 原有数（originalValue） =  原有实力数    strength（Strength）
-    sql = "select Equip_ID,Unit_ID,Work from strength where year=%s and Equip_ID =%s and Unit_ID=%s " % (str(int(year)), equipmentId,unitId)
+    sql = "select Equip_ID,Unit_ID,Strength from strength where year=%s and Equip_ID =%s and Unit_ID=%s " % (str(int(year)), equipmentId,unitId)
     workEquipment = selectOne(sql)
     if workEquipment is not None:
-        originalValue = int(workEquipment.get('Work', 0))
+        originalValue = int(workEquipment.get('Strength', 0))
         item['originalValue'] = originalValue
 
     # 原有编制数(OrignalAuthorizedValue) = 上一年编制数维护中对应编制数(Work)
