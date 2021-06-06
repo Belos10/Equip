@@ -21,7 +21,7 @@ class DisturbPlan(QWidget, yearList_Form):
         self.setupUi(self)
         self.first_treeWidget_dict = {}
         self.second_treeWidget_dict = {}
-        self.currentUnitDisturbPlanNum = {}
+        #self.currentUnitDisturbPlanNum = {}
         self.unitDisturbPlanList = {}
         self.unitFlag = 0
         self.initAll()
@@ -473,6 +473,17 @@ class DisturbPlan(QWidget, yearList_Form):
                         sum = sum + int(num)
             if sum != 0:
                 self.disturbResult.item(row, 4).setText(str(sum))
+        for i in range(0, len(self.currentUnitChilddict)):
+            for row in reversed(range(len(self.currentEquipdict))):
+                sum = 0
+                for childRow in reversed(range(len(self.currentEquipdict))):
+                    # 第0个字段是EquipID,第二个字段是Equip_Uper
+                    if self.currentEquipdict[row][0] == self.currentEquipdict[childRow][2]:
+                        num = self.disturbResult.item(childRow, 5 + i).text()
+                        if num != '':
+                            sum = sum + int(num)
+                if sum != 0:
+                    self.disturbResult.item(row, 5 + i).setText(str(sum))
 
 
 
@@ -660,7 +671,7 @@ class DisturbPlan(QWidget, yearList_Form):
         elif self.unitFlag == 2:
             # j = self.currentEquipdict[0][2]
             # unitRocketOther = selectRocketOther(self.currentEquipdict, self.currentYear,j)
-            # # 火箭军调拨单分配数
+            #
             # for unitID, unitItem in self.first_treeWidget_dict.items():
             #     if unitItem == self.tw_first.currentItem():
             #         #if selectUnitIfUppermost(unitID):
@@ -680,6 +691,7 @@ class DisturbPlan(QWidget, yearList_Form):
             #                         totalNum = int(childNum) + int(num)
             #                         self.disturbResult.item(row, 2).setText(str(totalNum))
             #         else:
+            # 火箭军调拨单分配数
             for unitID, unitItem in self.first_treeWidget_dict.items():
                 if unitItem == self.tw_first.currentItem():
                     for i in self.currentEquipdict:

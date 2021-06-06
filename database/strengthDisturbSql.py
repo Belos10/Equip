@@ -549,12 +549,12 @@ def addDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type, E
 
 
 
-# 单位表disturbplanunit中修改一条数据
-def updateDataIntoDisturbPlanUnit(Unit_ID, Unit_Name, Unit_Uper):
-    sql = "Update disturbplanunit set Unit_Name = '" + Unit_Name + "' where Unit_ID = '" + Unit_ID + "'"
-    # print(sql)
-    cur.execute(sql)
-    conn.commit()
+# # 单位表disturbplanunit中修改一条数据
+# def updateDataIntoDisturbPlanUnit(Unit_ID, Unit_Name, Unit_Uper):
+#     sql = "Update disturbplanunit set Unit_Name = '" + Unit_Name + "', Unit_Uper = '" + Unit_Uper + "', Unit_Alias = '" + Unit_Alias + "' where Unit_ID = '" + Unit_ID + "'"
+#     # print(sql)
+#     cur.execute(sql)
+#     conn.commit()
 
 
 #单位表unit中修改一条数据
@@ -593,7 +593,15 @@ def updateDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper, Unit_Alias):
         conn.rollback()
         return e
 
-    sql = "Update disturbplanunit set Unit_Name = '" + Unit_Name + "' where Unit_ID = '" + Unit_ID + "'"
+    sql = "Update disturbplanunit set Unit_Name = '" + Unit_Name + "', Unit_Uper = '" + Unit_Uper + "', Unit_Alias = '" + Unit_Alias + "' where Unit_ID = '" + Unit_ID + "'"
+    # print(sql)
+    try:
+        cur.execute(sql)
+    except Exception as e:
+        conn.rollback()
+        return e
+
+    sql = "Update retireplan set Unit_Name = '" + Unit_Name + "' where Unit_ID = '" + Unit_ID + "'"
     # print(sql)
     try:
         cur.execute(sql)
@@ -677,6 +685,23 @@ def updateDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type
     except Exception as e:
         conn.rollback()
         return e
+
+    sql = "Update retireplan set Equip_Name = '" + Equip_Name + "' where Equip_ID = '" + Equip_ID + "'"
+    # print(sql)
+    try:
+        cur.execute(sql)
+    except Exception as e:
+        conn.rollback()
+        return e
+
+    sql = "Update retireplannote set Equip_Name = '" + Equip_Name + "' where Equip_ID = '" + Equip_ID + "'"
+    # print(sql)
+    try:
+        cur.execute(sql)
+    except Exception as e:
+        conn.rollback()
+        return e
+
     try:
         conn.commit()
         return True
@@ -813,7 +838,7 @@ def delDataInUnit(Unit_ID):
         for year in yearInfoList:
             for equip in endEquipList:
                 inputInfoTuple = selectInputInfoByEquipUnit(UnitID, equip[0], year[1])
-                print("==================eeee", inputInfoTuple)
+                #print("==================eeee", inputInfoTuple)
                 for inputInfo in inputInfoTuple:
                     delSuccess = delFromInputInfo(UnitID, equip[0], inputInfo[2], inputInfo[3], inputInfo[4], inputInfo[10])
                     if delSuccess != True:
@@ -935,6 +960,14 @@ def delDataInUnit(Unit_ID):
             return False
 
         sql = "Delete from retire where Unit_ID = '" + UnitID[0] + "'"
+        try:
+            cur.execute(sql)
+        except Exception as e:
+            conn.rollback()
+            return False
+
+        sql = "Delete from retireplan where Unit_ID = '" + UnitID[0] + "'"
+        # print(sql)
         try:
             cur.execute(sql)
         except Exception as e:
@@ -1080,6 +1113,14 @@ def delDataInEquip(Equip_ID):
             conn.rollback()
             return e
 
+        sql = "Delete from retireplan where Equip_ID = '" + EquipID[0] + "'"
+        # print(sql)
+        try:
+            cur.execute(sql)
+        except Exception as e:
+            conn.rollback()
+            return e
+
         sql = "Delete from allotschedule where Equip_ID = '" + EquipID[0] + "'"
         # print(sql)
         try:
@@ -1121,9 +1162,9 @@ def delDataInEquip(Equip_ID):
 
 def selectIfExistsStrengthYear(year):
     allYear = selectAllDataAboutStrengthYear()
-    print("allYear",allYear)
+    #print("allYear",allYear)
     for i in allYear:
-        if i[1] == year:
+        if i[1] == str(year):
             return True
     return False
 
@@ -1917,12 +1958,6 @@ def delFromInputInfo(Unit_ID, Equip_ID, ID, num, year, inputYear):
         return e
 
 
-def selectDataFromInputByYear(year):
-    sql = "select * from inputinfo where year = '" + str(year) +"'"
-    cur.execute(sql)
-    result = cur.fetchall()
-    return result
-
 # # 修改批量录入某条数据的数量
 # def updateNumMutilInput(Unit_ID, Equip_ID, ID, num, orginNum, year, strengthYear):
 #     EquipIDList = []
@@ -2232,7 +2267,7 @@ def updateWeaveNum(Unit_ID, Equip_ID, weaveNum, orginWeave, year):
                           "NonStrength, Single, Arrive, year) VALUES" \
                           + "('" + EquipID + "','" + UnitID + "','" + equipName + "','" + unitName + "', 0," \
                                                                                                      " 0, 0,0,0, 0, 0, 0, 0, 0, 0," + "'" + \
-                          year + "', '" + "" + "')"
+                          year +  "')"
                     try:
                         cur.execute(sql)
                     except Exception as e:

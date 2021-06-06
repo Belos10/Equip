@@ -357,25 +357,25 @@ def selectDisturbPlanOther(EquipList, YearList):
     # disconnectMySql(conn, cur)
     return resultList
 
-# 读取火箭军计划数
-def selectRocketOther(EquipList, YearList,UnitID):
-    # conn, cur = connectMySql()
-    resultList = []
-    for Equip_ID in EquipList.values():
-        sql = "select Equip_Num from rockettransfer where Equip_Id = '" + Equip_ID[0] + "' and year = '" + YearList \
-              + "' and "
-        cur.execute(sql)
-        result = cur.fetchall()
-        #print("火箭军 result",result)
-        if result:
-            resultList.append(result)
-        else:
-            resultList.append([])
-        # for resultInfo in result:
-        #     resultList.append(resultInfo)
-    print("火箭军调拨resultList", resultList)
-    # disconnectMySql(conn, cur)
-    return resultList
+# # 读取火箭军计划数
+# def selectRocketOther(EquipList, YearList,UnitID):
+#     # conn, cur = connectMySql()
+#     resultList = []
+#     for Equip_ID in EquipList.values():
+#         sql = "select Equip_Num from rockettransfer where Equip_Id = '" + Equip_ID[0] + "' and year = '" + YearList \
+#               + "' and "
+#         cur.execute(sql)
+#         result = cur.fetchall()
+#         #print("火箭军 result",result)
+#         if result:
+#             resultList.append(result)
+#         else:
+#             resultList.append([])
+#         # for resultInfo in result:
+#         #     resultList.append(resultInfo)
+#     print("火箭军调拨resultList", resultList)
+#     # disconnectMySql(conn, cur)
+#     return resultList
 
 # 更新自定义分配数  机关
 def updateDisturbPlanInputNumUpmost(Equip_Id,Year,InputNum):
@@ -552,7 +552,8 @@ def selectYearListAboutRetirePlan():
 def insertIntoRetirePlanYear(year):
     #conn, cur = connectMySql()
     EquipList=selectAllDataAboutEquip()
-    UnitList=selectAllDataAboutUnit()
+    UnitList=[]
+    selectAllDataAboutUnit(UnitList)
     result = selectYearListAboutRetirePlan()
     sql = "insert into retireplanyear (num, year,proof) VALUES" \
           + "('" + str(len(result) + 1) + "', '" + str(year) + "','')"
@@ -598,14 +599,22 @@ def selectRetirePlanUnitInfoByUnitID(Unit_ID):
         return info
 
 # 更新分配计划数
-def updateRetirePlanNum(Equip_Id,Unit_Id,Year,RetireNum):
+def updateRetirePlanNum(Equip_Id,Unit_Id,Year,RetireNum,originNum,originalRetirePlanNum):
     #conn,cur=connectMySql()
-    sql="update retireplan set RetireNum='"+ RetireNum + "'where Equip_Id='" + Equip_Id + "'and Unit_Id ='" \
-        + Unit_Id + "' and Year = '" + Year + "'"
+    sql = "update retireplan set RetireNum='" + str(RetireNum) + "'where Equip_Id='" + Equip_Id + "'and Unit_Id ='" \
+          + Unit_Id + "' and Year = '" + Year + "'"
     #print("===========", sql)
+    cur.execute(sql)
+    #print("a[0][0]",a[0][0],"originNum",originNum)
+    if originalRetirePlanNum == '':
+        originalRetirePlanNum = 0
+    num = int(originNum[0]) - int(RetireNum) + int(originalRetirePlanNum)
+    sql="update strength set Strength= '%s' where Equip_ID = '%s' and Unit_ID = '%s' and year = '%s'"%(num,Equip_Id,Unit_Id,Year)
     cur.execute(sql)
     conn.commit()
     #disconnectMySql(conn,cur)
+
+
 
 # 更新分配计划备注
 def updateRetirePlanNote(Equip_Id,Year,Note):

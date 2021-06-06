@@ -25,8 +25,8 @@ class retirePlan(QWidget, retirePlan_Form):
     def initAll(self):
         self.first_treeWidget_dict = {}
         self.second_treeWidget_dict = {}
-        self.currentUnitDisturbPlanNum = {}
-        self.unitDisturbPlanList = {}
+        #self.currentUnitDisturbPlanNum = {}
+        self.unitRetirePlanList = {}
         self.tw_first.header().setVisible(False)
         self.tw_second.header().setVisible(False)
         self.le_first.setDisabled(1)
@@ -341,7 +341,7 @@ class retirePlan(QWidget, retirePlan_Form):
         print("currentYear:", self.currentYear)
         self.unitRetirePlanList = selectRetirePlanNum(self.currentUnitChilddict,
                                                         self.currentEquipdict, self.currentYear)
-        print("self.unitDisturbPlanList", self.unitRetirePlanList)
+        print("self.unitRetirePlanList", self.unitRetirePlanList)
         # 显示每个单位分配计划数
         num = 0
         for i in range(0,len(self.currentUnitChilddict)):
@@ -352,6 +352,8 @@ class retirePlan(QWidget, retirePlan_Form):
                 item.setFlags(Qt.ItemIsEnabled|Qt.ItemIsSelectable|Qt.ItemIsEditable)
                 num = num + 1
         self.initRetirePlanSum()
+
+
 
     # 初始化此次分配数
     def initRetirePlanSum(self):
@@ -379,21 +381,18 @@ class retirePlan(QWidget, retirePlan_Form):
             if sum != 0:
                 self.retirePlanResult.item(row, 2).setText(str(sum))
 
+        for i in range(0, len(self.currentUnitChilddict)):
+            for row in reversed(range(len(self.currentEquipdict))):
+                sum = 0
+                for childRow in reversed(range(len(self.currentEquipdict))):
+                    # 第0个字段是EquipID,第二个字段是Equip_Uper
+                    if self.currentEquipdict[row][0] == self.currentEquipdict[childRow][2]:
+                        num = self.retirePlanResult.item(childRow, 3 + i).text()
+                        if num != '':
+                            sum = sum + int(num)
+                if sum != 0:
+                    self.retirePlanResult.item(row, 3 + i).setText(str(sum))
 
-    # # 初始化此次分配数
-    # def initRetirePlanSum(self):
-    #     # 显示此次分配计划数
-    #     sum = 0
-    #     for i in self.currentEquipdict:
-    #         if not selectEquipIsHaveChild(self.currentEquipdict[i][0]):
-    #             for j in range(0, len(self.currentUnitChilddict)):
-    #                 num = self.retirePlanResult.item(i, 4 + j).text()
-    #                 if num == '-1' or num == '':
-    #                     sum = sum + 0
-    #                 else:
-    #                     sum = sum + int(num)
-    #             self.retirePlanResult.item(i,2).setText(str(sum))
-    #         sum = 0
 
     # 若装备含子装备，则该行不可选中
     def ifEquipHaveChild(self):
@@ -460,10 +459,28 @@ class retirePlan(QWidget, retirePlan_Form):
         self.currentRow = self.retirePlanResult.currentRow()
         self.currentColumn = self.retirePlanResult.currentColumn()
         if 3 <= self.currentColumn <= self.lenHeaderList-2:
-            updateRetirePlanNum(self.currentEquipdict[self.currentRow][0],self.currentUnitChilddict[self.currentColumn-3][0],
-                                 self.currentYear,self.retirePlanResult.item(self.currentRow,self.currentColumn).text())
-            updateOneEquipmentBalanceData(self.currentYear,self.currentEquipdict[self.currentRow][0],self.currentUnitChilddict[self.currentColumn-3][0])
-            self.initRetirePlanSum()
+            try:
+                if self.retirePlanResult.item(self.currentRow, self.currentColumn).text() == '':
+                    num = 0
+                else:
+                    num = self.retirePlanResult.item(self.currentRow, self.currentColumn).text()
+                self.initRetirePlanSum()
+                originRetirePlanNum = selectRetirePlanNum({0: self.currentUnitChilddict[self.currentColumn - 3]},
+                                                            {0: self.currentEquipdict[self.currentRow]}, self.currentYear)
+                originStrengthNum = selectStrengthNum(self.currentUnitChilddict[self.currentColumn - 3][0],
+                                                      self.currentEquipdict[self.currentRow][0], self.currentYear)
+                print("originRetirePlanNum", originRetirePlanNum, "originStrengthNum", originStrengthNum)
+                if originStrengthNum[0] != '':
+                    updateRetirePlanNum(self.currentEquipdict[self.currentRow][0],
+                                         self.currentUnitChilddict[self.currentColumn - 3][0],
+                                         self.currentYear, num, originStrengthNum[0], originRetirePlanNum[0])
+                    updateOneEquipmentBalanceData(self.currentYear, self.currentEquipdict[self.currentRow][0],
+                                                  self.currentUnitChilddict[self.currentColumn - 3][0])
+                else:
+                    QMessageBox.information(self, "提示", "未填写实力数", QMessageBox.Yes)
+            except ValueError:
+                QMessageBox.information(self, "提示", "请输入数字", QMessageBox.Yes)
+                self.retirePlanResult.item(self.currentRow, self.currentColumn).setText("")
         if self.currentColumn == self.lenHeaderList-1:
             updateRetirePlanNote(self.currentEquipdict[self.currentRow][0],self.currentYear,self.retirePlanResult.item(self.currentRow,self.currentColumn).text())
 
