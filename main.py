@@ -5,6 +5,8 @@ from sysManage.MainWindowManage import Manage_Widgets
 from PyQt5 import sip
 from sysManage.login.login import login
 from icons.readQss import readQss
+from utills.CommomHelper import CommonHelper
+
 '''
     显示主界面
 '''
@@ -31,8 +33,9 @@ class mainManage(QObject):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     widget = Manage_Widgets()
-    #qss = readQss()
-    #widget.setStyleSheet(qss)
+    styleFile = './icons/ElegantDark.qss'
+    qssStyle = CommonHelper.readQss(styleFile)
+    widget.setStyleSheet(qssStyle)
     sys.exit(app.exec_())
 
 
