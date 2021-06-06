@@ -130,21 +130,6 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
 
 
     def _initUnitTreeWidget(self, stack,root):
-        # if root == '':
-        #     result = selectDisturbPlanUnitInfoByDeptUper('')
-        # else:
-        #     result = selectDisturbPlanUnitInfoByDeptUper(root)
-        #
-        # # rowData: (单位编号，单位名称，上级单位编号)
-        # for rowData in result:
-        #     item = QTreeWidgetItem(mother)
-        #     item.setText(0, rowData[1])
-        #     #item.setCheckState(0, Qt.Unchecked)
-        #     self.first_treeWidget_dict[rowData[0]] = item
-        #     if rowData[0] != '':
-        #         self._initUnitTreeWidget(rowData[0], item)
-        #     else:
-        #         return
         while stack:
             UnitInfo = stack.pop(0)
             item = QTreeWidgetItem(root.pop(0))
@@ -160,20 +145,6 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
 
 
     def _initEquipTreeWidget(self, stack,root):
-        # if root == '':
-        #     result = selectEquipInfoByEquipUper('')
-        # else:
-        #     result = selectEquipInfoByEquipUper(root)
-        # # rowData: (装备编号，装备名称，上级装备编号, 录入类型, 装备类型)
-        # for rowData in result:
-        #     item = QTreeWidgetItem(mother)
-        #     item.setText(0, rowData[1])
-        #     item.setCheckState(0, Qt.Unchecked)
-        #     self.second_treeWidget_dict[rowData[0]] = item
-        #     if rowData[0] != '':
-        #         self._initEquipTreeWidget(rowData[0], item)
-        #     else:
-        #         return
         while stack:
             EquipInfo = stack.pop(0)
             item = QTreeWidgetItem(root.pop(0))
@@ -196,6 +167,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         self.currentUnitChilddict = {}
         self.unitFlag = 0
         self.disturbResult.clear()
+        self.cb_schedule.setCurrentIndex(0)
         # 获取子单位名
         j = 0
         for unitID, unitItem in self.first_treeWidget_dict.items():
@@ -410,8 +382,8 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
     # 读取初始分配计划数
     def initDisturbPlanNum(self):
         #print("currentYear:", self.currentYear)
-        self.unitDisturbPlanList = selectDisturbPlanNum(self.currentUnitChilddict,
-                                                        self.currentEquipdict, self.currentYear)
+        self.unitDisturbPlanList = selectDisturbPlanNumByList(self.currentUnitChilddict,
+                                                              self.currentEquipdict, self.currentYear)
         print("self.unitDisturbPlanList", self.unitDisturbPlanList)
         # 显示每个单位分配计划数
         num = 0
@@ -432,7 +404,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
             if not selectEquipIsHaveChild(self.currentEquipdict[i][0]):
                 for j in range(0, len(self.currentUnitChilddict)):
                     num = self.disturbResult.item(i, 5 + j).text()
-                    if num == '-1' or num == '':
+                    if num == '':
                         sum = sum + 0
                     else:
                         sum = sum + int(num)
@@ -448,7 +420,18 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                         sum = sum + int(num)
             if sum != 0:
                 self.disturbResult.item(row, 4).setText(str(sum))
-
+        # 每个单位的上层装备合计数
+        for i in range(0, len(self.currentUnitChilddict)):
+            for row in reversed(range(len(self.currentEquipdict))):
+                sum = 0
+                for childRow in reversed(range(len(self.currentEquipdict))):
+                    # 第0个字段是EquipID,第二个字段是Equip_Uper
+                    if self.currentEquipdict[row][0] == self.currentEquipdict[childRow][2]:
+                        num = self.disturbResult.item(childRow, 5 + i).text()
+                        if num != '':
+                            sum = sum + int(num)
+                if sum != 0:
+                    self.disturbResult.item(row, 5 + i).setText(str(sum))
 
     '''
         功能：
@@ -519,15 +502,11 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
 
     # 初始化机关单位数与装备单位
     def initDisturbPlanOther(self):
-        self.unitDisturbPlanOtherList = selectDisturbPlanOther(self.currentEquipdict, self.currentYear)
-        #unitRocketOther = selectRocketOther(self.currentEquipdict, self.currentYear)
+        unitDisturbPlanOtherList = selectDisturbPlanOther(self.currentEquipdict, self.currentYear)
         # 装备单位
         for i in range(0, len(self.currentEquipdict)):
             item = self.disturbResult.item(i, 1)
-            if self.unitDisturbPlanOtherList[i]:
-                item.setText(str(self.unitDisturbPlanOtherList[i][0][0]))
-            else:
-                item.setText("")
+            item.setText(str(self.currentEquipdict[i][5]))
         if self.unitFlag == 1:
             # 陆军调拨单开具数
             for unitID, unitItem in self.first_treeWidget_dict.items():
@@ -535,59 +514,32 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                     # if selectUnitIfUppermost(unitID):
                     for i in range(0, len(self.currentEquipdict)):
                         item = self.disturbResult.item(i, 2)
-                        if self.unitDisturbPlanOtherList[i]:
-                            item.setText(str(self.unitDisturbPlanOtherList[i][0][1]))
+                        if unitDisturbPlanOtherList[i]:
+                            item.setText(str(unitDisturbPlanOtherList[i][0][1]))
                         else:
-                            item.setText("0")
-                    for childRow, equipInfo in self.currentEquipdict.items():
-                        uperInfoList = selectUperInfoByEquipID(equipInfo[0])
-                        childNum = self.disturbResult.item(childRow, 2).text()
-                        for uperInfo in uperInfoList:
-                            for row, uperInfoRow in self.currentEquipdict.items():
-                                if uperInfo[0] == uperInfoRow[0]:
-                                    num = self.disturbResult.item(row, 2).text()
-                                    totalNum = int(childNum) + int(num)
-                                    self.disturbResult.item(row, 2).setText(str(totalNum))
-                    # else:
-                    #     for i in self.currentEquipdict:
-                    #         item = self.disturbResult.item(i, 2)
-                    #         result = selectDisturbPlanNum({0: [unitID]}, self.currentEquipdict, self.currentYear)
-                    #         if result:
-                    #             item.setText(str(result[i]))
-                    #         else:
-                    #             item.setText("0")
+                            item.setText("")
+
+                    for row in reversed(range(len(self.currentEquipdict))):
+                        sum = 0
+                        for childRow in reversed(range(len(self.currentEquipdict))):
+                            # 第0个字段是EquipID,第二个字段是Equip_Uper
+                            if self.currentEquipdict[row][0] == self.currentEquipdict[childRow][2]:
+                                num = self.disturbResult.item(childRow, 2).text()
+                                if num != '':
+                                    sum = sum + int(num)
+                        if sum != 0:
+                            self.disturbResult.item(row, 2).setText(str(sum))
         elif self.unitFlag == 2:
-            # j = self.currentEquipdict[0][2]
-            # unitRocketOther = selectRocketOther(self.currentEquipdict, self.currentYear,j)
-            # # 火箭军调拨单分配数
-            # for unitID, unitItem in self.first_treeWidget_dict.items():
-            #     if unitItem == self.tw_first.currentItem():
-            #         #if selectUnitIfUppermost(unitID):
-            #         for i in range(0, len(self.currentEquipdict)):
-            #             item = self.disturbResult.item(i, 2)
-            #             if unitRocketOther[i]:
-            #                 item.setText(str(unitRocketOther[i][0][j]))
-            #             else:
-            #                 item.setText("0")
-            #         for childRow, equipInfo in self.currentEquipdict.items():
-            #             uperInfoList = selectUperInfoByEquipID(equipInfo[0])
-            #             childNum = self.disturbResult.item(childRow, 2).text()
-            #             for uperInfo in uperInfoList:
-            #                 for row, uperInfoRow in self.currentEquipdict.items():
-            #                     if uperInfo[0] == uperInfoRow[0]:
-            #                         num = self.disturbResult.item(row, 2).text()
-            #                         totalNum = int(childNum) + int(num)
-            #                         self.disturbResult.item(row, 2).setText(str(totalNum))
-            #         else:
+            # 火箭军调拨单分配数
             for unitID, unitItem in self.first_treeWidget_dict.items():
                 if unitItem == self.tw_first.currentItem():
                     for i in self.currentEquipdict:
                         item = self.disturbResult.item(i, 2)
-                        result = selectDisturbPlanNum({0: [unitID]}, self.currentEquipdict, self.currentYear)
+                        result = selectDisturbPlanNumByList({0: [unitID]}, self.currentEquipdict, self.currentYear)
                         if result:
                             item.setText(str(result[i]))
                         else:
-                            item.setText("0")
+                            item.setText("")
 
                     for row in reversed(range(len(self.currentEquipdict))):
                         sum = 0

@@ -2323,7 +2323,7 @@ def findBigOtherYear(year):
         yearList.append(info[0])
     return yearList
 
-# 根据单位号，装备号修改某年的实力数，strengthNum为修改后的实力数，orginStrengthNum为原来的实力数
+# 根据单位号，装备号修改某年的实力数
 def updateStrengthAboutStrengrh(Unit_ID, Equip_ID, year, strengthNum, orginStrengthNum):
     EquipIDList = []
     UnitIDList = []
@@ -2338,7 +2338,7 @@ def updateStrengthAboutStrengrh(Unit_ID, Equip_ID, year, strengthNum, orginStren
             unitName = selectUnitNameByUnitID(UnitID)
             strengthYearInfo = seletNumAboutStrength(UnitID, EquipID, year)
             if strengthYearInfo:
-                orginYearStrengthNum  = strengthYearInfo[0][4]
+                orginYearStrengthNum = strengthYearInfo[0][4]
             else:
                 orginYearStrengthNum = 0
                 sql = "INSERT INTO strength (Equip_ID, Unit_ID, Equip_Name, Unit_Name, Strength, Work, Now, Error, Retire, Delay, Pre, NonObject," \

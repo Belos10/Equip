@@ -252,6 +252,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                                 #     return
 
     def slotUpdateStrength(self):
+        self.inputStrength.le_inputText.setText('')
         self.inputStrength.show()
 
 
