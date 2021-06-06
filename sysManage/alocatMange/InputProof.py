@@ -1,6 +1,7 @@
 from widgets.alocatMange.inputProof import widget_inputProof
 from PyQt5.QtWidgets import QWidget,QDialog
 from PyQt5 import QtCore
+from PyQt5.Qt import Qt
 from PyQt5.QtWidgets import QMessageBox,QPushButton
 from database.alocatMangeSql import updateDisturbPlanProof
 
@@ -12,6 +13,7 @@ class InputProof(QDialog,widget_inputProof):
         self.setupUi(self)
         self.currentYear = ''
         self.setWindowTitle("设置调拨依据")
+        self.setWindowFlags(Qt.WindowTitleHint | Qt.CustomizeWindowHint | Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint|Qt.Dialog)
         self.signalConnect()
 
 

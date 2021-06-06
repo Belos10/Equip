@@ -57,10 +57,11 @@ class factorySet(QWidget, Widget_Factory_Set):
         self.tw_result.clicked.connect(self.slotClickedTableWidget)
         self.pb_add.clicked.connect(self.slotAddFactoryInfo)
         self.pb_update.clicked.connect(self.slotUpdateFactoryInfo)
-        #self.pb_del.clicked.connect(self.slotDelFactoryInfo)
+        self.pb_del.clicked.connect(self.slotDelFactoryInfo)
         #self.pb_input.clicked.connect(self.slotInputFactoryInfo)
         #self.pb_output.clicked.connect(self.slotOutputFactoryInfo)
 
+    # 新增厂家
     def slotAddFactoryInfo(self):
         if haveFactoryID(self.le_id.text()) == True:
             QMessageBox.information(self,"新增", "新增失败，该厂家编号已存在", QMessageBox.Yes)
@@ -89,6 +90,7 @@ class factorySet(QWidget, Widget_Factory_Set):
                 QMessageBox.information(self, "新增", str(addSuccess) + ",新增失败", QMessageBox.Yes)
                 return
 
+    # 修改厂家
     def slotUpdateFactoryInfo(self):
         if self.tw_result.currentRow() < 0:
             return
@@ -117,6 +119,22 @@ class factorySet(QWidget, Widget_Factory_Set):
             else:
                 QMessageBox.information(self, "修改", str(addSuccess) + ",修改失败", QMessageBox.Yes)
                 return
+    # 删除厂家
+    def slotDelFactoryInfo(self):
+        if self.tw_result.currentRow() < 0:
+            return
+        else:
+            #row = self.tw_result.currentRow()
+            ID = self.le_id.text()
+            addSuccess = delInfoFromFactory(ID)
+            if addSuccess == True:
+                QMessageBox.information(self, "删除", "删除成功", QMessageBox.Yes)
+                self.initTableWidget()
+                return
+            else:
+                QMessageBox.information(self, "删除", str(addSuccess) + ",删除失败", QMessageBox.Yes)
+                return
+
     def slotClickedTableWidget(self):
         row = self.tw_result.currentRow()
         if row < 0:

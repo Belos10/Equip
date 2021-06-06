@@ -34,14 +34,14 @@ def updateInfoIntoFactory(ID, name, address, connect, tel1, represent, tel2):
     except Exception as e:
         return e
 
-    sql = "update factory set Send_Connect = '" + connect + "', Send_Tel = '" \
-          + tel1 + "' where Send_UnitName = '" + name + "'"
-    try:
-        cur.execute(sql)
-        conn.commit()
-        return True
-    except Exception as e:
-        return e
+    # sql = "update factory set Send_Connect = '" + connect + "', Send_Tel = '" \
+    #       + tel1 + "' where Send_UnitName = '" + name + "'"
+    # try:
+    #     cur.execute(sql)
+    #     conn.commit()
+    #     return True
+    # except Exception as e:
+    #     return e
 
 def addInfoIntoFactory(ID, name, address, connect, tel1, represent, tel2):
     sql = "insert into factory(ID, name, address, connect, tel1, represent, tel2) values('" + ID + "', '" + name \
@@ -52,6 +52,16 @@ def addInfoIntoFactory(ID, name, address, connect, tel1, represent, tel2):
         return True
     except Exception as e:
         return e
+
+def delInfoFromFactory(ID):
+    sql = "delete from factory where ID = '" + ID + "'"
+    try:
+        cur.execute(sql)
+        conn.commit()
+        return True
+    except Exception as e:
+        return e
+
 
 def selectAllNameAboutFactory():
     sql = "select name from factory"
