@@ -22,11 +22,9 @@ class DisturbPlan(QWidget, yearList_Form):
         self.setupUi(self)
         self.first_treeWidget_dict = {}
         self.second_treeWidget_dict = {}
-        # self.currentUnitDisturbPlanNum = {}
         self.unitDisturbPlanList = {}
         self.unitFlag = 0
         self.initAll()
-        # initDisturbPlanDatabase()
         self.inputProof = InputProof()
         self.signalConnect()
 

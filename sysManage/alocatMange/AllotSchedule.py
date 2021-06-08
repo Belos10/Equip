@@ -45,6 +45,8 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         self.cb_schedule.setDisabled(1)
         self.tb_proof.clear()
         self.disturbResult.clear()
+        self.disturbResult.setRowCount(0)
+        self.disturbResult.setColumnCount(0)
         self._initYearWidget_()
 
 
@@ -156,6 +158,20 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                 stack.append(resultInfo)
                 root.append(item)
 
+    def initcbschedule(self):
+        self.cb_schedule.clear()
+        if self.unitFlag == 1:
+            self.cb_schedule.addItem("全部",0)
+            self.cb_schedule.addItem("完成进度1",1)
+            self.cb_schedule.addItem("完成进度2", 2)
+            self.cb_schedule.addItem("完成进度3", 3)
+            self.cb_schedule.addItem("完成全部进度", 4)
+        elif self.unitFlag == 2:
+            self.cb_schedule.addItem("全部", 0)
+            self.cb_schedule.addItem("完成进度1", 1)
+            self.cb_schedule.addItem("完成进度2", 2)
+            self.cb_schedule.addItem("完成全部进度", 3)
+
 
 
     '''
@@ -175,9 +191,11 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                 if selectUnitIfBase(unitID):
                     self.unitFlag = 2
                     result = findDisturbPlanUnitChildInfo(unitID)
+                    self.initcbschedule()
                 else:
                     self.unitFlag = 1
                     result = selectDisturbPlanChooseUnit()
+                    self.initcbschedule()
                 for resultInfo in result:
                     self.currentUnitChilddict[j] = resultInfo
                     j = j + 1
@@ -258,13 +276,13 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                 i = i + 1
         # 选择各基地
         elif self.unitFlag == 2:
-            headerlist = ['装备名称及规格型号', '单位', '火箭军调拨单开具数', '此次机关分配数', '此次分配合计数']
+            headerlist = ['装备名称及规格型号', '单位', '火箭军调拨单开具数', '机关分配计划数', '此次分配合计数']
             if len(self.currentUnitChilddict):
                 for i in self.currentUnitChilddict.values():
                     headerlist.append(i[1])
-            headerlist.append('陆军调拨单进度')
-            headerlist.append('接装条件')
+            # headerlist.append('陆军调拨单进度')
             headerlist.append('火箭军调拨单进度')
+            headerlist.append('接装条件')
             headerlist.append('完成接装')
             headerlist.append('备注')
             self.lenHeaderList = len(headerlist)
@@ -302,7 +320,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                     currentRowResult.append(item)
                 item = QTableWidgetItem("")
                 item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-                self.disturbResult.setItem(i, 9 + self.lenCurrentUnitChilddict, item)
+                self.disturbResult.setItem(i, 8 + self.lenCurrentUnitChilddict, item)
                 currentRowResult.append(item)
                 i = i + 1
         self.disturbResult.setColumnWidth(2, 150)
@@ -334,54 +352,90 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         若装备不含子装备，则设置按钮
     '''
     def ifEquipHaveChild(self):
-        for i in self.currentEquipdict:
-            if not selectEquipIsHaveChild(self.currentEquipdict[i][0]):
-                # 陆军调拨单进度
-                flag1 = selectArmySchedule(self.currentEquipdict[i][0],self.currentYear)
-                item = QPushButton("设置进度")
-                item.clicked.connect(self.setArmySchedule)
-                if flag1[0][0] != '0':
-                    item = QPushButton("已完成")
-                self.disturbResult.setCellWidget(i, 5 + self.lenCurrentUnitChilddict, item)
+        # 选择机关或其他
+        if self.unitFlag == 1:
+            for i in self.currentEquipdict:
+                if not selectEquipIsHaveChild(self.currentEquipdict[i][0]):
+                    # 陆军调拨单进度
+                    flag1 = selectArmySchedule(self.currentEquipdict[i][0],self.currentYear)
+                    item = QPushButton("设置进度")
+                    item.clicked.connect(self.setArmySchedule)
+                    if flag1[0][0] != '0':
+                        item = QPushButton("已完成")
+                    self.disturbResult.setCellWidget(i, 5 + self.lenCurrentUnitChilddict, item)
 
-                # 是否具备接装条件
+                    # 是否具备接装条件
+                    flag2 = selectAllotConditionUper(self.currentEquipdict[i][0], self.currentYear)
+                    item = QPushButton("设置进度")
+                    item.clicked.connect(self.setCondition)
+                    if int(flag2[0][0]):
+                        item = QPushButton("已完成")
+                    self.disturbResult.setCellWidget(i, 6 + self.lenCurrentUnitChilddict, item)
 
-                flag2 = selectAllotCondition(self.currentEquipdict[i][0],self.currentYear)
-                item = QPushButton("设置进度")
-                item.clicked.connect(self.setCondition)
-                if int(flag2[0][0]):
-                    item = QPushButton("已完成")
-                self.disturbResult.setCellWidget(i, 6 + self.lenCurrentUnitChilddict, item)
+                    # 火箭军调拨单进度
+                    flag3 = selectRocketScheduleUper(self.currentEquipdict[i][0], self.currentYear)
+                    item = QPushButton("设置进度")
+                    item.clicked.connect(self.setRocketSchedule)
+                    if int(flag3[0][0]):
+                        item = QPushButton("已完成")
+                    self.disturbResult.setCellWidget(i, 7 + self.lenCurrentUnitChilddict, item)
 
-                # 火箭军调拨单进度
-                flag3 = selectRocketSchedule(self.currentEquipdict[i][0], self.currentYear)
-                item = QPushButton("设置进度")
-                item.clicked.connect(self.setRocketSchedule)
-                if int(flag3[0][0]):
-                    item = QPushButton("已完成")
-                self.disturbResult.setCellWidget(i, 7 + self.lenCurrentUnitChilddict, item)
+                    # 是否完成接装
+                    flag4 = selectIfScheduleFinishUper(self.currentEquipdict[i][0], self.currentYear)
+                    print("flag4",flag4)
+                    item = QPushButton("设置进度")
+                    item.clicked.connect(self.setScheduleFinish)
+                    if flag4[0][0] != '0':
+                        item = QPushButton("已完成")
+                    self.disturbResult.setCellWidget(i, 8 + self.lenCurrentUnitChilddict, item)
+        # 选择基地
+        elif self.unitFlag == 2:
+            for i in self.currentEquipdict:
+                if not selectEquipIsHaveChild(self.currentEquipdict[i][0]):
+                    # # 陆军调拨单进度
+                    # flag1 = selectArmySchedule(self.currentEquipdict[i][0], self.currentYear)
+                    # item = QPushButton("设置进度")
+                    # item.clicked.connect(self.setArmySchedule)
+                    # if flag1[0][0] != '0':
+                    #     item = QPushButton("已完成")
+                    # self.disturbResult.setCellWidget(i, 5 + self.lenCurrentUnitChilddict, item)
 
+                    # 火箭军调拨单进度
+                    flag2 = selectRocketScheduleBase(self.currentEquipdict[i][0], self.currentYear)
+                    item = QPushButton("设置进度")
+                    item.clicked.connect(self.setRocketSchedule)
+                    if int(flag2[0][0]):
+                        item = QPushButton("已完成")
+                    self.disturbResult.setCellWidget(i, 5 + self.lenCurrentUnitChilddict, item)
 
-                # 是否完成接装
-                flag4 = selectIfScheduleFinish(self.currentEquipdict[i][0], self.currentYear)
-                print("flag4",flag4)
-                item = QPushButton("设置进度")
-                item.clicked.connect(self.setScheduleFinish)
-                if flag4[0][0] != '0':
-                    item = QPushButton("已完成")
-                self.disturbResult.setCellWidget(i, 8 + self.lenCurrentUnitChilddict, item)
+                    # 是否具备接装条件
+                    flag3 = selectAllotConditionBase(self.currentEquipdict[i][0], self.currentYear)
+                    item = QPushButton("设置进度")
+                    item.clicked.connect(self.setCondition)
+                    if int(flag3[0][0]):
+                        item = QPushButton("已完成")
+                    self.disturbResult.setCellWidget(i, 6 + self.lenCurrentUnitChilddict, item)
+
+                    # 是否完成接装
+                    flag4 = selectIfScheduleFinishBase(self.currentEquipdict[i][0], self.currentYear)
+                    print("flag4", flag4)
+                    item = QPushButton("设置进度")
+                    item.clicked.connect(self.setScheduleFinish)
+                    if flag4[0][0] != '0':
+                        item = QPushButton("已完成")
+                    self.disturbResult.setCellWidget(i, 7 + self.lenCurrentUnitChilddict, item)
 
     # 初始化调拨依据
     def initDisturbPlanProof(self):
         proof = selectDisturbPlanProof(self.currentYear)
         self.tb_proof.setText(proof[0][0])
-        #self..setTextInteractionFlags(Qt.TextSelectableByMouse|Qt.TextSelectableByKeyboard)
+        # self.setTextInteractionFlags(Qt.TextSelectableByMouse|Qt.TextSelectableByKeyboard)
 
 
 
     # 读取初始分配计划数
     def initDisturbPlanNum(self):
-        #print("currentYear:", self.currentYear)
+        # print("currentYear:", self.currentYear)
         self.unitDisturbPlanList = selectDisturbPlanNumByList(self.currentUnitChilddict,
                                                               self.currentEquipdict, self.currentYear)
         print("self.unitDisturbPlanList", self.unitDisturbPlanList)
@@ -493,12 +547,12 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
 
     # 读取初始分配计划备注
     def initDisturbPlanNote(self):
-        self.unitDisturbPlanNoteList = selectDisturbPlanNote(self.currentEquipdict, self.currentYear)
-        #print("self.unitDisturbPlanNoteList", self.unitDisturbPlanNoteList)
+        unitDisturbPlanNoteList = selectDisturbPlanNote(self.currentEquipdict, self.currentYear)
+        # print("self.unitDisturbPlanNoteList", self.unitDisturbPlanNoteList)
         for i in range(0,len(self.currentEquipdict)):
             item=self.disturbResult.item(i,self.lenHeaderList-1)
-            if self.unitDisturbPlanNoteList[i] is not None:
-                item.setText(str(self.unitDisturbPlanNoteList[i]))
+            if unitDisturbPlanNoteList[i] is not None:
+                item.setText(str(unitDisturbPlanNoteList[i]))
 
     # 初始化机关单位数与装备单位
     def initDisturbPlanOther(self):
@@ -552,6 +606,8 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                         if sum != 0:
                             self.disturbResult.item(row, 2).setText(str(sum))
 
+
+    # 进度1 陆军调拨
     def setArmySchedule(self):
         self.armySchedule.setYear(self.currentYear)
         self.armySchedule.setWindowTitle("陆军调拨单选择")
@@ -560,6 +616,34 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         self.armySchedule.show()
         self.armySchedule.signal.connect(self.updateArmy)
 
+    # 更新进度1 陆军调拨
+    def updateArmy(self):
+        currentRow = self.disturbResult.currentRow()
+        item = QPushButton("已完成")
+        self.disturbResult.setCellWidget(currentRow, 5 + self.lenCurrentUnitChilddict, item)
+        updateArmySchedule(self.currentEquipdict[currentRow][0], self.currentYear)
+
+    # 进度2 接装条件
+    def setCondition(self):
+        currentRow = self.disturbResult.currentRow()
+        currentColomn = self.disturbResult.currentColumn()
+        if currentRow < 0 or currentColomn <0:
+            return
+        if currentColomn - 1 < 0:
+            return
+        if self.disturbResult.cellWidget(currentRow, currentColomn - 1).text() != "已完成":
+            QMessageBox.information(self, "设置接装条件", "上一级未完成", QMessageBox.Yes)
+            return
+        reply = QMessageBox.question(self,"设置接装条件","是否具备接装条件？",QMessageBox.Yes,QMessageBox.Cancel)
+        if reply==QMessageBox.Yes:
+            item = QPushButton("已完成")
+            self.disturbResult.setCellWidget(currentRow, 6 + self.lenCurrentUnitChilddict, item)
+            if self.unitFlag == 1:
+                updateAllotConditionUper(self.currentEquipdict[currentRow][0], self.currentYear)
+            elif self.unitFlag == 2:
+                updateAllotConditionBase(self.currentEquipdict[currentRow][0], self.currentYear)
+
+    # 进度3 火箭军调拨
     def setRocketSchedule(self):
         row = self.disturbResult.currentRow()
         currentColomn = self.disturbResult.currentColumn()
@@ -567,9 +651,10 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
             return
         if currentColomn - 1 < 0:
             return
-        if self.disturbResult.cellWidget(row, currentColomn - 1).text() != "已完成":
-            QMessageBox.information(self, "设置接装条件", "上一级未完成", QMessageBox.Yes)
-            return
+        if self.unitFlag == 1:
+            if self.disturbResult.cellWidget(row, currentColomn - 1).text() != "已完成":
+                QMessageBox.information(self, "设置接装条件", "上一级未完成", QMessageBox.Yes)
+                return
         currentUnit=[]
         for i in self.currentUnitChilddict.values():
             currentUnit.append(i)
@@ -590,36 +675,19 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
             self.rocketSchedule.show()
             self.rocketSchedule.signal.connect(self.updateRocket)
 
+    # 更新进度3 火箭军调拨
     def updateRocket(self):
         currentRow = self.disturbResult.currentRow()
         item = QPushButton("已完成")
-        self.disturbResult.setCellWidget(currentRow, 7 + self.lenCurrentUnitChilddict, item)
-        updateRocketSchedule(self.currentEquipdict[currentRow][0], self.currentYear)
+        if self.unitFlag == 1:
+            self.disturbResult.setCellWidget(currentRow, 7 + self.lenCurrentUnitChilddict, item)
+            updateRocketScheduleUper(self.currentEquipdict[currentRow][0], self.currentYear)
+        elif self.unitFlag == 2:
+            self.disturbResult.setCellWidget(currentRow, 5 + self.lenCurrentUnitChilddict, item)
+            updateRocketScheduleBase(self.currentEquipdict[currentRow][0], self.currentYear)
 
 
-    def updateArmy(self):
-        currentRow = self.disturbResult.currentRow()
-        item = QPushButton("已完成")
-        self.disturbResult.setCellWidget(currentRow, 5 + self.lenCurrentUnitChilddict, item)
-        updateArmySchedule(self.currentEquipdict[currentRow][0], self.currentYear)
-
-
-    def setCondition(self):
-        currentRow=self.disturbResult.currentRow()
-        currentColomn = self.disturbResult.currentColumn()
-        if currentRow < 0 or currentColomn <0:
-            return
-        if currentColomn - 1 < 0:
-            return
-        if self.disturbResult.cellWidget(currentRow, currentColomn - 1).text() != "已完成":
-            QMessageBox.information(self, "设置接装条件", "上一级未完成", QMessageBox.Yes)
-            return
-        reply = QMessageBox.question(self,"设置接装条件","是否具备接装条件？",QMessageBox.Yes,QMessageBox.Cancel)
-        if reply==QMessageBox.Yes:
-            item = QPushButton("已完成")
-            self.disturbResult.setCellWidget(currentRow, 6 + self.lenCurrentUnitChilddict, item)
-            updateAllotCondition(self.currentEquipdict[currentRow][0],self.currentYear)
-
+    # 进度4 是否完成
     def setScheduleFinish(self):
         currentRow = self.disturbResult.currentRow()
         currentColomn = self.disturbResult.currentColumn()
@@ -634,87 +702,167 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         self.scheduleFinish.show()
         self.scheduleFinish.signal.connect(self.updateFinish)
 
-
+    # 更新进度4 是否完成
     def updateFinish(self):
         currentRow = self.disturbResult.currentRow()
         fileName = self.scheduleFinish.returnFileName()
         print("fileName", fileName)
         if fileName != "":
             item = QPushButton("已完成")
-            self.disturbResult.setCellWidget(currentRow, 8 + self.lenCurrentUnitChilddict, item)
-            updateScheduleFinish(self.currentEquipdict[currentRow][0], self.currentYear,fileName)
+            if self.unitFlag == 1:
+                self.disturbResult.setCellWidget(currentRow, 8 + self.lenCurrentUnitChilddict, item)
+                updateScheduleFinishUper(self.currentEquipdict[currentRow][0], self.currentYear, fileName)
+            elif self.unitFlag == 2:
+                self.disturbResult.setCellWidget(currentRow, 7 + self.lenCurrentUnitChilddict, item)
+                updateScheduleFinishBase(self.currentEquipdict[currentRow][0], self.currentYear, fileName)
+
 
     # 筛选调拨进度
     def selectSchedule(self):
-        index = self.cb_schedule.currentIndex()
-        # 未选择状态
-        if index == 0:
-            self._initDisturbPlanByUnitListAndEquipList(self.originalEquipDict)
+        if self.unitFlag == 1:
+            index = self.cb_schedule.currentIndex()
+            # 未选择状态
+            if index == 0:
+                self._initDisturbPlanByUnitListAndEquipList(self.originalEquipDict)
 
-        # 完成进度一
-        elif index == 1:
-            equipDict={}
-            j = 0
-            for equipID, equipItem in self.second_treeWidget_dict.items():
-                flag1 = selectArmySchedule(equipID, self.currentYear)
-                if flag1[0][0] != '0':
-                    if equipItem.checkState(0) == Qt.Checked:
-                        equipInfo = findEquipInfo(equipID)
-                        equipDict[j] = equipInfo[0]
-                        j = j + 1
-                    elif equipItem.checkState(0) == Qt.PartiallyChecked:
-                        equipInfo = findEquipInfo(equipID)
-                        equipDict[j] = equipInfo[0]
-                        j = j + 1
-            self._initDisturbPlanByUnitListAndEquipList(equipDict)
+            # 完成进度一
+            elif index == 1:
+                equipDict={}
+                j = 0
+                for equipID, equipItem in self.second_treeWidget_dict.items():
+                    flag1 = selectArmySchedule(equipID, self.currentYear)
+                    if flag1[0][0] != '0':
+                        if equipItem.checkState(0) == Qt.Checked:
+                            equipInfo = findEquipInfo(equipID)
+                            equipDict[j] = equipInfo[0]
+                            j = j + 1
+                        elif equipItem.checkState(0) == Qt.PartiallyChecked:
+                            equipInfo = findEquipInfo(equipID)
+                            equipDict[j] = equipInfo[0]
+                            j = j + 1
+                self._initDisturbPlanByUnitListAndEquipList(equipDict)
 
-        # 完成进度二
-        elif index == 2:
-            equipDict = {}
-            j = 0
-            for equipID, equipItem in self.second_treeWidget_dict.items():
-                flag2 = selectAllotCondition(equipID, self.currentYear)
-                if int(flag2[0][0]):
-                    if equipItem.checkState(0) == Qt.Checked:
-                        equipInfo = findEquipInfo(equipID)
-                        equipDict[j] = equipInfo[0]
-                        j = j + 1
-                    elif equipItem.checkState(0) == Qt.PartiallyChecked:
-                        equipInfo = findEquipInfo(equipID)
-                        equipDict[j] = equipInfo[0]
-                        j = j + 1
-            self._initDisturbPlanByUnitListAndEquipList(equipDict)
+            # 完成进度二
+            elif index == 2:
+                equipDict = {}
+                j = 0
+                for equipID, equipItem in self.second_treeWidget_dict.items():
+                    flag2 = selectAllotConditionUper(equipID, self.currentYear)
+                    if int(flag2[0][0]):
+                        if equipItem.checkState(0) == Qt.Checked:
+                            equipInfo = findEquipInfo(equipID)
+                            equipDict[j] = equipInfo[0]
+                            j = j + 1
+                        elif equipItem.checkState(0) == Qt.PartiallyChecked:
+                            equipInfo = findEquipInfo(equipID)
+                            equipDict[j] = equipInfo[0]
+                            j = j + 1
+                self._initDisturbPlanByUnitListAndEquipList(equipDict)
 
-        # 完成进度三
-        elif index == 3:
-            equipDict = {}
-            j = 0
-            for equipID, equipItem in self.second_treeWidget_dict.items():
-                flag3 = selectRocketSchedule(equipID, self.currentYear)
-                if int(flag3[0][0]):
-                    if equipItem.checkState(0) == Qt.Checked:
-                        equipInfo = findEquipInfo(equipID)
-                        equipDict[j] = equipInfo[0]
-                        j = j + 1
-                    elif equipItem.checkState(0) == Qt.PartiallyChecked:
-                        equipInfo = findEquipInfo(equipID)
-                        equipDict[j] = equipInfo[0]
-                        j = j + 1
-            self._initDisturbPlanByUnitListAndEquipList(equipDict)
+            # 完成进度三
+            elif index == 3:
+                equipDict = {}
+                j = 0
+                for equipID, equipItem in self.second_treeWidget_dict.items():
+                    flag3 = selectRocketScheduleUper(equipID, self.currentYear)
+                    if int(flag3[0][0]):
+                        if equipItem.checkState(0) == Qt.Checked:
+                            equipInfo = findEquipInfo(equipID)
+                            equipDict[j] = equipInfo[0]
+                            j = j + 1
+                        elif equipItem.checkState(0) == Qt.PartiallyChecked:
+                            equipInfo = findEquipInfo(equipID)
+                            equipDict[j] = equipInfo[0]
+                            j = j + 1
+                self._initDisturbPlanByUnitListAndEquipList(equipDict)
 
-        # 完成进度四
-        elif index == 4:
-            equipDict = {}
-            j = 0
-            for equipID, equipItem in self.second_treeWidget_dict.items():
-                flag4 = selectIfScheduleFinish(equipID, self.currentYear)
-                if flag4[0][0] != '0':
-                    if equipItem.checkState(0) == Qt.Checked:
-                        equipInfo = findEquipInfo(equipID)
-                        equipDict[j] = equipInfo[0]
-                        j = j + 1
-                    elif equipItem.checkState(0) == Qt.PartiallyChecked:
-                        equipInfo = findEquipInfo(equipID)
-                        equipDict[j] = equipInfo[0]
-                        j = j + 1
-            self._initDisturbPlanByUnitListAndEquipList(equipDict)
+            # 完成进度四
+            elif index == 4:
+                equipDict = {}
+                j = 0
+                for equipID, equipItem in self.second_treeWidget_dict.items():
+                    flag4 = selectIfScheduleFinishUper(equipID, self.currentYear)
+                    if flag4[0][0] != '0':
+                        if equipItem.checkState(0) == Qt.Checked:
+                            equipInfo = findEquipInfo(equipID)
+                            equipDict[j] = equipInfo[0]
+                            j = j + 1
+                        elif equipItem.checkState(0) == Qt.PartiallyChecked:
+                            equipInfo = findEquipInfo(equipID)
+                            equipDict[j] = equipInfo[0]
+                            j = j + 1
+                self._initDisturbPlanByUnitListAndEquipList(equipDict)
+###################################################################################
+        elif self.unitFlag == 2:
+            index = self.cb_schedule.currentIndex()
+            # 未选择状态
+            if index == 0:
+                self._initDisturbPlanByUnitListAndEquipList(self.originalEquipDict)
+
+            # 完成进度一
+            # elif index == 1:
+            #     equipDict = {}
+            #     j = 0
+            #     for equipID, equipItem in self.second_treeWidget_dict.items():
+            #         flag1 = selectArmySchedule(equipID, self.currentYear)
+            #         if flag1[0][0] != '0':
+            #             if equipItem.checkState(0) == Qt.Checked:
+            #                 equipInfo = findEquipInfo(equipID)
+            #                 equipDict[j] = equipInfo[0]
+            #                 j = j + 1
+            #             elif equipItem.checkState(0) == Qt.PartiallyChecked:
+            #                 equipInfo = findEquipInfo(equipID)
+            #                 equipDict[j] = equipInfo[0]
+            #                 j = j + 1
+            #     self._initDisturbPlanByUnitListAndEquipList(equipDict)
+
+            # 完成进度二
+            elif index == 2:
+                equipDict = {}
+                j = 0
+                for equipID, equipItem in self.second_treeWidget_dict.items():
+                    flag2 = selectAllotConditionBase(equipID, self.currentYear)
+                    if int(flag2[0][0]):
+                        if equipItem.checkState(0) == Qt.Checked:
+                            equipInfo = findEquipInfo(equipID)
+                            equipDict[j] = equipInfo[0]
+                            j = j + 1
+                        elif equipItem.checkState(0) == Qt.PartiallyChecked:
+                            equipInfo = findEquipInfo(equipID)
+                            equipDict[j] = equipInfo[0]
+                            j = j + 1
+                self._initDisturbPlanByUnitListAndEquipList(equipDict)
+
+            # 完成进度一
+            elif index == 1:
+                equipDict = {}
+                j = 0
+                for equipID, equipItem in self.second_treeWidget_dict.items():
+                    flag3 = selectRocketScheduleBase(equipID, self.currentYear)
+                    if int(flag3[0][0]):
+                        if equipItem.checkState(0) == Qt.Checked:
+                            equipInfo = findEquipInfo(equipID)
+                            equipDict[j] = equipInfo[0]
+                            j = j + 1
+                        elif equipItem.checkState(0) == Qt.PartiallyChecked:
+                            equipInfo = findEquipInfo(equipID)
+                            equipDict[j] = equipInfo[0]
+                            j = j + 1
+                self._initDisturbPlanByUnitListAndEquipList(equipDict)
+
+            # 完成进度三
+            elif index == 3:
+                equipDict = {}
+                j = 0
+                for equipID, equipItem in self.second_treeWidget_dict.items():
+                    flag4 = selectIfScheduleFinishBase(equipID, self.currentYear)
+                    if flag4[0][0] != '0':
+                        if equipItem.checkState(0) == Qt.Checked:
+                            equipInfo = findEquipInfo(equipID)
+                            equipDict[j] = equipInfo[0]
+                            j = j + 1
+                        elif equipItem.checkState(0) == Qt.PartiallyChecked:
+                            equipInfo = findEquipInfo(equipID)
+                            equipDict[j] = equipInfo[0]
+                            j = j + 1
+                self._initDisturbPlanByUnitListAndEquipList(equipDict)

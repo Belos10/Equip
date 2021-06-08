@@ -273,26 +273,6 @@
            <string>全部</string>
           </property>
          </item>
-         <item>
-          <property name="text">
-           <string>完成进度一</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>完成进度二</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>完成进度三</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>完成所有进度</string>
-          </property>
-         </item>
         </widget>
        </item>
        <item>

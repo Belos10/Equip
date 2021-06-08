@@ -1,9 +1,22 @@
 import sqlite3
 import os
+import pymysql
+from database.config import ConnectMySqlDict
+
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 conn = sqlite3.connect(os.path.join(BASE_DIR ,'NuclearManageSystem.db'))
 cur = conn.cursor()
+
+
+# host = ConnectMySqlDict.get('host')
+# port = ConnectMySqlDict.get('port')
+# user = ConnectMySqlDict.get('user')
+# password = ConnectMySqlDict.get('password')
+# db = ConnectMySqlDict.get('db')
+#
+# conn = pymysql.connect(host=host, port=port, user=user, password=password, db=db)
+# cur = conn.cursor()
 
 '''
     功能：

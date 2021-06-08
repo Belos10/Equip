@@ -38,6 +38,7 @@ class transferModel(QDialog, Widget_Transfer_Model):
     def slotClickedOutput(self):
         pass
 
+    # 保存分单
     def slotSaveSingle(self):
         print("保存分单")
         for key, page in self.currentSingelUnitPage.items():
@@ -186,7 +187,7 @@ class transferModel(QDialog, Widget_Transfer_Model):
             page.tw_ditalModel.setItem(10, page.crtColumnCount + 1 + half + 2, item1)
             page.tw_ditalModel.setItem(10, 2*page.crtColumnCount + 2 + half+2, item2)
 
-
+    # 保存总单
     def slotClickedSaveTotal(self):
         print("保存总单, ", self.currentSingelUnitPage)
         half = int((self.totalModel.crtColumnCount - 4) / 2)
@@ -330,7 +331,7 @@ class transferModel(QDialog, Widget_Transfer_Model):
         self.currentYear = year
 
     def getUnitIDList(self, unitInfoList, equipInfo, year, requireInfo):
-        print("===========", requireInfo)
+        #print("===========", requireInfo)
         if unitInfoList == "" and equipInfo =="" and  year =="" and  requireInfo == "":
             self.pb_input.setDisabled(True)
             self.pb_output.setDisabled(True)
@@ -339,6 +340,11 @@ class transferModel(QDialog, Widget_Transfer_Model):
             self.pb_confirm.setDisabled(True)
             return
         #print("==============================")
+        self.pb_input.setDisabled(False)
+        self.pb_output.setDisabled(False)
+        self.pb_saveTotal.setDisabled(False)
+        self.pb_saveSingle.setDisabled(False)
+        self.pb_confirm.setDisabled(False)
         self.unitInfoList = unitInfoList
         self.equipInfo = equipInfo
         self.year = year
@@ -347,7 +353,7 @@ class transferModel(QDialog, Widget_Transfer_Model):
         self.currentUnitInfoList = unitInfoList
         self.tw_transferModel.clear()
         #print("requireInfo :==============", requireInfo)
-
+        #####
         self.totalModel = totalModel()
         self.totalModel.initTableWidget(self.unitInfoList, self.equipInfo, self.year, self.requireInfo)
         self.tw_transferModel.addTab(self.totalModel, "总单")
@@ -359,7 +365,7 @@ class transferModel(QDialog, Widget_Transfer_Model):
             self.tw_transferModel.addTab(page, unitInfo[0])
             self.currentSingelUnitPage[unitInfo[0]] = page
             page.initTableWidget(unitInfo, self.equipInfo,self.year)
-
+        #######
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     widget = transferModel()
