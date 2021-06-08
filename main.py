@@ -1,11 +1,12 @@
 import sys
+# from fbs_runtime.application_context.PyQt5 import ApplicationContext
 from PyQt5.Qt import QObject
 from PyQt5.QtWidgets import QApplication
 from sysManage.MainWindowManage import Manage_Widgets
 from PyQt5 import sip
 from sysManage.login.login import login
 from icons.readQss import readQss
-from utills.CommomHelper import CommonHelper
+import os
 
 '''
     显示主界面
@@ -31,11 +32,17 @@ class mainManage(QObject):
         app.quit()
 
 if __name__ == "__main__":
+    # appctxt = ApplicationContext()
     app = QApplication(sys.argv)
     widget = Manage_Widgets()
-    styleFile = './icons/ElegantDark.qss'
-    qssStyle = CommonHelper.readQss(styleFile)
+    basepath=os.path.split(os.path.abspath(__file__))[0]
+    path = basepath + "\\icons\\ElegantDark.qss"
+    # path=os.path.join(basepath,"./icons/ElegantDark.qss")
+    # print(path)
+    with open(path, 'r') as f:
+        qssStyle = f.read()
     widget.setStyleSheet(qssStyle)
+    # exit_code = appctxt.app.exec_()
     sys.exit(app.exec_())
 
 

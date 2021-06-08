@@ -4,9 +4,37 @@ import pymysql
 from database.config import ConnectMySqlDict
 
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-conn = sqlite3.connect(os.path.join(BASE_DIR ,'NuclearManageSystem.db'))
-cur = conn.cursor()
+#os.path.join(BASE_DIR ,'NuclearManageSystem.db')
+
+
+try:
+    # basepath = os.path.abspath(os.path.dirname(__file__))
+    basepath = os.path.split(os.path.realpath(__file__))[0]
+    # basepath = os.path.dirname(os.path.abspath(__file__))
+    # basepath = os.path.dirname(os.path.realpath(__file__))
+    # curpath = os.path.realpath(__file__)
+    # basepath = os.path.dirname(curpath)
+    # path = basepath + '\\NuclearManageSystem.db'
+    # print('路径',path)
+    # # conn = sqlite3.connect(path)
+    conn = sqlite3.connect('NuclearManageSystem.db')
+    cur = conn.cursor()
+except sqlite3.OperationalError:
+    # basepath = os.path.abspath(os.path.dirname(__file__))
+    # # basepath = os.path.split(os.path.realpath(__file__))[0]
+    # # basepath = os.path.dirname(os.path.abspath(__file__))
+    # # basepath = os.path.dirname(os.path.realpath(__file__))
+    # os.mkdir(basepath)
+    print("异常")
+finally:
+    # assert os.path.exists(basepath)
+    # path = basepath + 'database\\NuclearManageSystem.db'
+    # # print(path)
+    # conn = sqlite3.connect(path)
+    # cur = conn.cursor()
+
+    pass
+
 
 
 # host = ConnectMySqlDict.get('host')
@@ -103,6 +131,9 @@ def executeCommit(sql=''):
         conn.rollback()
         print(error)
         return error
+#初始化
+def initTables():
+    pass
 if __name__ == '__main__':
     # executeCommit("delete into equipment_balance(equip_balance_id) values('001')")
     pass
