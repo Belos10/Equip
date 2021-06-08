@@ -1,5 +1,5 @@
 import re
-
+from database.loginSql import *
 from PyQt5.QtCore import QPoint
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QDialog,QLineEdit
@@ -27,6 +27,7 @@ class login(QDialog, Widget_Login_New):
         # flags = flags | Qt.WindowTitleHint | Qt.CustomizeWindowHint | Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint
         # self.setWindowFlags(flags)
         self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
+        updateRootLogin()
 
     def initLoginWidget(self):
         self.le_accont.setPlaceholderText("请输入账号")

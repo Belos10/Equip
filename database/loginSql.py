@@ -10,10 +10,8 @@ from database.connectAndDisSql import *
 '''
 def findAllLoginAccontList():
     sql = "select accont from login"
-
     cur.execute(sql)
     result = cur.fetchall()
-
     loginAccontList = []
     for accont in result:
         loginAccontList.append(accont[0])
@@ -25,10 +23,8 @@ def findAllLoginAccontList():
 '''
 def selectUserInfoByAccont(accont):
     sql = "select * from login where accont = '" + accont + "'"
-
     cur.execute(sql)
     result = cur.fetchall()
-
     return result
 
 '''
@@ -37,30 +33,41 @@ def selectUserInfoByAccont(accont):
 '''
 def selectAllDataAboutLogin():
     sql = "select * from login "
-
     cur.execute(sql)
     result = cur.fetchall()
-
     return result
+
+
+def updateRootLogin():
+    loginList = selectAllDataAboutLogin()
+    print("loginList", loginList)
+    if len(loginList) == 0:
+        insertIntoLogin('root', '默认机关', '123456', '机关', '1')
+    else:
+        for login in loginList:
+            if login[3] == '机关':
+                return
+        insertIntoLogin('root', '默认机关', '123456', '机关', '1')
+
+
 
 def insertIntoLogin(accont, name, password, role, unitID):
     sql = "insert into login(accont,name,password,role,unitID) values " + \
           "('" + accont + "','" + name + "','" + password + \
           "','" + role + "','" + unitID + "')"
     cur.execute(sql)
-
     conn.commit()
+
 
 def delFromLogin(accont):
     sql = "delete from login where accont = '" + accont + "'"
     cur.execute(sql)
-
     conn.commit()
+
 
 def updateUserInfo(accont, name, password, role, unitID):
     sql = "update login set name = '" +  name + "', password = '" + password + "', role = '" + role\
           + "', unitID = '" + unitID + "' where accont = '" + accont + "'"
     print(sql)
     cur.execute(sql)
-
     conn.commit()

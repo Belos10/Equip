@@ -277,7 +277,7 @@ def insertIntoDisturbPlanYear(year):
         sql = "insert into disturbplannote(Equip_id,Equip_Name,Year,Note) values " +\
                   "('" + EquipInfo[0] + "','" + EquipInfo[1] + "','" + str(year) +"', '' )"
         cur.execute(sql)
-        sql = "insert into allotschedule (Equip_Id,Equip_Name,army,allotcondition,rocket,finish,year) values " \
+        sql = "insert into allotschedule (Equip_Id,Equip_Name,army,allotconditionUper,rocketUper,finishUper,year) values " \
               + "('" + EquipInfo[0] + "','" + EquipInfo[1] + "', '0','0','0','0','" + str(year) + "' )"
         cur.execute(sql)
         for UnitInfo in UnitList:
@@ -437,30 +437,61 @@ def selectArmySchedule(Equip_Id,Year):
     # disconnectMySql(conn, cur)
     return result
 
-# 查询是否具备条件进度
-def selectAllotCondition(Equip_Id,Year):
+# 查询是否具备条件进度(基地)
+def selectAllotConditionBase(Equip_Id, Year):
     # conn, cur = connectMySql()
-    sql = "select allotcondition from allotschedule where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
+    sql = "select allotconditionBase from allotschedule where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
     cur.execute(sql)
     result = cur.fetchall()
     conn.commit()
     # disconnectMySql(conn, cur)
     return result
 
-# 查询火箭军调拨单进度
-def selectRocketSchedule(Equip_Id,Year):
+# 查询是否具备条件进度(机关)
+def selectAllotConditionUper(Equip_Id, Year):
     # conn, cur = connectMySql()
-    sql = "select rocket from allotschedule where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
+    sql = "select allotconditionUper from allotschedule where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
     cur.execute(sql)
     result = cur.fetchall()
     conn.commit()
     # disconnectMySql(conn, cur)
     return result
 
-# 查询是否完成
-def selectIfScheduleFinish(Equip_Id,Year):
+# 查询火箭军调拨单进度(基地)
+def selectRocketScheduleBase(Equip_Id, Year):
     # conn, cur = connectMySql()
-    sql = "select finish from allotschedule where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
+    sql = "select rocketBase from allotschedule where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
+    cur.execute(sql)
+    result = cur.fetchall()
+    conn.commit()
+    # disconnectMySql(conn, cur)
+    return result
+
+# 查询火箭军调拨单进度(机关)
+def selectRocketScheduleUper(Equip_Id, Year):
+    # conn, cur = connectMySql()
+    sql = "select rocketUper from allotschedule where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
+    cur.execute(sql)
+    result = cur.fetchall()
+    conn.commit()
+    # disconnectMySql(conn, cur)
+    return result
+
+# 查询是否完成(基地)
+def selectIfScheduleFinishBase(Equip_Id, Year):
+    # conn, cur = connectMySql()
+    sql = "select finishBase from allotschedule where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
+    cur.execute(sql)
+    result = cur.fetchall()
+    conn.commit()
+    # disconnectMySql(conn, cur)
+    return result
+
+
+# 查询是否完成(机关)
+def selectIfScheduleFinishUper(Equip_Id, Year):
+    # conn, cur = connectMySql()
+    sql = "select finishUper from allotschedule where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
     cur.execute(sql)
     result = cur.fetchall()
     conn.commit()
@@ -476,26 +507,52 @@ def updateArmySchedule(Equip_Id,Year):
     # disconnectMySql(conn, cur)
 
 # 更新是否具备条件进度
-def updateAllotCondition(Equip_Id, Year):
+def updateAllotConditionBase(Equip_Id, Year):
     # conn, cur = connectMySql()
-    sql = "update allotschedule set allotcondition = '1' where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
+    sql = "update allotschedule set allotconditionBase = '1' where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
     print(sql)
     cur.execute(sql)
     conn.commit()
     # disconnectMySql(conn, cur)
 
-# 更新火箭军调拨单进度
-def updateRocketSchedule(Equip_Id,Year):
+
+# 更新是否具备条件进度
+def updateAllotConditionUper(Equip_Id, Year):
     # conn, cur = connectMySql()
-    sql = "update allotschedule set rocket = '1' where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
+    sql = "update allotschedule set allotconditionUper = '1' where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
+    print(sql)
     cur.execute(sql)
     conn.commit()
     # disconnectMySql(conn, cur)
 
-# 更新是否完成进度
-def updateScheduleFinish(Equip_Id,Year,fileName):
+# 更新火箭军调拨单进度(机关)
+def updateRocketScheduleBase(Equip_Id, Year):
     # conn, cur = connectMySql()
-    sql = "update allotschedule set finish = '" + fileName + "' where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
+    sql = "update allotschedule set rocketBase = '1' where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
+    cur.execute(sql)
+    conn.commit()
+    # disconnectMySql(conn, cur)
+
+# 更新火箭军调拨单进度(基地)
+def updateRocketScheduleUper(Equip_Id, Year):
+    # conn, cur = connectMySql()
+    sql = "update allotschedule set rocketUper = '1' where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
+    cur.execute(sql)
+    conn.commit()
+    # disconnectMySql(conn, cur)
+
+# 更新是否完成进度(基地)
+def updateScheduleFinishBase(Equip_Id, Year, fileName):
+    # conn, cur = connectMySql()
+    sql = "update allotschedule set finishBase = '" + fileName + "' where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
+    cur.execute(sql)
+    conn.commit()
+    #disconnectMySql(conn, cur)
+
+# 更新是否完成进度(机关)
+def updateScheduleFinishUper(Equip_Id, Year, fileName):
+    # conn, cur = connectMySql()
+    sql = "update allotschedule set finishUper = '" + fileName + "' where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
     cur.execute(sql)
     conn.commit()
     #disconnectMySql(conn, cur)
