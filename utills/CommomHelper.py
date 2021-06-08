@@ -4,5 +4,5 @@ class CommonHelper:
 
   @staticmethod
   def readQss(style):
-    with open(style, 'r') as f:
+    with open(style, 'a+') as f:
       return f.read()
