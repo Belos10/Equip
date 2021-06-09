@@ -1222,7 +1222,7 @@ def selectAboutWeaveByEquipShow(UnitList, EquipList, yearList):
             # 查询当前装备ID的孩子序列
             EquipIDChildList = []
             findChildEquip(Equip_ID, EquipIDChildList, "")
-            print("''''''''''''''", EquipIDChildList)
+            #print("''''''''''''''", EquipIDChildList)
             for childEquipID in EquipIDChildList:
                 sql = "select * from weave where Unit_ID = '" + Unit_ID + \
                         "' and Equip_ID = '" + childEquipID[0] + "' and year = '" + yearList + "'"
@@ -3051,6 +3051,7 @@ def findEquipUnitByEquipID(EquipID):
     cur.execute(sql)
     result = cur.fetchall()
     return result
+
 
 def findUperEquipIDByName(Equip_Name):
     sql = "select * from equip where Equip_Name ='" + Equip_Name + "'"

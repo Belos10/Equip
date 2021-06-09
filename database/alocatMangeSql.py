@@ -611,6 +611,14 @@ def selectDisturbPlanChooseUnit():
     else:
         return []
 
+def selectLevelForGeneralEquip(Equip_ID, count = -1):
+    sql = "select Equip_Uper from equip where Equip_ID = '" + Equip_ID + "'"
+    cur.execute(sql)
+    result = cur.fetchall()
+    result_Uper = result[0][0]
+    if result_Uper != '':
+        count = selectLevelForGeneralEquip(result_Uper,count+1)
+    return count
 
 
 '''
