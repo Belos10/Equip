@@ -159,7 +159,7 @@ class singleModel(QDialog, Widget_Dital_Model):
         self.tw_ditalModel.setSpan(self.crtRowCount - 9, startColumn + 1, 4, self.crtColumnCount - 1)
 
         self.initLastFourRow("承办单位:", "(盖章)", "交装单位:", "(盖章)", self.crtRowCount - 4, startColumn)
-        self.initLastFourRow("局    长:", "杨刚", "主管领导:", "", self.crtRowCount - 3, startColumn)
+        self.initLastFourRow("局    长:", '', "主管领导:", "", self.crtRowCount - 3, startColumn)
         self.initLastFourRow("经 办 人:", "", "经 办 人:", "", self.crtRowCount - 2, startColumn)
         self.initLastFourRow("日    期:", "", "日    期:", "", self.crtRowCount - 1, startColumn)
 
@@ -216,30 +216,46 @@ class singleModel(QDialog, Widget_Dital_Model):
 
         item = QTableWidgetItem()
         item.setText(second)
+        item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
         self.tw_ditalModel.setItem(row, startColumn + 1, item)
 
         item = QTableWidgetItem()
         item.setText("")
-
-        half = int((self.crtColumnCount - 4) / 2)
-        print(self.crtColumnCount, half)
+        item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
         self.tw_ditalModel.setItem(row, startColumn + 2, item)
-        self.tw_ditalModel.setSpan(row, startColumn + 2, 1, half - 1)
 
         item = QTableWidgetItem()
         item.setText(third)
-
         item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-        self.tw_ditalModel.setItem(row, startColumn + half + 2, item)
+        item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+        self.tw_ditalModel.setItem(row, startColumn + 3, item)
 
         item = QTableWidgetItem()
         item.setText(fourth)
-        self.tw_ditalModel.setItem(row, startColumn + half + 3, item)
-
+        item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+        self.tw_ditalModel.setItem(row, startColumn + 4, item)
         item = QTableWidgetItem()
         item.setText("")
-        self.tw_ditalModel.setItem(row, startColumn + half + 4, item)
+        item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+        self.tw_ditalModel.setItem(row, startColumn + 5, item)
 
+        item = QTableWidgetItem()
+        if '交装单位' in third:
+            third = '接装单位'
+        item.setText(third)
+        item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+        self.tw_ditalModel.setItem(row, startColumn + 6, item)
+        item = QTableWidgetItem()
+        item.setText(fourth)
+        self.tw_ditalModel.setItem(row, startColumn + 7, item)
+        item = QTableWidgetItem()
+        item.setText("")
+        item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+        self.tw_ditalModel.setItem(row, startColumn + 8, item)
+        item = QTableWidgetItem()
+        item.setText("")
+        item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+        self.tw_ditalModel.setItem(row, startColumn + 9, item)
     def updateTableWidget(self, requireInfo):
         self.updateSigleTable(requireInfo, 0)
         self.updateSigleTable(requireInfo, self.crtColumnCount + 1)

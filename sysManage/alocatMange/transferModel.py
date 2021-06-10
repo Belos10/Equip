@@ -556,7 +556,7 @@ class transferModel(QDialog, Widget_Transfer_Model):
         self.initSingleTable(pageIndex, workSheet, style,crtRowCount, crtColumnCount,unitInfo, equipInfo, crtColumnCount + 1)
         workSheet.write_merge(14, 14 + crtRowCount - 24, crtColumnCount * 2 + 1,  crtColumnCount * 2 + 1, "第二联：发物单位留存",style)
         self.initSingleTable(pageIndex, workSheet, style,crtRowCount, crtColumnCount,unitInfo, equipInfo, crtColumnCount * 2 + 2)
-        workSheet.write_merge(14, 14 + crtRowCount - 24, crtColumnCount * 3 + 1,  crtColumnCount * 3 + 1, "第三联：收物单位留存",style)
+        workSheet.write_merge(14, 14 + crtRowCount - 24, crtColumnCount * 3 + 2,  crtColumnCount * 3 + 3, "第三联：收物单位留存",style)
 
     def initExcelTotalTableLastFourRow(self, workSheet, stlye,crtColumnCount, first, second, third, fourth, row):
         half = int((crtColumnCount - 4) / 2)
@@ -634,19 +634,27 @@ class transferModel(QDialog, Widget_Transfer_Model):
 
 
     def initSingleTableExcelLastFourRow(self,pageIndex, workSheet, stlye, crtColumnCount, first, second, third, fourth, row, startColumn):
-        half = int((crtColumnCount - 4) / 2)
         #第一列
         workSheet.write(row, startColumn, first, stlye)
         #第二列
         workSheet.write(row, startColumn + 1, second, stlye)
         #第三列
-        workSheet.write_merge(row,row, startColumn + 2, startColumn + half + 1, '', stlye)
+        workSheet.write(row, startColumn + 2, '', stlye)
         #第四列
-        workSheet.write(row, startColumn + half + 2, third, stlye)
+        workSheet.write(row, startColumn + 3, third, stlye)
         #第五列
-        workSheet.write(row, startColumn + half + 3, fourth, stlye)
+        workSheet.write(row, startColumn + 4, fourth, stlye)
         #第六列
-        workSheet.write_merge(row, row, startColumn + half + 4, startColumn + 2 * half + 3 , '', stlye)
+        workSheet.write(row, startColumn + 5, '', stlye)
+        # 第四列
+        if '交装单位' in third:
+            third = '接装单位'
+        workSheet.write(row, startColumn + 6, third, stlye)
+        # 第五列
+        workSheet.write(row, startColumn + 7, fourth, stlye)
+        # 第六列
+        workSheet.write(row, startColumn + 8, '', stlye)
+        workSheet.write(row, startColumn + 9, '', stlye)
 
 
 
