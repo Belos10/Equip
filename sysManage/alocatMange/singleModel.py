@@ -48,7 +48,6 @@ class singleModel(QDialog, Widget_Dital_Model):
 
 
         self.initSingleTable(unitInfo, equipInfo, self.crtColumnCount * 2 + 2)
-        self.initSingleTable(unitInfo, equipInfo, self.crtColumnCount + 1)
         item = QTableWidgetItem()
         item.setText("第三联：收物单位留存")
         item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
@@ -97,7 +96,7 @@ class singleModel(QDialog, Widget_Dital_Model):
         item.setText("应发数")
         item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
         self.tw_ditalModel.setItem(14, startColumn + 3, item)
-        self.tw_ditalModel.setSpan(14, startColumn, 1, 2)
+        self.tw_ditalModel.setSpan(14, startColumn + 3, 1, 2)
 
         item = QTableWidgetItem()
         item.setText("质量")
@@ -144,7 +143,7 @@ class singleModel(QDialog, Widget_Dital_Model):
         item = QTableWidgetItem()
         item.setText("备注")
         item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-        self.tw_ditalModel.setItem(15, startColumn + 8, item)
+        self.tw_ditalModel.setItem(15, startColumn + 9, item)
 
         item = QTableWidgetItem()
         item.setText("备注")
@@ -225,7 +224,7 @@ class singleModel(QDialog, Widget_Dital_Model):
         half = int((self.crtColumnCount - 4) / 2)
         print(self.crtColumnCount, half)
         self.tw_ditalModel.setItem(row, startColumn + 2, item)
-        self.tw_ditalModel.setSpan(row, startColumn + 2, 1, half)
+        self.tw_ditalModel.setSpan(row, startColumn + 2, 1, half - 1)
 
         item = QTableWidgetItem()
         item.setText(third)

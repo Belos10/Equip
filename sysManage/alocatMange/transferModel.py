@@ -35,9 +35,6 @@ class transferModel(QDialog, Widget_Transfer_Model):
 
         self.pb_saveSingle.clicked.connect(self.slotSaveSingle)
 
-    def slotClickedOutput(self):
-        pass
-
     # 保存分单
     def slotSaveSingle(self):
         print("保存分单")
@@ -365,7 +362,294 @@ class transferModel(QDialog, Widget_Transfer_Model):
             self.tw_transferModel.addTab(page, unitInfo[0])
             self.currentSingelUnitPage[unitInfo[0]] = page
             page.initTableWidget(unitInfo, self.equipInfo,self.year)
-        #######
+
+    def slotClickedOutput(self):
+        directoryPath = QFileDialog.getExistingDirectory(self, "请选择导出文件夹", "c:/")
+        if len(directoryPath) > 0:
+            import xlwt
+            workBook = xlwt.Workbook(encoding='utf-8')
+            titileStyle = xlwt.XFStyle()  # 初始化样式
+            font = xlwt.Font()  # 为样式创建字体
+            font.name = '宋体'
+            font.bold = True
+            font.height = 20 * 11  # 字体大小，11为字号，20为衡量单位
+            alignment = xlwt.Alignment()  ## Create Alignment
+            alignment.horz = xlwt.Alignment.HORZ_CENTER
+            alignment.vert = xlwt.Alignment.VERT_CENTER
+            borders = xlwt.Borders()
+            borders.left = 2  # 设置为细实线
+            borders.right = 2
+            borders.top = 2
+            borders.bottom = 2
+            titileStyle.font = font  # 设定样式
+            titileStyle.alignment = alignment
+            titileStyle.borders = borders
+            contentStyle = xlwt.XFStyle()  # 初始化样式
+            font = xlwt.Font()  # 为样式创建字体
+            font.name = '宋体'
+            font.height = 20 * 11  # 字体大小，11为字号，20为衡量单位
+            alignment = xlwt.Alignment()  ## Create Alignment
+            alignment.horz = xlwt.Alignment.HORZ_CENTER
+            alignment.vert = xlwt.Alignment.VERT_CENTER
+            borders = xlwt.Borders()
+            borders.left = 1  # 设置为细实线
+            borders.right = 1
+            borders.top = 1
+            borders.bottom = 1
+            contentStyle.font = font  # 设定样式
+            contentStyle.alignment = alignment
+            contentStyle.borders = borders
+
+           #画总单
+            workSheet = workBook.add_sheet("总单")
+            for i in range(self.totalModel.tw_ditalModel.columnCount()):
+                workSheet.col(i).width = 4000
+            self.initExcelTotalTable(workSheet,titileStyle,contentStyle,self.unitInfoList, self.equipInfo, self.year, self.requireInfo)
+
+            #画分单
+            for unitInfo, num in zip(self.unitInfoList, self.requireInfo[2: -2]):
+                if num == "" or num == "0":
+                    continue
+                workSheet = workBook.add_sheet(num)
+                for i in range(self.currentSingelUnitPage[unitInfo[0]].tw_ditalModel.columnCount()):
+                    workSheet.col(i).width = 4000
+                self.initToExcelSingleTable(unitInfo[0], workSheet, contentStyle, unitInfo, self.equipInfo, self.year)
+
+            try:
+                pathName = "%s/%s年调拨单.xls" % (directoryPath, self.year)
+                workBook.save(pathName)
+                import win32api
+                win32api.ShellExecute(0, 'open', pathName, '', '', 1)
+                QMessageBox.about(self, "导出成功", "导出成功！")
+                return
+            except Exception as e:
+                QMessageBox.about(self, "导出失败", "导出表格被占用，请关闭正在使用的Execl！")
+                return
+        else:
+            QMessageBox.about(self, "选取文件夹失败！", "请选择正确的文件夹！")
+        pass
+
+    def initExcelTotalTable(self,workSheet,titileStyle,contentStyle, unitInfoList, equipInfo, year, requireInfo):
+        minSize = 13
+        isMin = False
+        unitNum = len(unitInfoList)
+        crtColumnCount = len(unitInfoList) + 6
+        title = '装备调拨分配计划'
+        if crtColumnCount < minSize:
+            crtColumnCount = minSize
+            isMin = True
+        else:
+            isMin = False
+        crtRowCount = 26
+        workSheet.write_merge(0, 2, 0, crtColumnCount - 1, title,contentStyle)
+        self.initExcelTotalTableNinethRow(workSheet,contentStyle,crtColumnCount,'调拨单号:', '调拨日期:', 3)
+        self.initExcelTotalTableNinethRow(workSheet,contentStyle,crtColumnCount,'调拨依据:', '调拨性质:', 4)
+        self.initExcelTotalTableNinethRow(workSheet,contentStyle,crtColumnCount,'交装单位:', '单位地址:', 5)
+        self.initExcelTotalTableNinethRow(workSheet,contentStyle,crtColumnCount,'联系人:', '联系方式:', 6)
+        self.initExcelTotalTableNinethRow(workSheet,contentStyle,crtColumnCount,'军代表:', '联系方式:', 7)
+        self.initExcelTotalTableNinethRow(workSheet,contentStyle,crtColumnCount,'接装单位:', '', 8)
+        self.initExcelTotalTableNinethRow(workSheet,contentStyle,crtColumnCount,'单位地址:', '', 9)
+        self.initExcelTotalTableNinethRow(workSheet,contentStyle,crtColumnCount,'联系人:', '联系方式:', 10)
+        half = int((crtColumnCount - 2) / 2)
+        self.initExcelTotalTableNinethRow(workSheet,contentStyle,crtColumnCount,'调拨方式:', '运输方式:', 11)
+        workSheet.write(15, 0, '1',contentStyle)
+        workSheet.write(15, 1, equipInfo[1], contentStyle)
+        workSheet.write(15, 2, equipInfo[5], contentStyle)
+        workSheet.write(15, 3, requireInfo[0], contentStyle)
+        workSheet.write(15, 4, requireInfo[1], contentStyle)
+
+        for i, unitInfo in enumerate(unitInfoList):
+            workSheet.write(14, 5 + i, unitInfo[3], contentStyle)
+        workSheet.write(14, 0, '编号', contentStyle)
+        workSheet.write(14, 1, '装备名称', contentStyle)
+        workSheet.write(14, 2, '计量单位', contentStyle)
+        workSheet.write(14, 3, '质量', contentStyle)
+        workSheet.write(14, 4, '总数', contentStyle)
+        workSheet.write(14, crtColumnCount - 1, '备注', contentStyle)
+        for i, num in enumerate(requireInfo[2:-2]):
+            workSheet.write(15, i + 5, num, contentStyle)
+        workSheet.write_merge(crtRowCount - 9, crtRowCount -6, 0, 0, '备注', contentStyle )
+        workSheet.write_merge(crtRowCount - 9, crtRowCount - 6, 1, crtColumnCount - 1, "1.火箭军装备分配，按照《装备调拨分配计划》执行；\n"
+                     "2.火箭军部队接装，需凭《火箭军装备调拨通知单》；\n"
+                     "3.完成装备调拨后，将《装备调拨分配计划》《火箭军装备调拨通知单》第一联，盖章签字后交我局；《火箭军装备调拨通知单》第三联，盖章签字后交接装单位。", contentStyle)
+        self.initExcelTotalTableLastFourRow(workSheet,contentStyle,crtColumnCount,"承办单位:", "(盖章)", "交装单位:", "(盖章)", crtRowCount - 4)
+        self.initExcelTotalTableLastFourRow(workSheet,contentStyle,crtColumnCount,"局    长:", '', "主管领导:", "", crtRowCount - 3)
+        self.initExcelTotalTableLastFourRow(workSheet,contentStyle,crtColumnCount,"经 办 人:", '', "经 办 人:", "", crtRowCount - 2)
+        self.initExcelTotalTableLastFourRow(workSheet,contentStyle,crtColumnCount,"日    期:", '', "日    期:", '', crtRowCount - 1)
+        workSheet.write(13, 0, '有效期至: ', contentStyle)
+
+        if self.totalModel.tw_ditalModel.cellWidget(13, 1):
+            contextText = self.totalModel.tw_ditalModel.cellWidget(13, 1).text()
+        else:
+            contextText = ""
+        workSheet.write(13, 1, contextText, contentStyle)
+
+
+
+        # 初始化前9行
+    def initExcelTotalTableNinethRow(self, workSheet, stlye, crtColumnCount, first, second, row):
+        workSheet.write(row,0,first,stlye)
+        half = int((crtColumnCount - 2) / 2)
+        workSheet.write(row, half + 1, second, stlye)
+
+
+        if row == 3:
+            # 写第二列
+            if self.totalModel.tw_ditalModel.item(row, 1):
+                contextText = self.totalModel.tw_ditalModel.item(row, 1).text()
+            else:
+                contextText = ""
+            workSheet.write_merge(row, row, 1, half, contextText,stlye)
+            #写第四列
+            half = int((crtColumnCount - 4) / 2)
+            if self.totalModel.tw_ditalModel.cellWidget(row, half + 3):
+                contextText = self.totalModel.tw_ditalModel.cellWidget(row, half + 3).text()
+            else:
+                contextText = ""
+            workSheet.write_merge(row, row, half + 3, crtColumnCount - 1, contextText, stlye)
+
+        elif row == 8 or row == 9:
+            # 写第二列
+            if self.totalModel.tw_ditalModel.item(row, 1):
+                contextText = self.totalModel.tw_ditalModel.item(row, 1).text()
+            else:
+                contextText = ""
+            workSheet.write_merge(row, row, 1, half, contextText,stlye)
+            #写第四列
+            workSheet.write_merge(row, row, half + 2, crtColumnCount - 1, '', stlye)
+        elif row == 5:
+            #写第二列
+            if self.totalModel.tw_ditalModel.cellWidget(row, 1):
+                Send_UnitName = self.totalModel.tw_ditalModel.cellWidget(5, 1).currentText()
+            else:
+                Send_UnitName = ""
+            workSheet.write_merge(row, row, 1, half, Send_UnitName,stlye)
+            #写第四列
+            if self.totalModel.tw_ditalModel.item(row, half + 2):
+                contextText = self.totalModel.tw_ditalModel.item(row, half + 2).text()
+            else:
+                contextText = ""
+            workSheet.write_merge(row, row, half + 2, crtColumnCount - 1, contextText, stlye)
+
+        else:
+            #写第二列
+            if self.totalModel.tw_ditalModel.item(row, 1):
+                contextText = self.totalModel.tw_ditalModel.item(row, 1).text()
+            else:
+                contextText = ""
+
+            workSheet.write_merge(row, row, 1, half, contextText,stlye)
+            #写第四列
+            if self.totalModel.tw_ditalModel.item(row, half + 2):
+                contextText = self.totalModel.tw_ditalModel.item(row, half + 2).text()
+            else:
+                contextText = ""
+            workSheet.write_merge(row, row, half + 2, crtColumnCount - 1, contextText,stlye)
+
+
+
+    def initToExcelSingleTable(self,pageIndex, workSheet, style, unitInfo, equipInfo, year):
+        crtColumnCount = 10
+        crtRowCount = 27
+        self.initSingleTable(pageIndex, workSheet, style,crtRowCount, crtColumnCount, unitInfo, equipInfo, 0)
+        workSheet.write_merge(14, 14 + crtRowCount - 24, crtColumnCount, crtColumnCount,"第一联：存根" ,style)
+        self.initSingleTable(pageIndex, workSheet, style,crtRowCount, crtColumnCount,unitInfo, equipInfo, crtColumnCount + 1)
+        workSheet.write_merge(14, 14 + crtRowCount - 24, crtColumnCount * 2 + 1,  crtColumnCount * 2 + 1, "第二联：发物单位留存",style)
+        self.initSingleTable(pageIndex, workSheet, style,crtRowCount, crtColumnCount,unitInfo, equipInfo, crtColumnCount * 2 + 2)
+        workSheet.write_merge(14, 14 + crtRowCount - 24, crtColumnCount * 3 + 1,  crtColumnCount * 3 + 1, "第三联：收物单位留存",style)
+
+    def initExcelTotalTableLastFourRow(self, workSheet, stlye,crtColumnCount, first, second, third, fourth, row):
+        half = int((crtColumnCount - 4) / 2)
+        workSheet.write(row, 0, first, stlye)
+        if len(second) < 0:
+            if self.totalModel.tw_ditalModel.item(row, 1) != None:
+                contentText = self.totalModel.tw_ditalModel.item(row, 1).text()
+            else:
+                contentText = ''
+        else:
+            contentText = second
+        workSheet.write(row, 1, contentText, stlye)
+        workSheet.write_merge(row, row, 2, 1 + half, '', stlye)
+        workSheet.write(row, half + 2, third, stlye)
+
+        if len(fourth) < 0:
+            if self.totalModel.tw_ditalModel.item(row, half + 3) != None:
+                contentText = self.totalModel.tw_ditalModel.item(row, half + 3).text()
+            else:
+                contentText = ''
+        else:
+            contentText = fourth
+        workSheet.write(row, half + 3, contentText, stlye)
+        workSheet.write_merge(row, row, half + 4, crtColumnCount - 1, '', stlye)
+
+    def initSingleTable(self,pageIndex, workSheet,stlye, crtRowCount, crtColumnCount,unitInfo, equipInfo, startColumn):
+        workSheet.write_merge(0, 2, startColumn,startColumn + crtColumnCount - 1, '火箭军装备调拨通知单', stlye)
+        self.initSingleTableExcelNinethRow(pageIndex, workSheet, stlye, crtColumnCount,'调拨单号:', '调拨日期:', 3, startColumn)
+        self.initSingleTableExcelNinethRow(pageIndex, workSheet, stlye, crtColumnCount,'调拨依据:', '调拨性质:', 4, startColumn)
+        self.initSingleTableExcelNinethRow(pageIndex, workSheet, stlye, crtColumnCount,'交装单位:', '单位地址:', 5, startColumn)
+        self.initSingleTableExcelNinethRow(pageIndex, workSheet, stlye, crtColumnCount,'联系人:', '联系方式:', 6, startColumn)
+        self.initSingleTableExcelNinethRow(pageIndex, workSheet, stlye, crtColumnCount,'军代表:', '联系方式:', 7, startColumn)
+        self.initSingleTableExcelNinethRow(pageIndex, workSheet, stlye, crtColumnCount,'接装单位:', '', 8, startColumn)
+        self.initSingleTableExcelNinethRow(pageIndex, workSheet, stlye, crtColumnCount,'单位地址:', '', 9, startColumn)
+        self.initSingleTableExcelNinethRow(pageIndex, workSheet, stlye, crtColumnCount,'联系人:', '联系方式:', 10, startColumn)
+        self.initSingleTableExcelNinethRow(pageIndex, workSheet, stlye, crtColumnCount,'调拨方式:', '运输方式:', 11, startColumn)
+
+        workSheet.write_merge(14, 15, startColumn , startColumn , "编号",stlye)
+        workSheet.write_merge(14, 15, startColumn + 1, startColumn + 1, "装备名称",stlye)
+        workSheet.write_merge(14, 15, startColumn + 2, startColumn + 2, "计量单位",stlye)
+        workSheet.write_merge(14, 14, startColumn + 3, startColumn + 4, "应发数",stlye)
+        workSheet.write(15, startColumn + 3, "质量",stlye)
+        workSheet.write(15, startColumn + 4, "数量",stlye)
+        workSheet.write_merge(14, 14, startColumn + 5, startColumn + 6, "实发数", stlye)
+        workSheet.write(15, startColumn + 5, "质量", stlye)
+        workSheet.write(15, startColumn + 6, "质量", stlye)
+        workSheet.write_merge(14, 14, startColumn + 7, startColumn + 8, "接收数", stlye)
+        workSheet.write(15, startColumn + 7, "质量", stlye)
+        workSheet.write(15, startColumn + 8, "数量", stlye)
+        workSheet.write(15, startColumn + 9, "备注", stlye)
+        workSheet.write_merge(crtRowCount - 9, crtRowCount - 6, startColumn, startColumn, "备注", stlye)
+        workSheet.write_merge(crtRowCount - 9, crtRowCount - 6, startColumn + 1, startColumn + crtColumnCount - 1, "1.凭《火箭军装备调拨通知单》接装；\n"
+                     "2.完成接装后，将《火箭军装备调拨通知单》三联单，按要求分别盖章签字，并归档。", stlye)
+        self.initSingleTableExcelLastFourRow(pageIndex, workSheet, stlye, crtColumnCount,"承办单位:", "(盖章)", "交装单位:", "(盖章)", crtRowCount - 4, startColumn)
+        self.initSingleTableExcelLastFourRow(pageIndex, workSheet, stlye, crtColumnCount,"局    长:", "杨刚", "主管领导:", "", crtRowCount - 3, startColumn)
+        self.initSingleTableExcelLastFourRow(pageIndex, workSheet, stlye, crtColumnCount,"经 办 人:", "", "经 办 人:", "", crtRowCount - 2, startColumn)
+        self.initSingleTableExcelLastFourRow(pageIndex, workSheet, stlye, crtColumnCount,"日    期:", "", "日    期:", "", crtRowCount - 1, startColumn)
+
+
+
+    def initSingleTableExcelNinethRow(self,pageIndex, workSheet, stlye, crtColumnCount, first, second, row, startColumn):
+        half = int((crtColumnCount - 2) / 2)
+        workSheet.write(row, startColumn, first, stlye)
+        if self.currentSingelUnitPage[pageIndex].tw_ditalModel.item(row, 1):
+            contextText = self.currentSingelUnitPage[pageIndex].tw_ditalModel.item(row, 1).text()
+        else:
+            contextText = ""
+        workSheet.write_merge(row, row, startColumn + 1, startColumn + half, contextText, stlye)
+        workSheet.write(row, startColumn + half + 1, second, stlye)
+        if self.currentSingelUnitPage[pageIndex].tw_ditalModel.item(row, half + 2):
+            contextText = self.currentSingelUnitPage[pageIndex].tw_ditalModel.item(row, half + 2).text()
+        else:
+            contextText = ""
+        workSheet.write_merge(row, row, startColumn + half + 2,startColumn + crtColumnCount - 1 ,contextText, stlye)
+
+
+    def initSingleTableExcelLastFourRow(self,pageIndex, workSheet, stlye, crtColumnCount, first, second, third, fourth, row, startColumn):
+        half = int((crtColumnCount - 4) / 2)
+        #第一列
+        workSheet.write(row, startColumn, first, stlye)
+        #第二列
+        workSheet.write(row, startColumn + 1, second, stlye)
+        #第三列
+        workSheet.write_merge(row,row, startColumn + 2, startColumn + half + 1, '', stlye)
+        #第四列
+        workSheet.write(row, startColumn + half + 2, third, stlye)
+        #第五列
+        workSheet.write(row, startColumn + half + 3, fourth, stlye)
+        #第六列
+        workSheet.write_merge(row, row, startColumn + half + 4, startColumn + 2 * half + 3 , '', stlye)
+
+
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     widget = transferModel()
