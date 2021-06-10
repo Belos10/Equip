@@ -29,7 +29,8 @@ class DisturbPlan(QWidget, yearList_Form):
         self.signalConnect()
 
     def initAll(self):
-
+        self.pb_firstSelect.setDisabled(1)
+        self.pb_secondSelect.setDisabled(1)
         self.tw_first.header().setVisible(False)
         self.tw_second.header().setVisible(False)
         self.le_first.setDisabled(1)
@@ -67,6 +68,7 @@ class DisturbPlan(QWidget, yearList_Form):
         self.inputProof.signal.connect(self.initDisturbPlanProof)
         self.pb_outputToExcel.clicked.connect(self.slotOutputToExcel)
 
+    # 查询单位
     def slotSelectUnit(self):
         findText = self.le_first.text()
         for i, item in self.first_treeWidget_dict.items():
@@ -74,12 +76,15 @@ class DisturbPlan(QWidget, yearList_Form):
                 self.tw_first.setCurrentItem(item)
                 break
 
+    # 查询装备
     def slotSelectEquip(self):
         findText = self.le_second.text()
         for i, item in self.second_treeWidget_dict.items():
             if item.text(0) == findText:
                 self.tw_second.setCurrentItem(item)
                 break
+        print("self.second_treeWidget_dict",self.second_treeWidget_dict)
+
 
     # 信号与槽连接的断开
     def signalDisconnectSlot(self):
@@ -155,6 +160,7 @@ class DisturbPlan(QWidget, yearList_Form):
             item.setText(year)
             self.lw_yearChoose.addItem(item)
 
+    # 点击年份后 初始化装备与单位列表
     def slotClickedInqury(self):
         self.initUserInfo()
         self.tw_first.clear()
@@ -168,6 +174,8 @@ class DisturbPlan(QWidget, yearList_Form):
         self.pb_proof.setDisabled(0)
         self.first_treeWidget_dict = {}
         self.second_treeWidget_dict = {}
+        self.pb_firstSelect.setDisabled(0)
+        self.pb_secondSelect.setDisabled(0)
         self.currentYear = self.lw_yearChoose.currentItem().text()
         # startEquipIDInfo = findUperEquipIDByName("通用装备")
         startInfo = selectDisturbPlanUnitInfoByUnitID(self.userInfo[0][4])
@@ -178,14 +186,15 @@ class DisturbPlan(QWidget, yearList_Form):
             root.append(self.tw_first)
             self._initUnitTreeWidget(stack, root)
 
-        # equipInfo = None
+        # equipInfo = 通用装备一行的所有信息
         equipInfo = findUperEquipIDByName("通用装备")
         stack = []
         root = []
         if equipInfo:
+            # stack 传入 通用装备ID
             stack.append(equipInfo[0])
             root.append(self.tw_second)
-            self._initEquipTreeWidget(stack, root)
+            self._initEquipTreeWidget(stack, root,0)
 
     def initUserInfo(self):
         self.userInfo = get_value("totleUserInfo")
@@ -202,23 +211,40 @@ class DisturbPlan(QWidget, yearList_Form):
                 stack.append(resultInfo)
                 root.append(item)
 
-    def _initEquipTreeWidget(self, stack, root):
+    def _initEquipTreeWidget(self, stack, root, count):
         while stack:
             EquipInfo = stack.pop(0)
             item = QTreeWidgetItem(root.pop(0))
+            #Name = count * (' ') + EquipInfo[1]
             item.setText(0, EquipInfo[1])
+            #item.setText(0,"Name")
             item.setCheckState(0, Qt.Unchecked)
             self.second_treeWidget_dict[EquipInfo[0]] = item
+            ###############
             result = selectEquipInfoByEquipUper(EquipInfo[0])
+            print("这里的结果",result)
             for resultInfo in result:
                 stack.append(resultInfo)
                 root.append(item)
+                self._initEquipTreeWidget(stack,root,count+1)
         # print("first_treeWidget_dict", self.first_treeWidget_dict)
+
+    def fun1(self,result):
+        count = selectLevelForGeneralEquip(result[0][0])
+        Name = count * '    ' + result[0][1]
+        result1 = []
+        for i,value in enumerate(result[0]):
+            if i != 1:
+                result1.append(result[0][i])
+            else:
+                result1.append(Name)
+        result[0] = tuple(result1)
+        return result
+
 
     '''
         查询结果
     '''
-
     def slotDisturbStrengthResult(self):
         self.yearList = []
         # self.currentEquipdict.clear()
@@ -245,10 +271,12 @@ class DisturbPlan(QWidget, yearList_Form):
         for equipID, equipItem in self.second_treeWidget_dict.items():
             if equipItem.checkState(0) == Qt.Checked:
                 equipInfo = findEquipInfo(equipID)
+                equipInfo = self.fun1(equipInfo)
                 self.currentEquipdict[j] = equipInfo[0]
                 j = j + 1
             elif equipItem.checkState(0) == Qt.PartiallyChecked:
                 equipInfo = findEquipInfo(equipID)
+                equipInfo = self.fun1(equipInfo)
                 self.currentEquipdict[j] = equipInfo[0]
                 j = j + 1
         print("self.currentEquipdict", self.currentEquipdict)
