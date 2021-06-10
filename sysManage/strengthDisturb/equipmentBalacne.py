@@ -339,7 +339,6 @@ class equipmentBalance(QWidget, Widget_Retirement):
                 else:
                     self.resultList[row][' lastLevel'] = False
                 item = QTableWidgetItem(self.resultList[row].get('Equip_Name'))
-                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
                 item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                 self.tw_result.setItem(row + 4, 0,item)
 

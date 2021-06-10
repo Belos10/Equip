@@ -110,14 +110,90 @@ def getResultByYearAndEquipAndUnit(year,equipList,unitList):
                 resultList.append(getOneEquipmentBalanceDate(year, equip, unit))
 
         return resultList
+'''
+    功能：
+        判断单位的为几级单位
+'''
+def gradeInUnit(UnitId):
+    sql = "select Unit_Uper from unit where Unit_ID='%s'"%UnitId
+    data = selectOne(sql)
+    if data != None:
+        return gradeInUnit(data['Unit_Uper']) + 1
+    else:
+        return 0
+'''
+    功能：
+        判断装备的为几级单位
+'''
+def gradeInEquip(equipmentId):
+    sql = "select Equip_Uper from equip where Equip_ID='%s'"%equipmentId
+    data = selectOne(sql)
+    if data != None:
+        return gradeInUnit(data['Equip_Uper']) + 1
+    else:
+        return 0
+'''
+    功能获取缩进之后到装备名称
+'''
+
+def getFomatEquipmentName(equipmentId):
+    grade = gradeInEquip(equipmentId)
+    space = '    '
+    header = ''
+    for i in range(grade):
+        header = header + space
+    formatName = header + selectEquipNameByEquipID(equipmentId)
+    return formatName
+
+'''
+    功能获取缩进之后到单位名称
+'''
+
+def getFomatUnitName(unitId):
+    grade = gradeInUnit(unitId)
+    space = '    '
+    header = ''
+    for i in range(grade):
+        header = header + space
+    formatName = header + selectUnitNameByUnitID(unitId)
+    return formatName
+
+'''
+    功能：
+        通过单位号找到单位名字
+        Unit_ID: 需要找的单位的ID号 
+'''
+def selectUnitNameByUnitID(Unit_ID):
+    cur = conn.cursor()
+    sql = "select Unit_Name from unit where Unit_ID = '" + Unit_ID + "'"
+    cur.execute(sql)
+    unitName = cur.fetchall()
+    for name in unitName:
+        return name[0]
+
+
+'''
+    功能：
+        通过单位号找到单位名字
+        Unit_ID: 需要找的单位的ID号 
+'''
+
+
+def selectEquipNameByEquipID(equipID):
+    cur = conn.cursor()
+    sql = "select Equip_Name from equip where Equip_ID = '" + equipID + "'"
+    cur.execute(sql)
+    euipName = cur.fetchall()
+    for name in euipName:
+        return name[0]
+
 
 def getOneEquipmentBalanceDate(year, equip, unit):
     item = {}
     sql = "select equip_balance_id,Equip_ID from equipment_balance where year=%s and Equip_ID=%s and Unit_ID=%s" % (
     year, equip, unit)
     result = selectOne(sql)
-    sql = "select Equip_Name from equip where Equip_ID=%s" % result['Equip_ID']
-    item.update(selectOne(sql))
+    item['Equip_Name'] = getFomatEquipmentName(equip)
     sql = "select * from equipment_balance where equip_balance_id=%s" % result['equip_balance_id']
     item.update(selectOne(sql))
     sql = "select * from eb_quality_status where equip_balance_id=%s" % result['equip_balance_id']
@@ -239,7 +315,9 @@ def updateOneEquipmentBalanceData(year,equipmentId,unitId):
     item['changeValue'] = item['existingValue'] - item['originalValue']
 
     sql = "select equip_balance_id from  equipment_balance where equip_balance_id=%s"%item['equipmentBalanceKey']
+
     equipmentBalance = selectOne(sql)
+    print(equipmentBalance)
     if equipmentBalance is None or equipmentBalance['equip_balance_id'] is None:
         insertOneEquipmentBalanceData(item)
     else:

@@ -16,7 +16,6 @@ def selectUnitNameByUnitID(Unit_ID):
         return name[0]
 
 
-
 '''
     功能获取单位表中各个单位的名字
 '''

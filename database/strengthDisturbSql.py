@@ -1,7 +1,7 @@
 import pymysql
 from database.connectAndDisSql import *
 #from database.alocatMangeSql import selectYearListAboutDisturbPlan
-from database.SD_EquipmentBanlanceSql import updateOneEquipmentBalanceData, deleteByYear
+from database.SD_EquipmentBanlanceSql import updateOneEquipmentBalanceData, deleteByYear, getFomatEquipmentName
 
 #new
 
@@ -2791,7 +2791,7 @@ def selectAboutRetireByEquipShow(UnitList, EquipList, year):
             strengthInfo = selectStrengthInfo(unitID, EquipID, year)
             ID = unitID + EquipID + year
             equipInfo = selectEquipInfoByEquipID(EquipID)
-            equipName = equipInfo[0][1]
+            equipName = getFomatEquipmentName(equipInfo[0][0])
             equipUnit = equipInfo[0][5]
             if equipUnit:
                 pass
