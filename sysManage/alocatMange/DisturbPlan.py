@@ -215,21 +215,17 @@ class DisturbPlan(QWidget, yearList_Form):
         while stack:
             EquipInfo = stack.pop(0)
             item = QTreeWidgetItem(root.pop(0))
-            #Name = count * (' ') + EquipInfo[1]
             item.setText(0, EquipInfo[1])
-            #item.setText(0,"Name")
             item.setCheckState(0, Qt.Unchecked)
             self.second_treeWidget_dict[EquipInfo[0]] = item
-            ###############
             result = selectEquipInfoByEquipUper(EquipInfo[0])
-            print("这里的结果",result)
             for resultInfo in result:
                 stack.append(resultInfo)
                 root.append(item)
                 self._initEquipTreeWidget(stack,root,count+1)
         # print("first_treeWidget_dict", self.first_treeWidget_dict)
 
-    def fun1(self,result):
+    def addTab(self, result):
         count = selectLevelForGeneralEquip(result[0][0])
         Name = count * '    ' + result[0][1]
         result1 = []
@@ -271,12 +267,12 @@ class DisturbPlan(QWidget, yearList_Form):
         for equipID, equipItem in self.second_treeWidget_dict.items():
             if equipItem.checkState(0) == Qt.Checked:
                 equipInfo = findEquipInfo(equipID)
-                equipInfo = self.fun1(equipInfo)
+                equipInfo = self.addTab(equipInfo)
                 self.currentEquipdict[j] = equipInfo[0]
                 j = j + 1
             elif equipItem.checkState(0) == Qt.PartiallyChecked:
                 equipInfo = findEquipInfo(equipID)
-                equipInfo = self.fun1(equipInfo)
+                equipInfo = self.addTab(equipInfo)
                 self.currentEquipdict[j] = equipInfo[0]
                 j = j + 1
         print("self.currentEquipdict", self.currentEquipdict)
@@ -285,7 +281,6 @@ class DisturbPlan(QWidget, yearList_Form):
     '''
         初始化分配计划结果
     '''
-
     def _initDisturbPlanByUnitListAndEquipList(self):
         self.disturbResult.clear()
         self.disturbResult.setRowCount(0)

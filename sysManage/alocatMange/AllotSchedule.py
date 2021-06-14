@@ -101,7 +101,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         self.second_treeWidget_dict = {}
         self.initUserInfo()
         self.currentYear = self.lw_yearChoose.currentItem().text()
-        self._initUnitTreeWidget("", self.tw_first)
+        # self._initUnitTreeWidget("", self.tw_first)
         startInfo = selectDisturbPlanUnitInfoByUnitID(self.userInfo[0][4])
         stack = []
         root = []
@@ -116,7 +116,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         if equipInfo:
             stack.append(equipInfo[0])
             root.append(self.tw_second)
-            self._initEquipTreeWidget(stack, root)
+            self._initEquipTreeWidget(stack, root, 0)
         # startEquipIDInfo = findUperEquipIDByName("通用装备")
         # for startEquipInfo in startEquipIDInfo:
         #     # self.second_treeWidget_dict[0] = startEquipInfo
@@ -143,10 +143,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                 stack.append(resultInfo)
                 root.append(item)
 
-
-
-
-    def _initEquipTreeWidget(self, stack,root):
+    def _initEquipTreeWidget(self, stack, root, count):
         while stack:
             EquipInfo = stack.pop(0)
             item = QTreeWidgetItem(root.pop(0))
@@ -157,6 +154,19 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
             for resultInfo in result:
                 stack.append(resultInfo)
                 root.append(item)
+                self._initEquipTreeWidget(stack, root, count + 1)
+
+    def addTab(self, result):
+        count = selectLevelForGeneralEquip(result[0][0])
+        Name = count * '    ' + result[0][1]
+        result1 = []
+        for i,value in enumerate(result[0]):
+            if i != 1:
+                result1.append(result[0][i])
+            else:
+                result1.append(Name)
+        result[0] = tuple(result1)
+        return result
 
     def initcbschedule(self):
         self.cb_schedule.clear()
@@ -205,12 +215,14 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         for equipID, equipItem in self.second_treeWidget_dict.items():
             if equipItem.checkState(0) == Qt.Checked:
                 equipInfo = findEquipInfo(equipID)
-                self.originalEquipDict[j]= equipInfo[0]
-                j=j+1
+                equipInfo = self.addTab(equipInfo)
+                self.originalEquipDict[j] = equipInfo[0]
+                j = j + 1
             elif equipItem.checkState(0) == Qt.PartiallyChecked:
                 equipInfo = findEquipInfo(equipID)
+                equipInfo = self.addTab(equipInfo)
                 self.originalEquipDict[j] = equipInfo[0]
-                j=j+1
+                j = j + 1
         #print("self.originalEquipDict",self.originalEquipDict)
         self._initDisturbPlanByUnitListAndEquipList(self.originalEquipDict)
 

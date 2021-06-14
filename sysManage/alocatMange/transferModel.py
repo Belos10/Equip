@@ -322,6 +322,7 @@ class transferModel(QDialog, Widget_Transfer_Model):
             for key, page in self.currentSingelUnitPage.items():
                 page.saveSingleModel()
                 page.setDisabled(True)
+            self.slotClickedOutput()
             self.signal.emit('1')
 
     def setCurrentYear(self, year):

@@ -167,7 +167,7 @@ class retirePlan(QWidget, retirePlan_Form):
         if equipInfo:
             stack.append(equipInfo[0])
             root.append(self.tw_second)
-            self._initEquipTreeWidget(stack, root)
+            self._initEquipTreeWidget(stack, root, 0)
 
     def initUserInfo(self):
         self.userInfo = get_value("totleUserInfo")
@@ -183,7 +183,7 @@ class retirePlan(QWidget, retirePlan_Form):
                 stack.append(resultInfo)
                 root.append(item)
 
-    def _initEquipTreeWidget(self, stack, root):
+    def _initEquipTreeWidget(self, stack, root, count):
         while stack:
             EquipInfo = stack.pop(0)
             item = QTreeWidgetItem(root.pop(0))
@@ -194,6 +194,7 @@ class retirePlan(QWidget, retirePlan_Form):
             for resultInfo in result:
                 stack.append(resultInfo)
                 root.append(item)
+                self._initEquipTreeWidget(stack, root, count + 1)
 
     '''
         查询结果
@@ -224,14 +225,29 @@ class retirePlan(QWidget, retirePlan_Form):
         for equipID, equipItem in self.second_treeWidget_dict.items():
             if equipItem.checkState(0) == Qt.Checked:
                 equipInfo = findEquipInfo(equipID)
+                equipInfo = self.addTab(equipInfo)
                 self.currentEquipdict[j] = equipInfo[0]
                 j = j + 1
             elif equipItem.checkState(0) == Qt.PartiallyChecked:
                 equipInfo = findEquipInfo(equipID)
+                equipInfo = self.addTab(equipInfo)
                 self.currentEquipdict[j] = equipInfo[0]
                 j = j + 1
-
         self._initRetirePlanByUnitListAndEquipList()
+
+
+    def addTab(self, result):
+        count = selectLevelForGeneralEquip(result[0][0])
+        Name = count * '    ' + result[0][1]
+        result1 = []
+        for i,value in enumerate(result[0]):
+            if i != 1:
+                result1.append(result[0][i])
+            else:
+                result1.append(Name)
+        result[0] = tuple(result1)
+        return result
+
 
     '''
         初始化退役报废计划结果
