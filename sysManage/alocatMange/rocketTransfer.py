@@ -37,7 +37,7 @@ class rocketTransfer(QWidget, Widget_Rocket_Transfer):
         self.lw_yearChoose.clear()
         self.yearList = []
         allYear = selectYearListAboutDisturbPlan()
-        print(allYear)
+        # print(allYear)
         for year in allYear:
             self.yearList.append(year)
 

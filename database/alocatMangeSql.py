@@ -377,10 +377,7 @@ def selectDisturbPlanOther(EquipList, YearList):
             resultList.append(result)
         else:
             resultList.append([])
-        # for resultInfo in result:
-        #     resultList.append(resultInfo)
     print("陆军调拨单resultList", resultList)
-    # disconnectMySql(conn, cur)
     return resultList
 
 # # 读取火箭军计划数
@@ -559,13 +556,11 @@ def updateScheduleFinishUper(Equip_Id, Year, fileName):
 
 # 陆军调拨号与装备质量
 def selectQuaAndID(Equip_ID, year):
-    # conn, cur = connectMySql()
     sql = "select Equip_Quity,Trans_ID from armytransfer where Equip_ID = '" + Equip_ID + "'and year = '" + year + "'"
     cur.execute(sql)
     result = cur.fetchall()
     print("找质量和陆军单号result", result)
     conn.commit()
-    # disconnectMySql(conn, cur)
     return result
 
 # 按装备ID列表从unit表复制数据至disturbplanunit表

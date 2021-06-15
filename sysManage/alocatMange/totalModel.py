@@ -322,7 +322,7 @@ class totalModel(QDialog, Widget_Dital_Model):
         item = QTableWidgetItem()
         item.setText("")
         half = int((self.crtColumnCount - 2) / 2)
-        print(self.crtColumnCount, half)
+        # print(self.crtColumnCount, half)
         self.tw_ditalModel.setItem(row, 1, item)
         self.tw_ditalModel.setSpan(row, 1, 1, half)
 
@@ -397,7 +397,7 @@ class totalModel(QDialog, Widget_Dital_Model):
         if row == 3:
             item = QDateEdit()
             half = int((self.crtColumnCount - 4) / 2)
-            print(self.crtColumnCount, half)
+            # print(self.crtColumnCount, half)
             self.tw_ditalModel.setCellWidget(row, 2, item)
             #self.tw_ditalModel.setSpan(row, 2, 1, half)
         else:
@@ -405,7 +405,7 @@ class totalModel(QDialog, Widget_Dital_Model):
             item.setText("")
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             half = int((self.crtColumnCount - 4) / 2)
-            print(self.crtColumnCount, half)
+            # print(self.crtColumnCount, half)
             self.tw_ditalModel.setItem(row, 2, item)
             self.tw_ditalModel.setSpan(row, 2, 1, half)
 

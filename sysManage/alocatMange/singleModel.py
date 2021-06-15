@@ -194,7 +194,7 @@ class singleModel(QDialog, Widget_Dital_Model):
         item = QTableWidgetItem()
         item.setText("")
         half = int((self.crtColumnCount - 2) / 2)
-        print(self.crtColumnCount, half)
+        # print(self.crtColumnCount, half)
         self.tw_ditalModel.setItem(row, startColumn + 1, item)
         self.tw_ditalModel.setSpan(row, startColumn + 1, 1, half)
 
@@ -262,7 +262,7 @@ class singleModel(QDialog, Widget_Dital_Model):
         self.updateSigleTable(requireInfo, 2 * self.crtColumnCount + 2)
 
     def updateSigleTable(self, requireInfo, startColumn):
-        print(requireInfo)
+        # print(requireInfo)
         half = int((self.crtColumnCount - 4) / 2)
         self.tw_ditalModel.item(3, startColumn+half + 3).setText(requireInfo[0])
         self.tw_ditalModel.item(4, startColumn+1).setText(requireInfo[1])

@@ -303,7 +303,6 @@ class transferModel(QDialog, Widget_Transfer_Model):
                 requireInfo.append(self.totalModel.equipInfo[5])
                 requireInfo.append(Equip_Quity)
                 if key == unitInfo[0]:
-                    print("hao")
                     requireInfo.append(unitInfo[3])
                     requireInfo.append(self.totalModel.requireInfo[2 + i])
                     page.updateTableWidget(requireInfo)
@@ -329,7 +328,6 @@ class transferModel(QDialog, Widget_Transfer_Model):
         self.currentYear = year
 
     def getUnitIDList(self, unitInfoList, equipInfo, year, requireInfo):
-        #print("===========", requireInfo)
         if unitInfoList == "" and equipInfo =="" and  year =="" and  requireInfo == "":
             self.pb_input.setDisabled(True)
             self.pb_output.setDisabled(True)
@@ -337,7 +335,6 @@ class transferModel(QDialog, Widget_Transfer_Model):
             self.pb_saveSingle.setDisabled(True)
             self.pb_confirm.setDisabled(True)
             return
-        #print("==============================")
         self.pb_input.setDisabled(False)
         self.pb_output.setDisabled(False)
         self.pb_saveTotal.setDisabled(False)
@@ -350,12 +347,9 @@ class transferModel(QDialog, Widget_Transfer_Model):
         self.unitNum = len(unitInfoList)
         self.currentUnitInfoList = unitInfoList
         self.tw_transferModel.clear()
-        #print("requireInfo :==============", requireInfo)
-        #####
         self.totalModel = totalModel()
         self.totalModel.initTableWidget(self.unitInfoList, self.equipInfo, self.year, self.requireInfo)
         self.tw_transferModel.addTab(self.totalModel, "总单")
-        print("require", self.requireInfo)
         for unitInfo, num in zip(unitInfoList, requireInfo[2: -2]):
             if num == "" or num == "0":
                 continue

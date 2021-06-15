@@ -203,6 +203,7 @@ class retirePlan(QWidget, retirePlan_Form):
     def slotRetireStrengthResult(self):
         self.yearList = []
         self.currentEquipdict = {}
+        self.currentEquipdictTab = {}
         self.currentUnitChilddict = {}
         self.unitFlag = 0
         self.retirePlanResult.clear()
@@ -225,13 +226,15 @@ class retirePlan(QWidget, retirePlan_Form):
         for equipID, equipItem in self.second_treeWidget_dict.items():
             if equipItem.checkState(0) == Qt.Checked:
                 equipInfo = findEquipInfo(equipID)
-                equipInfo = self.addTab(equipInfo)
                 self.currentEquipdict[j] = equipInfo[0]
+                equipInfo = self.addTab(equipInfo)
+                self.currentEquipdictTab[j] = equipInfo[0]
                 j = j + 1
             elif equipItem.checkState(0) == Qt.PartiallyChecked:
                 equipInfo = findEquipInfo(equipID)
-                equipInfo = self.addTab(equipInfo)
                 self.currentEquipdict[j] = equipInfo[0]
+                equipInfo = self.addTab(equipInfo)
+                self.currentEquipdictTab[j] = equipInfo[0]
                 j = j + 1
         self._initRetirePlanByUnitListAndEquipList()
 
@@ -272,7 +275,7 @@ class retirePlan(QWidget, retirePlan_Form):
             self.retirePlanResult.setHorizontalHeaderLabels(headerlist)
             self.retirePlanResult.setColumnWidth(0, 200)
             i = 0
-            for LineInfo in self.currentEquipdict.values():
+            for LineInfo in self.currentEquipdictTab.values():
                 currentRowResult = []
                 item = QTableWidgetItem(LineInfo[1])
                 item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
@@ -313,7 +316,7 @@ class retirePlan(QWidget, retirePlan_Form):
             self.retirePlanResult.setHorizontalHeaderLabels(headerlist)
             self.retirePlanResult.setColumnWidth(0, 200)
             i = 0
-            for LineInfo in self.currentEquipdict.values():
+            for LineInfo in self.currentEquipdictTab.values():
                 currentRowResult = []
                 item = QTableWidgetItem(LineInfo[1])
                 item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)

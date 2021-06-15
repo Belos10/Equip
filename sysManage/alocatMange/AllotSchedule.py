@@ -189,7 +189,8 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
     '''
     def slotDisturbStrengthResult(self):
         self.yearList = []
-        self.originalEquipDict={}
+        self.originalEquipDict = {}
+        self.originalEquipDictTab = {}
         self.currentUnitChilddict = {}
         self.unitFlag = 0
         self.disturbResult.clear()
@@ -215,22 +216,24 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         for equipID, equipItem in self.second_treeWidget_dict.items():
             if equipItem.checkState(0) == Qt.Checked:
                 equipInfo = findEquipInfo(equipID)
-                equipInfo = self.addTab(equipInfo)
                 self.originalEquipDict[j] = equipInfo[0]
+                equipInfo = self.addTab(equipInfo)
+                self.originalEquipDictTab[j] = equipInfo[0]
                 j = j + 1
             elif equipItem.checkState(0) == Qt.PartiallyChecked:
                 equipInfo = findEquipInfo(equipID)
-                equipInfo = self.addTab(equipInfo)
                 self.originalEquipDict[j] = equipInfo[0]
+                equipInfo = self.addTab(equipInfo)
+                self.originalEquipDictTab[j] = equipInfo[0]
                 j = j + 1
         #print("self.originalEquipDict",self.originalEquipDict)
-        self._initDisturbPlanByUnitListAndEquipList(self.originalEquipDict)
+        self._initDisturbPlanByUnitListAndEquipList(self.originalEquipDict,self.originalEquipDictTab)
 
 
     '''
         初始化分配计划结果
     '''
-    def _initDisturbPlanByUnitListAndEquipList(self,equipDict):
+    def _initDisturbPlanByUnitListAndEquipList(self,equipDict,equipDictTab={}):
         self.disturbResult.clear()
         self.disturbResult.setRowCount(0)
         self.currentEquipdict = equipDict
@@ -254,7 +257,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
             self.currentDisturbPlan.clear()
             self.disturbResult.setColumnWidth(0, 200)
             i = 0
-            for LineInfo in self.currentEquipdict.values():
+            for LineInfo in equipDictTab.values():
                 currentRowResult = []
                 item = QTableWidgetItem(LineInfo[1])
                 item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
@@ -303,7 +306,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
             self.disturbResult.setHorizontalHeaderLabels(headerlist)
             self.disturbResult.setColumnWidth(0, 200)
             i = 0
-            for LineInfo in self.currentEquipdict.values():
+            for LineInfo in equipDictTab.values():
                 currentRowResult = []
                 item = QTableWidgetItem(LineInfo[1])
                 item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
@@ -390,6 +393,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                     item.clicked.connect(self.setRocketSchedule)
                     if int(flag3[0][0]):
                         item = QPushButton("已完成")
+                        item.clicked.connect(self.showRocket)
                     self.disturbResult.setCellWidget(i, 7 + self.lenCurrentUnitChilddict, item)
 
                     # 是否完成接装
@@ -418,6 +422,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                     item.clicked.connect(self.setRocketSchedule)
                     if int(flag2[0][0]):
                         item = QPushButton("已完成")
+                        item.clicked.connect(self.showRocket)
                     self.disturbResult.setCellWidget(i, 5 + self.lenCurrentUnitChilddict, item)
 
                     # 是否具备接装条件
@@ -694,10 +699,51 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         if self.unitFlag == 1:
             self.disturbResult.setCellWidget(currentRow, 7 + self.lenCurrentUnitChilddict, item)
             updateRocketScheduleUper(self.currentEquipdict[currentRow][0], self.currentYear)
+            item.clicked.connect(self.showRocket)
         elif self.unitFlag == 2:
             self.disturbResult.setCellWidget(currentRow, 5 + self.lenCurrentUnitChilddict, item)
             updateRocketScheduleBase(self.currentEquipdict[currentRow][0], self.currentYear)
+            item.clicked.connect(self.showRocket)
 
+    def showRocket(self):
+        row = self.disturbResult.currentRow()
+        currentColomn = self.disturbResult.currentColumn()
+        ShowRocket = transferModel()
+        if row < 0 or currentColomn < 0:
+            return
+        if currentColomn - 1 < 0:
+            return
+        if self.unitFlag == 1:
+            if self.disturbResult.cellWidget(row, currentColomn - 1).text() != "已完成":
+                QMessageBox.information(self, "设置接装条件", "上一级未完成", QMessageBox.Yes)
+                return
+        currentUnit = []
+        for i in self.currentUnitChilddict.values():
+            currentUnit.append(i)
+        if row != -1:
+            # 存放质量和陆军单号
+            result1 = selectQuaAndID(self.currentEquipdict[row][0], self.currentYear)
+            if result1:
+                info1 = [result1[0][0], self.disturbResult.item(row, 4).text()]
+                for i in range(0, self.lenCurrentUnitChilddict):
+                    info1.append(self.disturbResult.item(row, 5 + i).text())
+                info1.append(self.tb_proof.toPlainText())
+                info1.append(result1[0][1])
+                ShowRocket.getUnitIDList(currentUnit, self.currentEquipdict[self.disturbResult.currentRow()],
+                                                  self.currentYear, info1)
+            else:
+                ShowRocket.getUnitIDList("", "",
+                                                  "", "")
+            ShowRocket.setWindowFlags(Qt.Dialog | Qt.WindowCloseButtonHint)
+            ShowRocket.pb_output.setDisabled(1)
+            ShowRocket.pb_input.setDisabled(1)
+            ShowRocket.pb_confirm.setDisabled(1)
+            ShowRocket.pb_saveSingle.setDisabled(1)
+            ShowRocket.pb_saveTotal.setDisabled(1)
+            # ShowRocket.tw_transferModel.set
+            #ShowRocket.setDisabled(1)
+            ShowRocket.show()
+            ShowRocket.exec_()
 
     # 进度4 是否完成
     def setScheduleFinish(self):
@@ -735,11 +781,12 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
             index = self.cb_schedule.currentIndex()
             # 未选择状态
             if index == 0:
-                self._initDisturbPlanByUnitListAndEquipList(self.originalEquipDict)
+                self._initDisturbPlanByUnitListAndEquipList(self.originalEquipDict,self.originalEquipDictTab)
 
             # 完成进度一
             elif index == 1:
                 equipDict={}
+                equipDictTab = {}
                 j = 0
                 for equipID, equipItem in self.second_treeWidget_dict.items():
                     flag1 = selectArmySchedule(equipID, self.currentYear)
@@ -747,16 +794,21 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                         if equipItem.checkState(0) == Qt.Checked:
                             equipInfo = findEquipInfo(equipID)
                             equipDict[j] = equipInfo[0]
+                            equipInfo = self.addTab(equipInfo)
+                            equipDictTab[j] = equipInfo[0]
                             j = j + 1
                         elif equipItem.checkState(0) == Qt.PartiallyChecked:
                             equipInfo = findEquipInfo(equipID)
                             equipDict[j] = equipInfo[0]
+                            equipInfo = self.addTab(equipInfo)
+                            equipDictTab[j] = equipInfo[0]
                             j = j + 1
-                self._initDisturbPlanByUnitListAndEquipList(equipDict)
+                self._initDisturbPlanByUnitListAndEquipList(equipDict,equipDictTab)
 
             # 完成进度二
             elif index == 2:
                 equipDict = {}
+                equipDictTab = {}
                 j = 0
                 for equipID, equipItem in self.second_treeWidget_dict.items():
                     flag2 = selectAllotConditionUper(equipID, self.currentYear)
@@ -764,16 +816,21 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                         if equipItem.checkState(0) == Qt.Checked:
                             equipInfo = findEquipInfo(equipID)
                             equipDict[j] = equipInfo[0]
+                            equipInfo = self.addTab(equipInfo)
+                            equipDictTab[j] = equipInfo[0]
                             j = j + 1
                         elif equipItem.checkState(0) == Qt.PartiallyChecked:
                             equipInfo = findEquipInfo(equipID)
                             equipDict[j] = equipInfo[0]
+                            equipInfo = self.addTab(equipInfo)
+                            equipDictTab[j] = equipInfo[0]
                             j = j + 1
-                self._initDisturbPlanByUnitListAndEquipList(equipDict)
+                self._initDisturbPlanByUnitListAndEquipList(equipDict,equipDictTab)
 
             # 完成进度三
             elif index == 3:
                 equipDict = {}
+                equipDictTab = {}
                 j = 0
                 for equipID, equipItem in self.second_treeWidget_dict.items():
                     flag3 = selectRocketScheduleUper(equipID, self.currentYear)
@@ -781,16 +838,21 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                         if equipItem.checkState(0) == Qt.Checked:
                             equipInfo = findEquipInfo(equipID)
                             equipDict[j] = equipInfo[0]
+                            equipInfo = self.addTab(equipInfo)
+                            equipDictTab[j] = equipInfo[0]
                             j = j + 1
                         elif equipItem.checkState(0) == Qt.PartiallyChecked:
                             equipInfo = findEquipInfo(equipID)
                             equipDict[j] = equipInfo[0]
+                            equipInfo = self.addTab(equipInfo)
+                            equipDictTab[j] = equipInfo[0]
                             j = j + 1
-                self._initDisturbPlanByUnitListAndEquipList(equipDict)
+                self._initDisturbPlanByUnitListAndEquipList(equipDict,equipDictTab)
 
             # 完成进度四
             elif index == 4:
                 equipDict = {}
+                equipDictTab = {}
                 j = 0
                 for equipID, equipItem in self.second_treeWidget_dict.items():
                     flag4 = selectIfScheduleFinishUper(equipID, self.currentYear)
@@ -798,39 +860,25 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                         if equipItem.checkState(0) == Qt.Checked:
                             equipInfo = findEquipInfo(equipID)
                             equipDict[j] = equipInfo[0]
+                            equipInfo = self.addTab(equipInfo)
+                            equipDictTab[j] = equipInfo[0]
                             j = j + 1
                         elif equipItem.checkState(0) == Qt.PartiallyChecked:
                             equipInfo = findEquipInfo(equipID)
                             equipDict[j] = equipInfo[0]
+                            equipInfo = self.addTab(equipInfo)
+                            equipDictTab[j] = equipInfo[0]
                             j = j + 1
-                self._initDisturbPlanByUnitListAndEquipList(equipDict)
-###################################################################################
+                self._initDisturbPlanByUnitListAndEquipList(equipDict,equipDictTab)
         elif self.unitFlag == 2:
             index = self.cb_schedule.currentIndex()
             # 未选择状态
             if index == 0:
-                self._initDisturbPlanByUnitListAndEquipList(self.originalEquipDict)
-
-            # 完成进度一
-            # elif index == 1:
-            #     equipDict = {}
-            #     j = 0
-            #     for equipID, equipItem in self.second_treeWidget_dict.items():
-            #         flag1 = selectArmySchedule(equipID, self.currentYear)
-            #         if flag1[0][0] != '0':
-            #             if equipItem.checkState(0) == Qt.Checked:
-            #                 equipInfo = findEquipInfo(equipID)
-            #                 equipDict[j] = equipInfo[0]
-            #                 j = j + 1
-            #             elif equipItem.checkState(0) == Qt.PartiallyChecked:
-            #                 equipInfo = findEquipInfo(equipID)
-            #                 equipDict[j] = equipInfo[0]
-            #                 j = j + 1
-            #     self._initDisturbPlanByUnitListAndEquipList(equipDict)
-
+                self._initDisturbPlanByUnitListAndEquipList(self.originalEquipDict,self.originalEquipDictTab)
             # 完成进度二
             elif index == 2:
                 equipDict = {}
+                equipDictTab = {}
                 j = 0
                 for equipID, equipItem in self.second_treeWidget_dict.items():
                     flag2 = selectAllotConditionBase(equipID, self.currentYear)
@@ -838,16 +886,21 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                         if equipItem.checkState(0) == Qt.Checked:
                             equipInfo = findEquipInfo(equipID)
                             equipDict[j] = equipInfo[0]
+                            equipInfo = self.addTab(equipInfo)
+                            equipDictTab[j] = equipInfo[0]
                             j = j + 1
                         elif equipItem.checkState(0) == Qt.PartiallyChecked:
                             equipInfo = findEquipInfo(equipID)
                             equipDict[j] = equipInfo[0]
+                            equipInfo = self.addTab(equipInfo)
+                            equipDictTab[j] = equipInfo[0]
                             j = j + 1
-                self._initDisturbPlanByUnitListAndEquipList(equipDict)
+                self._initDisturbPlanByUnitListAndEquipList(equipDict,equipDictTab)
 
             # 完成进度一
             elif index == 1:
                 equipDict = {}
+                equipDictTab = {}
                 j = 0
                 for equipID, equipItem in self.second_treeWidget_dict.items():
                     flag3 = selectRocketScheduleBase(equipID, self.currentYear)
@@ -855,16 +908,21 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                         if equipItem.checkState(0) == Qt.Checked:
                             equipInfo = findEquipInfo(equipID)
                             equipDict[j] = equipInfo[0]
+                            equipInfo = self.addTab(equipInfo)
+                            equipDictTab[j] = equipInfo[0]
                             j = j + 1
                         elif equipItem.checkState(0) == Qt.PartiallyChecked:
                             equipInfo = findEquipInfo(equipID)
                             equipDict[j] = equipInfo[0]
+                            equipInfo = self.addTab(equipInfo)
+                            equipDictTab[j] = equipInfo[0]
                             j = j + 1
-                self._initDisturbPlanByUnitListAndEquipList(equipDict)
+                self._initDisturbPlanByUnitListAndEquipList(equipDict,equipDictTab)
 
             # 完成进度三
             elif index == 3:
                 equipDict = {}
+                equipDictTab = {}
                 j = 0
                 for equipID, equipItem in self.second_treeWidget_dict.items():
                     flag4 = selectIfScheduleFinishBase(equipID, self.currentYear)
@@ -872,9 +930,13 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                         if equipItem.checkState(0) == Qt.Checked:
                             equipInfo = findEquipInfo(equipID)
                             equipDict[j] = equipInfo[0]
+                            equipInfo = self.addTab(equipInfo)
+                            equipDictTab[j] = equipInfo[0]
                             j = j + 1
                         elif equipItem.checkState(0) == Qt.PartiallyChecked:
                             equipInfo = findEquipInfo(equipID)
                             equipDict[j] = equipInfo[0]
+                            equipInfo = self.addTab(equipInfo)
+                            equipDictTab[j] = equipInfo[0]
                             j = j + 1
-                self._initDisturbPlanByUnitListAndEquipList(equipDict)
+                self._initDisturbPlanByUnitListAndEquipList(equipDict,equipDictTab)
