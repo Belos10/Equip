@@ -30,6 +30,7 @@ class rocketTransfer(QWidget, Widget_Rocket_Transfer):
     def signalConnect(self):
         self.lw_yearChoose.itemPressed.connect(self.slotSelectResult)
         self.pb_outputToExcel.clicked.connect(self.slotOutputToExcel)
+        self.pb_showRocket.clicked.connect(self.showRocket)
 
     def _initYearWidget_(self):
         self.yearList = []
@@ -222,6 +223,38 @@ class rocketTransfer(QWidget, Widget_Rocket_Transfer):
             self.tw_result.setItem(i + 2, 18, item)
             self.currentResult[i] = rocketTransferInfo
 
+    def showRocket(self):
+        row = self.disturbResult.currentRow()
+        currentColomn = self.disturbResult.currentColumn()
+        if row < 0 or currentColomn < 0:
+            return
+        if currentColomn - 1 < 0:
+            return
+        if self.unitFlag == 1:
+            if self.disturbResult.cellWidget(row, currentColomn - 1).text() != "已完成":
+                QMessageBox.information(self, "设置接装条件", "上一级未完成", QMessageBox.Yes)
+                return
+        currentUnit = []
+        for i in self.currentUnitChilddict.values():
+            currentUnit.append(i)
+        if row != -1:
+            # 存放质量和陆军单号
+            result1 = selectQuaAndID(self.currentEquipdict[row][0], self.currentYear)
+            if result1:
+                info1 = [result1[0][0], self.disturbResult.item(row, 4).text()]
+                for i in range(0, self.lenCurrentUnitChilddict):
+                    info1.append(self.disturbResult.item(row, 5 + i).text())
+                info1.append(self.tb_proof.toPlainText())
+                info1.append(result1[0][1])
+                # 单位Info 当前选中装备Info 当前年份 [质量 此次分配合计数 各单位分配数 依据 陆军单号]
+                self.rocketSchedule.getUnitIDList(currentUnit, self.currentEquipdict[self.disturbResult.currentRow()],
+                                                  self.currentYear, info1)
+            else:
+                self.rocketSchedule.getUnitIDList("", "",
+                                                  "", "")
+            self.rocketSchedule.setWindowFlags(Qt.Dialog | Qt.WindowCloseButtonHint)
+            self.rocketSchedule.show()
+            self.rocketSchedule.signal.connect(self.updateRocket)
 
 
     def slotOutputToExcel(self):

@@ -684,6 +684,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                     info1.append(self.disturbResult.item(row,5+i).text())
                 info1.append(self.tb_proof.toPlainText())
                 info1.append(result1[0][1])
+                # 单位Info 当前选中装备Info 当前年份 [质量 此次分配合计数 各单位分配数 依据 陆军单号]
                 self.rocketSchedule.getUnitIDList(currentUnit,self.currentEquipdict[self.disturbResult.currentRow()],self.currentYear,info1)
             else:
                 self.rocketSchedule.getUnitIDList("", "",

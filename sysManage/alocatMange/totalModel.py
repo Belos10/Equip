@@ -222,6 +222,7 @@ class totalModel(QDialog, Widget_Dital_Model):
 
         for i, unitInfo in enumerate(unitInfoList):
             item = QTableWidgetItem()
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             item.setText(unitInfo[3])
             self.tw_ditalModel.setItem(14, 5 + i, item)
 
@@ -250,11 +251,11 @@ class totalModel(QDialog, Widget_Dital_Model):
         item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
         self.tw_ditalModel.setItem(14, 4, item)
 
-        for i in range(5, self.crtColumnCount - 1):
-            item = QTableWidgetItem()
-            item.setText("")
-            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-            self.tw_ditalModel.setItem(14, i, item)
+        # for i in range(5, self.crtColumnCount - 1):
+        #     item = QTableWidgetItem()
+        #     item.setText("")
+        #     item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+        #     self.tw_ditalModel.setItem(14, i, item)
 
         item = QTableWidgetItem()
         item.setText("备注")
@@ -264,6 +265,7 @@ class totalModel(QDialog, Widget_Dital_Model):
         for i, num in enumerate(requireInfo[2:-2]):
             item = QTableWidgetItem()
             item.setText(num)
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.tw_ditalModel.setItem(15, i + 5, item)
 
         item = QTableWidgetItem()
