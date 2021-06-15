@@ -1,5 +1,5 @@
 from widgets.manage_widget import Widget_Manage_Widgets
-from PyQt5.QtWidgets import QMainWindow, QWidget, QApplication,QMessageBox
+from PyQt5.QtWidgets import QMainWindow, QWidget, QApplication, QMessageBox, QDesktopWidget
 from sysManage.strengthDisturb.strengthDisturb import strengthDisturb
 from sysManage.alocatMange.alocatMange import alocatMange
 from sysManage.dictSelect.dictSelect import dictSelect
@@ -43,8 +43,13 @@ class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
         self.login = login()
         self.login.show()
         self.hide()
-
+        self.center()
         self.signalConnect()
+
+    def center(self):
+        self.size = QDesktopWidget().screenGeometry()
+        self.resize = self.geometry()
+        self.move((self.size.width() - self.resize.width()) / 2, (self.size.height() - self.resize.height()) / 2)
 
     def signalConnect(self):
         self.tb_ManageWidget.currentChanged.connect(self.slotCurrentChange)

@@ -15,3 +15,4 @@ class showInputResult(QDialog, Widget_ShowInputResult):
         flags = flags | Qt.WindowTitleHint | Qt.CustomizeWindowHint | Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint
         self.setWindowFlags(flags)
         self.tw_result.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.tw_result.setSelectionBehavior(QAbstractItemView.SelectRows)

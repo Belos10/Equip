@@ -1,3 +1,4 @@
+from PyQt5.QtCore import QVariant
 from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, QAbstractItemView, \
     QMessageBox, QListWidgetItem,QInputDialog,QHeaderView,QLineEdit
 from widgets.strengthDisturb.maintenMange import Widget_Mainten_Manage
@@ -85,6 +86,9 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
         self.pb_firstSelect.clicked.connect(self.slotSelectUnit)
 
         self.pb_secondSelect.clicked.connect(self.slotSelectEquip)
+
+        # self.tw_second.itemChanged.connect(self.slotCheckedChange)
+        # self.tw_first.itemChanged.connect(self.slotCheckedChange)
 
     def slotSelectUnit(self):
         findText = self.le_first.text()
@@ -240,11 +244,72 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
             # 从数据库中单位表中获取数据初始化单位目录，tableWidget显示所有的单位表
             # self._initUnitTreeWidget("", self.tw_first)
 
+    '''
+           功能：
+               设置级目录联选中状态
+    '''
+
+    # def slotCheckedChange(self, item, num):
+    #     # 如果是顶部节点，只考虑Child：
+    #     if item.childCount() and not item.parent():  # 判断是顶部节点，也就是根节点
+    #         if item.checkState(num) == 0:  # 规定点击根节点只有两态切换，没有中间态
+    #             for i in range(item.childCount()):  # 遍历子节点进行状态切换
+    #                 item.child(i).setCheckState(num, 0)
+    #         elif item.checkState(num) == 2:
+    #             for i in range(item.childCount()):
+    #                 item.child(i).setCheckState(num, 2)
+    #     # 如果是底部节点，只考虑Parent
+    #     if item.parent() and not item.childCount():
+    #         parent_item = item.parent()  # 获得父节点
+    #         brother_item_num = parent_item.childCount()  # 获得兄弟节点的数目，包括自身在内
+    #         checked_num = 0  # 设置计数器
+    #         for i in range(brother_item_num):  # 根据三态不同状态值进行数值累计
+    #             checked_num += parent_item.child(i).checkState(num)
+    #         if checked_num == 0:  # 最终结果进行比较，决定父节点的三态
+    #             parent_item.setCheckState(num, 0)
+    #         elif checked_num / 2 == brother_item_num:
+    #             parent_item.setCheckState(num, 2)
+    #         else:
+    #             parent_item.setCheckState(num, 1)
+    #
+    #         # 中间层需要全面考虑
+    #     if item.parent() and item.childCount():
+    #         if item.checkState(num) == 0:  # 规定点击根节点只有两态切换，没有中间态
+    #             for i in range(item.childCount()):  # 遍历子节点进行状态切换
+    #                 item.child(i).setCheckState(num, 0)
+    #         elif item.checkState(num) == 2:
+    #             for i in range(item.childCount()):
+    #                 item.child(i).setCheckState(num, 2)
+    #         parent_item = item.parent()  # 获得父节点
+    #         brother_item_num = parent_item.childCount()  # 获得兄弟节点的数目，包括自身在内
+    #         checked_num = 0  # 设置计数器
+    #         for i in range(brother_item_num):  # 根据三态不同状态值进行数值累计
+    #             checked_num += parent_item.child(i).checkState(num)
+    #         if checked_num == 0:  # 最终结果进行比较，决定父节点的三态
+    #             parent_item.setCheckState(num, 0)
+    #         elif checked_num / 2 == brother_item_num:
+    #             parent_item.setCheckState(num, 2)
+    #         else:
+    #             parent_item.setCheckState(num, 1)
+
+    # def initEquipTreeWidget(self, stack, root):
+    #     while stack:
+    #         EquipInfo = stack.pop(0)
+    #         item = QTreeWidgetItem(root.pop(0))
+    #         item.setText(0, EquipInfo[1])
+    #         item.setCheckState(0, Qt.Unchecked)
+    #         self.second_treeWidget_dict[EquipInfo[0]] = item
+    #         result = selectEquipInfoByEquipUper(EquipInfo[0])
+    #         for resultInfo in result:
+    #             stack.append(resultInfo)
+    #             root.append(item)
+
     def initEquipTreeWidget(self, stack, root):
         while stack:
             EquipInfo = stack.pop(0)
             item = QTreeWidgetItem(root.pop(0))
             item.setText(0, EquipInfo[1])
+            item.setData(0, Qt.UserRole, QVariant(EquipInfo[0]))
             item.setCheckState(0, Qt.Unchecked)
             self.second_treeWidget_dict[EquipInfo[0]] = item
             result = selectEquipInfoByEquipUper(EquipInfo[0])
@@ -263,6 +328,7 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
             UnitInfo = stack.pop(0)
             item = QTreeWidgetItem(root.pop(0))
             item.setText(0, UnitInfo[1])
+            item.setData(0, Qt.UserRole, QVariant(UnitInfo[0]))
             item.setCheckState(0, Qt.Unchecked)
             if UnitInfo:
                 if UnitInfo[4]  == "是":
@@ -283,6 +349,8 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
     def slotInquryStrengthResult(self):
         self.currentCheckedUnitList = []
         self.currentCheckedEquipList = []
+        # self.currentCheckedUnitList = self.get_checked(self.tw_first.topLevelItem(0))
+        # self.currentCheckedEquipList = self.get_checked(self.tw_second.topLevelItem(0))
         for unitID, unitItem in self.first_treeWidget_dict.items():
             if unitItem.checkState(0) == Qt.Checked:
                 self.currentCheckedUnitList.append(unitID)
@@ -291,6 +359,9 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
             if equipItem.checkState(0) == Qt.Checked:
                 self.currentCheckedEquipList.append(equipID)
 
+        print("----------装备单位列表---------")
+        print(self.currentCheckedUnitList)
+        print(self.currentCheckedEquipList)
         if self.currentCheckedUnitList == [] or self.currentCheckedEquipList == []:
             headerlist = ['单位名称', '装备名称', '实力数', '编制数', '现有数']
             self.tw_result.setHorizontalHeaderLabels(headerlist)
@@ -448,3 +519,17 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
                 self.first_treeWidget_dict[publicEquipID] = publicItem
             if rowData[0] != '':
                 self._initUnitTreeWidget(rowData[0], item)
+
+    def get_checked(self, node: QTreeWidgetItem) -> list:
+        """ 得到当前节点选中的所有分支， 返回一个 list """
+        temp_list = []
+        # 此处看下方注释 1
+        for item in node.takeChildren():
+            # 判断是否选中
+            if item.checkState(0) == Qt.Checked or item.checkState(0) == Qt.PartiallyChecked:
+                temp_list.append(str(item.data(0, Qt.UserRole)))
+                # 判断是否还有子分支
+                if item.childCount():
+                    temp_list.extend(self.get_checked(item))
+            node.addChild(item)
+        return temp_list
