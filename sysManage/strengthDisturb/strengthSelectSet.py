@@ -85,6 +85,23 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
     def slotInputIntoMysql(self):
         if self.cb_setChoose.currentIndex() == 0:
             print(self.inputUnitInfoList)
+            # selectedItems = self.showInputResult.tw_result.selectedItems();
+            # currentSelectRowCount = len(selectedItems)
+            # for i in range(currentSelectRowCount):
+            #     firstItem = selectedItems.at(i).topRow()
+            #     lastItem = selectedItems.at(i).bottomRow()
+            #     for j in range(firstItem,lastItem):
+            #         self.showInputResult.tw_result.item(j,)
+            #         unitInfo = []
+            #         unitInfo.append(Unit_ID)
+            #         unitInfo.append(Unit_Name)
+            #         unitInfo.append(Unit_Uper)
+            #         unitInfo.append(Unit_Alias)
+            #         unitInfo.append(Is_Group)
+            #         self.inputUnitInfoList.append(unitInfo)
+
+
+
             inputSuccess = inputIntoUnitFromExcel(self.inputUnitInfoList)
             if inputSuccess != True:
                 for error in inputSuccess:
@@ -111,25 +128,24 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
         self.setDisabled(True)
         self.showInputResult.setDisabled(False)
         if self.cb_setChoose.currentIndex() == 0:
-            filename, _ = QFileDialog.getOpenFileName(self, "选中文件", '', "Excel files(*.xlsx, *.xls)")
+            filename, _ = QFileDialog.getOpenFileName(self, "选中文件", '', "Excel Files (*.xls, *.xlsx)")
             try:
-                self.rdfile = xlrd.open_workbook(filename)
-                self.tablename = "unit"
-                self.sheet = self.rdfile.sheet_by_name("unit")
+                workBook = xlrd.open_workbook(filename)
+                self.workSheet = workBook.sheet_by_index(0)
                 self.inputUnitInfoList = []
                 self.showInputResult.setWindowTitle("导入Excel数据到数据库Unit表中")
                 self.showInputResult.show()
                 title = ['单位编号', '单位名称', '上级单位编号', '单位别名', '是否为旅团']
 
-                self.showInputResult.tw_result.setColumnCount(self.sheet.ncols)
+                self.showInputResult.tw_result.setColumnCount(self.workSheet.ncols)
                 self.showInputResult.tw_result.setHorizontalHeaderLabels(title)
-                self.showInputResult.tw_result.setRowCount(self.sheet.nrows - 1)
-                for r in range(1, self.sheet.nrows):
-                    Unit_ID = self.sheet.cell(r,0).value
-                    Unit_Name = self.sheet.cell(r,1).value
-                    Unit_Uper = self.sheet.cell(r,2).value
-                    Unit_Alias = self.sheet.cell(r,3).value
-                    Is_Group = self.sheet.cell(r, 4).value
+                self.showInputResult.tw_result.setRowCount(self.workSheet.nrows - 1)
+                for r in range(1, self.workSheet.nrows):
+                    Unit_ID = str(int(self.workSheet.cell(r,0).value))
+                    Unit_Name = self.workSheet.cell(r,1).value
+                    Unit_Uper = str(int(self.workSheet.cell(r,2).value))
+                    Unit_Alias = self.workSheet.cell(r,3).value
+                    Is_Group = self.workSheet.cell(r, 4).value
                     item = QTableWidgetItem(Unit_ID)
                     self.showInputResult.tw_result.setItem(r-1, 0, item)
                     item = QTableWidgetItem(Unit_Name)
