@@ -663,13 +663,13 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
     # 进度3 火箭军调拨
     def setRocketSchedule(self):
         row = self.disturbResult.currentRow()
-        currentColomn = self.disturbResult.currentColumn()
-        if row < 0 or currentColomn < 0:
+        column = self.disturbResult.currentColumn()
+        if row < 0 or column < 0:
             return
-        if currentColomn - 1 < 0:
+        if column - 1 < 0:
             return
         if self.unitFlag == 1:
-            if self.disturbResult.cellWidget(row, currentColomn - 1).text() != "已完成":
+            if self.disturbResult.cellWidget(row, column - 1).text() != "已完成":
                 QMessageBox.information(self, "设置接装条件", "上一级未完成", QMessageBox.Yes)
                 return
         currentUnit=[]
