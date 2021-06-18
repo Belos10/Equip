@@ -392,6 +392,7 @@ class OrderAllotPlan(QWidget, Widget_OrderPlan):
 
     # 改变调拨依据
     def slotProofChange(self):
+        QMessageBox.information(self, "1111", "测试", QMessageBox.Yes)
         self.inputProof.setYear(self.currentYear)
         self.inputProof.show()
 

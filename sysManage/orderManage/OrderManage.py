@@ -7,14 +7,14 @@ from sysManage.orderManage.OrderAllotPlan import OrderAllotPlan
     功能：
         调配管理主界面
 '''
-class orderManage(QMainWindow, widget_orderManage):
+class OrderManage(QMainWindow, widget_orderManage):
     def __init__(self, parent=None):
-        super(orderManage, self).__init__(parent)
+        super(OrderManage, self).__init__(parent)
         self.setupUi(self)
 
         self.orderPlan = QWidget()                  # 订购计划
         self.adjustOrder = QWidget()                # 订购计划调整
-        self.orderAllotPlan = QWidget(self)      # 订购分配计划
+        self.orderAllotPlan = OrderAllotPlan(self)      # 订购分配计划
         self.orderSchedule = QWidget()              # 订购进度
         self.retirePlan = QWidget()             # 订购退役计划
         self.userInfo = None
@@ -123,4 +123,3 @@ class orderManage(QMainWindow, widget_orderManage):
         self.tb_orderAllotPlan.setDisabled(False)
         self.tb_orderSchedule.setDisabled(False)
         self.tb_retirePlan.setDisabled(True)
-        # self.disturbPlan.initAll()
