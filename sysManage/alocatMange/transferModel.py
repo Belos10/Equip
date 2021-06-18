@@ -23,6 +23,7 @@ class transferModel(QDialog, Widget_Transfer_Model):
         self.currentSingelUnitPage = {}
         self.currentUnitInfoList = []
         self.currentYear = ""
+        self.requireInfoDict = {}
         self.signalConnect()
         self.setWindowTitle("火箭军调拨单")
 
@@ -305,6 +306,7 @@ class transferModel(QDialog, Widget_Transfer_Model):
                 if key == unitInfo[0]:
                     requireInfo.append(unitInfo[3])
                     requireInfo.append(self.totalModel.requireInfo[2 + i])
+                    self.requireInfoDict[str(i)] = requireInfo.copy()
                     page.updateTableWidget(requireInfo)
 
     def slotClickedConfim(self):
@@ -408,7 +410,7 @@ class transferModel(QDialog, Widget_Transfer_Model):
                 workSheet = workBook.add_sheet(num)
                 for i in range(self.currentSingelUnitPage[unitInfo[0]].tw_ditalModel.columnCount()):
                     workSheet.col(i).width = 4000
-                self.initToExcelSingleTable(unitInfo[0], workSheet, contentStyle, unitInfo, self.equipInfo, self.year)
+                self.initToExcelSingleTable(unitInfo[0], workSheet, contentStyle, unitInfo, self.equipInfo,self.requireInfo, self.year)
 
             try:
                 pathName = "%s/%s年调拨单.xls" % (directoryPath, self.year)
@@ -543,14 +545,14 @@ class transferModel(QDialog, Widget_Transfer_Model):
 
 
 
-    def initToExcelSingleTable(self,pageIndex, workSheet, style, unitInfo, equipInfo, year):
+    def initToExcelSingleTable(self,pageIndex, workSheet, style, unitInfo, equipInfo, requireInfo,year):
         crtColumnCount = 10
         crtRowCount = 27
-        self.initSingleTable(pageIndex, workSheet, style,crtRowCount, crtColumnCount, unitInfo, equipInfo, 0)
+        self.initSingleTable(pageIndex, workSheet, style,crtRowCount, crtColumnCount, unitInfo, equipInfo,requireInfo, 0)
         workSheet.write_merge(14, 14 + crtRowCount - 24, crtColumnCount, crtColumnCount,"第一联：存根" ,style)
-        self.initSingleTable(pageIndex, workSheet, style,crtRowCount, crtColumnCount,unitInfo, equipInfo, crtColumnCount + 1)
+        self.initSingleTable(pageIndex, workSheet, style,crtRowCount, crtColumnCount,unitInfo, equipInfo, requireInfo,crtColumnCount + 1)
         workSheet.write_merge(14, 14 + crtRowCount - 24, crtColumnCount * 2 + 1,  crtColumnCount * 2 + 1, "第二联：发物单位留存",style)
-        self.initSingleTable(pageIndex, workSheet, style,crtRowCount, crtColumnCount,unitInfo, equipInfo, crtColumnCount * 2 + 2)
+        self.initSingleTable(pageIndex, workSheet, style,crtRowCount, crtColumnCount,unitInfo, equipInfo,requireInfo, crtColumnCount * 2 + 2)
         workSheet.write_merge(14, 14 + crtRowCount - 24, crtColumnCount * 3 + 2,  crtColumnCount * 3 + 3, "第三联：收物单位留存",style)
 
     def initExcelTotalTableLastFourRow(self, workSheet, stlye,crtColumnCount, first, second, third, fourth, row):
@@ -577,7 +579,7 @@ class transferModel(QDialog, Widget_Transfer_Model):
         workSheet.write(row, half + 3, contentText, stlye)
         workSheet.write_merge(row, row, half + 4, crtColumnCount - 1, '', stlye)
 
-    def initSingleTable(self,pageIndex, workSheet,stlye, crtRowCount, crtColumnCount,unitInfo, equipInfo, startColumn):
+    def initSingleTable(self,pageIndex, workSheet,stlye, crtRowCount, crtColumnCount,unitInfo, equipInfo, requireInfo,startColumn):
         workSheet.write_merge(0, 2, startColumn,startColumn + crtColumnCount - 1, '火箭军装备调拨通知单', stlye)
         self.initSingleTableExcelNinethRow(pageIndex, workSheet, stlye, crtColumnCount,'调拨单号:', '调拨日期:', 3, startColumn)
         self.initSingleTableExcelNinethRow(pageIndex, workSheet, stlye, crtColumnCount,'调拨依据:', '调拨性质:', 4, startColumn)
@@ -605,8 +607,18 @@ class transferModel(QDialog, Widget_Transfer_Model):
         workSheet.write_merge(crtRowCount - 9, crtRowCount - 6, startColumn, startColumn, "备注", stlye)
         workSheet.write_merge(crtRowCount - 9, crtRowCount - 6, startColumn + 1, startColumn + crtColumnCount - 1, "1.凭《火箭军装备调拨通知单》接装；\n"
                      "2.完成接装后，将《火箭军装备调拨通知单》三联单，按要求分别盖章签字，并归档。", stlye)
+        requireInfo = self.requireInfoDict.get(pageIndex,[])
+        if len(requireInfo) > 0 :
+            half = int((crtColumnCount - 4) / 2)
+            workSheet.write(13, startColumn + 0, "有效期至", stlye)
+            workSheet.write(13, startColumn + 1, requireInfo[9], stlye)
+            workSheet.write(16, startColumn + 0, "1", stlye)
+            workSheet.write(16, startColumn + 1, requireInfo[-5], stlye)
+            workSheet.write(16, startColumn + 2, requireInfo[-4], stlye)
+            workSheet.write(16, startColumn + 3, requireInfo[-3], stlye)
+            workSheet.write(16, startColumn + 4, requireInfo[-1], stlye)
         self.initSingleTableExcelLastFourRow(pageIndex, workSheet, stlye, crtColumnCount,"承办单位:", "(盖章)", "交装单位:", "(盖章)", crtRowCount - 4, startColumn)
-        self.initSingleTableExcelLastFourRow(pageIndex, workSheet, stlye, crtColumnCount,"局    长:", "杨刚", "主管领导:", "", crtRowCount - 3, startColumn)
+        self.initSingleTableExcelLastFourRow(pageIndex, workSheet, stlye, crtColumnCount,"局    长:", "", "主管领导:", "", crtRowCount - 3, startColumn)
         self.initSingleTableExcelLastFourRow(pageIndex, workSheet, stlye, crtColumnCount,"经 办 人:", "", "经 办 人:", "", crtRowCount - 2, startColumn)
         self.initSingleTableExcelLastFourRow(pageIndex, workSheet, stlye, crtColumnCount,"日    期:", "", "日    期:", "", crtRowCount - 1, startColumn)
 
