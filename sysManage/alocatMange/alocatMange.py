@@ -17,7 +17,7 @@ class alocatMange(QMainWindow, Widget_Alocat_Mange):
         super(alocatMange, self).__init__(parent)
         self.setupUi(self)
 
-        self.disturbPlan = DisturbPlan()            #分配调整计划
+        self.disturbPlan = DisturbPlan(self)            #分配调整计划
         self.allotSchedule = AllotSchedule()        #调拨进度
         self.transferManage = transferManage(self)  #调拨单管理
         self.retirePlan = retirePlan(self)              #退役报废计划

@@ -9,6 +9,7 @@ from sysManage.login.loginSet import loginSet
 from sysManage.dangerGoods.dangerGoods import DangerGoods
 from sysManage.positionEngineer.positionEngineerMain import PositionEngineerMain
 from sysManage.userInfo import get_value,set_value
+from sysManage.orderManage.orderManage import orderManage
 #new
 class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
     def __init__(self, parent=None):
@@ -17,7 +18,7 @@ class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
         self.setLogin = loginSet()
         self.strengthDisturb = strengthDisturb()
         self.alocatMange = alocatMange()
-        self.purChasPlan = QWidget()
+        self.purChasPlan = orderManage()
         self.mantanSupport = QWidget()
         self.warStorage = QWidget()
         self.contractMange = QWidget()

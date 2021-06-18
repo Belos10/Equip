@@ -240,7 +240,7 @@ class retirePlan(QWidget, retirePlan_Form):
 
 
     def addTab(self, result):
-        count = selectLevelForGeneralEquip(result[0][0])
+        count = selectLevelForEquip(result[0][0])
         Name = count * '    ' + result[0][1]
         result1 = []
         for i,value in enumerate(result[0]):
