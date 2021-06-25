@@ -206,7 +206,7 @@ class DisturbPlan(QWidget, yearList_Form):
             item.setText(0, UnitInfo[1])
             # item.setCheckState(0, Qt.Unchecked)
             self.first_treeWidget_dict[UnitInfo[0]] = item
-            result = selectUnitInfoByDeptUper(UnitInfo[0])
+            result = selectDisturbPlanUnitInfoByDeptUper(UnitInfo[0])
             for resultInfo in result:
                 stack.append(resultInfo)
                 root.append(item)

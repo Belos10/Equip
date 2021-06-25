@@ -564,10 +564,10 @@ def selectQuaAndID(Equip_ID, year):
     return result
 
 # 按装备ID列表从unit表复制数据至disturbplanunit表
-def insertIntoDistrubPlanUnitFromList(UnitList):
+def insertIntoDisturbPlanUnitFromList(UnitList):
     # conn,cur = connectMySql()
     equipInfoTuple = selectAllDataAboutEquip()
-    disturbplanYearInfoTuple = selectAllDataAboutDisturbPlan()
+    disturbplanYearInfoTuple = selectYearListAboutDisturbPlan()
     for i in UnitList:
         unitInfo = selectUnitInfoByUnitID(i)
         sql = "insert into disturbplanunit select * from unit where Unit_ID = '" + i + "'"
@@ -617,7 +617,7 @@ def selectLevelForEquip(Equip_ID, count = -1):
 
 
 '''
-退役报废计划
+    退役报废计划
 '''
 # 读取分配计划年份
 def selectYearListAboutRetirePlan():

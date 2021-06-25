@@ -18,6 +18,8 @@ class widget_orderManageSet(object):
         self.widget_2 = QtWidgets.QWidget(MainWindow)
         self.widget_2.setObjectName("widget_2")
         self.gridLayout = QtWidgets.QGridLayout(self.widget_2)
+        self.gridLayout.setContentsMargins(0, 0, 0, 0)
+        self.gridLayout.setSpacing(0)
         self.gridLayout.setObjectName("gridLayout")
         self.OrderSet_stackedWidget = QtWidgets.QStackedWidget(self.widget_2)
         self.OrderSet_stackedWidget.setObjectName("OrderSet_stackedWidget")
@@ -28,7 +30,7 @@ class widget_orderManageSet(object):
         MainWindow.addToolBar(QtCore.Qt.TopToolBarArea, self.toolBar)
 
         self.retranslateUi(MainWindow)
-        self.OrderSet_stackedWidget.setCurrentIndex(-1)
+        # self.OrderSet_stackedWidget.setCurrentIndex(-1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):

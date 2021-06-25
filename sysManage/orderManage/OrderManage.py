@@ -2,6 +2,7 @@ import sys
 from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget
 from widgets.orderManage.orderManage import widget_orderManage
 from sysManage.orderManage.OrderAllotPlan import OrderAllotPlan
+from sysManage.orderManage.OrderRetirePlan import OrderRetirePlan
 
 '''
     功能：
@@ -16,7 +17,7 @@ class OrderManage(QMainWindow, widget_orderManage):
         self.adjustOrder = QWidget()                # 订购计划调整
         self.orderAllotPlan = OrderAllotPlan(self)      # 订购分配计划
         self.orderSchedule = QWidget()              # 订购进度
-        self.retirePlan = QWidget()             # 订购退役计划
+        self.retirePlan = OrderRetirePlan()             # 订购退役计划
         self.userInfo = None
 
         #添加页面
@@ -98,7 +99,7 @@ class OrderManage(QMainWindow, widget_orderManage):
         self.tb_orderAllotPlan.setDisabled(True)
         self.tb_orderSchedule.setDisabled(False)
         self.tb_retirePlan.setDisabled(False)
-        # self.transferManage.slotArmyTransfer()
+        self.orderAllotPlan.initAll()
 
     '''
         功能：

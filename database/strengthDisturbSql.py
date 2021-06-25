@@ -352,11 +352,6 @@ def selectAllDataAboutEquip():
         resultList.append(resultInfo)
     return resultList
 
-def selectAllDataAboutDisturbPlan():
-    sql = "select * from disturbplanyear"
-    cur.execute(sql)
-    result = cur.fetchall()
-    return result
 
 def addDataIntoDisturbPlanUnit(Unit_ID, Unit_Name, Unit_Uper):
     sql = "INSERT INTO disturbplanunit (Unit_ID, Unit_Name, Unit_Uper,Unit_Alias, Is_Group) VALUES" \
@@ -379,6 +374,33 @@ def selectYearListAboutDisturbPlan():
     return yearList
 
 
+
+# 读取分配计划年份
+def selectYearListAboutOrderPlan():
+    yearList = []
+    sql = "select * from orderallotplanyear order by year"
+    cur.execute(sql)
+    result = cur.fetchall()
+    for yearInfo in result:
+        yearList.append(yearInfo[1])
+    return yearList
+
+
+def selectYearListAboutRetirePlan():
+    #conn, cur = connectMySql()
+    yearList = []
+    sql = "select * from retireplanyear order by year"
+
+    cur.execute(sql)
+    result = cur.fetchall()
+
+    #disconnectMySql(conn, cur)
+    for yearInfo in result:
+        yearList.append(yearInfo[1])
+    return yearList
+
+
+
 # 往单位表unit中插入一条数据
 def addDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper, Unit_Alias, Is_Group):
     # 插入的sql语句
@@ -398,11 +420,11 @@ def addDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper, Unit_Alias, Is_Group):
         cur.execute(sql)
     except Exception as e:
         return False
-    strengthYearInfoTuple = []
-    equipInfoTuple = []
     equipInfoTuple = selectAllDataAboutEquip()
     strengthYearInfoTuple = selectAllDataAboutStrengthYear()
     disturbplanYearInfoTuple = selectYearListAboutDisturbPlan()
+    orderallotplanYearInfoTuple = selectYearListAboutOrderPlan()
+    retireplanYearInfoTuple = selectYearListAboutRetirePlan()
     print("test:     ", equipInfoTuple)
     for equipInfo in equipInfoTuple:
         for strengthYearInfo in strengthYearInfoTuple:
@@ -426,30 +448,36 @@ def addDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper, Unit_Alias, Is_Group):
                 conn.rollback()
                 return e
 
-            for disturbplanYearInfo in disturbplanYearInfoTuple:
-                sql = "insert into disturbplan (Equip_Id,Equip_Name,Unit_Id,Unit_Name,Year,DisturbNum) values " \
-                      + "('" + equipInfo[0] + "','" + equipInfo[1] + "','" + Unit_ID + \
-                      "','" + Unit_Name + "','" + disturbplanYearInfo[1] + "', '' )"
-                try:
-                    cur.execute(sql)
-                except Exception as e:
-                    conn.rollback()
-                    return e
         for disturbplanYearInfo in disturbplanYearInfoTuple:
-            sql = "insert into disturbplannote (Equip_Id,Equip_Name,Year,Note) values " \
-                  + "('" + equipInfo[0] + "','" + equipInfo[1] + "','" + disturbplanYearInfo[1] + "', '' )"
+            sql = "insert into disturbplan (Equip_Id,Equip_Name,Unit_Id,Unit_Name,Year,DisturbNum) values " \
+                  + "('" + equipInfo[0] + "','" + equipInfo[1] + "','" + Unit_ID + \
+                  "','" + Unit_Name + "','" + disturbplanYearInfo + "', '' )"
             try:
                 cur.execute(sql)
             except Exception as e:
                 conn.rollback()
                 return e
-            sql = "insert into allotschedule (Equip_Id,Equip_Name,army,allotconditionUper,rocketUper,finishUper,year) values " \
-                  + "('" + equipInfo[0] + "','" + equipInfo[1] + "', '0','0','0','0','" + disturbplanYearInfo[1] + "' )"
+
+        for orderallotplanYearInfo in orderallotplanYearInfoTuple:
+            sql = "insert into orderallotplan (Equip_Id,Equip_Name,Unit_Id,Unit_Name,Year,OrderNum) values " \
+                  + "('" + equipInfo[0] + "','" + equipInfo[1] + "','" + Unit_ID + \
+                  "','" + Unit_Name + "','" + orderallotplanYearInfo + "', '' )"
             try:
                 cur.execute(sql)
             except Exception as e:
                 conn.rollback()
                 return e
+
+        for retireplanYearInfo in retireplanYearInfoTuple:
+            sql = "insert into retireplan (Equip_Id,Equip_Name,Unit_Id,Unit_Name,Year,RetireNum) values " \
+                  + "('" + equipInfo[0] + "','" + equipInfo[1] + "','" + Unit_ID + \
+                  "','" + Unit_Name + "','" + retireplanYearInfo + "', '' )"
+            try:
+                cur.execute(sql)
+            except Exception as e:
+                conn.rollback()
+                return e
+
     try:
         conn.commit()
         return True
@@ -472,13 +500,14 @@ def addDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type, E
         return e
 
     publicEquipInfoList = selectAllDataAboutPublicEquip()
-    strengthYearInfoTuple = []
     unitInfoTuple = []
     strengthYearInfoTuple = selectAllDataAboutStrengthYear()
     selectSuccess = selectAllDataAboutUnit(unitInfoTuple)
     if selectSuccess != True:
         return selectSuccess
-    disturbplanYearInfoTuple = selectAllDataAboutDisturbPlan()
+    disturbplanYearInfoTuple = selectYearListAboutDisturbPlan()
+    orderallotplanYearInfoTuple = selectYearListAboutOrderPlan()
+    retireplanYearInfoTuple = selectYearListAboutRetirePlan()
 
     print(unitInfoTuple)
     for publicEquip in publicEquipInfoList:
@@ -518,15 +547,36 @@ def addDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type, E
         for disturbplanYearInfo in disturbplanYearInfoTuple:
             sql = "insert into disturbplan (Equip_Id,Equip_Name,Unit_Id,Unit_Name,Year,DisturbNum) values " \
                   + "('" + Equip_ID + "','" + Equip_Name + "','" + unitInfo[0] +\
-                  "','" + unitInfo[1] + "','"+ disturbplanYearInfo[1] +"', '' )"
+                  "','" + unitInfo[1] + "','"+ disturbplanYearInfo +"', '' )"
             try:
                 cur.execute(sql)
             except Exception as e:
                 conn.rollback()
                 return e
+
+        for orderallotplanYearInfo in orderallotplanYearInfoTuple:
+            sql = "insert into orderallotplan (Equip_Id,Equip_Name,Unit_Id,Unit_Name,Year,OrderNum) values " \
+                  + "('" + Equip_ID + "','" + Equip_Name + "','" + unitInfo[0] + \
+                  "','" + unitInfo[1] + "','" + orderallotplanYearInfo + "', '' )"
+            try:
+                cur.execute(sql)
+            except Exception as e:
+                conn.rollback()
+                return e
+
+        for retireplanYearInfo in retireplanYearInfoTuple:
+            sql = "insert into retireplan (Equip_Id,Equip_Name,Unit_Id,Unit_Name,Year,RetireNum) values " \
+                  + "('" + Equip_ID + "','" + Equip_Name + "','" + unitInfo[0] + \
+                  "','" + unitInfo[1] + "','" + retireplanYearInfo + "', '' )"
+            try:
+                cur.execute(sql)
+            except Exception as e:
+                conn.rollback()
+                return e
+
     for disturbplanYearInfo in disturbplanYearInfoTuple:
         sql = "insert into disturbplannote (Equip_Id,Equip_Name,Year,Note) values " \
-              + "('" + Equip_ID + "','" + Equip_Name + "','" + disturbplanYearInfo[1] + "', '' )"
+              + "('" + Equip_ID + "','" + Equip_Name + "','" + disturbplanYearInfo + "', '' )"
         try:
             cur.execute(sql)
         except Exception as e:
@@ -534,12 +584,40 @@ def addDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type, E
             return e
 
         sql = "insert into allotschedule (Equip_Id,Equip_Name,army,allotconditionUper,rocketUper,finishUper,year) values " \
-              + "('" + Equip_ID + "','" + Equip_Name + "', '0','0','0','0','" + disturbplanYearInfo[1] + "' )"
+              + "('" + Equip_ID + "','" + Equip_Name + "', '0','0','0','0','" + disturbplanYearInfo + "' )"
         try:
             cur.execute(sql)
         except Exception as e:
             conn.rollback()
             return e
+
+    for retireplanYearInfo in retireplanYearInfoTuple:
+        sql = "insert into retireplannote (Equip_Id,Equip_Name,Year,Note) values " \
+              + "('" + Equip_ID + "','" + Equip_Name + "','" + retireplanYearInfo + "', '' )"
+        try:
+            cur.execute(sql)
+        except Exception as e:
+            conn.rollback()
+            return e
+
+    for orderallotplanYearInfo in orderallotplanYearInfoTuple:
+        sql = "insert into orderallotplannote (Equip_Id,Equip_Name,Year,Note) values " \
+              + "('" + Equip_ID + "','" + Equip_Name + "','" + orderallotplanYearInfo + "', '' )"
+        try:
+            cur.execute(sql)
+        except Exception as e:
+            conn.rollback()
+            return e
+
+        sql = "insert into orderallotschedule (Equip_Id,Equip_Name,army,allotconditionUper,rocketUper,finishUper,year) values " \
+              + "('" + Equip_ID + "','" + Equip_Name + "', '0','0','0','0','" + orderallotplanYearInfo + "' )"
+        try:
+            cur.execute(sql)
+        except Exception as e:
+            conn.rollback()
+            return e
+
+
     try:
         conn.commit()
         return True
@@ -547,14 +625,6 @@ def addDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type, E
         conn.rollback()
         return e
 
-
-
-# # 单位表disturbplanunit中修改一条数据
-# def updateDataIntoDisturbPlanUnit(Unit_ID, Unit_Name, Unit_Uper):
-#     sql = "Update disturbplanunit set Unit_Name = '" + Unit_Name + "', Unit_Uper = '" + Unit_Uper + "', Unit_Alias = '" + Unit_Alias + "' where Unit_ID = '" + Unit_ID + "'"
-#     # print(sql)
-#     cur.execute(sql)
-#     conn.commit()
 
 
 #单位表unit中修改一条数据
@@ -602,6 +672,22 @@ def updateDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper, Unit_Alias):
         return e
 
     sql = "Update retireplan set Unit_Name = '" + Unit_Name + "' where Unit_ID = '" + Unit_ID + "'"
+    # print(sql)
+    try:
+        cur.execute(sql)
+    except Exception as e:
+        conn.rollback()
+        return e
+
+    sql = "Update orderallotplan set Unit_Name = '" + Unit_Name + "' where Unit_ID = '" + Unit_ID + "'"
+    # print(sql)
+    try:
+        cur.execute(sql)
+    except Exception as e:
+        conn.rollback()
+        return e
+
+    sql = "Update orderretireplan set Unit_Name = '" + Unit_Name + "' where Unit_ID = '" + Unit_ID + "'"
     # print(sql)
     try:
         cur.execute(sql)
@@ -695,6 +781,46 @@ def updateDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type
         return e
 
     sql = "Update retireplannote set Equip_Name = '" + Equip_Name + "' where Equip_ID = '" + Equip_ID + "'"
+    # print(sql)
+    try:
+        cur.execute(sql)
+    except Exception as e:
+        conn.rollback()
+        return e
+
+    sql = "Update orderallotplan set Equip_Name = '" + Equip_Name + "' where Equip_ID = '" + Equip_ID + "'"
+    # print(sql)
+    try:
+        cur.execute(sql)
+    except Exception as e:
+        conn.rollback()
+        return e
+
+    sql = "Update orderallotplannote set Equip_Name = '" + Equip_Name + "' where Equip_ID = '" + Equip_ID + "'"
+    # print(sql)
+    try:
+        cur.execute(sql)
+    except Exception as e:
+        conn.rollback()
+        return e
+
+    sql = "Update orderretireplan set Equip_Name = '" + Equip_Name + "' where Equip_ID = '" + Equip_ID + "'"
+    # print(sql)
+    try:
+        cur.execute(sql)
+    except Exception as e:
+        conn.rollback()
+        return e
+
+    sql = "Update orderretireplannote set Equip_Name = '" + Equip_Name + "' where Equip_ID = '" + Equip_ID + "'"
+    # print(sql)
+    try:
+        cur.execute(sql)
+    except Exception as e:
+        conn.rollback()
+        return e
+
+    sql = "Update orderallotschedule set Equip_Name = '" + Equip_Name + "' where Equip_ID = '" + Equip_ID + "'"
     # print(sql)
     try:
         cur.execute(sql)
@@ -974,6 +1100,22 @@ def delDataInUnit(Unit_ID):
             conn.rollback()
             return False
 
+        sql = "Delete from orderallotplan where Unit_ID = '" + UnitID[0] + "'"
+        # print(sql)
+        try:
+            cur.execute(sql)
+        except Exception as e:
+            conn.rollback()
+            return False
+
+        sql = "Delete from orderretireplan where Unit_Id = '" + UnitID[0] + "'"
+        # print(sql)
+        try:
+            cur.execute(sql)
+        except Exception as e:
+            conn.rollback()
+            return False
+
     try:
         conn.commit()
         return True
@@ -1121,6 +1263,14 @@ def delDataInEquip(Equip_ID):
             conn.rollback()
             return e
 
+        sql = "Delete from retireplannote where Equip_ID = '" + EquipID[0] + "'"
+        # print(sql)
+        try:
+            cur.execute(sql)
+        except Exception as e:
+            conn.rollback()
+            return e
+
         sql = "Delete from allotschedule where Equip_ID = '" + EquipID[0] + "'"
         # print(sql)
         try:
@@ -1152,6 +1302,47 @@ def delDataInEquip(Equip_ID):
         except Exception as e:
             conn.rollback()
             return e
+
+        sql = "Delete from orderallotplan where Equip_ID = '" + EquipID[0] + "'"
+        # print(sql)
+        try:
+            cur.execute(sql)
+        except Exception as e:
+            conn.rollback()
+            return e
+
+        sql = "Delete from orderallotplannote where Equip_ID = '" + EquipID[0] + "'"
+        # print(sql)
+        try:
+            cur.execute(sql)
+        except Exception as e:
+            conn.rollback()
+            return e
+
+        sql = "Delete from orderallotschedule where Equip_ID = '" + EquipID[0] + "'"
+        # print(sql)
+        try:
+            cur.execute(sql)
+        except Exception as e:
+            conn.rollback()
+            return e
+
+        sql = "Delete from orderretireplan where Equip_ID = '" + EquipID[0] + "'"
+        # print(sql)
+        try:
+            cur.execute(sql)
+        except Exception as e:
+            conn.rollback()
+            return e
+
+        sql = "Delete from orderretireplannote where Equip_ID = '" + EquipID[0] + "'"
+        # print(sql)
+        try:
+            cur.execute(sql)
+        except Exception as e:
+            conn.rollback()
+            return e
+
     try:
         conn.commit()
         return True
@@ -1181,6 +1372,7 @@ def selectAllDataAboutStrengthYear():
     # 测试结果
     # print(result)
     return yearInfoList
+
 
 #按照单位编号，装备编号以及录入年份查找录入信息
 def selectInfoAboutInput(Unit_ID, Equip_ID, inputYear, factoryYear, startFactoryYear, endFactorYear):
@@ -1781,9 +1973,7 @@ def selectUnitIsHaveChild(Unit_ID):
 
 # 查看某装备是否有子装备
 def selectEquipIsHaveChild(Equip_ID):
-
     sql = "select * from equip where Equip_Uper = '" + Equip_ID + "'"
-
     cur.execute(sql)
     result = cur.fetchall()
     if result:
@@ -2430,8 +2620,8 @@ def selectAllEndUnit():
         else:
             resultList.append(unitInfo)
     return resultList
-# 查找实力查询所有年份名字
 
+# 查找实力查询所有年份名字
 def selectAllStrengthYear():
     yearList = []
     sql = "SELECT * from strengthyear ORDER BY year"
@@ -2441,6 +2631,7 @@ def selectAllStrengthYear():
         yearList.append(yearInfo[1])
 
     return yearList
+
 
 
 # 查找实力查询所有年份信息
@@ -2645,7 +2836,6 @@ def findDisturbPlanUnitChildInfo(unitId):
     sql = "select * from disturbplanunit where Unit_Uper = '" + unitId + "'"
     cur.execute(sql)
     result = cur.fetchall()
-    print("findDisturbPlanUnitChildInfo   result",result)
     if result:
         return result
     else:
@@ -2657,7 +2847,6 @@ def findUnitChildInfo(unitId):
     sql = "select * from unit where Unit_Uper = '" + unitId + "'"
     cur.execute(sql)
     result = cur.fetchall()
-    #print("result",result)
     if result:
         return result
     else:

@@ -3,11 +3,12 @@ import sys
 from PyQt5.QtWidgets import *
 from database.SD_EquipmentBanlanceSql import updateOneEquipmentBalanceData, deleteByYear
 from database.strengthDisturbSql import *
+from database.OrderManageSql import *
 from PyQt5.Qt import Qt, QRegExpValidator, QRegExp
 from PyQt5.QtGui import QColor, QBrush, QFont
 from database.alocatMangeSql import *
 from sysManage.userInfo import get_value
-from sysManage.alocatMange.InputProof import InputProof
+from sysManage.orderManage.InputProof import InputProof
 
 '''
     分配调整计划
@@ -119,7 +120,7 @@ class OrderAllotPlan(QWidget, Widget_OrderPlan):
         year, ok = QInputDialog.getInt(self, "Get year", "year:", 0, 0, 100000, 1)
         if ok:
             haveYear = False
-            allyear = selectYearListAboutDisturbPlan()
+            allyear = selectYearListAboutOrderPlan()
             for yearInfo in allyear:
                 if str(year) == yearInfo:
                     haveYear = True
@@ -127,7 +128,7 @@ class OrderAllotPlan(QWidget, Widget_OrderPlan):
                 reply = QMessageBox.information(self, '添加', '添加失败，该年份已存在', QMessageBox.Yes)
                 return
 
-            insertIntoDisturbPlanYear(year)
+            insertIntoOrderPlanYear(year)
             if not selectIfExistsStrengthYear(year):
                 insertIntoStrengthYear(year)
             self._initYearWidget_()
@@ -139,7 +140,7 @@ class OrderAllotPlan(QWidget, Widget_OrderPlan):
         if reply == QMessageBox.Yes:
             currentYear = self.lw_yearChoose.currentItem()
             # print("currentYear.text()",currentYear.text())
-            deleteDisturbPlanYear(currentYear.text())
+            deleteOrderPlanYear(currentYear.text())
             deleteByYear(currentYear.text())
             self._initYearWidget_()
 
@@ -149,7 +150,7 @@ class OrderAllotPlan(QWidget, Widget_OrderPlan):
         self.currentYear = None
         self.lw_yearChoose.clear()
         # self.yearList = ['全部']
-        allYear = selectYearListAboutDisturbPlan()
+        allYear = selectYearListAboutOrderPlan()
         for year in allYear:
             self.yearList.append(year)
 
@@ -175,8 +176,7 @@ class OrderAllotPlan(QWidget, Widget_OrderPlan):
         self.pb_firstSelect.setDisabled(0)
         self.pb_secondSelect.setDisabled(0)
         self.currentYear = self.lw_yearChoose.currentItem().text()
-        # startEquipIDInfo = findUperEquipIDByName("通用装备")
-        startInfo = selectDisturbPlanUnitInfoByUnitID(self.userInfo[0][4])
+        startInfo = selectUnitInfoByUnitID(self.userInfo[0][4])
         stack = []
         root = []
         if startInfo:
@@ -253,10 +253,10 @@ class OrderAllotPlan(QWidget, Widget_OrderPlan):
             if unitItem == self.tw_first.currentItem():
                 if selectUnitIfBase(unitID):
                     self.unitFlag = 2
-                    result = findDisturbPlanUnitChildInfo(unitID)
+                    result = findUnitChildInfo(unitID)
                 else:
                     self.unitFlag = 1
-                    result = selectDisturbPlanChooseUnit()
+                    result = selectOrderPlanChooseUnit()
                 for resultInfo in result:
                     self.currentUnitChilddict[j] = resultInfo
                     j = j + 1
@@ -387,21 +387,20 @@ class OrderAllotPlan(QWidget, Widget_OrderPlan):
 
     # 初始化调拨依据
     def initOrderPlanProof(self):
-        proof = selectDisturbPlanProof(self.currentYear)
+        proof = selectOrderPlanProof(self.currentYear)
         self.tb_proof.setText(proof[0][0])
 
     # 改变调拨依据
     def slotProofChange(self):
-        QMessageBox.information(self, "1111", "测试", QMessageBox.Yes)
         self.inputProof.setYear(self.currentYear)
         self.inputProof.show()
 
     # 读取初始分配计划数
     def initOrderPlanNum(self):
         print("currentYear:", self.currentYear)
-        self.unitOrderPlanList = selectDisturbPlanNumByList(self.currentUnitChilddict,
-                                                            self.currentEquipdict, self.currentYear)
-        print("self.unitDisturbPlanList", self.unitOrderPlanList)
+        self.unitOrderPlanList = selectOrderAllotPlanNumByList(self.currentUnitChilddict,
+                                                               self.currentEquipdict, self.currentYear)
+        print("self.unitOrderPlanList", self.unitOrderPlanList)
         # 显示每个单位分配计划数
         num = 0
         for i in range(0, len(self.currentUnitChilddict)):
@@ -441,28 +440,7 @@ class OrderAllotPlan(QWidget, Widget_OrderPlan):
                         sum = sum + int(num)
             if sum != 0:
                 self.orderResult.item(row, 4).setText(str(sum))
-        # elif flag1 == '2':
-        #     sum = 0
-        #     for i in self.currentEquipdict:
-        #         if not selectEquipIsHaveChild(self.currentEquipdict[i][0]):
-        #             for j in range(0, len(self.currentUnitChilddict)):
-        #                 num = self.disturbResult.item(i, 5 + j).text()
-        #                 if num == '':
-        #                     sum = sum + 0
-        #                 else:
-        #                     sum = sum + int(num)
-        #             self.disturbResult.item(i, 4).setText(str(sum))
-        #         sum = 0
-        #     # 此次分配数的上层装备合计数
-        #     for row in reversed(range(len(self.currentEquipdict))):
-        #         sum = 0
-        #         for childRow in reversed(range(len(self.currentEquipdict))):
-        #             # 第0个字段是EquipID,第二个字段是Equip_Uper
-        #             if self.currentEquipdict[row][0] == self.currentEquipdict[childRow][2]:
-        #                 num = self.disturbResult.item(childRow, 4).text()
-        #                 if num != '':
-        #                     sum = sum + int(num)
-        #         self.disturbResult.item(row, 4).setText(str(sum))
+
 
     # 每个单位的上层装备合计数
     def updateOrderPlanSumEachUnit(self):
@@ -477,17 +455,7 @@ class OrderAllotPlan(QWidget, Widget_OrderPlan):
                             sum = sum + int(num)
                 if sum != 0:
                     self.orderResult.item(row, 5 + i).setText(str(sum))
-        # elif flag1 == '2':
-        #     for i in range(0, len(self.currentUnitChilddict)):
-        #         for row in reversed(range(len(self.currentEquipdict))):
-        #             sum = 0
-        #             for childRow in reversed(range(len(self.currentEquipdict))):
-        #                 # 第0个字段是EquipID,第二个字段是Equip_Uper
-        #                 if self.currentEquipdict[row][0] == self.currentEquipdict[childRow][2]:
-        #                     num = self.disturbResult.item(childRow, 5 + i).text()
-        #                     if num != '':
-        #                         sum = sum + int(num)
-        #             self.disturbResult.item(row, 5 + i).setText(str(sum))
+
 
     # 若装备含子装备，则该行不可选中
     def ifEquipHaveChild(self):
@@ -556,19 +524,18 @@ class OrderAllotPlan(QWidget, Widget_OrderPlan):
                 num = self.orderResult.item(self.currentRow, self.currentColumn).text()
                 self.initOrderPlanSum()
                 self.updateOrderPlanSumEachUnit()
-                originDisturbPlanNum = selectDisturbPlanNumByList({0: self.currentUnitChilddict[self.currentColumn - 5]},
-                                                                  {0: self.currentEquipdict[self.currentRow]},
-                                                                  self.currentYear)
+                originOrderPlanNum = selectOrderAllotPlanNumByList({0: self.currentUnitChilddict[self.currentColumn - 5]},
+                                                                   {0: self.currentEquipdict[self.currentRow]},
+                                                                   self.currentYear)
                 originStrengthNum = selectStrengthNum(self.currentUnitChilddict[self.currentColumn - 5][0],
                                                       self.currentEquipdict[self.currentRow][0], self.currentYear)
-                print("originDisturbPlanNum", originDisturbPlanNum, "originStrengthNum", originStrengthNum)
+                print("originOrderPlanNum", originOrderPlanNum, "originStrengthNum", originStrengthNum)
                 if originStrengthNum[0] != '':
-                    updateDisturbPlanNum(self.currentEquipdict[self.currentRow][0],
-                                         self.currentUnitChilddict[self.currentColumn - 5][0],
-                                         self.currentYear, num, originDisturbPlanNum[0])
+                    updateOrderPlanNum(self.currentEquipdict[self.currentRow][0],
+                                       self.currentUnitChilddict[self.currentColumn - 5][0],
+                                       self.currentYear, num, originOrderPlanNum[0])
                     updateOneEquipmentBalanceData(self.currentYear, self.currentEquipdict[self.currentRow][0],
                                                   self.currentUnitChilddict[self.currentColumn - 5][0])
-                    # self.initDisturbPlanSum()
                 else:
                     QMessageBox.information(self, "提示", "未填写实力数", QMessageBox.Yes)
             except ValueError:
@@ -577,8 +544,8 @@ class OrderAllotPlan(QWidget, Widget_OrderPlan):
 
         # 备注
         if self.currentColumn == self.lenHeaderList - 1:
-            updateDisturbPlanNote(self.currentEquipdict[self.currentRow][0], self.currentYear,
-                                  self.orderResult.item(self.currentRow, self.currentColumn).text())
+            updateOrderPlanNote(self.currentEquipdict[self.currentRow][0], self.currentYear,
+                                self.orderResult.item(self.currentRow, self.currentColumn).text())
         # 自定义计划数
         if self.currentColumn == 3:
             if self.orderResult.item(self.currentRow, self.currentColumn).text() == '':
@@ -586,9 +553,9 @@ class OrderAllotPlan(QWidget, Widget_OrderPlan):
             else:
                 num = self.orderResult.item(self.currentRow, self.currentColumn).text()
             if self.unitFlag == 1:
-                updateDisturbPlanInputNumUpmost(self.currentEquipdict[self.currentRow][0], self.currentYear, num)
+                updateOrderPlanInputNumUpmost(self.currentEquipdict[self.currentRow][0], self.currentYear, num)
             elif self.unitFlag == 2:
-                updateDisturbPlanInputNumBase(self.currentEquipdict[self.currentRow][0], self.currentYear, num)
+                updateOrderPlanInputNumBase(self.currentEquipdict[self.currentRow][0], self.currentYear, num)
 
     # 初始化分配计划年份
     def setOrderPlanTitle(self):
@@ -602,14 +569,14 @@ class OrderAllotPlan(QWidget, Widget_OrderPlan):
     # 初始化自定义计划数
     def initOrderPlanInputNum(self):
         if self.unitFlag == 1:
-            unitOrderPlanInputNumList = selectDisturbPlanInputNumUpmost(self.currentEquipdict, self.currentYear)
+            unitOrderPlanInputNumList = selectOrderPlanInputNumUpmost(self.currentEquipdict, self.currentYear)
             for i in range(0, len(self.currentEquipdict)):
                 item = self.orderResult.item(i, 3)
                 if unitOrderPlanInputNumList[i] is not None:
                     item.setText(str(unitOrderPlanInputNumList[i]))
                 item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable)
         elif self.unitFlag == 2:
-            unitOrderPlanInputNumList = selectDisturbPlanInputNumBase(self.currentEquipdict, self.currentYear)
+            unitOrderPlanInputNumList = selectOrderPlanInputNumBase(self.currentEquipdict, self.currentYear)
             for i in range(0, len(self.currentEquipdict)):
                 item = self.orderResult.item(i, 3)
                 if unitOrderPlanInputNumList[i] is not None:
@@ -618,7 +585,7 @@ class OrderAllotPlan(QWidget, Widget_OrderPlan):
 
     # 读取初始分配计划备注
     def initOrderPlanNote(self):
-        self.unitOrderPlanNoteList = selectDisturbPlanNote(self.currentEquipdict, self.currentYear)
+        self.unitOrderPlanNoteList = selectOrderPlanNote(self.currentEquipdict, self.currentYear)
 
         for i in range(0, len(self.currentEquipdict)):
             item = self.orderResult.item(i, self.lenHeaderList - 1)
@@ -628,7 +595,7 @@ class OrderAllotPlan(QWidget, Widget_OrderPlan):
 
     # 读取调拨单开具数计划数与装备单位
     def initOrderPlanOther(self):
-        unitDisturbPlanOtherList = selectDisturbPlanOther(self.currentEquipdict, self.currentYear)
+        unitOrderPlanOtherList = selectOrderPlanOther(self.currentEquipdict, self.currentYear)
         # 装备单位
         for i in range(0, len(self.currentEquipdict)):
             item = self.orderResult.item(i, 1)
@@ -640,8 +607,8 @@ class OrderAllotPlan(QWidget, Widget_OrderPlan):
                     # if selectUnitIfUppermost(unitID):
                     for i in range(0, len(self.currentEquipdict)):
                         item = self.orderResult.item(i, 2)
-                        if unitDisturbPlanOtherList[i]:
-                            item.setText(str(unitDisturbPlanOtherList[i][0][1]))
+                        if unitOrderPlanOtherList[i]:
+                            item.setText(str(unitOrderPlanOtherList[i][0][1]))
                         else:
                             item.setText("")
 
@@ -661,7 +628,7 @@ class OrderAllotPlan(QWidget, Widget_OrderPlan):
                 if unitItem == self.tw_first.currentItem():
                     for i in self.currentEquipdict:
                         item = self.orderResult.item(i, 2)
-                        result = selectDisturbPlanNumByList({0: [unitID]}, self.currentEquipdict, self.currentYear)
+                        result = selectOrderAllotPlanNumByList({0: [unitID]}, self.currentEquipdict, self.currentYear)
                         if result:
                             item.setText(str(result[i]))
                         else:
@@ -777,7 +744,7 @@ class OrderAllotPlan(QWidget, Widget_OrderPlan):
             for i in range(len(headerlist)):
                 workSheet.col(i).width = 5500
             workSheet.write_merge(0, 0, 0, len(headerlist) - 1, "%s年分配调整计划" % (self.currentYear), headTitleStyle)
-            proof = selectDisturbPlanProof(self.currentYear)
+            proof = selectOrderPlanProof(self.currentYear)
             proofText = proof[0][0]
             workSheet.write_merge(1, 1, 0, len(headerlist) - 1, proofText, headTitleStyle2)
             # 画表头
