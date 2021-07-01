@@ -1,3 +1,4 @@
+from sysManage.contractMangement.contractMangementMain import ContractManagementMain
 from widgets.manage_widget import Widget_Manage_Widgets
 from PyQt5.QtWidgets import QMainWindow, QWidget, QApplication, QMessageBox, QDesktopWidget
 from sysManage.strengthDisturb.strengthDisturb import strengthDisturb
@@ -20,7 +21,7 @@ class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
         self.purChasPlan = QWidget()
         self.mantanSupport = QWidget()
         self.warStorage = QWidget()
-        self.contractMange = QWidget()
+        self.contractMange = ContractManagementMain()
         self.dangerGoods = DangerGoods()
         self.PosEngin = PositionEngineerMain()
         self.dictSelect = dictSelect()

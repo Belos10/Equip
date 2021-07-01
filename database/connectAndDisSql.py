@@ -37,7 +37,7 @@ finally:
 
 
 
-# host = ConnectMySqlDict.get('host')
+# host = ConnectMySqlDic.get('host')
 # port = ConnectMySqlDict.get('port')
 # user = ConnectMySqlDict.get('user')
 # password = ConnectMySqlDict.get('password')
@@ -127,13 +127,12 @@ def executeCommit(sql=''):
     try:
         cur.execute(sql)
         conn.commit()
+        return True
     except sqlite3.Error as error:
         conn.rollback()
         print(error)
-        return error
-#初始化
-def initTables():
-    pass
+        return False
+
 if __name__ == '__main__':
     # executeCommit("delete into equipment_balance(equip_balance_id) values('001')")
     pass
