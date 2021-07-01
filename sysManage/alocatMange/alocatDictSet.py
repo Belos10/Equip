@@ -343,7 +343,7 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
                     return
 
     def updateUnit(self):
-        insertIntoDistrubPlanUnitFromList(self.addUnitChoose.currentUnitID)
+        insertIntoDisturbPlanUnitFromList(self.addUnitChoose.currentUnitID)
         print("self.addUnitChoose.currentUnitID",self.addUnitChoose.currentUnitID)
         self.slotUnitDictInit()
 

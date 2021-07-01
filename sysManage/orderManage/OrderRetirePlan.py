@@ -3,7 +3,8 @@ from PyQt5.QtWidgets import *
 from PyQt5.Qt import Qt
 from PyQt5.QtGui import QColor, QBrush, QFont
 # new
-from widgets.alocatMange.retirePlan import retirePlan_Form
+from widgets.orderManage.retirePlan import retirePlan_Form
+from database.OrderManageSql import *
 from sysManage.userInfo import get_value
 from sysManage.alocatMange.InputProof import InputProof
 from database.SD_EquipmentBanlanceSql import updateOneEquipmentBalanceData, deleteByYear
@@ -14,9 +15,9 @@ from database.alocatMangeSql import *
 '''
 
 
-class retirePlan(QWidget, retirePlan_Form):
+class OrderRetirePlan(QWidget, retirePlan_Form):
     def __init__(self, parent=None):
-        super(retirePlan, self).__init__(parent)
+        super(OrderRetirePlan, self).__init__(parent)
         self.setupUi(self)
         self.unitFlag = 0
         self.initAll()
@@ -26,7 +27,6 @@ class retirePlan(QWidget, retirePlan_Form):
     def initAll(self):
         self.first_treeWidget_dict = {}
         self.second_treeWidget_dict = {}
-        # self.currentUnitDisturbPlanNum = {}
         self.unitRetirePlanList = {}
         self.tw_first.header().setVisible(False)
         self.tw_second.header().setVisible(False)
@@ -104,7 +104,7 @@ class retirePlan(QWidget, retirePlan_Form):
         year, ok = QInputDialog.getInt(self, "Get year", "year:", 0, 0, 100000, 1)
         if ok:
             haveYear = False
-            allyear = selectYearListAboutRetirePlan()
+            allyear = selectYearListAboutOrderRetirePlan()
             for yearInfo in allyear:
                 if str(year) == yearInfo:
                     haveYear = True
@@ -112,7 +112,7 @@ class retirePlan(QWidget, retirePlan_Form):
                 reply = QMessageBox.information(self, '添加', '添加失败，该年份已存在', QMessageBox.Yes)
                 return
 
-            insertIntoRetirePlanYear(year)
+            insertIntoOrderRetirePlanYear(year)
             self._initYearWidget_()
             return
 
@@ -121,7 +121,7 @@ class retirePlan(QWidget, retirePlan_Form):
         reply = QMessageBox.question(self, "删除", "是否删除所选？", QMessageBox.Yes, QMessageBox.Cancel)
         if reply == QMessageBox.Yes:
             currentYear = self.lw_yearChoose.currentItem()
-            deleteRetirePlanYear(currentYear.text())
+            deleteOrderRetirePlanYear(currentYear.text())
             deleteByYear(currentYear.text())
             self._initYearWidget_()
 
@@ -130,7 +130,7 @@ class retirePlan(QWidget, retirePlan_Form):
         self.yearList = []
         self.currentYear = None
         self.lw_yearChoose.clear()
-        allYear = selectYearListAboutRetirePlan()
+        allYear = selectYearListAboutOrderRetirePlan()
         for year in allYear:
             self.yearList.append(year)
 
@@ -153,7 +153,7 @@ class retirePlan(QWidget, retirePlan_Form):
         self.second_treeWidget_dict = {}
         self.currentYear = self.lw_yearChoose.currentItem().text()
 
-        startInfo = selectRetirePlanUnitInfoByUnitID(self.userInfo[0][4])
+        startInfo = selectUnitInfoByUnitID(self.userInfo[0][4])
         stack = []
         root = []
         if startInfo:
@@ -161,7 +161,7 @@ class retirePlan(QWidget, retirePlan_Form):
             root.append(self.tw_first)
             self._initUnitTreeWidget(stack, root)
 
-        equipInfo = findUperEquipIDByName("通用装备")
+        equipInfo = findUperEquipIDByName("专用装备")
         stack = []
         root = []
         if equipInfo:
@@ -178,7 +178,7 @@ class retirePlan(QWidget, retirePlan_Form):
             item = QTreeWidgetItem(root.pop(0))
             item.setText(0, UnitInfo[1])
             self.first_treeWidget_dict[UnitInfo[0]] = item
-            result = selectDisturbPlanUnitInfoByDeptUper(UnitInfo[0])
+            result = selectUnitInfoByDeptUper(UnitInfo[0])
             for resultInfo in result:
                 stack.append(resultInfo)
                 root.append(item)
@@ -195,6 +195,7 @@ class retirePlan(QWidget, retirePlan_Form):
                 stack.append(resultInfo)
                 root.append(item)
                 self._initEquipTreeWidget(stack, root, count + 1)
+
 
     '''
         查询结果
@@ -213,14 +214,13 @@ class retirePlan(QWidget, retirePlan_Form):
             if unitItem == self.tw_first.currentItem():
                 if selectUnitIfBase(unitID):
                     self.unitFlag = 2
-                    result = findDisturbPlanUnitChildInfo(unitID)
+                    result = findUnitChildInfo(unitID)
                 else:
                     self.unitFlag = 1
-                    result = selectDisturbPlanChooseUnit()
+                    result = selectOrderPlanChooseUnit()
                 for resultInfo in result:
                     self.currentUnitChilddict[j] = resultInfo
                     j = j + 1
-
         # 获取当前装备名
         j = 0
         for equipID, equipItem in self.second_treeWidget_dict.items():
@@ -350,8 +350,8 @@ class retirePlan(QWidget, retirePlan_Form):
     # 读取初始退役计划数
     def initRetirePlanNum(self):
 
-        self.unitRetirePlanList = selectRetirePlanNumByList(self.currentUnitChilddict,
-                                                            self.currentEquipdict, self.currentYear)
+        self.unitRetirePlanList = selectOrderRetirePlanNumByList(self.currentUnitChilddict,
+                                                                 self.currentEquipdict, self.currentYear)
         # print("self.unitRetirePlanList", self.unitRetirePlanList)
         # 显示每个单位分配计划数
         num = 0
@@ -407,15 +407,12 @@ class retirePlan(QWidget, retirePlan_Form):
             if selectEquipIsHaveChild(self.currentEquipdict[i][0]):
                 for j in range(1, self.retirePlanResult.columnCount()):
                     item = self.retirePlanResult.item(i, j)
-                    # item.setText("")
-                    # item.setBackground(QBrush(QColor(240, 240, 240)))
                     item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
 
     '''
         功能：
             设置级目录联选中状态
     '''
-
     def slotCheckedChange(self, item, num):
         # 如果是顶部节点，只考虑Child：
         if item.childCount() and not item.parent():  # 判断是顶部节点，也就是根节点
@@ -461,7 +458,6 @@ class retirePlan(QWidget, retirePlan_Form):
     '''
         改变分配计划数与备注
     '''
-
     def slotItemChange(self):
         self.currentRow = self.retirePlanResult.currentRow()
         self.currentColumn = self.retirePlanResult.currentColumn()
@@ -469,15 +465,15 @@ class retirePlan(QWidget, retirePlan_Form):
             try:
                 num = self.retirePlanResult.item(self.currentRow, self.currentColumn).text()
                 self.initRetirePlanSum()
-                originRetirePlanNum = selectRetirePlanNumByList({0: self.currentUnitChilddict[self.currentColumn - 3]},
-                                                                {0: self.currentEquipdict[self.currentRow]}, self.currentYear)
+                originRetirePlanNum = selectOrderRetirePlanNumByList({0: self.currentUnitChilddict[self.currentColumn - 3]},
+                                                                     {0: self.currentEquipdict[self.currentRow]}, self.currentYear)
                 originStrengthNum = selectStrengthNum(self.currentUnitChilddict[self.currentColumn - 3][0],
                                                       self.currentEquipdict[self.currentRow][0], self.currentYear)
                 # print("originRetirePlanNum", originRetirePlanNum, "originStrengthNum", originStrengthNum)
                 if originStrengthNum[0] != '':
-                    updateRetirePlanNum(self.currentEquipdict[self.currentRow][0],
-                                        self.currentUnitChilddict[self.currentColumn - 3][0],
-                                        self.currentYear, num, originRetirePlanNum[0])
+                    updateOrderRetirePlanNum(self.currentEquipdict[self.currentRow][0],
+                                             self.currentUnitChilddict[self.currentColumn - 3][0],
+                                             self.currentYear, num, originRetirePlanNum[0])
                     updateOneEquipmentBalanceData(self.currentYear, self.currentEquipdict[self.currentRow][0],
                                                   self.currentUnitChilddict[self.currentColumn - 3][0])
                 else:
@@ -486,8 +482,8 @@ class retirePlan(QWidget, retirePlan_Form):
                 QMessageBox.information(self, "提示", "请输入数字", QMessageBox.Yes)
                 self.retirePlanResult.item(self.currentRow, self.currentColumn).setText("")
         if self.currentColumn == self.lenHeaderList - 1:
-            updateRetirePlanNote(self.currentEquipdict[self.currentRow][0], self.currentYear,
-                                 self.retirePlanResult.item(self.currentRow, self.currentColumn).text())
+            updateOrderRetirePlanNote(self.currentEquipdict[self.currentRow][0], self.currentYear,
+                                      self.retirePlanResult.item(self.currentRow, self.currentColumn).text())
 
     # 初始化分配计划年份
     def setRetirePlanTitle(self):
@@ -500,7 +496,7 @@ class retirePlan(QWidget, retirePlan_Form):
 
     # 读取初始分配计划备注
     def initRetirePlanNote(self):
-        self.unitRetirePlanNoteList = selectRetirePlanNote(self.currentEquipdict, self.currentYear)
+        self.unitRetirePlanNoteList = selectOrderRetirePlanNote(self.currentEquipdict, self.currentYear)
         for i in range(0, len(self.currentEquipdict)):
             item = self.retirePlanResult.item(i, self.lenHeaderList - 1)
             if self.unitRetirePlanNoteList[i] is not None:
