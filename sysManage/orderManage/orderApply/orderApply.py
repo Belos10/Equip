@@ -2,6 +2,7 @@ from PyQt5.QtCore import QVariant
 from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, QAbstractItemView, \
     QMessageBox, QListWidgetItem, QInputDialog, QHeaderView, QFileDialog
 
+from database.OrderApplySql import *
 from utills.utillsComponent import CheckableComboBox
 from widgets.strengthDisturb.retirement import Widget_Retirement
 from database.strengthDisturbSql import *
@@ -9,11 +10,11 @@ from PyQt5.Qt import Qt
 from sysManage.userInfo import get_value
 
 '''
-   编制数维护
+   订购申请
 '''
-class retirement(QWidget, Widget_Retirement):
+class OrderApply(QWidget, Widget_Retirement):
     def __init__(self, parent=None):
-        super(retirement, self).__init__(parent)
+        super(OrderApply, self).__init__(parent)
         self.setupUi(self)
 
         self.first_treeWidget_dict = {}
@@ -91,7 +92,7 @@ class retirement(QWidget, Widget_Retirement):
             if reply == QMessageBox.Cancel:
                 return
             else:
-                delRetireYearALLYear()
+                clearOrderApply()
                 self._initAll_()
                 return
         if currentRow < 0:
@@ -100,8 +101,7 @@ class retirement(QWidget, Widget_Retirement):
             currentYear = self.lw_year.currentItem().text()
             reply = QMessageBox.question(self, '删除', '是否删除当前年份以及当前年份下所有数据？', QMessageBox.Yes, QMessageBox.Cancel)
             if reply == QMessageBox.Yes:
-                delRetireYearByYear(currentYear)
-                # self._initSelectYear_()
+                deleteOrderApplyYearByYear(currentYear)
                 self._initAll_()
             else:
                 return
@@ -111,16 +111,16 @@ class retirement(QWidget, Widget_Retirement):
         year, ok = QInputDialog.getInt(self, "Get year", "year:", 0, 0, 100000, 1)
 
         if year:
-            allyearInfo = selectAllRetirementYearInfo()
+            allyearInfo = selectAllOrderApplyYearInfo()
             haveYear = False
             for yearInfo in allyearInfo:
-                if str(year) == yearInfo[1]:
+                if str(year) == yearInfo:
                     haveYear = True
                     break
             if haveYear:
                 reply = QMessageBox.information(self, "新增", "年份已存在，新增失败", QMessageBox.Yes)
                 return
-            insertIntoRetireYear(year)
+            insertIntoOrderApplyYear(year)
             self._initSelectYear_()
 
     '''
@@ -173,7 +173,7 @@ class retirement(QWidget, Widget_Retirement):
             item.setData(0,Qt.UserRole,QVariant(EquipInfo[0]))
             item.setCheckState(0, Qt.Unchecked)
             self.second_treeWidget_dict[EquipInfo[0]] = item
-            result = selectGeneralEquipmentInfoByEquipUper(EquipInfo[0])
+            result = selectSpecialEquipmentInfoByEquipUper(EquipInfo[0])
             for resultInfo in result:
                 stack.append(resultInfo)
                 root.append(item)
@@ -204,13 +204,7 @@ class retirement(QWidget, Widget_Retirement):
             if unitItem == self.tw_first.currentItem():
                 self.currentCheckedUnitList.append(unitID)
                 break
-
-        # for equipID, equipItem in self.second_treeWidget_dict.items():
-        #     if equipItem.checkState(0) == Qt.Checked or equipItem.checkState(0) == Qt.PartiallyChecked:
         self.currentCheckedEquipList = self.get_checked(self.tw_second.topLevelItem(0))
-        # print('-----------------------------')
-        # print(self.currentCheckedEquipList)
-
         if self.currentCheckedEquipList == [] or self.currentCheckedUnitList == []:
             self.tw_result.setRowCount(2)
             self.tw_result.horizontalHeader().setVisible(False)
@@ -271,16 +265,16 @@ class retirement(QWidget, Widget_Retirement):
         self.currentYearListItem = {}
         self.yearList = []
         self.lw_year.clear()
-        allyearList = selectAllRetirementYearInfo()
+        allyearList = selectAllOrderApplyYearInfo()
 
         for year in allyearList:
-            self.yearList.append(year[1])
+            self.yearList.append(year)
 
         for year in self.yearList:
             item = QListWidgetItem()
             item.setText(year)
             self.lw_year.addItem(item)
-            self.currentYearListItem[year[1]] = item
+            self.currentYearListItem[year] = item
 
     # 初始化单位目录
     def _initUnitTreeWidget(self, root, mother):
@@ -360,10 +354,10 @@ class retirement(QWidget, Widget_Retirement):
         self.tw_result.verticalHeader().setVisible(False)
         self.currentInquiryResult.clear()
 
-        self.tw_result.setColumnCount(10)
+        self.tw_result.setColumnCount(9)
         self.tw_result.setRowCount(2)
         item = QTableWidgetItem()
-        item.setText("%s年%s装备补充及退役需求表"%(self.year,selectUnitNameByUnitID(self.currentCheckedUnitList[0])))
+        item.setText("%s年%s专用装备订购申请表"%(self.year,selectUnitNameByUnitID(self.currentCheckedUnitList[0])))
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
         self.tw_result.setItem(0, 0, item)
@@ -388,13 +382,13 @@ class retirement(QWidget, Widget_Retirement):
         item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
         self.tw_result.setItem(1, 2, item)
 
-        item = QTableWidgetItem('实力数')
+        item = QTableWidgetItem('编制数')
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
         self.tw_result.setItem(1, 3, item)
 
         item = QTableWidgetItem()
-        item.setText("编制数")
+        item.setText("实力数")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
         self.tw_result.setItem(1, 4, item)
@@ -415,25 +409,19 @@ class retirement(QWidget, Widget_Retirement):
 
 
         item = QTableWidgetItem()
-        item.setText("超/缺编制数")
+        item.setText("申请需求")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
         self.tw_result.setItem(1, 7, item)
 
 
         item = QTableWidgetItem()
-        item.setText("申请需求")
+        item.setText("备注")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
         self.tw_result.setItem(1, 8, item)
 
-
-        item = QTableWidgetItem()
-        item.setText("备注")
-        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-        self.tw_result.setItem(1, 9, item)
-        self.resultList = selectAboutRetireByEquipShow(currentCheckedUnitList, currentCheckedEquipList, currentYear)
+        self.resultList = selectAboutOrderApplyByEquipAndUnit(currentCheckedUnitList, currentCheckedEquipList, currentYear)
 
         self.tw_result.setRowCount(len(self.resultList) + 2)
         classID = 1
@@ -466,42 +454,38 @@ class retirement(QWidget, Widget_Retirement):
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.tw_result.setItem(i + 2, 2, item)
 
-            # 实力数
+            # 编制数
             item = QTableWidgetItem(str(LineInfo[5]))
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.tw_result.setItem(i + 2, 3, item)
-            # 现有数
-            item = QTableWidgetItem(LineInfo[8])
-            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-            self.tw_result.setItem(i + 2, 6, item)
-            # 超缺编数
-            item = QTableWidgetItem(LineInfo[9])
-            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-            self.tw_result.setItem(i + 2, 7, item)
-            # 编制数
-
-            item = QTableWidgetItem(LineInfo[6])
+            # 实力数
+            item = QTableWidgetItem(str(LineInfo[6]))
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.tw_result.setItem(i + 2, 4, item)
 
-            if len(LineInfo[7]) < 1:
-                LineInfo[7] = '0'
+            # 现有数
+            item = QTableWidgetItem(str(LineInfo[8]))
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.tw_result.setItem(i + 2, 6, item)
+
+            if len(str(LineInfo[7])) < 1:
+                LineInfo[7] = 0
             if len(ID) == 0 or ID.isdigit() == False:
                 #拟退役数
-                item = QTableWidgetItem(LineInfo[7])
+                item = QTableWidgetItem(str(LineInfo[7]))
                 item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                 self.tw_result.setItem(i + 2, 5, item)
                 #申请需求
+                item = QTableWidgetItem(str(LineInfo[9]))
+                item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+                self.tw_result.setItem(i + 2, 7, item)
+                #备注
                 item = QTableWidgetItem(LineInfo[10])
                 item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                 self.tw_result.setItem(i + 2, 8, item)
-                #备注
-                item = QTableWidgetItem(LineInfo[11])
-                item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-                self.tw_result.setItem(i + 2, 9, item)
             else:
                 checkBox = CheckableComboBox()
-                checkBox.addItem(LineInfo[7], LineInfo[7])
+                checkBox.addItem(str(LineInfo[7]), LineInfo[7])
                 from PyQt5.QtCore import QVariant
                 v = QVariant(0)
                 checkBox.setItemData(0, v, Qt.UserRole - 1)
@@ -517,13 +501,13 @@ class retirement(QWidget, Widget_Retirement):
                 self.tw_result.setCellWidget(i + 2, 5, checkBox)
 
                 # 申请需求
+                item = QTableWidgetItem(str(LineInfo[9]))
+                # item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+                self.tw_result.setItem(i + 2, 7, item)
+                # 备注
                 item = QTableWidgetItem(LineInfo[10])
                 # item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                 self.tw_result.setItem(i + 2, 8, item)
-                # 备注
-                item = QTableWidgetItem(LineInfo[11])
-                # item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-                self.tw_result.setItem(i + 2, 9, item)
             self.currentInquiryResult[i] = LineInfo
         self.tw_result.itemChanged.connect(self.soltCheckData)
 
@@ -535,13 +519,13 @@ class retirement(QWidget, Widget_Retirement):
                                                         self.currentYear)
             return
         for i, result in self.currentInquiryResult.items():
-            if result[13] == True:
+            if result[-1] == True:
                 checkbox = self.tw_result.cellWidget(i + 2, 5)
                 num = checkbox.itemText(0)
-                apply = self.tw_result.item(i + 2, 8).text()
-                other = self.tw_result.item(i + 2, 9).text()
-                updateRetireAboutRetire(num, apply, other, result)
-        reply = QMessageBox.question(self, '修改', '修改成功', QMessageBox.Yes)
+                apply = self.tw_result.item(i + 2, 7).text()
+                other = self.tw_result.item(i + 2, 8).text()
+                updateOrderApply(num, apply, other, result)
+        QMessageBox.question(self, '修改', '修改成功', QMessageBox.Yes)
         self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList,
                                                    self.currentYear)
         return
@@ -550,7 +534,7 @@ class retirement(QWidget, Widget_Retirement):
         if item != None and type(item) != int:
             column = item.column()
             row = item.row()
-            if  column == 8:
+            if  column == 7:
                 self.pb_save.setDisabled(False)
                 input = item.text()
                 if input.isdigit() == True:
@@ -569,13 +553,11 @@ class retirement(QWidget, Widget_Retirement):
                 planToRetire = 0
                 if len(checkItems) > 0:
                     for i,item in enumerate(checkItems):
-                        print(item.text())
                         data = comboxCheck.itemData(i + 1,Qt.UserRole)
                         planToRetire= int(data) + planToRetire
                     comboxCheck.setItemText(0,str(planToRetire))
                     comboxCheck.setCurrentIndex(0)
                 else:
-                    print(comboxCheck.itemData(0,Qt.UserRole))
                     comboxCheck.setItemText(0, str(comboxCheck.itemData(0,Qt.UserRole)))
                     comboxCheck.setCurrentIndex(0)
                     return
@@ -606,12 +588,12 @@ class retirement(QWidget, Widget_Retirement):
                                                         self.currentYear)
             return
         for i, result in self.currentInquiryResult.items():
-            if result[13] == True:
+            if result[-1] == True:
                 checkbox = self.tw_result.cellWidget(i + 2, 5)
                 num = checkbox.itemText(0)
-                apply = self.tw_result.item(i + 2, 8).text()
-                other = self.tw_result.item(i + 2, 9).text()
-                updateRetireAboutRetire(num, apply, other, result)
+                apply = self.tw_result.item(i + 2, 7).text()
+                other = self.tw_result.item(i + 2, 8).text()
+                updateOrderApply(num, apply, other, result)
         self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList,
                                                     self.currentYear)
         currentClass = 0
@@ -663,17 +645,16 @@ class retirement(QWidget, Widget_Retirement):
             contentStyle.borders = borders
 
 
-            workSheet.write_merge(0, 0, 0, 9, "%s年%s装备补充及退役需求表" % (self.year, selectUnitNameByUnitID(self.currentCheckedUnitList[0])), titileStyle)
+            workSheet.write_merge(0, 0, 0, 8, "%s年%s装备补充及退役需求表" % (self.year, selectUnitNameByUnitID(self.currentCheckedUnitList[0])), titileStyle)
             workSheet.write(1,0,"序号",titileStyle)
             workSheet.write(1, 1, "装备名称",titileStyle)
             workSheet.write(1, 2, "单位",titileStyle)
-            workSheet.write(1, 3, "实力数",titileStyle)
-            workSheet.write(1, 4, "编制数",titileStyle)
+            workSheet.write(1, 3, "编制数",titileStyle)
+            workSheet.write(1, 4, "实力数",titileStyle)
             workSheet.write(1, 5, "拟退役数",titileStyle)
             workSheet.write(1, 6, "现有数",titileStyle)
-            workSheet.write(1, 7, "超/缺编制数", titileStyle)
-            workSheet.write(1, 8, "申请需求", titileStyle)
-            workSheet.write(1, 9, "备注", titileStyle)
+            workSheet.write(1, 7, "申请需求", titileStyle)
+            workSheet.write(1, 8, "备注", titileStyle)
 
             for i, LineInfo in enumerate(self.resultList):
                 m_isSecond = isSecondDict(LineInfo[2])
@@ -696,27 +677,23 @@ class retirement(QWidget, Widget_Retirement):
                 workSheet.write(i + 2, 1, LineInfo[3], contentStyle)
                 # 单位
                 workSheet.write(i + 2, 2, LineInfo[4],contentStyle)
-
-                # 实力数
-                workSheet.write(i + 2, 3,str(LineInfo[5]), contentStyle)
-                # 现有数
-                workSheet.write(i + 2, 6, LineInfo[8], contentStyle)
-                # 超缺编数
-                workSheet.write(i + 2, 7, LineInfo[9], contentStyle)
                 # 编制数
+                workSheet.write(i + 2, 3,str(LineInfo[5]), contentStyle)
+                # 实力数
                 workSheet.write(i + 2, 4, LineInfo[6], contentStyle)
-
-                if len(LineInfo[7]) < 1:
+                if len(str(LineInfo[7])) < 1:
                     LineInfo[7] = '0'
                 # 拟退役数
                 workSheet.write(i + 2, 5, LineInfo[7], contentStyle)
+                #现有数
+                workSheet.write(i + 2, 6, LineInfo[8], contentStyle)
                 # 申请需求
-                workSheet.write(i + 2, 8, LineInfo[10], contentStyle)
+                workSheet.write(i + 2, 7, LineInfo[9], contentStyle)
                 # 备注
-                workSheet.write(i + 2, 9, LineInfo[11], contentStyle)
+                workSheet.write(i + 2, 8, LineInfo[10], contentStyle)
 
             try:
-                pathName = "%s/%s年%s装备补充及退役需求表.xls" % (directoryPath,self.year, selectUnitNameByUnitID(self.currentCheckedUnitList[0]))
+                pathName = "%s/%s年%s专用装备订购申请表.xls" % (directoryPath,self.year, selectUnitNameByUnitID(self.currentCheckedUnitList[0]))
                 workBook.save(pathName)
                 import win32api
                 win32api.ShellExecute(0, 'open', pathName, '', '', 1)
