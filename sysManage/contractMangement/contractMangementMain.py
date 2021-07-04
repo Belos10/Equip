@@ -2,6 +2,7 @@
 import sys
 from PyQt5.QtWidgets import QMainWindow,QApplication,QWidget
 
+from sysManage.contractMangement.maintenanceManagement import MaintenanceManagement
 from sysManage.contractMangement.orderManagememt import OrderManagement
 from widgets.contractMangement.ContractManagementMainUI import ContractManagementMainUI
 
@@ -12,12 +13,13 @@ class ContractManagementMain(QMainWindow, ContractManagementMainUI):
         self.setupUi(self)
 
         self.orderManagement = OrderManagement()
-        self.maintenanceManagement = QWidget(self)
+        self.maintenanceManagement = MaintenanceManagement(self)
 
         self.stackedWidget.addWidget(self.orderManagement)
         self.stackedWidget.addWidget(self.maintenanceManagement)
 
         self.stackedWidget.setCurrentIndex(0)
+        self.tb_orderManagement.setDisabled(True)
         self.maintenanceManagement.setDisabled(False)
 
         self.connectSignal()

@@ -1,20 +1,22 @@
 from PyQt5.QtCore import Qt, QStringListModel, QDate
 
 from database.contractManagementSql import *
+from sysManage.contractMangement.AttachmentDialog import AttachmentDialog
 from sysManage.userInfo import get_value
 from widgets.contractMangement.OrderManagementUI import OrderManagementUI
 import sys
 from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QTableWidget, QHeaderView, QTableWidgetItem, QComboBox, \
-    QMessageBox, QFileDialog, QListWidgetItem, QListView, QInputDialog, QDateEdit
+    QMessageBox, QFileDialog, QListWidgetItem, QListView, QInputDialog, QPushButton, QDateEdit
 
 
-class OrderManagement(QWidget, OrderManagementUI):
+class MaintenanceManagement(QWidget, OrderManagementUI):
     def __init__(self, parent=None):
-        super(OrderManagement, self).__init__(parent)
+        super(MaintenanceManagement, self).__init__(parent)
         self.setupUi(self)
         self.selectedYear = ''
         self.contractName = ''
         self.contractNo = ''
+        self.attachmentDialog = None
         self.signalConnection()
         self.init()
 
@@ -56,8 +58,9 @@ class OrderManagement(QWidget, OrderManagementUI):
 
     def initYearList(self):
         self.yearList = []
-        self.yearList = getYearsFromContractOrder()
+        self.yearList = getYearsFromContractMaintenance()
         listModel = QStringListModel()
+        print(self.yearList)
         listModel.setStringList(self.yearList)
         self.lv_year.setModel(listModel)
         if len(self.yearList) == 0:
@@ -82,11 +85,11 @@ class OrderManagement(QWidget, OrderManagementUI):
         year = 0
         year, ok = QInputDialog.getInt(self, "Get year", "year:", 0, 0, 100000, 1)
         if ok:
-            if isHaveContractOrderYear(str(year)):
+            if isHaveContractMaintenanceYear(str(year)):
                 QMessageBox.information(self, "新增", "该年份已经存在，拒绝添加！", QMessageBox.Yes)
                 return
             else:
-                insertSuccess = addContractOrderYear(year)
+                insertSuccess = addContractMaintanceYear(year)
                 if insertSuccess == True:
                     QMessageBox.information(self, "新增", "新增成功！", QMessageBox.Yes)
                 else:
@@ -99,6 +102,7 @@ class OrderManagement(QWidget, OrderManagementUI):
         if (len(self.yearList) != 0):
             self.selectedYear = self.yearList[item.row()]
             self.displayData()
+
 
 
     '''
@@ -118,25 +122,29 @@ class OrderManagement(QWidget, OrderManagementUI):
 
     def displayData(self):
         self.tw_result.itemChanged.disconnect(self.slotAlterAndSava)
-        print(self.selectedYear, self.contractNo, self.contractName)
-        self.result = getResult(self.selectedYear, self.contractNo, self.contractName)
+        self.result = getResultFromContractMaintenance(self.selectedYear, self.contractNo, self.contractName)
         self.tw_result.clear()
-        self.tw_result.setColumnCount(11)
+        self.tw_result.setColumnCount(12)
         self.currentLastRow = 0
         dataList = self.result
         if dataList is None or len(dataList) == 0:
             self.tw_result.setRowCount(2)
             self.initTableHeader()
+            self.tb_del.setDisabled(True)
+            self.tb_outputToExcel.setDisabled(True)
         else:
+            self.tb_del.setDisabled(False)
+            self.tb_outputToExcel.setDisabled(False)
+
             self.tw_result.setRowCount(2 + len(dataList))
             self.initTableHeader()
             item = QTableWidgetItem(self.selectedYear + '年')
             item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             item.setFlags(Qt.ItemIsEnabled)
             self.tw_result.setItem(2, 0, item)
-            self.tw_result.setSpan(2,0,len(dataList),1)
+            self.tw_result.setSpan(2, 0, len(dataList),1)
             for i in range(len(dataList)):
-                item = QTableWidgetItem(str(i + 1))
+                item = QTableWidgetItem(str(dataList[i][0]))
                 item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
                 item.setFlags(Qt.ItemIsEnabled)
                 self.tw_result.setItem(2 + i, 1, item)
@@ -177,12 +185,28 @@ class OrderManagement(QWidget, OrderManagementUI):
                 dataEdit.setDate(QDate(int(parsedDateList[0]), int(parsedDateList[1]), int(parsedDateList[2])))
                 self.tw_result.setCellWidget(2 + i, 9, dataEdit)
 
-
                 item = QTableWidgetItem(dataList[i][10])
                 item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
                 item.setFlags(Qt.ItemIsEnabled)
                 self.tw_result.setItem(2 + i, 10, item)
+                ##未完
+                pushButton = QPushButton("附件信息")
+                pushButton.clicked.connect(self.soltDisplayAttachment)
+                self.tw_result.setCellWidget(2 + i,11, pushButton)
+
+
         self.tw_result.itemChanged.connect(self.slotAlterAndSava)
+
+    def soltDisplayAttachment(self):
+        rowCount = self.tw_result.currentRow()
+        maintenanceId = self.result[rowCount - 2][0]
+        self.attachmentDialog = AttachmentDialog()
+        self.attachmentDialog.initTableWidget(maintenanceId,self.selectedYear)
+        self.attachmentDialog.show()
+
+
+
+        pass
 
     '''
         功能：
@@ -199,11 +223,11 @@ class OrderManagement(QWidget, OrderManagementUI):
         self.tw_result.resizeRowsToContents()
 
         # 绘制表头
-        item = QTableWidgetItem("订购计划--合同")
+        item = QTableWidgetItem("维修保障--合同")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tw_result.setItem(0, 0, item)
         item.setFlags(Qt.ItemIsEnabled)
-        self.tw_result.setSpan(0, 0, 1, 11)
+        self.tw_result.setItem(0, 0, item)
+        self.tw_result.setSpan(0, 0, 1, 12)
 
         item = QTableWidgetItem("年度")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
@@ -264,6 +288,11 @@ class OrderManagement(QWidget, OrderManagementUI):
         item.setFlags(Qt.ItemIsEnabled)
         self.tw_result.setItem(1, 10, item)
 
+        item = QTableWidgetItem("附件")
+        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        item.setFlags(Qt.ItemIsEnabled)
+        self.tw_result.setItem(1, 11, item)
+
     '''
         功能：
             新增一行的数据
@@ -315,32 +344,7 @@ class OrderManagement(QWidget, OrderManagementUI):
         # print('保存一行')
         rowData = []
         rowData.append(self.selectedYear)
-        for i in range(1, self.tw_result.columnCount()):
-            if i == 9:
-                item = self.tw_result.cellWidget(row, i)
-                if item != None:
-                    date = item.date().toString(Qt.ISODate)
-                    rowData.append(date)
-                else:
-                    break
-            else:
-                item = self.tw_result.item(row, i)
-                if (item != None):
-                    if (len(item.text()) > 0):
-                        rowData.append(item.text())
-                else:
-                    break
-        if len(rowData) == self.tw_result.columnCount():
-            if(insertOneDataInToContractOrder(rowData) == True):
-                QMessageBox.warning(self, "注意", "插入成功！", QMessageBox.Yes, QMessageBox.Yes)
-            else:
-                QMessageBox.warning(self, "警告", "插入失败！", QMessageBox.Yes, QMessageBox.Yes)
-            self.displayData()
-
-    def alterRowData(self, row):
-        # print("修改一行数据")
-        rowData = []
-        for i in range(1, self.tw_result.columnCount()):
+        for i in range(1, self.tw_result.columnCount() - 1):
             if i == 9:
                 item = self.tw_result.cellWidget(row, i)
                 if item != None:
@@ -356,7 +360,33 @@ class OrderManagement(QWidget, OrderManagementUI):
                 else:
                     break
         if len(rowData) == self.tw_result.columnCount() - 1:
-            if (updataOneDataToContractOrder(rowData) == True):
+            if(insertOneDataInToContractMaintenance(rowData) == True):
+                QMessageBox.warning(self, "注意", "插入成功！", QMessageBox.Yes, QMessageBox.Yes)
+            else:
+                QMessageBox.warning(self, "警告", "插入失败！", QMessageBox.Yes, QMessageBox.Yes)
+            self.displayData()
+
+    def alterRowData(self, row):
+        # print("修改一行数据")
+        rowData = []
+        rowData.append(self.selectedYear)
+        for i in range(1, self.tw_result.columnCount() - 1):
+            if i == 9:
+                item = self.tw_result.cellWidget(row, i)
+                if item != None:
+                    date = item.date().toString(Qt.ISODate)
+                    rowData.append(date)
+                else:
+                    break
+            else:
+                item = self.tw_result.item(row, i)
+                if (item != None):
+                    if (len(item.text()) > 0):
+                        rowData.append(item.text())
+                else:
+                    break
+        if len(rowData) == self.tw_result.columnCount() - 1:
+            if (updataOneDataToContractMaintenance(rowData) == True):
                 QMessageBox.warning(self, "注意", "修改成功！", QMessageBox.Yes, QMessageBox.Yes)
             else:
                 QMessageBox.warning(self, "警告", "修改失败！", QMessageBox.Yes, QMessageBox.Yes)
@@ -400,16 +430,19 @@ class OrderManagement(QWidget, OrderManagementUI):
             item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             item.setFlags(Qt.ItemIsEnabled)
             self.tw_result.setItem(rowCount, 8, item)
+
             deliveryDate = QDateEdit()
             deliveryDate.setDisplayFormat("yyyy-MM-dd")
             self.tw_result.setCellWidget(rowCount, 9, deliveryDate)
 
+            pushButton = QPushButton("附件信息")
+            pushButton.clicked.connect(self.soltDisplayAttachment)
+            self.tw_result.setCellWidget(rowCount, 11, pushButton)
 
         else:
             QMessageBox.warning(self, "注意", "请先将数据补充完整！", QMessageBox.Yes, QMessageBox.Yes)
 
     def slotDelete(self):
-
         rowCount = self.tw_result.currentRow()
         resultCount = len(self.result)
         if rowCount < 2:
@@ -417,8 +450,9 @@ class OrderManagement(QWidget, OrderManagementUI):
         elif rowCount >= 2 and rowCount < 2 + resultCount:
             reply = QMessageBox.question(self, '警告', '是否删除该行数据？', QMessageBox.Cancel, QMessageBox.Yes)
             if reply == QMessageBox.Yes:
-                deleteDataByContractOrderIdAndYear(self.result[rowCount - 2][0],self.selectedYear)
+                deleteDataByContractMaintenance(self.result[rowCount - 2][0],self.selectedYear)
                 self.tw_result.removeRow(rowCount)
+            self.displayData()
         else:
             self.tw_result.removeRow(rowCount)
 
@@ -519,6 +553,6 @@ class OrderManagement(QWidget, OrderManagementUI):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    widget = OrderManagement()
+    widget = MaintenanceManagement()
     widget.show()
     sys.exit(app.exec_())
