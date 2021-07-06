@@ -325,10 +325,18 @@ def selectEquipInfoByEquipUper(Equip_Uper):
 
     cur.execute(sql)
     result = cur.fetchall()
+    return result
+# 根据Equip_Uper查询信息,并返回
+def selectSpecialEquipmentInfoByEquipUper(Equip_Uper):
+    sql = "select * from equip where Equip_Uper = '%s' and Equip_Type = '专用装备'"%Equip_Uper
+    cur.execute(sql)
+    result = cur.fetchall()
+    return result
 
-    # 测试结果
-    # print(result)
-
+def selectGeneralEquipmentInfoByEquipUper(Equip_Uper):
+    sql = "select * from equip where Equip_Uper = '%s' and Equip_Type = '通用装备'"%Equip_Uper
+    cur.execute(sql)
+    result = cur.fetchall()
     return result
 
 

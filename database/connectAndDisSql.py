@@ -115,7 +115,10 @@ def executeSql(sql):
     try:
         cur.execute(sql)
         records = cur.fetchall()
-        return records
+        if records == None:
+            return []
+        else:
+            return records
     except sqlite3.Error as error:
         print(error)
 

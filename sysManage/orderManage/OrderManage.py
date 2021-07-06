@@ -1,5 +1,7 @@
 import sys
 from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget
+
+from sysManage.orderManage.orderApply.orderApply import OrderApply
 from widgets.orderManage.orderManage import widget_orderManage
 from sysManage.orderManage.OrderAllotPlan import OrderAllotPlan
 from sysManage.orderManage.OrderRetirePlan import OrderRetirePlan
@@ -13,7 +15,7 @@ class OrderManage(QMainWindow, widget_orderManage):
         super(OrderManage, self).__init__(parent)
         self.setupUi(self)
 
-        self.orderPlan = QWidget()                  # 订购计划
+        self.orderPlan = OrderApply()                  # 订购申请
         self.adjustOrder = QWidget()                # 订购计划调整
         self.orderAllotPlan = OrderAllotPlan(self)      # 订购分配计划
         self.orderSchedule = QWidget()              # 订购进度

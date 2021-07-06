@@ -22,5 +22,7 @@
     <file>system.png</file>
     <file>maintenanceManagement.png</file>
     <file>orderManagement.png</file>
+    <file>orderApply.png</file>
+    <file>orderAllotPlan.png</file>
   </qresource>
 </RCC>
