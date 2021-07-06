@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.Qt import Qt
 from PyQt5.QtGui import QColor, QBrush, QFont
 # new
-from widgets.orderManage.retirePlan import retirePlan_Form
+from widgets.orderManage.Widget_OrderRetirePlan import retirePlan_Form
 from database.OrderManageSql import *
 from sysManage.userInfo import get_value
 from sysManage.alocatMange.InputProof import InputProof
@@ -111,7 +111,6 @@ class OrderRetirePlan(QWidget, retirePlan_Form):
             if haveYear == True:
                 reply = QMessageBox.information(self, '添加', '添加失败，该年份已存在', QMessageBox.Yes)
                 return
-
             insertIntoOrderRetirePlanYear(year)
             self._initYearWidget_()
             return
