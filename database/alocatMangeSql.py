@@ -340,7 +340,7 @@ def selectDisturbPlanProof(year):
     #disconnectMySql(conn, cur)
     return result
 
-# 修改年份对应调拨依据
+# 修改Disturb年份对应调拨依据
 def updateDisturbPlanProof(year,proof):
     # conn, cur = connectMySql()
     sql = "update disturbplanyear set proof = '" + proof + "' where year = '" + year + "'"
@@ -348,6 +348,13 @@ def updateDisturbPlanProof(year,proof):
     conn.commit()
     #disconnectMySql(conn, cur)
 
+# 修改Retire年份对应调拨依据
+def updateRetirePlanProof(year,proof):
+    # conn, cur = connectMySql()
+    sql = "update retireplanyear set proof = '" + proof + "' where year = '" + year + "'"
+    cur.execute(sql)
+    conn.commit()
+    #disconnectMySql(conn, cur)
 
 # 读取分配计划备注
 def selectDisturbPlanNote(EquipList, YearList):

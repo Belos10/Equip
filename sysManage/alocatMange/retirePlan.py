@@ -5,7 +5,7 @@ from PyQt5.QtGui import QColor, QBrush, QFont
 # new
 from widgets.alocatMange.retirePlan import retirePlan_Form
 from sysManage.userInfo import get_value
-from sysManage.alocatMange.InputProof import InputProof
+from sysManage.alocatMange.InputProof_Retire import InputProof
 from database.SD_EquipmentBanlanceSql import updateOneEquipmentBalanceData, deleteByYear
 from database.alocatMangeSql import *
 

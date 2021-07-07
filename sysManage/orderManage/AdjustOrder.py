@@ -1,52 +1,42 @@
 import sys
 from PyQt5.QtWidgets import *
-#new
 from database.SD_EquipmentBanlanceSql import updateOneEquipmentBalanceData
-from widgets.alocatMange.allotSchedule import widget_AllotSchedule
+from widgets.orderManage.Widget_AdjustOrder import widget_adjustOrder
 from database.strengthDisturbSql import *
 from PyQt5.Qt import Qt
 from PyQt5.QtGui import QColor, QBrush,QFont
-from database.alocatMangeSql import *
-from sysManage.alocatMange.ArmySchedule import ArmySchedule
-from sysManage.alocatMange.armyTransfer import armyTransfer
-from sysManage.alocatMange.ScheduleFinish import ScheduleFisish
-from sysManage.alocatMange.transferModel import transferModel
+from database.OrderManageSql import *
 from sysManage.userInfo import get_value
 
-class AllotSchedule(QWidget,widget_AllotSchedule):
+class AdjustOrder(QWidget, widget_adjustOrder):
     def __init__(self,parent=None):
-        super(AllotSchedule, self).__init__(parent)
+        super(AdjustOrder, self).__init__(parent)
         self.setupUi(self)
         self.initAll()
-        self.first_treeWidget_dict = {}
-        self.second_treeWidget_dict = {}
-        self.currentDisturbPlan = {}
-        self.currentUnitDisturbPlanNum = {}
-        self.unitDisturbPlanList = {}
-        self.currentEquipdict = {}
-        self.armySchedule = ArmySchedule(self)
-        self.scheduleFinish = ScheduleFisish(self)
+        # self.first_treeWidget_dict = {}
+        # self.second_treeWidget_dict = {}
+        # self.currentAdjustOrder = {}
+        # self.currentUnitAdjustOrderNum = {}
+        # self.unitAdjustOrderList = {}
+        # self.currentEquipdict = {}
+        # self.armySchedule = ArmySchedule(self)
+        # self.scheduleFinish = ScheduleFisish(self)
         self.fileName = ""
         self.unitFlag = 0
-        self.rocketSchedule = transferModel(self)
+        # self.rocketSchedule = transferModel(self)
         self.signalConnect()
 
 
     def initAll(self):
-        self.tw_first.header().setVisible(False)
-        self.tw_second.header().setVisible(False)
+        self.tw_equip.header().setVisible(False)
         self.le_first.setDisabled(1)
-        self.le_second.setDisabled(1)
-        self.tw_first.setDisabled(1)
-        self.tw_second.setDisabled(1)
-        self.tw_first.clear()
-        self.tw_second.clear()
-        self.txt_disturbPlanYear.clear()
+        self.tw_equip.setDisabled(1)
+        self.tw_equip.clear()
+        self.txt_adjustOrderYear.clear()
         self.cb_schedule.setDisabled(1)
-        self.tb_proof.clear()
-        self.disturbResult.clear()
-        self.disturbResult.setRowCount(0)
-        self.disturbResult.setColumnCount(0)
+        self.adjustForm.clear()
+        self.adjustForm.setRowCount(0)
+        self.adjustForm.setColumnCount(0)
         self._initYearWidget_()
 
 
@@ -54,13 +44,14 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
     def signalConnect(self):
         # 点击选择年份后刷新页面 初始化
         self.lw_yearChoose.itemClicked.connect(self.slotClickedInqury)
-        self.lw_yearChoose.itemClicked.connect(self.setDisturbPlanTitle)
-        self.lw_yearChoose.itemClicked.connect(self.initDisturbPlanProof)
+        self.lw_yearChoose.itemClicked.connect(self.setAdjustOrderTitle)
+        # self.lw_yearChoose.itemClicked.connect(self.initDisturbPlanProof)
         # 点击第一目录结果
-        self.tw_first.itemClicked.connect(self.slotDisturbStrengthResult)
+        self.tw_equip.itemClicked.connect(self.slotAdjustStrengthResult)
+        self.tw_equip.itemChanged.connect(self.slotCheckedChange)
         # 点击第二目录结果
-        self.tw_second.itemClicked.connect(self.slotDisturbStrengthResult)
-        self.tw_second.itemChanged.connect(self.slotCheckedChange)
+        # self.tw_second.itemClicked.connect(self.slotDisturbStrengthResult)
+        # 选择进度
         self.cb_schedule.activated.connect(self.selectSchedule)
 
 
@@ -88,26 +79,26 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
 
 
     def slotClickedInqury(self):
-        self.tw_first.clear()
+        self.tw_equip.clear()
         self.tw_second.clear()
-        self.tw_first.header().setVisible(False)
+        self.tw_equip.header().setVisible(False)
         self.tw_second.header().setVisible(False)
         self.le_first.setDisabled(False)
         self.le_second.setDisabled(False)
-        self.tw_first.setDisabled(False)
+        self.tw_equip.setDisabled(False)
         self.tw_second.setDisabled(False)
         self.cb_schedule.setDisabled(0)
         self.first_treeWidget_dict = {}
         self.second_treeWidget_dict = {}
         self.initUserInfo()
         self.currentYear = self.lw_yearChoose.currentItem().text()
-        # self._initUnitTreeWidget("", self.tw_first)
+        # self._initUnitTreeWidget("", self.tw_equip)
         startInfo = selectDisturbPlanUnitInfoByUnitID(self.userInfo[0][4])
         stack = []
         root = []
         if startInfo:
             stack.append(startInfo)
-            root.append(self.tw_first)
+            root.append(self.tw_equip)
             self._initUnitTreeWidget(stack, root)
 
         equipInfo =  findUperEquipIDByName("通用装备")
@@ -187,18 +178,18 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
     '''
         查询结果
     '''
-    def slotDisturbStrengthResult(self):
+    def slotAdjustStrengthResult(self):
         self.yearList = []
         self.originalEquipDict = {}
         self.originalEquipDictTab = {}
         self.currentUnitChilddict = {}
         self.unitFlag = 0
-        self.disturbResult.clear()
+        self.adjustForm.clear()
         self.cb_schedule.setCurrentIndex(0)
         # 获取子单位名
         j = 0
         for unitID, unitItem in self.first_treeWidget_dict.items():
-            if unitItem == self.tw_first.currentItem():
+            if unitItem == self.tw_equip.currentItem():
                 if selectUnitIfBase(unitID):
                     self.unitFlag = 2
                     result = findDisturbPlanUnitChildInfo(unitID)
@@ -234,8 +225,8 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         初始化分配计划结果
     '''
     def _initDisturbPlanByUnitListAndEquipList(self,equipDict,equipDictTab={}):
-        self.disturbResult.clear()
-        self.disturbResult.setRowCount(0)
+        self.adjustForm.clear()
+        self.adjustForm.setRowCount(0)
         self.currentEquipdict = equipDict
         self.lenCurrentUnitChilddict = len(self.currentUnitChilddict)
         self.lenCurrentEquipdict = len(self.currentEquipdict)
@@ -251,42 +242,42 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
             headerlist.append('完成接装')
             headerlist.append('备注')
             self.lenHeaderList = len(headerlist)
-            self.disturbResult.setColumnCount(self.lenHeaderList)
-            self.disturbResult.setRowCount(len(self.currentEquipdict))
-            self.disturbResult.setHorizontalHeaderLabels(headerlist)
-            self.currentDisturbPlan.clear()
-            self.disturbResult.setColumnWidth(0, 200)
+            self.adjustForm.setColumnCount(self.lenHeaderList)
+            self.adjustForm.setRowCount(len(self.currentEquipdict))
+            self.adjustForm.setHorizontalHeaderLabels(headerlist)
+            self.currentAdjustOrder.clear()
+            self.adjustForm.setColumnWidth(0, 200)
             i = 0
             for LineInfo in equipDictTab.values():
                 currentRowResult = []
                 item = QTableWidgetItem(LineInfo[1])
                 item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
                 currentRowResult.append(item)
-                self.disturbResult.setItem(i, 0, item)
+                self.adjustForm.setItem(i, 0, item)
                 item = QTableWidgetItem("")
                 item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
                 currentRowResult.append(item)
-                self.disturbResult.setItem(i, 1, item)
+                self.adjustForm.setItem(i, 1, item)
                 item = QTableWidgetItem("")
                 item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
                 currentRowResult.append(item)
-                self.disturbResult.setItem(i, 2, item)
+                self.adjustForm.setItem(i, 2, item)
                 item = QTableWidgetItem("")
                 item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
                 currentRowResult.append(item)
-                self.disturbResult.setItem(i, 3, item)
+                self.adjustForm.setItem(i, 3, item)
                 item = QTableWidgetItem("")
                 item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
                 currentRowResult.append(item)
-                self.disturbResult.setItem(i, 4, item)
+                self.adjustForm.setItem(i, 4, item)
                 for x in range(0, self.lenCurrentUnitChilddict):
                     item = QTableWidgetItem("")
                     item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-                    self.disturbResult.setItem(i, x + 5, item)
+                    self.adjustForm.setItem(i, x + 5, item)
                     currentRowResult.append(item)
                 item = QTableWidgetItem("")
                 item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-                self.disturbResult.setItem(i, 9 + self.lenCurrentUnitChilddict, item)
+                self.adjustForm.setItem(i, 9 + self.lenCurrentUnitChilddict, item)
                 currentRowResult.append(item)
                 i = i + 1
         # 选择各基地
@@ -301,44 +292,44 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
             headerlist.append('完成接装')
             headerlist.append('备注')
             self.lenHeaderList = len(headerlist)
-            self.disturbResult.setColumnCount(self.lenHeaderList)
-            self.disturbResult.setRowCount(len(self.currentEquipdict))
-            self.disturbResult.setHorizontalHeaderLabels(headerlist)
-            self.disturbResult.setColumnWidth(0, 200)
+            self.adjustForm.setColumnCount(self.lenHeaderList)
+            self.adjustForm.setRowCount(len(self.currentEquipdict))
+            self.adjustForm.setHorizontalHeaderLabels(headerlist)
+            self.adjustForm.setColumnWidth(0, 200)
             i = 0
             for LineInfo in equipDictTab.values():
                 currentRowResult = []
                 item = QTableWidgetItem(LineInfo[1])
                 item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
                 currentRowResult.append(item)
-                self.disturbResult.setItem(i, 0, item)
+                self.adjustForm.setItem(i, 0, item)
                 item = QTableWidgetItem("")
                 item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
                 currentRowResult.append(item)
-                self.disturbResult.setItem(i, 1, item)
+                self.adjustForm.setItem(i, 1, item)
                 item = QTableWidgetItem("")
                 item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
                 currentRowResult.append(item)
-                self.disturbResult.setItem(i, 2, item)
+                self.adjustForm.setItem(i, 2, item)
                 item = QTableWidgetItem("")
                 item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
                 currentRowResult.append(item)
-                self.disturbResult.setItem(i, 3, item)
+                self.adjustForm.setItem(i, 3, item)
                 item = QTableWidgetItem("")
                 item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
                 currentRowResult.append(item)
-                self.disturbResult.setItem(i, 4, item)
+                self.adjustForm.setItem(i, 4, item)
                 for x in range(0, self.lenCurrentUnitChilddict):
                     item = QTableWidgetItem("")
                     item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-                    self.disturbResult.setItem(i, x + 5, item)
+                    self.adjustForm.setItem(i, x + 5, item)
                     currentRowResult.append(item)
                 item = QTableWidgetItem("")
                 item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-                self.disturbResult.setItem(i, 8 + self.lenCurrentUnitChilddict, item)
+                self.adjustForm.setItem(i, 8 + self.lenCurrentUnitChilddict, item)
                 currentRowResult.append(item)
                 i = i + 1
-        self.disturbResult.setColumnWidth(2, 150)
+        self.adjustForm.setColumnWidth(2, 150)
         if self.currentUnitChilddict and self.currentEquipdict:
             self.initDisturbPlanNum()
             self.initDisturbPlanNote()
@@ -351,14 +342,14 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         if self.unitFlag == 1:
             unitDisturbPlanInputNumList = selectDisturbPlanInputNumUpmost(self.currentEquipdict, self.currentYear)
             for i in range(0, len(self.currentEquipdict)):
-                item = self.disturbResult.item(i, 3)
+                item = self.adjustForm.item(i, 3)
                 if unitDisturbPlanInputNumList[i] is not None:
                     item.setText(str(unitDisturbPlanInputNumList[i]))
                 # item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable)
         elif self.unitFlag == 2:
             unitDisturbPlanInputNumList = selectDisturbPlanInputNumBase(self.currentEquipdict, self.currentYear)
             for i in range(0, len(self.currentEquipdict)):
-                item = self.disturbResult.item(i, 3)
+                item = self.adjustForm.item(i, 3)
                 if unitDisturbPlanInputNumList[i] is not None:
                     item.setText(str(unitDisturbPlanInputNumList[i]))
                 # item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable)
@@ -377,7 +368,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                     item.clicked.connect(self.setArmySchedule)
                     if flag1[0][0] != '0':
                         item = QPushButton("已完成")
-                    self.disturbResult.setCellWidget(i, 5 + self.lenCurrentUnitChilddict, item)
+                    self.adjustForm.setCellWidget(i, 5 + self.lenCurrentUnitChilddict, item)
 
                     # 是否具备接装条件
                     flag2 = selectAllotConditionUper(self.currentEquipdict[i][0], self.currentYear)
@@ -385,7 +376,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                     item.clicked.connect(self.setCondition)
                     if int(flag2[0][0]):
                         item = QPushButton("已完成")
-                    self.disturbResult.setCellWidget(i, 6 + self.lenCurrentUnitChilddict, item)
+                    self.adjustForm.setCellWidget(i, 6 + self.lenCurrentUnitChilddict, item)
 
                     # 火箭军调拨单进度
                     flag3 = selectRocketScheduleUper(self.currentEquipdict[i][0], self.currentYear)
@@ -394,7 +385,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                     if int(flag3[0][0]):
                         item = QPushButton("已完成")
                         item.clicked.connect(self.showRocket)
-                    self.disturbResult.setCellWidget(i, 7 + self.lenCurrentUnitChilddict, item)
+                    self.adjustForm.setCellWidget(i, 7 + self.lenCurrentUnitChilddict, item)
 
                     # 是否完成接装
                     flag4 = selectIfScheduleFinishUper(self.currentEquipdict[i][0], self.currentYear)
@@ -403,7 +394,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                     item.clicked.connect(self.setScheduleFinish)
                     if flag4[0][0] != '0':
                         item = QPushButton("已完成")
-                    self.disturbResult.setCellWidget(i, 8 + self.lenCurrentUnitChilddict, item)
+                    self.adjustForm.setCellWidget(i, 8 + self.lenCurrentUnitChilddict, item)
         # 选择基地
         elif self.unitFlag == 2:
             for i in self.currentEquipdict:
@@ -414,7 +405,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                     # item.clicked.connect(self.setArmySchedule)
                     # if flag1[0][0] != '0':
                     #     item = QPushButton("已完成")
-                    # self.disturbResult.setCellWidget(i, 5 + self.lenCurrentUnitChilddict, item)
+                    # self.adjustForm.setCellWidget(i, 5 + self.lenCurrentUnitChilddict, item)
 
                     # 火箭军调拨单进度
                     flag2 = selectRocketScheduleBase(self.currentEquipdict[i][0], self.currentYear)
@@ -423,7 +414,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                     if int(flag2[0][0]):
                         item = QPushButton("已完成")
                         item.clicked.connect(self.showRocket)
-                    self.disturbResult.setCellWidget(i, 5 + self.lenCurrentUnitChilddict, item)
+                    self.adjustForm.setCellWidget(i, 5 + self.lenCurrentUnitChilddict, item)
 
                     # 是否具备接装条件
                     flag3 = selectAllotConditionBase(self.currentEquipdict[i][0], self.currentYear)
@@ -431,7 +422,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                     item.clicked.connect(self.setCondition)
                     if int(flag3[0][0]):
                         item = QPushButton("已完成")
-                    self.disturbResult.setCellWidget(i, 6 + self.lenCurrentUnitChilddict, item)
+                    self.adjustForm.setCellWidget(i, 6 + self.lenCurrentUnitChilddict, item)
 
                     # 是否完成接装
                     flag4 = selectIfScheduleFinishBase(self.currentEquipdict[i][0], self.currentYear)
@@ -440,12 +431,12 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                     item.clicked.connect(self.setScheduleFinish)
                     if flag4[0][0] != '0':
                         item = QPushButton("已完成")
-                    self.disturbResult.setCellWidget(i, 7 + self.lenCurrentUnitChilddict, item)
+                    self.adjustForm.setCellWidget(i, 7 + self.lenCurrentUnitChilddict, item)
 
-    # 初始化调拨依据
-    def initDisturbPlanProof(self):
-        proof = selectDisturbPlanProof(self.currentYear)
-        self.tb_proof.setText(proof[0][0])
+    # # 初始化调拨依据
+    # def initDisturbPlanProof(self):
+    #     proof = selectDisturbPlanProof(self.currentYear)
+    #     self.tb_proof.setText(proof[0][0])
         # self.setTextInteractionFlags(Qt.TextSelectableByMouse|Qt.TextSelectableByKeyboard)
 
 
@@ -453,16 +444,16 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
     # 读取初始分配计划数
     def initDisturbPlanNum(self):
         # print("currentYear:", self.currentYear)
-        self.unitDisturbPlanList = selectDisturbPlanNumByList(self.currentUnitChilddict,
+        self.unitAdjustOrderList = selectDisturbPlanNumByList(self.currentUnitChilddict,
                                                               self.currentEquipdict, self.currentYear)
-        print("self.unitDisturbPlanList", self.unitDisturbPlanList)
+        print("self.unitDisturbPlanList", self.unitAdjustOrderList)
         # 显示每个单位分配计划数
         num = 0
         for i in range(0, len(self.currentUnitChilddict)):
             for j in range(0, len(self.currentEquipdict)):
-                item = self.disturbResult.item(j, 5 + i)
-                if self.unitDisturbPlanList[num] != '-1':
-                    item.setText(self.unitDisturbPlanList[num])
+                item = self.adjustForm.item(j, 5 + i)
+                if self.unitAdjustOrderList[num] != '-1':
+                    item.setText(self.unitAdjustOrderList[num])
                 num = num + 1
         self.initDisturbPlanSum()
 
@@ -474,23 +465,23 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         for i in self.currentEquipdict:
             if not selectEquipIsHaveChild(self.currentEquipdict[i][0]):
                 for j in range(0, len(self.currentUnitChilddict)):
-                    num = self.disturbResult.item(i, 5 + j).text()
+                    num = self.adjustForm.item(i, 5 + j).text()
                     if num == '':
                         sum = sum + 0
                     else:
                         sum = sum + int(num)
-                self.disturbResult.item(i, 4).setText(str(sum))
+                self.adjustForm.item(i, 4).setText(str(sum))
             sum = 0
         for row in reversed(range(len(self.currentEquipdict))):
             sum = 0
             for childRow in reversed(range(len(self.currentEquipdict))):
                 # 第0个字段是EquipID,第二个字段是Equip_Uper
                 if self.currentEquipdict[row][0] == self.currentEquipdict[childRow][2]:
-                    num = self.disturbResult.item(childRow, 4).text()
+                    num = self.adjustForm.item(childRow, 4).text()
                     if num != '':
                         sum = sum + int(num)
             if sum != 0:
-                self.disturbResult.item(row, 4).setText(str(sum))
+                self.adjustForm.item(row, 4).setText(str(sum))
         # 每个单位的上层装备合计数
         for i in range(0, len(self.currentUnitChilddict)):
             for row in reversed(range(len(self.currentEquipdict))):
@@ -498,11 +489,11 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                 for childRow in reversed(range(len(self.currentEquipdict))):
                     # 第0个字段是EquipID,第二个字段是Equip_Uper
                     if self.currentEquipdict[row][0] == self.currentEquipdict[childRow][2]:
-                        num = self.disturbResult.item(childRow, 5 + i).text()
+                        num = self.adjustForm.item(childRow, 5 + i).text()
                         if num != '':
                             sum = sum + int(num)
                 if sum != 0:
-                    self.disturbResult.item(row, 5 + i).setText(str(sum))
+                    self.adjustForm.item(row, 5 + i).setText(str(sum))
 
     '''
         功能：
@@ -553,13 +544,13 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
 
 
     # 初始化分配计划年份
-    def setDisturbPlanTitle(self):
+    def setAdjustOrderTitle(self):
         txt=str(self.currentYear)+"年分配计划"
-        self.txt_disturbPlanYear.setFont(QFont("Microsoft YaHei"))
-        self.txt_disturbPlanYear.setAlignment(Qt.AlignCenter)
-        self.txt_disturbPlanYear.setTextInteractionFlags(Qt.NoTextInteraction)
-        self.txt_disturbPlanYear.setFontPointSize(15)
-        self.txt_disturbPlanYear.setText(txt)
+        self.txt_adjustOrderYear.setFont(QFont("Microsoft YaHei"))
+        self.txt_adjustOrderYear.setAlignment(Qt.AlignCenter)
+        self.txt_adjustOrderYear.setTextInteractionFlags(Qt.NoTextInteraction)
+        self.txt_adjustOrderYear.setFontPointSize(15)
+        self.txt_adjustOrderYear.setText(txt)
 
 
     # 读取初始分配计划备注
@@ -567,7 +558,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         unitDisturbPlanNoteList = selectDisturbPlanNote(self.currentEquipdict, self.currentYear)
         # print("self.unitDisturbPlanNoteList", self.unitDisturbPlanNoteList)
         for i in range(0,len(self.currentEquipdict)):
-            item=self.disturbResult.item(i,self.lenHeaderList-1)
+            item=self.adjustForm.item(i,self.lenHeaderList-1)
             if unitDisturbPlanNoteList[i] is not None:
                 item.setText(str(unitDisturbPlanNoteList[i]))
 
@@ -576,15 +567,15 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         unitDisturbPlanOtherList = selectDisturbPlanOther(self.currentEquipdict, self.currentYear)
         # 装备单位
         for i in range(0, len(self.currentEquipdict)):
-            item = self.disturbResult.item(i, 1)
+            item = self.adjustForm.item(i, 1)
             item.setText(str(self.currentEquipdict[i][5]))
         if self.unitFlag == 1:
             # 陆军调拨单开具数
             for unitID, unitItem in self.first_treeWidget_dict.items():
-                if unitItem == self.tw_first.currentItem():
+                if unitItem == self.tw_equip.currentItem():
                     # if selectUnitIfUppermost(unitID):
                     for i in range(0, len(self.currentEquipdict)):
-                        item = self.disturbResult.item(i, 2)
+                        item = self.adjustForm.item(i, 2)
                         if unitDisturbPlanOtherList[i]:
                             item.setText(str(unitDisturbPlanOtherList[i][0][1]))
                         else:
@@ -595,17 +586,17 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                         for childRow in reversed(range(len(self.currentEquipdict))):
                             # 第0个字段是EquipID,第二个字段是Equip_Uper
                             if self.currentEquipdict[row][0] == self.currentEquipdict[childRow][2]:
-                                num = self.disturbResult.item(childRow, 2).text()
+                                num = self.adjustForm.item(childRow, 2).text()
                                 if num != '':
                                     sum = sum + int(num)
                         if sum != 0:
-                            self.disturbResult.item(row, 2).setText(str(sum))
+                            self.adjustForm.item(row, 2).setText(str(sum))
         elif self.unitFlag == 2:
             # 火箭军调拨单分配数
             for unitID, unitItem in self.first_treeWidget_dict.items():
-                if unitItem == self.tw_first.currentItem():
+                if unitItem == self.tw_equip.currentItem():
                     for i in self.currentEquipdict:
-                        item = self.disturbResult.item(i, 2)
+                        item = self.adjustForm.item(i, 2)
                         result = selectDisturbPlanNumByList({0: [unitID]}, self.currentEquipdict, self.currentYear)
                         if result:
                             item.setText(str(result[i]))
@@ -617,11 +608,11 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                         for childRow in reversed(range(len(self.currentEquipdict))):
                             # 第0个字段是EquipID,第二个字段是Equip_Uper
                             if self.currentEquipdict[row][0] == self.currentEquipdict[childRow][2]:
-                                num = self.disturbResult.item(childRow, 2).text()
+                                num = self.adjustForm.item(childRow, 2).text()
                                 if num != '':
                                     sum = sum + int(num)
                         if sum != 0:
-                            self.disturbResult.item(row, 2).setText(str(sum))
+                            self.adjustForm.item(row, 2).setText(str(sum))
 
 
     # 进度1 陆军调拨
@@ -635,26 +626,26 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
 
     # 更新进度1 陆军调拨
     def updateArmy(self):
-        currentRow = self.disturbResult.currentRow()
+        currentRow = self.adjustForm.currentRow()
         item = QPushButton("已完成")
-        self.disturbResult.setCellWidget(currentRow, 5 + self.lenCurrentUnitChilddict, item)
+        self.adjustForm.setCellWidget(currentRow, 5 + self.lenCurrentUnitChilddict, item)
         updateArmySchedule(self.currentEquipdict[currentRow][0], self.currentYear)
 
     # 进度2 接装条件
     def setCondition(self):
-        currentRow = self.disturbResult.currentRow()
-        currentColumn = self.disturbResult.currentColumn()
+        currentRow = self.adjustForm.currentRow()
+        currentColumn = self.adjustForm.currentColumn()
         if currentRow < 0 or currentColumn <0:
             return
         if currentColumn - 1 < 0:
             return
-        if self.disturbResult.cellWidget(currentRow, currentColumn - 1).text() != "已完成":
+        if self.adjustForm.cellWidget(currentRow, currentColumn - 1).text() != "已完成":
             QMessageBox.information(self, "设置接装条件", "上一级未完成", QMessageBox.Yes)
             return
         reply = QMessageBox.question(self,"设置接装条件","是否具备接装条件？",QMessageBox.Yes,QMessageBox.Cancel)
         if reply==QMessageBox.Yes:
             item = QPushButton("已完成")
-            self.disturbResult.setCellWidget(currentRow, 6 + self.lenCurrentUnitChilddict, item)
+            self.adjustForm.setCellWidget(currentRow, 6 + self.lenCurrentUnitChilddict, item)
             if self.unitFlag == 1:
                 updateAllotConditionUper(self.currentEquipdict[currentRow][0], self.currentYear)
             elif self.unitFlag == 2:
@@ -662,14 +653,14 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
 
     # 进度3 火箭军调拨
     def setRocketSchedule(self):
-        row = self.disturbResult.currentRow()
-        column = self.disturbResult.currentColumn()
+        row = self.adjustForm.currentRow()
+        column = self.adjustForm.currentColumn()
         if row < 0 or column < 0:
             return
         if column - 1 < 0:
             return
         if self.unitFlag == 1:
-            if self.disturbResult.cellWidget(row, column - 1).text() != "已完成":
+            if self.adjustForm.cellWidget(row, column - 1).text() != "已完成":
                 QMessageBox.information(self, "设置接装条件", "上一级未完成", QMessageBox.Yes)
                 return
         currentUnit=[]
@@ -679,13 +670,13 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
             # 存放质量和陆军单号
             result1 = selectQuaAndID(self.currentEquipdict[row][0],self.currentYear)
             if result1:
-                info1=[result1[0][0],self.disturbResult.item(row,4).text()]
+                info1=[result1[0][0],self.adjustForm.item(row,4).text()]
                 for i in range(0,self.lenCurrentUnitChilddict):
-                    info1.append(self.disturbResult.item(row,5+i).text())
+                    info1.append(self.adjustForm.item(row,5+i).text())
                 info1.append(self.tb_proof.toPlainText())
                 info1.append(result1[0][1])
                 # 单位Info 当前选中装备Info 当前年份 [质量 此次分配合计数 各单位分配数 依据 陆军单号]
-                self.rocketSchedule.getUnitIDList(currentUnit,self.currentEquipdict[self.disturbResult.currentRow()],self.currentYear,info1)
+                self.rocketSchedule.getUnitIDList(currentUnit,self.currentEquipdict[self.adjustForm.currentRow()],self.currentYear,info1)
             else:
                 self.rocketSchedule.getUnitIDList("", "",
                                                   "", "")
@@ -695,27 +686,27 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
 
     # 更新进度3 火箭军调拨
     def updateRocket(self):
-        currentRow = self.disturbResult.currentRow()
+        currentRow = self.adjustForm.currentRow()
         item = QPushButton("已完成")
         if self.unitFlag == 1:
-            self.disturbResult.setCellWidget(currentRow, 7 + self.lenCurrentUnitChilddict, item)
+            self.adjustForm.setCellWidget(currentRow, 7 + self.lenCurrentUnitChilddict, item)
             updateRocketScheduleUper(self.currentEquipdict[currentRow][0], self.currentYear)
             item.clicked.connect(self.showRocket)
         elif self.unitFlag == 2:
-            self.disturbResult.setCellWidget(currentRow, 5 + self.lenCurrentUnitChilddict, item)
+            self.adjustForm.setCellWidget(currentRow, 5 + self.lenCurrentUnitChilddict, item)
             updateRocketScheduleBase(self.currentEquipdict[currentRow][0], self.currentYear)
             item.clicked.connect(self.showRocket)
 
     def showRocket(self):
-        row = self.disturbResult.currentRow()
-        currentColumn = self.disturbResult.currentColumn()
+        row = self.adjustForm.currentRow()
+        currentColumn = self.adjustForm.currentColumn()
         ShowRocket = transferModel()
         if row < 0 or currentColumn < 0:
             return
         if currentColumn - 1 < 0:
             return
         if self.unitFlag == 1:
-            if self.disturbResult.cellWidget(row, currentColumn - 1).text() != "已完成":
+            if self.adjustForm.cellWidget(row, currentColumn - 1).text() != "已完成":
                 QMessageBox.information(self, "设置接装条件", "上一级未完成", QMessageBox.Yes)
                 return
         currentUnit = []
@@ -725,12 +716,12 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
             # 存放质量和陆军单号
             result1 = selectQuaAndID(self.currentEquipdict[row][0], self.currentYear)
             if result1:
-                info1 = [result1[0][0], self.disturbResult.item(row, 4).text()]
+                info1 = [result1[0][0], self.adjustForm.item(row, 4).text()]
                 for i in range(0, self.lenCurrentUnitChilddict):
-                    info1.append(self.disturbResult.item(row, 5 + i).text())
+                    info1.append(self.adjustForm.item(row, 5 + i).text())
                 info1.append(self.tb_proof.toPlainText())
                 info1.append(result1[0][1])
-                ShowRocket.getUnitIDList(currentUnit, self.currentEquipdict[self.disturbResult.currentRow()],
+                ShowRocket.getUnitIDList(currentUnit, self.currentEquipdict[self.adjustForm.currentRow()],
                                                   self.currentYear, info1)
             else:
                 ShowRocket.getUnitIDList("", "",
@@ -748,13 +739,13 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
 
     # 进度4 是否完成
     def setScheduleFinish(self):
-        currentRow = self.disturbResult.currentRow()
-        currentColumn = self.disturbResult.currentColumn()
+        currentRow = self.adjustForm.currentRow()
+        currentColumn = self.adjustForm.currentColumn()
         if currentRow < 0 or currentColumn < 0:
             return
         if currentColumn - 1 < 0:
             return
-        if self.disturbResult.cellWidget(currentRow, currentColumn - 1).text() != "已完成":
+        if self.adjustForm.cellWidget(currentRow, currentColumn - 1).text() != "已完成":
             QMessageBox.information(self, "设置接装条件", "上一级未完成", QMessageBox.Yes)
             return
         self.scheduleFinish.setWindowFlags(Qt.Dialog|Qt.WindowCloseButtonHint)
@@ -763,16 +754,16 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
 
     # 更新进度4 是否完成
     def updateFinish(self):
-        currentRow = self.disturbResult.currentRow()
+        currentRow = self.adjustForm.currentRow()
         fileName = self.scheduleFinish.returnFileName()
         print("fileName", fileName)
         if fileName != "":
             item = QPushButton("已完成")
             if self.unitFlag == 1:
-                self.disturbResult.setCellWidget(currentRow, 8 + self.lenCurrentUnitChilddict, item)
+                self.adjustForm.setCellWidget(currentRow, 8 + self.lenCurrentUnitChilddict, item)
                 updateScheduleFinishUper(self.currentEquipdict[currentRow][0], self.currentYear, fileName)
             elif self.unitFlag == 2:
-                self.disturbResult.setCellWidget(currentRow, 7 + self.lenCurrentUnitChilddict, item)
+                self.adjustForm.setCellWidget(currentRow, 7 + self.lenCurrentUnitChilddict, item)
                 updateScheduleFinishBase(self.currentEquipdict[currentRow][0], self.currentYear, fileName)
 
 

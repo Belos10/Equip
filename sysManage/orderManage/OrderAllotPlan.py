@@ -8,7 +8,7 @@ from PyQt5.Qt import Qt, QRegExpValidator, QRegExp
 from PyQt5.QtGui import QColor, QBrush, QFont
 from database.alocatMangeSql import *
 from sysManage.userInfo import get_value
-from sysManage.orderManage.InputProof import InputProof
+from sysManage.orderManage.InputProof_Allot import InputProof
 
 '''
     分配调整计划

@@ -6,7 +6,7 @@ from PyQt5.QtGui import QColor, QBrush, QFont
 from widgets.orderManage.Widget_OrderRetirePlan import retirePlan_Form
 from database.OrderManageSql import *
 from sysManage.userInfo import get_value
-from sysManage.alocatMange.InputProof import InputProof
+from sysManage.orderManage.InputProof_Retire import InputProof
 from database.SD_EquipmentBanlanceSql import updateOneEquipmentBalanceData, deleteByYear
 from database.alocatMangeSql import *
 
@@ -514,7 +514,6 @@ class OrderRetirePlan(QWidget, retirePlan_Form):
             导出数据到Excel
     '''
     def slotOutputToExcel(self):
-
         self.retirePlanList = {}
         if self.retirePlanResult.rowCount() <= 0:
             reply = QMessageBox.warning(self, '警告', '未选中任何数据，无法导出', QMessageBox.Yes)

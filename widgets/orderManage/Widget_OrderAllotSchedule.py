@@ -11,7 +11,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class widget_AllotSchedule(object):
+class widget_OrderAllotSchedule(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
         Form.resize(1026, 659)

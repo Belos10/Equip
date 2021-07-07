@@ -5,7 +5,8 @@ from sysManage.orderManage.orderApply.orderApply import OrderApply
 from widgets.orderManage.orderManage import widget_orderManage
 from sysManage.orderManage.OrderAllotPlan import OrderAllotPlan
 from sysManage.orderManage.OrderRetirePlan import OrderRetirePlan
-
+from sysManage.orderManage.OrderAllotSchedule import OrderAllotSchedule
+from sysManage.orderManage.AdjustOrder import AdjustOrder
 '''
     功能：
         调配管理主界面
@@ -16,10 +17,10 @@ class OrderManage(QMainWindow, widget_orderManage):
         self.setupUi(self)
 
         self.orderPlan = OrderApply()                  # 订购申请
-        self.adjustOrder = QWidget()                # 订购计划调整
+        self.adjustOrder = AdjustOrder()                # 订购计划调整
         self.orderAllotPlan = OrderAllotPlan(self)      # 订购分配计划
-        self.orderSchedule = QWidget()              # 订购进度
-        self.retirePlan = OrderRetirePlan()             # 订购退役计划
+        self.orderSchedule = OrderAllotSchedule(self)              # 订购进度
+        self.retirePlan = OrderRetirePlan(self)             # 订购退役计划
         self.userInfo = None
 
         #添加页面

@@ -2,20 +2,21 @@ import sys
 from PyQt5.QtWidgets import *
 #new
 from database.SD_EquipmentBanlanceSql import updateOneEquipmentBalanceData
-from widgets.alocatMange.allotSchedule import widget_AllotSchedule
+from widgets.orderManage.Widget_OrderAllotSchedule import widget_OrderAllotSchedule
 from database.strengthDisturbSql import *
 from PyQt5.Qt import Qt
 from PyQt5.QtGui import QColor, QBrush,QFont
-from database.alocatMangeSql import *
+from database.OrderManageSql import *
+##################################################
 from sysManage.alocatMange.ArmySchedule import ArmySchedule
 from sysManage.alocatMange.armyTransfer import armyTransfer
 from sysManage.alocatMange.ScheduleFinish import ScheduleFisish
 from sysManage.alocatMange.transferModel import transferModel
 from sysManage.userInfo import get_value
 
-class AllotSchedule(QWidget,widget_AllotSchedule):
+class OrderAllotSchedule(QWidget, widget_OrderAllotSchedule):
     def __init__(self,parent=None):
-        super(AllotSchedule, self).__init__(parent)
+        super(OrderAllotSchedule, self).__init__(parent)
         self.setupUi(self)
         self.initAll()
         self.first_treeWidget_dict = {}
@@ -76,7 +77,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         self.currentYear = None
         self.lw_yearChoose.clear()
         # self.yearList = ['全部']
-        allYear = selectYearListAboutDisturbPlan()
+        allYear = selectYearListAboutOrderPlan()
         for year in allYear:
             self.yearList.append(year)
 
@@ -102,7 +103,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         self.initUserInfo()
         self.currentYear = self.lw_yearChoose.currentItem().text()
         # self._initUnitTreeWidget("", self.tw_first)
-        startInfo = selectDisturbPlanUnitInfoByUnitID(self.userInfo[0][4])
+        startInfo = selectUnitInfoByUnitID(self.userInfo[0][4])
         stack = []
         root = []
         if startInfo:
@@ -110,22 +111,13 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
             root.append(self.tw_first)
             self._initUnitTreeWidget(stack, root)
 
-        equipInfo =  findUperEquipIDByName("通用装备")
+        equipInfo = findUperEquipIDByName("专用装备")
         stack = []
         root = []
         if equipInfo:
             stack.append(equipInfo[0])
             root.append(self.tw_second)
             self._initEquipTreeWidget(stack, root, 0)
-        # startEquipIDInfo = findUperEquipIDByName("通用装备")
-        # for startEquipInfo in startEquipIDInfo:
-        #     # self.second_treeWidget_dict[0] = startEquipInfo
-        #     item = QTreeWidgetItem(self.tw_second)
-        #     item.setText(0, startEquipInfo[1])
-        #     item.setCheckState(0, Qt.Unchecked)
-        #     self.second_treeWidget_dict[startEquipInfo[0]] = item
-        #     self._initEquipTreeWidget(startEquipInfo[0], item)
-        #     break
 
     def initUserInfo(self):
         self.userInfo = get_value("totleUserInfo")
@@ -138,7 +130,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
             item.setText(0, UnitInfo[1])
             # item.setCheckState(0, Qt.Unchecked)
             self.first_treeWidget_dict[UnitInfo[0]] = item
-            result = selectDisturbPlanUnitInfoByDeptUper(UnitInfo[0])
+            result = selectUnitInfoByUnitID(UnitInfo[0])
             for resultInfo in result:
                 stack.append(resultInfo)
                 root.append(item)
@@ -201,11 +193,11 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
             if unitItem == self.tw_first.currentItem():
                 if selectUnitIfBase(unitID):
                     self.unitFlag = 2
-                    result = findDisturbPlanUnitChildInfo(unitID)
+                    result = findUnitChildInfo(unitID)
                     self.initcbschedule()
                 else:
                     self.unitFlag = 1
-                    result = selectDisturbPlanChooseUnit()
+                    result = selectOrderPlanChooseUnit()
                     self.initcbschedule()
                 for resultInfo in result:
                     self.currentUnitChilddict[j] = resultInfo
@@ -349,14 +341,14 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
     # 初始化自定义计划数
     def initDisturbPlanInputNum(self):
         if self.unitFlag == 1:
-            unitDisturbPlanInputNumList = selectDisturbPlanInputNumUpmost(self.currentEquipdict, self.currentYear)
+            unitDisturbPlanInputNumList = selectOrderPlanInputNumUpmost(self.currentEquipdict, self.currentYear)
             for i in range(0, len(self.currentEquipdict)):
                 item = self.disturbResult.item(i, 3)
                 if unitDisturbPlanInputNumList[i] is not None:
                     item.setText(str(unitDisturbPlanInputNumList[i]))
                 # item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable)
         elif self.unitFlag == 2:
-            unitDisturbPlanInputNumList = selectDisturbPlanInputNumBase(self.currentEquipdict, self.currentYear)
+            unitDisturbPlanInputNumList = selectOrderPlanInputNumBase(self.currentEquipdict, self.currentYear)
             for i in range(0, len(self.currentEquipdict)):
                 item = self.disturbResult.item(i, 3)
                 if unitDisturbPlanInputNumList[i] is not None:
@@ -444,7 +436,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
 
     # 初始化调拨依据
     def initDisturbPlanProof(self):
-        proof = selectDisturbPlanProof(self.currentYear)
+        proof = selectOrderPlanProof(self.currentYear)
         self.tb_proof.setText(proof[0][0])
         # self.setTextInteractionFlags(Qt.TextSelectableByMouse|Qt.TextSelectableByKeyboard)
 
@@ -453,7 +445,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
     # 读取初始分配计划数
     def initDisturbPlanNum(self):
         # print("currentYear:", self.currentYear)
-        self.unitDisturbPlanList = selectDisturbPlanNumByList(self.currentUnitChilddict,
+        self.unitDisturbPlanList = selectOrderAllotPlanNumByList(self.currentUnitChilddict,
                                                               self.currentEquipdict, self.currentYear)
         print("self.unitDisturbPlanList", self.unitDisturbPlanList)
         # 显示每个单位分配计划数
@@ -564,7 +556,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
 
     # 读取初始分配计划备注
     def initDisturbPlanNote(self):
-        unitDisturbPlanNoteList = selectDisturbPlanNote(self.currentEquipdict, self.currentYear)
+        unitDisturbPlanNoteList = selectOrderPlanNote(self.currentEquipdict, self.currentYear)
         # print("self.unitDisturbPlanNoteList", self.unitDisturbPlanNoteList)
         for i in range(0,len(self.currentEquipdict)):
             item=self.disturbResult.item(i,self.lenHeaderList-1)
@@ -573,7 +565,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
 
     # 初始化机关单位数与装备单位
     def initDisturbPlanOther(self):
-        unitDisturbPlanOtherList = selectDisturbPlanOther(self.currentEquipdict, self.currentYear)
+        unitDisturbPlanOtherList = selectOrderPlanOther(self.currentEquipdict, self.currentYear)
         # 装备单位
         for i in range(0, len(self.currentEquipdict)):
             item = self.disturbResult.item(i, 1)
@@ -606,7 +598,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                 if unitItem == self.tw_first.currentItem():
                     for i in self.currentEquipdict:
                         item = self.disturbResult.item(i, 2)
-                        result = selectDisturbPlanNumByList({0: [unitID]}, self.currentEquipdict, self.currentYear)
+                        result = selectOrderAllotPlanNumByList({0: [unitID]}, self.currentEquipdict, self.currentYear)
                         if result:
                             item.setText(str(result[i]))
                         else:
