@@ -1,3 +1,5 @@
+import anaconda_navigator.external.UniversalAnalytics.Tracker
+
 from database.strengthDisturbSql import *
 #new
 #查询陆军调拨单所有年份表, 返回全部年份列表
@@ -689,3 +691,103 @@ def selectOrderRetirePlanNumByList(UnitList, EquipList, YearList):
 #         return result
 #     else:
 #         return []
+
+
+'''
+    调整计划
+'''
+
+# 读取分配计划年份
+def selectYearListAboutOrderAdjust():
+    yearList = []
+    sql = "select * from orderadjustyear order by year"
+    cur.execute(sql)
+    result = cur.fetchall()
+    for yearInfo in result:
+        yearList.append(yearInfo[1])
+    return yearList
+
+# EquipList字典形式  返回 [(xxx),(xxx),(xxx)] 数据
+def selectOrderAdjustDataByList(EquipList,Year):
+    resultList = []
+    for EquipInfo in EquipList.values():
+        sql = "select * from orderAdjust where equip_ID = '" + EquipInfo[0] + "' and year = '" + Year + "'"
+        cur.execute(sql)
+        result = cur.fetchall()
+        if len(result) != 0:
+            resultList.append(result[0])
+    return resultList
+
+
+# EquipList字典形式  返回 [(xxx),(xxx),(xxx)] 数据
+def selectOrderAdjustContDataByList(EquipList,Year):
+    resultList = []
+    for EquipInfo in EquipList.values():
+        sql = "select * from orderAdjustCont where equip_ID = '" + EquipInfo[0] + "' and year = '" + Year + "'"
+        cur.execute(sql)
+        result = cur.fetchall()
+        if len(result) != 0:
+            resultList.append(result[0])
+    return resultList
+
+
+# 按equip_ID号和年份 检索合同来源表  返回 [xxx]
+def selectOneOrderAdjustContData(equip_ID,Year):
+    sql = "select * from orderAdjustCont where equip_ID = '" + equip_ID + "' and year = '" + Year + "'"
+    cur.execute(sql)
+    result = cur.fetchall()
+    print(result[0])
+    return result[0]
+
+# 某年某装备是否选择了合同来源
+def ifHaveContSource(equip_ID,Year):
+    sql = "select contSource from orderAdjustCont where equip_ID = '" + equip_ID + "' and year = '" + Year + "'"
+    cur.execute(sql)
+    result = cur.fetchall()
+    if result[0][0]=='单一来源' or result[0][0]=='招标':
+        # return True
+        return result[0][0]
+    else:
+        return False
+
+# 按Data数组更新调整计划表
+def updateOrderAdjustData(equip_ID,data,year):
+    sql = "update orderAdjust set costUnit = '" + data[0] + "' and oneYear_LastNum = '" + data[1] + "'and oneYear_NowNum = '" + data[2] \
+          + "' and oneYear_NextNum = '" + data[3] + "' and oneYear_Amount = '" + data[4] + "' and twoYear_LastNum = '" + data[5] \
+          + "' and twoYear_NowNum = '" + data[6] + "' and twoYear_NextNum = '" + data[7] + "' and twoYear_Amount = '" + data[8] \
+          + "' and applicationUnit = '" + data[9] + "' and supplierUnit = '" + data[10] + "' and buyMode = '" + data[11] \
+          + "' and manufacturer = '" + data[12] + "' and adjustFactor = '" + data[13] + "' and allotUnit = '" + data[14] \
+          + "' and note = '" + data[15] + "' where equip_ID = '" + equip_ID + "' and year = '" + year + "'"
+    cur.execute(sql)
+    conn.commit()
+
+# 更新装备的合同来源
+def updateContSource(contSource,equip_ID,Year):
+    sql = "update orderAdjustCont set contSource = '" + contSource + "' where equip_ID = '" + \
+          equip_ID + "' and year = '" + Year + "'"
+    cur.execute(sql)
+    conn.commit()
+
+# 更新单一来源装备的合同进度表
+def udpateOrderAdjustContSingle(equip_ID,data,Year):
+    sql = "update orderAdjustCont set makeProj1 = '" + data[1] + "' and bid2 = '" + data[2] \
+          + "' and approval3 = '" + data[3] + "' and status1 = '" + data[0] \
+          + "' and signContract2 = '" + data[4] + "' and finish3 = '" + data[5] + "' where equip_ID = '" + \
+          equip_ID + "' and year = '" + Year + "'"
+    cur.execute(sql)
+    conn.commit()
+
+# 更新招标来源装备的合同进度表
+def udpateOrderAdjustContBid(equip_ID, data, Year):
+    sql = "update orderAdjustCont set makeProj1 = '" + data[0] + "' and bid2 = '" + data[1] \
+          + "' and approval3 = '" + data[2] + "' where equip_ID = '" + \
+          equip_ID + "' and year = '" + Year + "'"
+    cur.execute(sql)
+    conn.commit()
+
+# 返回某一年的合同 [(xxx),(xxx),(xxx)]
+def selectDataFromContractOrder(Year):
+    sql = "select * from contract_order where year = '" + Year + "'"
+    cur.execute(sql)
+    result = cur.fetchall()
+    return result

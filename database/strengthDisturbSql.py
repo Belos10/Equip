@@ -369,14 +369,10 @@ def addDataIntoDisturbPlanUnit(Unit_ID, Unit_Name, Unit_Uper):
 
 # 读取分配计划年份
 def selectYearListAboutDisturbPlan():
-    #conn, cur = connectMySql()
     yearList = []
     sql = "select * from disturbplanyear order by year"
-
     cur.execute(sql)
     result = cur.fetchall()
-
-    # disconnectMySql(conn, cur)
     for yearInfo in result:
         yearList.append(yearInfo[1])
     return yearList

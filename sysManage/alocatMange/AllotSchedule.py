@@ -626,10 +626,10 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
 
     # 进度1 陆军调拨
     def setArmySchedule(self):
+        self.armySchedule._initSelf_()
         self.armySchedule.setYear(self.currentYear)
         self.armySchedule.setWindowTitle("陆军调拨单选择")
         self.armySchedule.setWindowFlags(Qt.Dialog|Qt.WindowCloseButtonHint)
-        self.armySchedule._initSelf_()
         self.armySchedule.show()
         self.armySchedule.signal.connect(self.updateArmy)
 

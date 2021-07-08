@@ -15,7 +15,7 @@ class ArmySchedule(QDialog, widget_armySchedule ):
         # 设置tablewidget左侧栏以及头部不显示
         self.tw_result.horizontalHeader().setVisible(False)
         self.tw_result.verticalHeader().setVisible(False)
-        self.currentYear = '2001'
+        self.currentYear = ''
         # 初始化当前界面
         self._initSelf_()
         # 存储当前结果，结构为：{i（行数）：一行数据}
@@ -30,6 +30,7 @@ class ArmySchedule(QDialog, widget_armySchedule ):
 
     def setYear(self, year):
         self.currentYear = year
+        self.slotSelectResult()
         #print(self.currentYear)
 
 
@@ -38,7 +39,8 @@ class ArmySchedule(QDialog, widget_armySchedule ):
         初始化当前界面，设置当前查询结果界面为灰
     '''
     def _initSelf_(self):
-        self.slotSelectResult()
+        self.tw_result.clear()
+
 
     '''
         初始化结果tablewidget表头
