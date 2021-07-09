@@ -195,6 +195,7 @@ class retirement(QWidget, Widget_Retirement):
             for resultInfo in result:
                 stack.append(resultInfo)
                 root.append(item)
+        self.tw_first.expandAll()
 
         # 查看当前被选中的单位和装备并初始化
     def slotInquryStrengthResult(self):
@@ -236,6 +237,7 @@ class retirement(QWidget, Widget_Retirement):
             self.second_treeWidget_dict[rowData[0]] = item
             if rowData[0] != '':
                 self._initEquipTreeWidget(rowData[0], item)
+        self.tw_second.expandAll()
 
     '''
             功能：

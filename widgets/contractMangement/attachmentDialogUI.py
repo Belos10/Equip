@@ -9,15 +9,18 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtGui import QIcon
 
 
 class AttachmentDialogUI(object):
     def setupUi(self, dl_attachment):
         dl_attachment.setObjectName("dl_attachment")
-        dl_attachment.resize(691, 517)
+        dl_attachment.resize(997, 684)
+        dl_attachment.setMinimumSize(QtCore.QSize(1200, 800))
         self.verticalLayout = QtWidgets.QVBoxLayout(dl_attachment)
         self.verticalLayout.setObjectName("verticalLayout")
         self.tw_result = QtWidgets.QTableWidget(dl_attachment)
+        self.tw_result.setMinimumSize(QtCore.QSize(800, 600))
         self.tw_result.setObjectName("tw_result")
         self.tw_result.setColumnCount(0)
         self.tw_result.setRowCount(0)

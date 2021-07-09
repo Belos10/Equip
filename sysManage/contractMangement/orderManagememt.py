@@ -118,7 +118,6 @@ class OrderManagement(QWidget, OrderManagementUI):
 
     def displayData(self):
         self.tw_result.itemChanged.disconnect(self.slotAlterAndSava)
-        print(self.selectedYear, self.contractNo, self.contractName)
         self.result = getResult(self.selectedYear, self.contractNo, self.contractName)
         self.tw_result.clear()
         self.tw_result.setColumnCount(11)

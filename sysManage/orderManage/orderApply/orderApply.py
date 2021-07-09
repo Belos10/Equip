@@ -268,7 +268,7 @@ class OrderApply(QWidget, Widget_Retirement):
         allyearList = selectAllOrderApplyYearInfo()
 
         for year in allyearList:
-            self.yearList.append(year)
+            self.yearList.append(year[0])
 
         for year in self.yearList:
             item = QListWidgetItem()

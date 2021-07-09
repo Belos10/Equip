@@ -24,10 +24,10 @@ def deleteOrderApplyYearByYear(year):
 
 #查询年份表
 def selectAllOrderApplyYearInfo():
-    sql = "select year from order_apply_year "
+    sql = "select * from order_apply_year "
     years = executeSql(sql)
     if years != None and len(years) != 0:
-        return years[0]
+        return years
     else:
         return []
 
