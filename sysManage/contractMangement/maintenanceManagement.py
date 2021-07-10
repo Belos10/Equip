@@ -199,6 +199,8 @@ class MaintenanceManagement(QWidget, OrderManagementUI):
 
     def soltDisplayAttachment(self):
         rowCount = self.tw_result.currentRow()
+        if len(self.result) < 1:
+            return
         maintenanceId = self.result[rowCount - 2][0]
         self.attachmentDialog = AttachmentDialog()
         self.attachmentDialog.initTableWidget(maintenanceId,self.selectedYear)

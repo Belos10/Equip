@@ -2,19 +2,21 @@ from database.connectAndDisSql import *
 import operator
 
 def getYearsFromContractOrder():
+    result = []
     sql = "select year from contract_order_year "
     years = executeSql(sql)
     if years != None and len(years) != 0:
-        return years[0]
-    else:
-        return []
+        for year in years:
+            result.append(year[0])
+    return result
 def getYearsFromContractMaintenance():
+    result = []
     sql = "select year from contract_maintenance_year "
     years = executeSql(sql)
     if years != None and len(years) != 0:
-        return years[0]
-    else:
-        return []
+        for year in years:
+            result.append(year[0])
+    return result
 def isHaveContractOrderYear(year):
     sql = "select * from contract_order_year where year ='" + year + "'"
     cur.execute(sql)
@@ -111,7 +113,7 @@ def deleteDataByContractMaintenance(id,year):
     return excuteupdata(sqls)
 
 def deleteAttachmentDataByMaintenance(id,year):
-
+    sql = "delete from contract_attachment where maintenance_id = '%s' and year = '%s'"%(str(id),year)
     return executeCommit(sql)
 
 def getAttachmentInformation(maintenanceId,year):

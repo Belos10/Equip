@@ -151,11 +151,11 @@ QToolButton{
 
 }
 QToolButton:!enabled{
-     color:rgb(82,82,82);
+     color:rgb(133,203,248);
      font-size:16px;
 }
 QToolButton:selected, QToolButton:last:selected, QToolButton:hover,QToolButton:checked,QToolButton:pressed{
-      color:rgb(133,203,248);
+      color:rgb(240,240,240);
      font-size:16px;
 }
 

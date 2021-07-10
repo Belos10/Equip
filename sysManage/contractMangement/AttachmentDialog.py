@@ -1,4 +1,5 @@
 from PyQt5.QtCore import Qt, QDate
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QDialog, QHeaderView, QTableWidgetItem, QMessageBox, QDateEdit
 
 from database.contractManagementSql import *
@@ -9,10 +10,12 @@ class AttachmentDialog(QDialog, AttachmentDialogUI):
     def __init__(self, parent=None):
         super(AttachmentDialog, self).__init__(parent)
         self.setupUi(self)
+        self.setWindowIcon(QIcon(":/pic/system.png"))
         self.resultList = []
         self.maintenanceId = -1
         self.year = ''
         self.signalConnection()
+
 
 
     def signalConnection(self):

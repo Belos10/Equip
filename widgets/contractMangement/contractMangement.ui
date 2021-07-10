@@ -310,7 +310,7 @@
          <number>5</number>
         </property>
         <item>
-         <widget class="QToolButton" name="tb_add">
+         <widget class="QPushButton" name="tb_add">
           <property name="minimumSize">
            <size>
             <width>50</width>
@@ -329,7 +329,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QToolButton" name="tb_del">
+         <widget class="QPushButton" name="tb_del">
           <property name="minimumSize">
            <size>
             <width>50</width>
@@ -348,7 +348,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QToolButton" name="tb_input">
+         <widget class="QPushButton" name="tb_input">
           <property name="minimumSize">
            <size>
             <width>50</width>
@@ -380,7 +380,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QToolButton" name="tb_outputToExcel">
+         <widget class="QPushButton" name="tb_outputToExcel">
           <property name="maximumSize">
            <size>
             <width>120</width>

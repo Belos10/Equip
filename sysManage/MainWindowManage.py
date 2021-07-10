@@ -1,4 +1,7 @@
+from PyQt5.QtGui import QIcon
+
 from sysManage.contractMangement.contractMangementMain import ContractManagementMain
+from sysManage.serviceSupport.serviceSupportMain import yearServiceSupport
 from widgets.manage_widget import Widget_Manage_Widgets
 from PyQt5.QtWidgets import QMainWindow, QWidget, QApplication, QMessageBox, QDesktopWidget
 from sysManage.strengthDisturb.strengthDisturb import strengthDisturb
@@ -11,6 +14,9 @@ from sysManage.dangerGoods.dangerGoods import DangerGoods
 from sysManage.positionEngineer.positionEngineerMain import PositionEngineerMain
 from sysManage.userInfo import get_value,set_value
 from sysManage.orderManage.OrderManage import OrderManage
+import ctypes
+ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("myappid")
+
 #new
 class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
     def __init__(self, parent=None):
@@ -20,7 +26,7 @@ class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
         self.strengthDisturb = strengthDisturb()
         self.alocatMange = alocatMange()
         self.purChasPlan = OrderManage()
-        self.mantanSupport = QWidget()
+        self.mantanSupport = yearServiceSupport()
         self.warStorage = QWidget()
         self.contractMange = ContractManagementMain()
         self.dangerGoods = DangerGoods()
@@ -29,6 +35,7 @@ class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
         self.sysConfig = QWidget()
 
         self.setWindowTitle("核化装备管理系统")
+        self.setWindowIcon(QIcon(":/pic/system.png"))
         self.tb_ManageWidget.addTab(self.strengthDisturb, "实力分布")
         self.tb_ManageWidget.setCurrentIndex(0)
         self.tb_ManageWidget.addTab(self.alocatMange, "调配管理")

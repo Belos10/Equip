@@ -23,6 +23,8 @@ class PositionEngineerMain(QMainWindow, Position_Engineer_Widget):
         # self.stackedWidget.addWidget(self.directoryMaintenance)
 
         self.stackedWidget.setCurrentIndex(0)
+        self.tb_installation.setDisabled(True)
+        self.tb_equipmentStatistics.setDisabled(False)
         self.installationSituation.setDisabled(False)
         self.equipmentStatistics.setDisabled(True)
         # self.directoryMaintenance.setDisabled(True)
