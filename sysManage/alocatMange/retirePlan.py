@@ -2,7 +2,6 @@ import sys
 from PyQt5.QtWidgets import *
 from PyQt5.Qt import Qt
 from PyQt5.QtGui import QColor, QBrush, QFont
-# new
 from widgets.alocatMange.retirePlan import retirePlan_Form
 from sysManage.userInfo import get_value
 from sysManage.alocatMange.InputProof_Retire import InputProof
@@ -519,7 +518,6 @@ class retirePlan(QWidget, retirePlan_Form):
             导出数据到Excel
     '''
     def slotOutputToExcel(self):
-
         self.retirePlanList = {}
         if self.retirePlanResult.rowCount() <= 0:
             reply = QMessageBox.warning(self, '警告', '未选中任何数据，无法导出', QMessageBox.Yes)
@@ -541,7 +539,7 @@ class retirePlan(QWidget, retirePlan_Form):
             font.bold = True
             font.height = 20 * 11  # 字体大小，11为字号，20为衡量单位
             alignment = xlwt.Alignment()  ## Create Alignment
-            alignment.horz = xlwt.Alignment.HORZ_RIGHT
+            alignment.horz = xlwt.Alignment.HORZ_CENTER
             alignment.vert = xlwt.Alignment.VERT_CENTER
             borders = xlwt.Borders()
             borders.left = 1  # 设置为细实线
@@ -632,7 +630,7 @@ class retirePlan(QWidget, retirePlan_Form):
                     workSheet.write(2 + key, index, rowData[index], contentStyle)
 
             try:
-                pathName = "%s/%s年退役报废计划.xls" % (directoryPath, str(self.currentYear))
+                pathName = "%s/%s年通用装备退役报废计划.xls" % (directoryPath, str(self.currentYear))
                 workBook.save(pathName)
                 import win32api
                 win32api.ShellExecute(0, 'open', pathName, '', '', 1)

@@ -535,7 +535,7 @@ class OrderRetirePlan(QWidget, retirePlan_Form):
             font.bold = True
             font.height = 20 * 11  # 字体大小，11为字号，20为衡量单位
             alignment = xlwt.Alignment()  ## Create Alignment
-            alignment.horz = xlwt.Alignment.HORZ_RIGHT
+            alignment.horz = xlwt.Alignment.HORZ_CENTER
             alignment.vert = xlwt.Alignment.VERT_CENTER
             borders = xlwt.Borders()
             borders.left = 1  # 设置为细实线
@@ -626,7 +626,7 @@ class OrderRetirePlan(QWidget, retirePlan_Form):
                     workSheet.write(2 + key, index, rowData[index], contentStyle)
 
             try:
-                pathName = "%s/%s年退役报废计划.xls" % (directoryPath, str(self.currentYear))
+                pathName = "%s/%s年专用装备退役报废计划.xls" % (directoryPath, str(self.currentYear))
                 workBook.save(pathName)
                 import win32api
                 win32api.ShellExecute(0, 'open', pathName, '', '', 1)

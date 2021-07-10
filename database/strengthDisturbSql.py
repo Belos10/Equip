@@ -415,6 +415,17 @@ def selectYearListAboutOrderRetirePlan():
     return yearList
 
 
+# 读取订购调整计划年份
+def selectYearListAboutOrderAdjust():
+    yearList = []
+    sql = "select * from orderadjustyear order by year"
+    cur.execute(sql)
+    result = cur.fetchall()
+    for yearInfo in result:
+        yearList.append(yearInfo[1])
+    return yearList
+
+
 # 往单位表unit中插入一条数据
 def addDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper, Unit_Alias, Is_Group):
     # 插入的sql语句
@@ -534,7 +545,7 @@ def addDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type, E
     orderallotplanYearInfoTuple = selectYearListAboutOrderPlan()
     retireplanYearInfoTuple = selectYearListAboutRetirePlan()
     orderretireplanYearInfoTuple = selectYearListAboutOrderRetirePlan()
-
+    orderadjustYearInfoTuple = selectYearListAboutOrderAdjust()
     print(unitInfoTuple)
     for publicEquip in publicEquipInfoList:
         for strengthYearInfo in strengthYearInfoTuple:
@@ -662,6 +673,25 @@ def addDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type, E
             conn.rollback()
             return e
 
+    for orderadjustYearInfo in orderadjustYearInfoTuple:
+        sql = "insert into orderAdjust(year,equip_id,equipName,equipUnit,costUnit,oneYear_LastNum,oneYear_NowNum," \
+              "oneYear_NextNum,oneYear_Amount,twoYear_LastNum,twoYear_NowNum,twoYear_NextNum,twoYear_Amount," \
+              "applicationUnit,supplierUnit,buyMode,manufacturer,adjustFactor,allotUnit,note) values " + \
+              "('" + orderadjustYearInfo + "','" + Equip_ID + "','" + Equip_Name + "', '','','','','','','','','',''," \
+                                                                           "'','','','','','','' ) "
+        try:
+            cur.execute(sql)
+        except Exception as e:
+            conn.rollback()
+            return e
+        sql = "insert into orderAdjustCont (year,equip_Id,equip_Name,contSource,makeProj1,bid2,approval3,status1," \
+              "signContract2,finish3) values " \
+              + "('" + orderadjustYearInfo + "','" + Equip_ID + "','" + Equip_Name + "','','','','','','','' )"
+        try:
+            cur.execute(sql)
+        except Exception as e:
+            conn.rollback()
+            return e
 
     try:
         conn.commit()
@@ -866,6 +896,22 @@ def updateDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type
         return e
 
     sql = "Update orderallotschedule set Equip_Name = '" + Equip_Name + "' where Equip_ID = '" + Equip_ID + "'"
+    # print(sql)
+    try:
+        cur.execute(sql)
+    except Exception as e:
+        conn.rollback()
+        return e
+
+    sql = "Update orderAdjust set equipName = '" + Equip_Name + "' where equip_ID = '" + Equip_ID + "'"
+    # print(sql)
+    try:
+        cur.execute(sql)
+    except Exception as e:
+        conn.rollback()
+        return e
+
+    sql = "Update orderAdjustCont set equip_Name = '" + Equip_Name + "' where equip_ID = '" + Equip_ID + "'"
     # print(sql)
     try:
         cur.execute(sql)
@@ -1209,7 +1255,6 @@ def delDataInEquip(Equip_ID):
                 for strengthYear in yearInfoList:
                     for unitInfo in unitInfoList:
                         nodeStrengthInfo = selectStrengthInfo(unitInfo[0], uperIDList[-1], strengthYear[1])
-                        print("========, ", nodeStrengthInfo)
                         nodeWeaveInfo = selectWeaveInfo(unitInfo[0], uperIDList[-1], strengthYear[1])
                         if nodeStrengthInfo:
                             sql = "update strength set strength = strength - " + str(nodeStrengthInfo[0][4]) + \
@@ -1381,6 +1426,22 @@ def delDataInEquip(Equip_ID):
             return e
 
         sql = "Delete from orderretireplannote where Equip_ID = '" + EquipID[0] + "'"
+        # print(sql)
+        try:
+            cur.execute(sql)
+        except Exception as e:
+            conn.rollback()
+            return e
+
+        sql = "Delete from orderAdjust where Equip_ID = '" + EquipID[0] + "'"
+        # print(sql)
+        try:
+            cur.execute(sql)
+        except Exception as e:
+            conn.rollback()
+            return e
+
+        sql = "Delete from orderAdjustCont where Equip_ID = '" + EquipID[0] + "'"
         # print(sql)
         try:
             cur.execute(sql)

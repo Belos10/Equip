@@ -40,14 +40,42 @@ class AdjustOrder(QWidget, widget_adjustOrder):
         self.tw_equip.itemClicked.connect(self.slotAdjustStrengthResult)
         self.tw_equip.itemChanged.connect(self.slotCheckedChange)
         # 修改数据
-        # self.adjustForm.itemChanged.connect(self.updateAdjustOrder)
         self.pb_Save.clicked.connect(self.saveData)
-
+        self.pb_outputToExcel.clicked.connect(self.slotOutputToExcel)
 
 
     # 信号与槽连接的断开
     def signalDisconnectSlot(self):
         pass
+
+
+    # 新增年份
+    def slotAddNewYear(self):
+        year = 0
+        year, ok = QInputDialog.getInt(self, "Get year", "year:", 0, 0, 100000, 1)
+        if ok:
+            haveYear = False
+            allyear = selectYearListAboutOrderAdjust()
+            for yearInfo in allyear:
+                if str(year) == yearInfo:
+                    haveYear = True
+            if haveYear == True:
+                reply = QMessageBox.information(self, '添加', '添加失败，该年份已存在', QMessageBox.Yes)
+                return
+
+            insertIntoOrderAdjustYear(year)
+            self._initYearWidget_()
+            return
+
+
+    # 删除年份
+    def slotDelYear(self):
+        reply = QMessageBox.question(self, "删除", "是否删除所有？", QMessageBox.Yes, QMessageBox.Cancel)
+        if reply == QMessageBox.Yes:
+            currentYear = self.lw_yearChoose.currentItem()
+            deleteOrderAdjustYear(currentYear.text())
+            deleteByYear(currentYear.text())
+            self._initYearWidget_()
 
 
     # 初始化年份
@@ -65,7 +93,6 @@ class AdjustOrder(QWidget, widget_adjustOrder):
             self.lw_yearChoose.addItem(item)
 
 
-
     def slotClickedInqury(self):
         self.tw_equip.clear()
         self.tw_equip.header().setVisible(False)
@@ -75,6 +102,8 @@ class AdjustOrder(QWidget, widget_adjustOrder):
         self.equip_treeWidget_dict = {}
         self.initUserInfo()
         self.currentYear = self.lw_yearChoose.currentItem().text()
+        self.oneYear = int(self.currentYear) + 1
+        self.twoYear = int(self.currentYear) + 2
         # self._initUnitTreeWidget("", self.tw_equip)
         # startInfo = selectUnitInfoByUnitID(self.userInfo[0][4])
         # stack = []
@@ -173,8 +202,6 @@ class AdjustOrder(QWidget, widget_adjustOrder):
         self.adjustForm.setRowCount(0)
         self.currentEquipdict = equipDict
         self.lenCurrentEquipdict = len(self.currentEquipdict)
-        oneYear = int(self.currentYear) + 1
-        twoYear = int(self.currentYear) + 2
         self.adjustForm.setColumnCount(19)
         self.adjustForm.setRowCount(self.lenCurrentEquipdict+2)
 
@@ -191,11 +218,11 @@ class AdjustOrder(QWidget, widget_adjustOrder):
         item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
         self.adjustForm.setItem(0, 2, item)
         item = QTableWidgetItem()
-        item.setText(str(oneYear)+'年调整计划')
+        item.setText(str(self.oneYear)+'年调整计划')
         item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
         self.adjustForm.setItem(0, 3, item)
         item = QTableWidgetItem()
-        item.setText(str(twoYear) + '年计划')
+        item.setText(str(self.twoYear) + '年计划')
         item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
         self.adjustForm.setItem(0, 7, item)
         item = QTableWidgetItem()
@@ -314,7 +341,7 @@ class AdjustOrder(QWidget, widget_adjustOrder):
                 if ifHaveContSource(equipInfo[0],self.currentYear):
                     adjustContData = selectOneOrderAdjustContData(equipInfo[0],self.currentYear)
                     item = QPushButton(adjustContData[3])
-                    self.adjustForm.setCellWidget(i+2,18,item)
+                    self.adjustForm.setCellWidget(i + 2, 18, item)
                     item.clicked.connect(self.setAdjustCont)
                 else:
                     item = QComboBox()
@@ -322,9 +349,15 @@ class AdjustOrder(QWidget, widget_adjustOrder):
                     item.addItem("单一来源", 1)
                     item.addItem("招标", 2)
                     self.adjustForm.setCellWidget(i + 2, 18, item)
+            else:
+                item = QTableWidgetItem("")
+                item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                self.adjustForm.setItem(i + 2, 18, item)
 
     # 保存数据
     def saveData(self):
+        if self.adjustForm.rowCount()<2:
+            return
         flag =False
         for i,equipInfo in self.currentEquipdict.items():
             # 保存合同来源
@@ -417,12 +450,154 @@ class AdjustOrder(QWidget, widget_adjustOrder):
 
     # 初始化分配计划年份
     def setAdjustOrderTitle(self):
-        oneYear = int(self.currentYear) + 1
-        txt="火箭军正常装备订购" + str(self.currentYear) + "年调整和" + str(oneYear) + "年计划预算"
+        txt="火箭军正常装备订购" + str(self.currentYear) + "年调整和" + str(self.oneYear) + "年计划预算"
         self.txt_adjustOrderYear.setFont(QFont("Microsoft YaHei"))
         self.txt_adjustOrderYear.setAlignment(Qt.AlignCenter)
         self.txt_adjustOrderYear.setTextInteractionFlags(Qt.NoTextInteraction)
         self.txt_adjustOrderYear.setFontPointSize(15)
         self.txt_adjustOrderYear.setText(txt)
 
+
+    '''
+        功能
+            导出数据到Excel
+    '''
+    def slotOutputToExcel(self):
+        self.adjustOrderList = {}
+        if self.adjustForm.rowCount() <= 0:
+            reply = QMessageBox.warning(self, '警告', '未选中任何数据，无法导出', QMessageBox.Yes)
+            return
+        reply = QMessageBox.question(self, '导出Excel', '是否保存修改并导出Excel？', QMessageBox.Cancel, QMessageBox.Yes)
+        if reply == QMessageBox.Cancel:
+            self._initOrderAdjustByUnitListAndEquipList()
+            return
+
+        directoryPath = QFileDialog.getExistingDirectory(self, "请选择导出文件夹", "c:/")
+        if len(directoryPath) > 0 and '.' not in directoryPath:
+            import xlwt
+            workBook = xlwt.Workbook(encoding='utf-8')
+            workSheet = workBook.add_sheet('Sheet1')
+
+            headTitleStyle2 = xlwt.XFStyle()  # 初始化样式
+            font = xlwt.Font()  # 为样式创建字体
+            font.name = '宋体'
+            font.bold = True
+            font.height = 20 * 11  # 字体大小，11为字号，20为衡量单位
+            alignment = xlwt.Alignment()  ## Create Alignment
+            alignment.horz = xlwt.Alignment.HORZ_CENTER
+            alignment.vert = xlwt.Alignment.VERT_CENTER
+            borders = xlwt.Borders()
+            borders.left = 1  # 设置为细实线
+            borders.right = 1
+            borders.top = 1
+            borders.bottom = 1
+            headTitleStyle2.font = font  # 设定样式
+            headTitleStyle2.alignment = alignment
+            headTitleStyle2.borders = borders
+
+            headTitleStyle = xlwt.XFStyle()  # 初始化样式
+            font = xlwt.Font()  # 为样式创建字体
+            font.name = '宋体'
+            font.bold = True
+            font.height = 20 * 20  # 字体大小，11为字号，20为衡量单位
+            alignment = xlwt.Alignment()  ## Create Alignment
+            alignment.horz = xlwt.Alignment.HORZ_CENTER
+            alignment.vert = xlwt.Alignment.VERT_CENTER
+            borders = xlwt.Borders()
+            borders.left = 3  # 设置为细实线
+            borders.right = 3
+            borders.top = 3
+            borders.bottom = 3
+            headTitleStyle.font = font  # 设定样式
+            headTitleStyle.alignment = alignment
+            headTitleStyle.borders = borders
+
+            titileStyle = xlwt.XFStyle()  # 初始化样式
+            font = xlwt.Font()  # 为样式创建字体
+            font.name = '宋体'
+            font.bold = True
+            font.height = 20 * 11  # 字体大小，11为字号，20为衡量单位
+            alignment = xlwt.Alignment()  ## Create Alignment
+            alignment.horz = xlwt.Alignment.HORZ_CENTER
+            alignment.vert = xlwt.Alignment.VERT_CENTER
+            borders = xlwt.Borders()
+            borders.left = 2  # 设置为细实线
+            borders.right = 2
+            borders.top = 2
+            borders.bottom = 2
+            titileStyle.font = font  # 设定样式
+            titileStyle.alignment = alignment
+            titileStyle.borders = borders
+            contentStyle = xlwt.XFStyle()  # 初始化样式
+            font = xlwt.Font()  # 为样式创建字体
+            font.name = '宋体'
+            font.height = 20 * 11  # 字体大小，11为字号，20为衡量单位
+            alignment = xlwt.Alignment()  ## Create Alignment
+            alignment.horz = xlwt.Alignment.HORZ_CENTER
+            alignment.vert = xlwt.Alignment.VERT_CENTER
+            borders = xlwt.Borders()
+            borders.left = 1  # 设置为细实线
+            borders.right = 1
+            borders.top = 1
+            borders.bottom = 1
+            contentStyle.font = font  # 设定样式
+            contentStyle.alignment = alignment
+            contentStyle.borders = borders
+
+            #画表头
+            for i in range(19):
+                workSheet.col(i).width = 5500
+            workSheet.write_merge(0, 1, 0, 0, "名称", titileStyle)
+            workSheet.write_merge(0, 1, 1, 1, "单位", titileStyle)
+            workSheet.write_merge(0, 0, 2, 2, "单价(万元)", titileStyle)
+            workSheet.write_merge(0, 0, 3, 6, "%s年调整计划" % self.oneYear, titileStyle)
+            workSheet.write_merge(0, 0, 7, 10, "%s年计划" % self.twoYear, titileStyle)
+            workSheet.write_merge(0, 1, 11, 11, "申报单位", titileStyle)
+            workSheet.write_merge(0, 1, 12, 12, "承制部门", titileStyle)
+            workSheet.write_merge(0, 1, 13, 13, "采购方式", titileStyle)
+            workSheet.write_merge(0, 1, 14, 14, "生产厂家", titileStyle)
+            workSheet.write_merge(0, 1, 15, 15, "调整要素", titileStyle)
+            workSheet.write_merge(0, 1, 16, 16, "拟分配单位", titileStyle)
+            workSheet.write_merge(0, 1, 17, 17, "备注", titileStyle)
+            workSheet.write_merge(0, 1, 18, 18, "合同来源", titileStyle)
+            workSheet.write(1, 3, "上一年结转数量", titileStyle)
+            workSheet.write(1, 4, "今年应交数量", titileStyle)
+            workSheet.write(1, 5, "今年实交付数量", titileStyle)
+            workSheet.write(1, 6, "金额(万元)", titileStyle)
+            workSheet.write(1, 7, "上一年结转数量", titileStyle)
+            workSheet.write(1, 8, "今年应交数量", titileStyle)
+            workSheet.write(1, 9, "今年实交付数量", titileStyle)
+            workSheet.write(1, 10, "金额(万元)", titileStyle)
+
+            #填表数据
+            for i,equipInfo in self.currentEquipdict.items():
+                columnList = []
+                for j in range(18):
+                    columnList.append(self.adjustForm.item(i + 2, j).text())
+                if not selectEquipIsHaveChild(self.currentEquipdict[i][0]):
+                    if not ifHaveContSource(equipInfo[0], self.currentYear):
+                        columnList.append(self.adjustForm.cellWidget(i + 2, 18).currentText())
+                    else:
+                        columnList.append(self.adjustForm.cellWidget(i + 2, 18).text())
+                else:
+                    columnList.append(self.adjustForm.item(i + 2, 18).text())
+                self.adjustOrderList[i] = columnList
+
+            for key in self.adjustOrderList.keys():
+                for index in range(19):
+                    rowData = self.adjustOrderList.get(key)
+                    workSheet.write(2 + key, index, rowData[index], contentStyle)
+
+            try:
+                pathName = "%s/火箭军正常装备订购%s年调整和%s年计划预算.xls" % (directoryPath, str(self.currentYear), str(self.oneYear))
+                workBook.save(pathName)
+                import win32api
+                win32api.ShellExecute(0, 'open', pathName, '', '', 1)
+                QMessageBox.about(self, "导出成功", "导出成功！")
+                return
+            except Exception as e:
+                QMessageBox.about(self, "导出失败", "导出表格被占用，请关闭正在使用的Execl！")
+                return
+        else:
+            QMessageBox.about(self, "选取文件夹失败！", "请选择正确的文件夹！")
 

@@ -668,7 +668,7 @@ class OrderAllotPlan(QWidget, Widget_OrderPlan):
             font.bold = True
             font.height = 20 * 11  # 字体大小，11为字号，20为衡量单位
             alignment = xlwt.Alignment()  ## Create Alignment
-            alignment.horz = xlwt.Alignment.HORZ_RIGHT
+            alignment.horz = xlwt.Alignment.HORZ_CENTER
             alignment.vert = xlwt.Alignment.VERT_CENTER
             borders = xlwt.Borders()
             borders.left = 1  # 设置为细实线
@@ -743,7 +743,7 @@ class OrderAllotPlan(QWidget, Widget_OrderPlan):
                 headerlist.append('备注')
             for i in range(len(headerlist)):
                 workSheet.col(i).width = 5500
-            workSheet.write_merge(0, 0, 0, len(headerlist) - 1, "%s年分配调整计划" % (self.currentYear), headTitleStyle)
+            workSheet.write_merge(0, 0, 0, len(headerlist) - 1, "%s年订购分配计划" % self.currentYear, headTitleStyle)
             proof = selectOrderPlanProof(self.currentYear)
             proofText = proof[0][0]
             workSheet.write_merge(1, 1, 0, len(headerlist) - 1, proofText, headTitleStyle2)
@@ -762,7 +762,7 @@ class OrderAllotPlan(QWidget, Widget_OrderPlan):
                     rowData = self.orderPlanList.get(key)
                     workSheet.write(3 + key, index, rowData[index], contentStyle)
             try:
-                pathName = "%s/%s年通用装备分配调整计划.xls" % (directoryPath, self.currentYear)
+                pathName = "%s/%s年专用装备订购分配计划.xls" % (directoryPath, self.currentYear)
                 workBook.save(pathName)
                 import win32api
                 win32api.ShellExecute(0, 'open', pathName, '', '', 1)

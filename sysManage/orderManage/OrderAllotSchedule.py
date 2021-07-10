@@ -89,6 +89,7 @@ class OrderAllotSchedule(QWidget, widget_OrderAllotSchedule):
 
 
     def slotClickedInqury(self):
+        self.initUserInfo()
         self.tw_first.clear()
         self.tw_second.clear()
         self.tw_first.header().setVisible(False)
@@ -100,7 +101,6 @@ class OrderAllotSchedule(QWidget, widget_OrderAllotSchedule):
         self.cb_schedule.setDisabled(0)
         self.first_treeWidget_dict = {}
         self.second_treeWidget_dict = {}
-        self.initUserInfo()
         self.currentYear = self.lw_yearChoose.currentItem().text()
         # self._initUnitTreeWidget("", self.tw_first)
         startInfo = selectUnitInfoByUnitID(self.userInfo[0][4])
@@ -130,7 +130,7 @@ class OrderAllotSchedule(QWidget, widget_OrderAllotSchedule):
             item.setText(0, UnitInfo[1])
             # item.setCheckState(0, Qt.Unchecked)
             self.first_treeWidget_dict[UnitInfo[0]] = item
-            result = selectUnitInfoByUnitID(UnitInfo[0])
+            result = selectUnitInfoByDeptUper(UnitInfo[0])
             for resultInfo in result:
                 stack.append(resultInfo)
                 root.append(item)

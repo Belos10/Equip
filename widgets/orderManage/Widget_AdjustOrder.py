@@ -121,6 +121,11 @@ class widget_adjustOrder(object):
         self.horizontalLayout_7.addWidget(self.pb_Output)
         spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_7.addItem(spacerItem3)
+        self.pb_outputToExcel = QtWidgets.QPushButton(Form)
+        self.pb_outputToExcel.setObjectName("pb_outputToExcel")
+        self.horizontalLayout_7.addWidget(self.pb_outputToExcel)
+        spacerItem4 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_7.addItem(spacerItem4)
         self.verticalLayout_4.addLayout(self.horizontalLayout_7)
         self.horizontalLayout_2.addLayout(self.verticalLayout_4)
 
@@ -142,4 +147,5 @@ class widget_adjustOrder(object):
 "<p align=\"center\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:9pt;\"><br /></p></body></html>"))
         self.pb_Save.setText(_translate("Form", "保存"))
         self.pb_Input.setText(_translate("Form", "导入"))
-        self.pb_Output.setText(_translate("Form", "导出"))
+        self.pb_Output.setText(_translate("Form", "导出至数据包"))
+        self.pb_outputToExcel.setText(_translate("Form", "导出至Excel"))

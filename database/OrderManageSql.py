@@ -255,6 +255,8 @@ def deleteOrderPlanYear(year):
     cur.execute(sql)
     sql = "delete from orderallotplan where Year= '" + year + "'"
     cur.execute(sql)
+    sql = "delete from orderallotschedule where Year= '" + year + "'"
+    cur.execute(sql)
     conn.commit()
     # disconnectMySql(conn, cur)
 
@@ -696,6 +698,40 @@ def selectOrderRetirePlanNumByList(UnitList, EquipList, YearList):
 '''
     调整计划
 '''
+
+# 新增分配计划年份
+def insertIntoOrderAdjustYear(year):
+    UnitList = []
+    EquipList=selectAllDataAboutEquip()
+    selectAllDataAboutUnit(UnitList)
+    result = selectYearListAboutOrderAdjust()
+    sql = "insert into orderadjustyear (num, year) VALUES" \
+          + "('" + str(len(result) + 1) + "', '" + str(year) + "')"
+    cur.execute(sql)
+    for EquipInfo in EquipList:
+        sql = "insert into orderAdjust(year,equip_id,equipName,equipUnit,costUnit,oneYear_LastNum,oneYear_NowNum," \
+              "oneYear_NextNum,oneYear_Amount,twoYear_LastNum,twoYear_NowNum,twoYear_NextNum,twoYear_Amount," \
+              "applicationUnit,supplierUnit,buyMode,manufacturer,adjustFactor,allotUnit,note) values " +\
+                  "('" + str(year) + "','" + EquipInfo[0] + "','" + EquipInfo[1] +"', '','','','','','','','','',''," \
+                                                                                  "'','','','','','','' ) "
+        cur.execute(sql)
+        sql = "insert into orderAdjustCont (year,equip_Id,equip_Name,contSource,makeProj1,bid2,approval3,status1," \
+              "signContract2,finish3) values " \
+              + "('" + str(year) + "','" + EquipInfo[0] + "','" + EquipInfo[1] + "','','','','','','','' )"
+        cur.execute(sql)
+    conn.commit()
+
+
+# 删除分配计划年份
+def deleteOrderAdjustYear(year):
+    sql = "delete from orderadjustyear where year= '" + year + "'"
+    cur.execute(sql)
+    sql = "delete from orderAdjust where Year= '" + year + "'"
+    cur.execute(sql)
+    sql = "delete from orderAdjustCont where Year= '" + year + "'"
+    cur.execute(sql)
+    conn.commit()
+
 
 # 读取分配计划年份
 def selectYearListAboutOrderAdjust():

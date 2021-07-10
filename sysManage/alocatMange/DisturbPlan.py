@@ -442,28 +442,7 @@ class DisturbPlan(QWidget, yearList_Form):
                         sum = sum + int(num)
             if sum != 0:
                 self.disturbResult.item(row, 4).setText(str(sum))
-        # elif flag1 == '2':
-        #     sum = 0
-        #     for i in self.currentEquipdict:
-        #         if not selectEquipIsHaveChild(self.currentEquipdict[i][0]):
-        #             for j in range(0, len(self.currentUnitChilddict)):
-        #                 num = self.disturbResult.item(i, 5 + j).text()
-        #                 if num == '':
-        #                     sum = sum + 0
-        #                 else:
-        #                     sum = sum + int(num)
-        #             self.disturbResult.item(i, 4).setText(str(sum))
-        #         sum = 0
-        #     # 此次分配数的上层装备合计数
-        #     for row in reversed(range(len(self.currentEquipdict))):
-        #         sum = 0
-        #         for childRow in reversed(range(len(self.currentEquipdict))):
-        #             # 第0个字段是EquipID,第二个字段是Equip_Uper
-        #             if self.currentEquipdict[row][0] == self.currentEquipdict[childRow][2]:
-        #                 num = self.disturbResult.item(childRow, 4).text()
-        #                 if num != '':
-        #                     sum = sum + int(num)
-        #         self.disturbResult.item(row, 4).setText(str(sum))
+
 
     # 每个单位的上层装备合计数
     def updateDisturbPlanSumEachUnit(self):
@@ -478,17 +457,6 @@ class DisturbPlan(QWidget, yearList_Form):
                             sum = sum + int(num)
                 if sum != 0:
                     self.disturbResult.item(row, 5 + i).setText(str(sum))
-        # elif flag1 == '2':
-        #     for i in range(0, len(self.currentUnitChilddict)):
-        #         for row in reversed(range(len(self.currentEquipdict))):
-        #             sum = 0
-        #             for childRow in reversed(range(len(self.currentEquipdict))):
-        #                 # 第0个字段是EquipID,第二个字段是Equip_Uper
-        #                 if self.currentEquipdict[row][0] == self.currentEquipdict[childRow][2]:
-        #                     num = self.disturbResult.item(childRow, 5 + i).text()
-        #                     if num != '':
-        #                         sum = sum + int(num)
-        #             self.disturbResult.item(row, 5 + i).setText(str(sum))
 
     # 若装备含子装备，则该行不可选中
     def ifEquipHaveChild(self):
@@ -702,7 +670,7 @@ class DisturbPlan(QWidget, yearList_Form):
             font.bold = True
             font.height = 20 * 11  # 字体大小，11为字号，20为衡量单位
             alignment = xlwt.Alignment()  ## Create Alignment
-            alignment.horz = xlwt.Alignment.HORZ_RIGHT
+            alignment.horz = xlwt.Alignment.HORZ_CENTER
             alignment.vert = xlwt.Alignment.VERT_CENTER
             borders = xlwt.Borders()
             borders.left = 1  # 设置为细实线

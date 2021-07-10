@@ -263,12 +263,32 @@ p, li { white-space: pre-wrap; }
        <item>
         <widget class="QPushButton" name="pb_Output">
          <property name="text">
-          <string>导出</string>
+          <string>导出至数据包</string>
          </property>
         </widget>
        </item>
        <item>
         <spacer name="horizontalSpacer_5">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pb_outputToExcel">
+         <property name="text">
+          <string>导出至Excel</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
