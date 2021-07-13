@@ -149,11 +149,26 @@ class OrderAdjustCont(QDialog, Widget_OrderAdjustCont):
             column = self.contForm.currentColumn()
             if column < 0:
                 return
-            if 5 >= column >= 2 or column == 7:
-                reply = QMessageBox.question(self, "设置接装条件", "是否具备接装条件？", QMessageBox.Yes, QMessageBox.Cancel)
+            if 5 >= column >= 2:
+                reply = QMessageBox.question(self, "设置条件", "是否已完成？", QMessageBox.Yes, QMessageBox.Cancel)
                 if reply == QMessageBox.Yes:
                     item = QPushButton("已完成")
                     self.contForm.setCellWidget(0, column, item)
+            if column == 7:
+                data = selectOneOrderAdjustContData(self.equip_ID,self.currentYear)
+                flag = True
+                for i in range(4,9):
+                    if data[i] == '0':
+                        flag = False
+                        break
+                if flag:
+                    reply = QMessageBox.question(self, "设置条件", "是否已完成？", QMessageBox.Yes, QMessageBox.Cancel)
+                    if reply == QMessageBox.Yes:
+                        item = QPushButton("已完成")
+                        self.contForm.setCellWidget(0, column, item)
+                else:
+                    QMessageBox.information(self,"设置条件","存在未完成前置状态，无法设置完成",QMessageBox.Yes)
+                    return
 
 
     def setBidCondition(self):
