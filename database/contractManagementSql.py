@@ -48,9 +48,9 @@ def getResult(year,no,name):
     elif len(no) != 0 or len(name) != 0:
         sql = "select * from contract_order where year = '%s'"%year
         if len(no) != 0:
-            sql = sql + " and no = %s" % no
+            sql = sql + " and no like '%%%s%%'" % no
         if len(name) != 0:
-            sql = sql + " and name = '%s'"%name
+            sql = sql + " and name like '%%%s%%'"%name
         sql = sql + " order by id asc"
         result = executeSql(sql)
         return result
@@ -62,9 +62,9 @@ def getResultFromContractMaintenance(year,no,name):
     elif len(no) != 0 or len(name) != 0:
         sql = "select * from contract_maintenance where year = '%s'"%year
         if len(no) != 0:
-            sql = sql + " and no = %s" % no
+            sql = sql + " and no like '%%%s%%'" % no
         if len(name) != 0:
-            sql = sql + " and name = '%s'"%name
+            sql = sql + " and name like '%%%s%%'"%name
         sql = sql + " order by id asc"
         result = executeSql(sql)
         return result
@@ -79,8 +79,8 @@ def findAllContractOrderData(year):
 
 def insertOneDataInToContractOrder(rowData):
     print(rowData)
-    sql = "insert into contract_order(year,id,no,name,part_A,part_B,unit_price,count,amount,delivery_time,note) values ('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')"\
-          %(rowData[0],rowData[1],rowData[2],rowData[3],rowData[4],rowData[5],rowData[6],rowData[7],rowData[8],rowData[9],rowData[10])
+    sql = "insert into contract_order(year,no,name,part_A,part_B,unit_price,count,amount,delivery_time,note) values ('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')"\
+          %(rowData[0],rowData[2],rowData[3],rowData[4],rowData[5],rowData[6],rowData[7],rowData[8],rowData[9],rowData[10])
     return executeCommit(sql)
 
 def insertOneDataInToContractMaintenance(rowData):
@@ -92,6 +92,7 @@ def updataOneDataToContractOrder(rowData):
     print(rowData)
     sql = "update  contract_order set no = '%s', name = '%s', part_A = '%s', part_B = '%s', unit_price = '%s', count = '%s', amount = '%s',delivery_time = '%s', note = '%s' where id = '%s'" \
           %(rowData[1],rowData[2],rowData[3],rowData[4],rowData[5],rowData[6],rowData[7],rowData[8],rowData[9],rowData[0])
+    print(sql)
     return executeCommit(sql)
 
 def updataOneDataToContractMaintenance(rowData):
@@ -127,7 +128,9 @@ def insertOneDataInToContractAttachment(rowData):
 
 def updataOneDataToContractAttachment(rowData):
     print(rowData)
-    sql = "update  contract_order set no = '%s', contract_name = '%s', plan_project = '%s', budget_amount = '%s', unit_price = '%s', count = '%s', amount = '%s',payable_amount = '%s', signing_date = '%s', part_A_unit = '%s', unit_property = '%s', taxpayer_code = '%s', part_B_unit = '%s', payer_unit = '%s', planning_document = '%s', delivery_date = '%s', note = '%s' where maintenance_id = '%s' and id = '%s' and year = '%s'" \
+    sql = "update  contract_attachment set no = '%s', contract_name = '%s', plan_project = '%s', budget_amount = '%s', unit_price = '%s', count = '%s'," \
+          " amount = '%s',payable_amount = '%s', signing_date = '%s', part_A_unit = '%s', unit_property = '%s', taxpayer_code = '%s'," \
+          " part_B_unit = '%s', payer_unit = '%s', planning_document = '%s', delivery_date = '%s', note = '%s' where maintenance_id = '%s' and id = '%s' and year = '%s'" \
           %(rowData[2],rowData[3],rowData[4],rowData[5],rowData[6],rowData[7],rowData[8],rowData[9],rowData[10],rowData[11],rowData[12],rowData[13],rowData[14],rowData[15],rowData[16],rowData[17],rowData[18],rowData[0],rowData[11],rowData[19])
     return executeCommit(sql)
 

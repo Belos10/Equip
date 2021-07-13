@@ -11,8 +11,6 @@ import os
 '''
     显示主界面
 '''
-#new
-
 class mainManage(QObject):
     def __init__(self):
         self.login = login()
