@@ -717,7 +717,7 @@ def insertIntoOrderAdjustYear(year):
         cur.execute(sql)
         sql = "insert into orderAdjustCont (year,equip_Id,equip_Name,contSource,makeProj1,bid2,approval3,status1," \
               "signContract2,finish3) values " \
-              + "('" + str(year) + "','" + EquipInfo[0] + "','" + EquipInfo[1] + "','','','','','','','' )"
+              + "('" + str(year) + "','" + EquipInfo[0] + "','" + EquipInfo[1] + "','','0','0','0','0','0','0' )"
         cur.execute(sql)
     conn.commit()
 

@@ -42,7 +42,8 @@ class AdjustOrder(QWidget, widget_adjustOrder):
         # 修改数据
         self.pb_Save.clicked.connect(self.saveData)
         self.pb_outputToExcel.clicked.connect(self.slotOutputToExcel)
-
+        self.tb_add.clicked.connect(self.slotAddNewYear)
+        self.tb_del.clicked.connect(self.slotDelYear)
 
     # 信号与槽连接的断开
     def signalDisconnectSlot(self):
