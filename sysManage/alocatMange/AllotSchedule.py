@@ -376,7 +376,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                     item = QPushButton("设置进度")
                     item.clicked.connect(self.setArmySchedule)
                     if flag1[0][0] != '0':
-                        item = QPushButton("已完成")
+                        item = QPushButton(flag1[0][0])
                     self.disturbResult.setCellWidget(i, 5 + self.lenCurrentUnitChilddict, item)
 
                     # 是否具备接装条件
@@ -635,8 +635,9 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
 
     # 更新进度1 陆军调拨
     def updateArmy(self):
+        txt = self.armySchedule.returnID()
         currentRow = self.disturbResult.currentRow()
-        item = QPushButton("已完成")
+        item = QPushButton(txt)
         self.disturbResult.setCellWidget(currentRow, 5 + self.lenCurrentUnitChilddict, item)
         updateArmySchedule(self.currentEquipdict[currentRow][0], self.currentYear)
 
@@ -648,7 +649,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
             return
         if currentColumn - 1 < 0:
             return
-        if self.disturbResult.cellWidget(currentRow, currentColumn - 1).text() != "已完成":
+        if self.disturbResult.cellWidget(currentRow, currentColumn - 1).text() == "设置进度":
             QMessageBox.information(self, "设置接装条件", "上一级未完成", QMessageBox.Yes)
             return
         reply = QMessageBox.question(self,"设置接装条件","是否具备接装条件？",QMessageBox.Yes,QMessageBox.Cancel)

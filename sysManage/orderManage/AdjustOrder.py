@@ -52,7 +52,6 @@ class AdjustOrder(QWidget, widget_adjustOrder):
 
     # 新增年份
     def slotAddNewYear(self):
-        year = 0
         year, ok = QInputDialog.getInt(self, "Get year", "year:", 0, 0, 100000, 1)
         if ok:
             haveYear = False
@@ -63,7 +62,6 @@ class AdjustOrder(QWidget, widget_adjustOrder):
             if haveYear == True:
                 reply = QMessageBox.information(self, '添加', '添加失败，该年份已存在', QMessageBox.Yes)
                 return
-
             insertIntoOrderAdjustYear(year)
             self._initYearWidget_()
             return

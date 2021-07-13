@@ -33,6 +33,9 @@ class ArmySchedule(QDialog, widget_armySchedule ):
         self.slotSelectResult()
         #print(self.currentYear)
 
+    def returnID(self):
+        if self.tw_result.currentRow() != 0 and self.tw_result.currentRow() != 1:
+            return self.resultList[self.tw_result.currentRow()-2][0]
 
 
     '''
@@ -160,10 +163,9 @@ class ArmySchedule(QDialog, widget_armySchedule ):
     def slotSelectResult(self):
         self.currentResult = {}
         self._initResultHeader_()
-        resultList = selectArmyTransferByYear(self.currentYear)
-        self.tw_result.setRowCount(len(resultList) + 2)
-        print(resultList)
-        for i, armyTransferInfo in enumerate(resultList):
+        self.resultList = selectArmyTransferByYear(self.currentYear)
+        self.tw_result.setRowCount(len(self.resultList) + 2)
+        for i, armyTransferInfo in enumerate(self.resultList):
             item = QTableWidgetItem()
             item.setText(armyTransferInfo[0])
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)

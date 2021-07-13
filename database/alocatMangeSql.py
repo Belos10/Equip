@@ -278,7 +278,7 @@ def insertIntoDisturbPlanYear(year):
                   "('" + EquipInfo[0] + "','" + EquipInfo[1] + "','" + str(year) +"', '' )"
         cur.execute(sql)
         sql = "insert into allotschedule (Equip_Id,Equip_Name,army,allotconditionUper,rocketUper,finishUper,year) values " \
-              + "('" + EquipInfo[0] + "','" + EquipInfo[1] + "', '0','0','0','0','" + str(year) + "' )"
+              + "('" + EquipInfo[0] + "','" + EquipInfo[1] + "', '','0','0','0','" + str(year) + "' )"
         cur.execute(sql)
         for UnitInfo in UnitList:
             sql = "insert into disturbplan(Equip_id,Equip_Name,Unit_Id,Unit_Name,Year,DisturbNum) values " +\
@@ -503,9 +503,9 @@ def selectIfScheduleFinishUper(Equip_Id, Year):
     return result
 
 # 更新陆军调拨单进度
-def updateArmySchedule(Equip_Id,Year):
+def updateArmySchedule(Equip_Id,Year,txt):
     # conn, cur = connectMySql()
-    sql = "update allotschedule set army = '1' where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
+    sql = "update allotschedule set army = " + txt + " where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
     cur.execute(sql)
     conn.commit()
     # disconnectMySql(conn, cur)

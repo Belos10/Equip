@@ -631,7 +631,7 @@ def addDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type, E
             return e
 
         sql = "insert into allotschedule (Equip_Id,Equip_Name,army,allotconditionUper,rocketUper,finishUper,year) values " \
-              + "('" + Equip_ID + "','" + Equip_Name + "', '0','0','0','0','" + disturbplanYearInfo + "' )"
+              + "('" + Equip_ID + "','" + Equip_Name + "', '','0','0','0','" + disturbplanYearInfo + "' )"
         try:
             cur.execute(sql)
         except Exception as e:
@@ -665,8 +665,8 @@ def addDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type, E
             conn.rollback()
             return e
 
-        sql = "insert into orderallotschedule (Equip_Id,Equip_Name,army,allotconditionUper,rocketUper,finishUper,year) values " \
-              + "('" + Equip_ID + "','" + Equip_Name + "', '0','0','0','0','" + orderallotplanYearInfo + "' )"
+        sql = "insert into orderallotschedule (Equip_Id,Equip_Name,contract,allotconditionUper,rocketUper,finishUper,year) values " \
+              + "('" + Equip_ID + "','" + Equip_Name + "', '','0','0','0','" + orderallotplanYearInfo + "' )"
         try:
             cur.execute(sql)
         except Exception as e:
@@ -686,7 +686,7 @@ def addDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type, E
             return e
         sql = "insert into orderAdjustCont (year,equip_Id,equip_Name,contSource,makeProj1,bid2,approval3,status1," \
               "signContract2,finish3) values " \
-              + "('" + orderadjustYearInfo + "','" + Equip_ID + "','" + Equip_Name + "','','0','0','0','0','0','0' )"
+              + "('" + orderadjustYearInfo + "','" + Equip_ID + "','" + Equip_Name + "','','0','0','0','0','','0' )"
         try:
             cur.execute(sql)
         except Exception as e:
