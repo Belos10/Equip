@@ -1055,7 +1055,6 @@ def delDataInUnit(Unit_ID):
         for year in yearInfoList:
             for equip in endEquipList:
                 inputInfoTuple = selectInputInfoByEquipUnit(UnitID, equip[0], year[1])
-                #print("==================eeee", inputInfoTuple)
                 for inputInfo in inputInfoTuple:
                     delSuccess = delFromInputInfo(UnitID, equip[0], inputInfo[2], inputInfo[3], inputInfo[4], inputInfo[10])
                     if delSuccess != True:
@@ -1075,7 +1074,6 @@ def delDataInUnit(Unit_ID):
                           " where Equip_ID = '" + equipInfo[0] \
                           + "' and Unit_ID = '" + unitID + \
                           "' and year = '" + strengthYear[1] + "'"
-                            #print("=============", sql)
                             try:
                                 cur.execute(sql)
                             except Exception as e:
