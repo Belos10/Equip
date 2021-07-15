@@ -16,19 +16,11 @@ class PositionEngineerMain(QMainWindow, Position_Engineer_Widget):
 
         self.installationSituation = InstallationSituation(self)
         self.equipmentStatistics = EquipmentStatistics(self)
-        # self.directoryMaintenance = DirectoryMaintenance(self)
-
         self.stackedWidget.addWidget(self.installationSituation)
         self.stackedWidget.addWidget(self.equipmentStatistics)
-        # self.stackedWidget.addWidget(self.directoryMaintenance)
-
-        self.stackedWidget.setCurrentIndex(0)
-        self.tb_installation.setDisabled(True)
-        self.tb_equipmentStatistics.setDisabled(False)
-        self.installationSituation.setDisabled(False)
-        self.equipmentStatistics.setDisabled(True)
-        # self.directoryMaintenance.setDisabled(True)
         self.connectSignal()
+        self.slotInstallation()
+
 
 
     def connectSignal(self):
@@ -48,34 +40,19 @@ class PositionEngineerMain(QMainWindow, Position_Engineer_Widget):
         # self.tb_directoryMaintenance.setDisabled(False)
 
         self.slotDisconnect()
-        self.installationSituation.init()
         self.stackedWidget.setCurrentIndex(0)
-        self.installationSituation.init()
-        #self.strenSelect._initStrenInquiry() #初始化函数
         self.connectSignal()
+        self.installationSituation.init()
 
     def slotEquipmentStatistics(self):
         self.tb_installation.setDisabled(False)
         self.tb_equipmentStatistics.setDisabled(True)
-        # self.tb_directoryMaintenance.setDisabled(False)
         self.slotDisconnect()
         self.stackedWidget.setCurrentIndex(1)
         self.stackedWidget.currentWidget().setDisabled(False)
         self.equipmentStatistics.initEquipmentStatistics()
         self.connectSignal()
-        # self.maintenMange._initAll_() 初始化函数
 
-    # def slotDirectoryMaintenance(self):
-    #     self.tb_installation.setDisabled(False)
-    #
-    #     self.tb_equipmentStatistics.setDisabled(False)
-    #     self.tb_directoryMaintenance.setDisabled(True)
-    #     self.slotDisconnect()
-    #     self.stackedWidget.setCurrentIndex(2)
-    #     self.stackedWidget.currentWidget().setDisabled(False)
-    #     self.directoryMaintenance
-    #     self.connectSignal()
-    #     # self.directoryMaintenance._initAll_() 初始化函数
 
 
 if __name__ == "__main__":

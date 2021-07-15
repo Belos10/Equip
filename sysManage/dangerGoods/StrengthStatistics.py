@@ -1,11 +1,11 @@
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QDate
 from database.danderGoodsSql import *
 from sysManage.userInfo import get_value
 from widgets.dangerGoods.dangerGoodsStatisticsUI import DangerGoodsStatisticsUI
 
 import sys
 from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QTableWidget, QHeaderView, QTableWidgetItem, QComboBox, \
-    QMessageBox, QTreeWidgetItem
+    QMessageBox, QTreeWidgetItem, QDateEdit
 
 
 class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
@@ -14,6 +14,7 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
         self.setupUi(self)
         self.startInfo = None
         self.dataLen = 0
+        self.currentLastRow = -1
         self.signalConnection()
         self.init()
     first_treeWidget_dict = {}
@@ -86,10 +87,9 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
             根据单位id获取数据并展示
     '''
     def _initTableWidgetByUnit(self,unit):
-
+        self.tw_result.itemChanged.disconnect(self.slotAlterAndSava)
         self.rowCount =  2 + getCountOfUnit(unit)
         self.columnCount = 13
-        self.currentLastRow = self.rowCount - 1
         self.initHeader()
         if self.rowCount > 2:
             trainResultCount = 0
@@ -112,6 +112,7 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
                 self.dataLen = trainResultCount + chemicalResultCount + len(explosionResult)
             else:
                 self.dataLen = trainResultCount + chemicalResultCount
+        self.tw_result.itemChanged.connect(self.slotAlterAndSava)
 
 
 
@@ -123,6 +124,7 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
     '''
     def diplayDataByType(self,starIndex,typeData,type):
         item = QTableWidgetItem('%s'%type)
+        item.setFlags(Qt.ItemIsEnabled)
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.tw_result.setItem(starIndex, 1, item)
         if len(typeData) != 1:
@@ -132,6 +134,7 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
             self.info[index] = typeData[i][0]
             #序号
             item = QTableWidgetItem(str(i + 1))
+            item.setFlags(Qt.ItemIsEnabled)
             item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             self.tw_result.setItem(starIndex + i, 0, item)
 
@@ -145,38 +148,48 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
             item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             self.tw_result.setItem(starIndex + i, 3, item)
 
-            #小计
+            # 合计
             item = QTableWidgetItem(str(typeData[i][5]))
+            item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+            self.tw_result.setItem(starIndex + i, 4, item)
+
+            #小计
+            item = QTableWidgetItem(str(typeData[i][6]))
             item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             self.tw_result.setItem(starIndex + i, 5, item)
 
             #新堪品
-            item = QTableWidgetItem(typeData[i][6])
+            item = QTableWidgetItem(typeData[i][7])
             item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             self.tw_result.setItem(starIndex + i, 6, item)
 
-
-            item = QTableWidgetItem(typeData[i][7])
+            item = QTableWidgetItem(typeData[i][8])
             item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             self.tw_result.setItem(starIndex + i, 7, item)
 
-            item = QTableWidgetItem(typeData[i][8])
-            item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-            self.tw_result.setItem(starIndex + i, 8, item)
+            date = typeData[i][9]
+            parsedDateList = date.split('-')
+            dataEdit = QDateEdit()
+            dataEdit.setDisplayFormat("yyyy-MM-dd")
+            dataEdit.setDate(QDate(int(parsedDateList[0]), int(parsedDateList[1]), int(parsedDateList[2])))
+            self.tw_result.setCellWidget(2 + i, 8, dataEdit)
 
-            item = QTableWidgetItem(typeData[i][9])
-            item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-            self.tw_result.setItem(starIndex + i, 9, item)
-
-            item = QTableWidgetItem(typeData[i][10])
-            item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-            self.tw_result.setItem(starIndex + i, 10, item)
+            date = typeData[i][10]
+            parsedDateList = date.split('-')
+            dataEdit = QDateEdit()
+            dataEdit.setDisplayFormat("yyyy-MM-dd")
+            dataEdit.setDate(QDate(int(parsedDateList[0]), int(parsedDateList[1]), int(parsedDateList[2])))
+            self.tw_result.setCellWidget(2 + i, 9, dataEdit)
 
             item = QTableWidgetItem(typeData[i][11])
             item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-            self.tw_result.setItem(starIndex + i, 11, item)
+            self.tw_result.setItem(starIndex + i, 10, item)
 
             item = QTableWidgetItem(typeData[i][12])
+            item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+            self.tw_result.setItem(starIndex + i, 11, item)
+
+            item = QTableWidgetItem(typeData[i][13])
             item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             self.tw_result.setItem(starIndex + i, 12, item)
 
@@ -201,6 +214,7 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
             for resultInfo in result:
                 stack.append(resultInfo)
                 root.append(item)
+        self.tw_first.expandAll()
 
 
     '''
@@ -295,56 +309,70 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
                 self.savaRowData(currentRow)
             else:
                 self.alterRowData(currentRow)
-            pass
+
+
 
 
     def savaRowData(self,row):
         rowData = []
         rowData.append(self.unit)
         for i in range(1,self.tw_result.columnCount()):
-            if i == 4:
-                continue
+
             if i == 1 or i == 3 :
                 item = self.tw_result.cellWidget(row,i)
                 if item != None:
                     rowData.append(item.currentText())
+            elif i == 8 or i == 9:
+                item = self.tw_result.cellWidget(row, i)
+                if item != None:
+                    date = item.date().toString(Qt.ISODate)
+                    rowData.append(date)
             else:
                 item = self.tw_result.item(row, i)
+
                 if item != None and len(item.text()) > 0:
                     rowData.append(item.text())
                 else:
                     break
 
-        if len(rowData) < self.tw_result.columnCount() - 1:
+        if len(rowData) < self.tw_result.columnCount():
             return False
         else:
-            print(rowData)
             insertOneDataIntDangerGoods(rowData)
+            self.currentLastRow = -1
+            self._initTableWidgetByUnit(self.unit)
             QMessageBox.warning(self, "注意", "插入成功！", QMessageBox.Yes, QMessageBox.Yes)
 
     def alterRowData(self,row):
 
         rowData = []
-        rowData.append(self.info[row])
-        rowData.append(self.unit)
-        for i in range(self.tw_result.columnCount()):
-            if i == 0:
-                continue
-            if i == 3:
-                continue
-            item = self.tw_result.item(row, i)
-            if item != None and len(item.text()) > 0:
-                rowData.append(item.text())
+        rowData.append( self.info[row])
+        for i in range(2, self.tw_result.columnCount()):
+            if i == 8 or i == 9:
+                item = self.tw_result.cellWidget(row, i)
+                if item != None:
+                    date = item.date().toString(Qt.ISODate)
+                    rowData.append(date)
             else:
-                break
-
+                item = self.tw_result.item(row, i)
+                if i == 12:
+                    if item != None:
+                        rowData.append(item.text())
+                    else:
+                        break
+                else:
+                    if item != None and len(item.text()) > 0:
+                        rowData.append(item.text())
+                    else:
+                        break
         print(rowData)
-        if len(rowData) < self.tw_result.columnCount():
-            return False
-        else:
-            if updataOneDataInDangerGood(rowData) == True:
+        if len(rowData) == self.tw_result.columnCount() - 1:
+            if (updataOneDataInDangerGood(rowData) == True):
                 QMessageBox.warning(self, "注意", "修改成功！", QMessageBox.Yes, QMessageBox.Yes)
-        pass
+                self._initTableWidgetByUnit(self.unit)
+            else:
+                QMessageBox.warning(self, "警告", "修改失败！", QMessageBox.Yes, QMessageBox.Yes)
+
 
 
 
@@ -361,16 +389,37 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
             新增按钮槽函数
     '''
     def slotAdd(self):
-        if self.tw_result.rowCount() < 3 + self.dataLen:
+        if self.tw_result.rowCount() <= 2 + self.dataLen:
+            self.tw_result.itemChanged.disconnect(self.slotAlterAndSava)
             rowCount =  self.tw_result.rowCount()
             self.currentLastRow = rowCount
             self.tw_result.insertRow(rowCount)
+            if (rowCount + 1 == 3):
+                item = QTableWidgetItem('1')
+                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                item.setFlags(Qt.ItemIsEnabled)
+                self.tw_result.setItem(2, 0, item)
+            else:
+                lastNo = int(self.tw_result.item(rowCount - 1,0).text())
+                item = QTableWidgetItem(str(lastNo + 1))
+                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                item.setFlags(Qt.ItemIsEnabled)
+                self.tw_result.setItem(rowCount, 0, item)
+
             comboBox = QComboBox()
             comboBox.addItems(['训练用毒剂', '防化放射源','防化防爆弹药'])
             self.tw_result.setCellWidget(rowCount, 1, comboBox)
             comboBox = QComboBox()
             comboBox.addItems(['千克', '块','瓶','枚'])
             self.tw_result.setCellWidget(rowCount, 3, comboBox)
+
+            deliveryDate = QDateEdit()
+            deliveryDate.setDisplayFormat("yyyy-MM-dd")
+            self.tw_result.setCellWidget(rowCount, 8, deliveryDate)
+            storeDate = QDateEdit()
+            storeDate.setDisplayFormat("yyyy-MM-dd")
+            self.tw_result.setCellWidget(rowCount, 9, storeDate)
+            self.tw_result.itemChanged.connect(self.slotAlterAndSava)
         else:
             QMessageBox.warning(self, "注意", "请先将数据添加完成！", QMessageBox.Yes, QMessageBox.Yes)
             pass

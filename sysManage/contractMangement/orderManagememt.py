@@ -45,6 +45,13 @@ class OrderManagement(QWidget, OrderManagementUI):
             from database.strengthDisturbSql import selectUnitInfoByUnitID
             self.startInfo = selectUnitInfoByUnitID(self.userInfo[0][4])
 
+        self.pb_output.setDisabled(True)
+        self.pb_select.setDisabled(True)
+        self.tb_add.setDisabled(True)
+        self.tb_del.setDisabled(True)
+        self.tb_outputToExcel.setDisabled(True)
+        self.tw_result.setDisabled(True)
+        self.tb_input.setDisabled(True)
         #初始化年份列表
         self.initYearList()
         pass
@@ -60,20 +67,7 @@ class OrderManagement(QWidget, OrderManagementUI):
         listModel = QStringListModel()
         listModel.setStringList(self.yearList)
         self.lv_year.setModel(listModel)
-        if len(self.yearList) == 0:
-            self.pb_output.setDisabled(True)
-            self.pb_select.setDisabled(True)
-            self.tb_add.setDisabled(True)
-            self.tb_del.setDisabled(True)
-            self.tb_outputToExcel.setDisabled(True)
-            self.tw_result.setDisabled(True)
-        else:
-            self.pb_select.setDisabled(False)
-            self.tb_add.setDisabled(False)
-            self.tb_del.setDisabled(False)
-            self.tb_outputToExcel.setDisabled(False)
-            self.tw_result.setDisabled(False)
-            self.pb_output.setDisabled(False)
+
 
     '''
         新增年份
@@ -98,6 +92,14 @@ class OrderManagement(QWidget, OrderManagementUI):
     def displayDataByYear(self,item):
         if (len(self.yearList) != 0):
             self.selectedYear = self.yearList[item.row()]
+            if len(self.selectedYear) != 0:
+                self.pb_select.setDisabled(False)
+                self.tb_add.setDisabled(False)
+                self.tb_del.setDisabled(False)
+                self.tb_outputToExcel.setDisabled(False)
+                self.tw_result.setDisabled(False)
+                self.pb_output.setDisabled(False)
+                self.tb_input.setDisabled(False)
             self.displayData()
 
 
@@ -135,7 +137,7 @@ class OrderManagement(QWidget, OrderManagementUI):
             self.tw_result.setItem(2, 0, item)
             self.tw_result.setSpan(2,0,len(dataList),1)
             for i in range(len(dataList)):
-                item = QTableWidgetItem(str(i + 1))
+                item = QTableWidgetItem(str(dataList[i][0]))
                 item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
                 item.setFlags(Qt.ItemIsEnabled)
                 self.tw_result.setItem(2 + i, 1, item)
@@ -179,7 +181,7 @@ class OrderManagement(QWidget, OrderManagementUI):
 
                 item = QTableWidgetItem(dataList[i][10])
                 item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-                item.setFlags(Qt.ItemIsEnabled)
+                # item.setFlags(Qt.ItemIsEnabled)
                 self.tw_result.setItem(2 + i, 10, item)
         self.tw_result.itemChanged.connect(self.slotAlterAndSava)
 
@@ -376,6 +378,7 @@ class OrderManagement(QWidget, OrderManagementUI):
 
     def slotAdd(self):
         if self.tw_result.rowCount() <= 2 + len(self.result):
+            self.tw_result.itemChanged.disconnect(self.slotAlterAndSava)
             rowCount = self.tw_result.rowCount()
             self.currentLastRow = rowCount
             self.tw_result.insertRow(rowCount)
@@ -402,7 +405,7 @@ class OrderManagement(QWidget, OrderManagementUI):
             deliveryDate = QDateEdit()
             deliveryDate.setDisplayFormat("yyyy-MM-dd")
             self.tw_result.setCellWidget(rowCount, 9, deliveryDate)
-
+            self.tw_result.itemChanged.connect(self.slotAlterAndSava)
 
         else:
             QMessageBox.warning(self, "注意", "请先将数据补充完整！", QMessageBox.Yes, QMessageBox.Yes)

@@ -47,6 +47,13 @@ class MaintenanceManagement(QWidget, OrderManagementUI):
             from database.strengthDisturbSql import selectUnitInfoByUnitID
             self.startInfo = selectUnitInfoByUnitID(self.userInfo[0][4])
 
+        self.pb_output.setDisabled(True)
+        self.pb_select.setDisabled(True)
+        self.tb_add.setDisabled(True)
+        self.tb_del.setDisabled(True)
+        self.tb_outputToExcel.setDisabled(True)
+        self.tw_result.setDisabled(True)
+        self.tb_input.setDisabled(True)
         #初始化年份列表
         self.initYearList()
         pass
@@ -60,23 +67,8 @@ class MaintenanceManagement(QWidget, OrderManagementUI):
         self.yearList = []
         self.yearList = getYearsFromContractMaintenance()
         listModel = QStringListModel()
-        print(self.yearList)
         listModel.setStringList(self.yearList)
         self.lv_year.setModel(listModel)
-        if len(self.yearList) == 0:
-            self.pb_output.setDisabled(True)
-            self.pb_select.setDisabled(True)
-            self.tb_add.setDisabled(True)
-            self.tb_del.setDisabled(True)
-            self.tb_outputToExcel.setDisabled(True)
-            self.tw_result.setDisabled(True)
-        else:
-            self.pb_select.setDisabled(False)
-            self.tb_add.setDisabled(False)
-            self.tb_del.setDisabled(False)
-            self.tb_outputToExcel.setDisabled(False)
-            self.tw_result.setDisabled(False)
-            self.pb_output.setDisabled(False)
 
     '''
         新增年份
@@ -101,6 +93,14 @@ class MaintenanceManagement(QWidget, OrderManagementUI):
     def displayDataByYear(self,item):
         if (len(self.yearList) != 0):
             self.selectedYear = self.yearList[item.row()]
+            if len(self.selectedYear) != 0:
+                self.pb_select.setDisabled(False)
+                self.tb_add.setDisabled(False)
+                self.tb_del.setDisabled(False)
+                self.tb_outputToExcel.setDisabled(False)
+                self.tw_result.setDisabled(False)
+                self.pb_output.setDisabled(False)
+                self.tb_input.setDisabled(False)
             self.displayData()
 
 
@@ -361,6 +361,7 @@ class MaintenanceManagement(QWidget, OrderManagementUI):
                         rowData.append(item.text())
                 else:
                     break
+
         if len(rowData) == self.tw_result.columnCount() - 1:
             if(insertOneDataInToContractMaintenance(rowData) == True):
                 QMessageBox.warning(self, "注意", "插入成功！", QMessageBox.Yes, QMessageBox.Yes)

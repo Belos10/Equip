@@ -3,7 +3,7 @@ import operator
 
 def getYearsFromContractOrder():
     result = []
-    sql = "select year from contract_order_year "
+    sql = "select year from contract_order_year  order by year desc "
     years = executeSql(sql)
     if years != None and len(years) != 0:
         for year in years:
@@ -11,7 +11,7 @@ def getYearsFromContractOrder():
     return result
 def getYearsFromContractMaintenance():
     result = []
-    sql = "select year from contract_maintenance_year "
+    sql = "select year from contract_maintenance_year order by year desc "
     years = executeSql(sql)
     if years != None and len(years) != 0:
         for year in years:

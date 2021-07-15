@@ -13,6 +13,7 @@ class AttachmentDialog(QDialog, AttachmentDialogUI):
         self.setWindowIcon(QIcon(":/pic/system.png"))
         self.resultList = []
         self.maintenanceId = -1
+        self.currentLastRow = -1
         self.year = ''
         self.signalConnection()
 
@@ -140,6 +141,8 @@ class AttachmentDialog(QDialog, AttachmentDialogUI):
 
 
     def displayData(self):
+        self.tw_result.itemChanged.disconnect(self.slotAlterAndSava)
+        self.resultList = getAttachmentInformation(self.maintenanceId, self.year)
         for i in range(len(self.resultList)):
             item = QTableWidgetItem(str(self.resultList[i][1]))
             item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
@@ -161,7 +164,7 @@ class AttachmentDialog(QDialog, AttachmentDialogUI):
             #item.setFlags(Qt.ItemIsEnabled)
             self.tw_result.setItem(2 + i, 3, item)
 
-            item = QTableWidgetItem(self.resultList[i][5])
+            item = QTableWidgetItem(str(self.resultList[i][5]))
             item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             #item.setFlags(Qt.ItemIsEnabled)
             self.tw_result.setItem(2 + i, 4, item)
@@ -234,6 +237,7 @@ class AttachmentDialog(QDialog, AttachmentDialogUI):
             item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             #item.setFlags(Qt.ItemIsEnabled)
             self.tw_result.setItem(2 + i, 17, item)
+        self.tw_result.itemChanged.connect(self.slotAlterAndSava)
 
 
     def slotAlterAndSava(self):
@@ -276,7 +280,8 @@ class AttachmentDialog(QDialog, AttachmentDialogUI):
                 self.savaRowData(currentRow)
             else:
                 self.alterRowData(currentRow)
-        pass
+
+
 
     def savaRowData(self,row):
         # print('保存一行')
@@ -301,6 +306,7 @@ class AttachmentDialog(QDialog, AttachmentDialogUI):
         if len(rowData) == self.tw_result.columnCount() + 2:
             if (insertOneDataInToContractAttachment(rowData) == True):
                 QMessageBox.warning(self, "注意", "插入成功！", QMessageBox.Yes, QMessageBox.Yes)
+                self.currentLastRow = -1
             else:
                 QMessageBox.warning(self, "警告", "插入失败！", QMessageBox.Yes, QMessageBox.Yes)
             self.displayData()
@@ -332,8 +338,8 @@ class AttachmentDialog(QDialog, AttachmentDialogUI):
             self.displayData()
 
     def soltAdd(self):
-        print(self.tw_result.rowCount())
         if self.tw_result.rowCount() <= 2 + len(self.resultList):
+            self.tw_result.itemChanged.disconnect(self.slotAlterAndSava)
             rowCount = self.tw_result.rowCount()
             self.currentLastRow = rowCount
             self.tw_result.insertRow(rowCount)
@@ -360,6 +366,7 @@ class AttachmentDialog(QDialog, AttachmentDialogUI):
             deliveryDate = QDateEdit()
             deliveryDate.setDisplayFormat("yyyy-MM-dd")
             self.tw_result.setCellWidget(rowCount, 16, deliveryDate)
+            self.tw_result.itemChanged.connect(self.slotAlterAndSava)
         else:
             QMessageBox.warning(self, "注意", "请先将数据补充完整！", QMessageBox.Yes, QMessageBox.Yes)
 
@@ -381,4 +388,3 @@ class AttachmentDialog(QDialog, AttachmentDialogUI):
                 self.tw_result.removeRow(rowCount)
         else:
             self.tw_result.removeRow(rowCount)
-        pass

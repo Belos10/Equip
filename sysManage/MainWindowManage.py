@@ -103,6 +103,7 @@ class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
         #self.alocatMange.initUserInfo(self.userInfo)
         #self.PosEngin.slotInstallation()
         self.login.close()
+        self.PosEngin.slotInstallation()
         self.show()
 
     def slotCurrentChange(self):

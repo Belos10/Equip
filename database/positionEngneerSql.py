@@ -167,21 +167,22 @@ def exists(tableName,fieldName,fieldItem):
         根据基地、番号、阵地代号、装备到位情况进行筛选，返回符合记录
 '''
 def getResult(baseList,designationList,positionCodeLsit,prepareLsit):
+    print(baseList,designationList,positionCodeLsit,prepareLsit)
     if len(baseList) == 0 and len(designationList) == 0 and len(positionCodeLsit) == 0 and len(prepareLsit) == 0:
         return findAllInstallactionData()
-    elif  len(baseList) == 0 and (len(designationList) != 0 or len(positionCodeLsit) != 0 or len(prepareLsit) != 0):
+    elif len(baseList) == 0 and (len(designationList) != 0 or len(positionCodeLsit) != 0 or len(prepareLsit) != 0):
         sql = "select installaction_Id,Unit_ID,official_designation,position_name,location,is_prepare,now_situation," \
               "installation_time,plan_time,count,prepare_situation,run_situation,notes from posengin_installation where "
         if len(designationList) != 0:
-            sql = sql + "official_designation=%s "%(designationList[0])
+            sql = sql + "official_designation like '%%%s%%' "%(designationList[0])
         if len(positionCodeLsit)!= 0 and len(designationList) != 0 :
-            sql = sql + "and position_name=%s "%positionCodeLsit[0]
+            sql = sql + "and position_name like '%%%s%%' "%positionCodeLsit[0]
         elif len(positionCodeLsit)!= 0 and len(designationList) == 0 :
-            sql = sql + "position_name=%s " % positionCodeLsit[0]
+            sql = sql + "position_name like '%%%s%%' " % positionCodeLsit[0]
         if len(prepareLsit) != 0 and (len(positionCodeLsit) + len(designationList)) >= 1:
-            sql = sql + "and prepare_situation='%s'"%prepareLsit[0]
-        else:
-            sql = sql + "prepare_situation='%s'" % prepareLsit[0]
+            sql = sql + "and prepare_situation like '%%%s%%'"%prepareLsit[0]
+        elif len(prepareLsit) != 0 and  (len(positionCodeLsit) + len(designationList)) < 1:
+            sql = sql + "prepare_situation like '%%%s%%'" % prepareLsit[0]
 
         return list(selectData(sql))
     elif len(baseList) != 0 and (len(designationList) != 0 or len(positionCodeLsit) != 0 or len(prepareLsit) != 0):
@@ -190,11 +191,11 @@ def getResult(baseList,designationList,positionCodeLsit,prepareLsit):
             sql = "select installaction_Id,Unit_ID,official_designation,position_name,location,is_prepare,now_situation," \
                   "installation_time,plan_time,count,prepare_situation,run_situation,notes from posengin_installation where Unit_ID=%s "%base
             if len(designationList) != 0:
-                sql = sql + "and official_designation='%s' " % (designationList[0])
+                sql = sql + "and official_designation like'%%%s%%' " % (designationList[0])
             if len(positionCodeLsit)!= 0:
-                sql = sql + "and position_name='%s' " % positionCodeLsit[0]
+                sql = sql + "and position_name like'%%%s%%' " % positionCodeLsit[0]
             if len(prepareLsit) != 0:
-                sql = sql + "and prepare_situation='%s'" % prepareLsit[0]
+                sql = sql + "and prepare_situation like'%%%s%%'" % prepareLsit[0]
             data.extend(list(selectData(sql)))
         return data
     elif len(baseList) != 0 and (len(designationList) + len(positionCodeLsit) + len(prepareLsit)) == 0:
@@ -230,21 +231,23 @@ def getUnitIdbyName(unitName):
         向表中插入一条数据
 '''
 def insertOneDataIntInstallation(rowData):
+    print(rowData)
     sql = "insert into posengin_installation(Unit_ID,official_designation,position_name,location," \
           "is_prepare,now_situation,installation_time,plan_time,count,prepare_situation,run_situation,notes) " \
-          "values('%s','%s','%s','%s',%d,'%s',%s,%s,%s,'%s','%s','%s')"%(rowData[0],rowData[1],rowData[2],rowData[3],rowData[4],
+          "values('%s','%s','%s','%s',%d,'%s','%s','%s',%s,'%s','%s','%s')"%(rowData[0],rowData[1],rowData[2],rowData[3],rowData[4],
                                                           rowData[5],rowData[6],rowData[7],rowData[8],rowData[9],
                                                           rowData[10],rowData[11])
+    print(sql)
     executeCommit(sql)
 '''
     功能：
         根据序号更新安装表数据
 '''
 def updataOneDataIntInstallation(rowData):
-    sql = "update posengin_installation set Unit_ID='%s',official_designation='%s',position_name='%s',location='%s'," \
-          "is_prepare=%d,now_situation='%s',installation_time='%s',plan_time='%s',count=%s,prepare_situation='%s'," \
-          "run_situation='%s',notes='%s' where installaction_Id='%s'"%(rowData[1],rowData[2],rowData[3],rowData[4],
-                                                                       rowData[5],rowData[6],rowData[7],rowData[8],rowData[9],rowData[10],rowData[11],rowData[12],rowData[0])
+    sql = "update posengin_installation set official_designation='%s',position_name='%s',location='%s'," \
+          "is_prepare='%d',now_situation='%s',installation_time='%s',plan_time='%s',count='%s',prepare_situation='%s'," \
+          "run_situation='%s',notes='%s' where installaction_Id='%d'"%(rowData[1],rowData[2],rowData[3],rowData[4],
+                                                                       rowData[5],rowData[6],rowData[7],rowData[8],rowData[9],rowData[10],rowData[11],rowData[0])
     executeCommit(sql)
 
 
@@ -255,7 +258,7 @@ def updataOneDataIntInstallation(rowData):
 '''
 def deleteDataByInstallationId(installationId):
     sql = "delete from posengin_installation where installaction_Id='%s'" % installationId
-    executeCommit(sql)
+    return executeCommit(sql)
 
 
 
@@ -408,9 +411,9 @@ def findChildInUnit(unitId):
 '''
 
 def isLastLevelEquipment(equipmentId):
-    sql = "select Equip_ID from equip where Equip_Type='专用装备'  and length (Input_Type) > 3 and Equip_ID=%s"%equipmentId
+    sql = "select Equip_ID from equip where Input_Type = '逐批录入信息' and Equip_ID=%s or Input_Type = '逐号录入信息' and Equip_ID=%s"%(equipmentId,equipmentId)
     result = executeSql(sql)
-    if result != None:
+    if len(result) != 0:
         return True
     else:
         return False
