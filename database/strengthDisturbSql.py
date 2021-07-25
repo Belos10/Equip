@@ -1528,6 +1528,7 @@ def selectAboutWeaveByEquipShow(UnitList, EquipList, yearList):
                     weave = list(resultInfo)
                     weave[3] = childEquipID[1]
                     resultList.append(weave)
+    print("equip===================", resultList)
     return resultList
 
 def isEquipUper(Equip_ID, Equip_Uper):
@@ -1602,27 +1603,23 @@ def selectUnitIsGroup(Unit_ID):
 # 按单位展开时根据单位列表、装备列表以及年份查询编制表
 def selectAboutWeaveByUnitShow(UnitList, EquipList, yearList):
     resultList = []
-    # 如果只查询某年的
-    # if len(yearList) == 1:
-    # 如果查询全部年的
-
     for Equip_ID in EquipList:
         for Unit_ID in UnitList:
             # 查询当前单位ID的孩子序列
             UnitIDChildList = []
             findChildUnitByWeave(Unit_ID, UnitIDChildList, "")
-            # print("==================", UnitIDChildList)
+            print("u1uu1it==================", UnitIDChildList)
             for childUnitID in UnitIDChildList:
                 sql = "select * from weave where Unit_ID = '" + childUnitID[0] + \
                             "' and Equip_ID = '" + Equip_ID + "' and year = '" + yearList + "'"
-                # print("==================", sql)
+                print("uiunit==================", sql)
                 cur.execute(sql)
                 result = cur.fetchall()
                 for resultInfo in result:
                     weave = list(resultInfo)
                     weave[2] = childUnitID[1]
                     resultList.append(weave)
-    # print("===================",resultList)
+    print("unit===================",resultList)
     return resultList
 
 #实力查询展开到末级
@@ -1697,6 +1694,7 @@ def selectAboutWeaveByLast(UnitList, EquipList, year):
                 info[2] = UnitID[1]
                 resultList.append(info)
                 break
+
     return resultList
 
 # 按单位展开时根据单位列表、装备列表以及年份查询实力表

@@ -639,7 +639,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         currentRow = self.disturbResult.currentRow()
         item = QPushButton(txt)
         self.disturbResult.setCellWidget(currentRow, 5 + self.lenCurrentUnitChilddict, item)
-        updateArmySchedule(self.currentEquipdict[currentRow][0], self.currentYear)
+        updateArmySchedule(self.currentEquipdict[currentRow][0], self.currentYear,txt)
 
     # 进度2 接装条件
     def setCondition(self):

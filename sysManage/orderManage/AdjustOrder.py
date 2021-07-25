@@ -52,7 +52,7 @@ class AdjustOrder(QWidget, widget_adjustOrder):
 
     # 新增年份
     def slotAddNewYear(self):
-        year, ok = QInputDialog.getInt(self, "Get year", "year:", 0, 0, 100000, 1)
+        year, ok = QInputDialog.getInt(self, "新增年份", "year:", 0, 0, 100000, 1)
         if ok:
             haveYear = False
             allyear = selectYearListAboutOrderAdjust()
@@ -468,7 +468,7 @@ class AdjustOrder(QWidget, widget_adjustOrder):
             return
         reply = QMessageBox.question(self, '导出Excel', '是否保存修改并导出Excel？', QMessageBox.Cancel, QMessageBox.Yes)
         if reply == QMessageBox.Cancel:
-            self._initOrderAdjustByUnitListAndEquipList()
+            self._initOrderAdjustByUnitListAndEquipList(self.originalEquipDict, self.originalEquipDictTab)
             return
 
         directoryPath = QFileDialog.getExistingDirectory(self, "请选择导出文件夹", "c:/")
