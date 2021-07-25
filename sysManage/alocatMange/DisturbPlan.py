@@ -52,9 +52,9 @@ class DisturbPlan(QWidget, yearList_Form):
         self.lw_yearChoose.itemClicked.connect(self.initDisturbPlanProof)
         # 点击第一目录结果
         self.tw_first.itemClicked.connect(self.slotDisturbStrengthResult)
-        self.tw_second.itemChanged.connect(self.slotCheckedChange)
         # 点击第二目录结果
         self.tw_second.itemClicked.connect(self.slotDisturbStrengthResult)
+        self.tw_second.itemChanged.connect(self.slotCheckedChange)
         # 新增年份
         self.tb_add.clicked.connect(self.slotAddNewYear)
         # 删除年份
