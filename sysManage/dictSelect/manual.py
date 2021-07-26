@@ -1,8 +1,11 @@
 from PyQt5.QAxContainer import QAxWidget
 from PyQt5.QtCore import QVariant
+from PyQt5.QtGui import QColor
+
 from widgets.dictSelect.widget_manual import widget_manual
-from PyQt5.QtWidgets import QWidget, QFileDialog, QTreeWidgetItem
+from PyQt5.QtWidgets import QWidget, QFileDialog, QTreeWidgetItem, QMessageBox
 from docx import Document
+import os
 
 
 class Manual(QWidget,widget_manual):
@@ -19,7 +22,8 @@ class Manual(QWidget,widget_manual):
     def initWord(self):
         self.headingTxt={}
         self.allTxt= {}
-        self.wordFile = Document('F:/Program/Python/NuclearManageSystem/装备性能手册.docx')
+        path = os.path.abspath('装备性能手册.docx')
+        self.wordFile = Document(path)
         for i,p in enumerate(self.wordFile.paragraphs):
             style_name = p.style.name
 
@@ -55,7 +59,6 @@ class Manual(QWidget,widget_manual):
         #     #     root.append(item)
 
     def initArticle(self):
-        # self.tb_article.setFontPointSize(16)
         for p in self.wordFile.paragraphs:
             style_name = p.style.name
             if style_name.startswith('Title'):
@@ -86,6 +89,31 @@ class Manual(QWidget,widget_manual):
                 self.tb_article.append('<p align="left" style=" margin-top:0px; margin-bottom:0px; margin-left:0px; '
                                        'margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" '
                                        'font-size:12pt;">%s</span></p>'%p.text)
+
+    # def initArticle(self):
+    #     self.axWidget.clear()
+    #     # self.closeWord()
+    #     # self.axWidget = QAxWidget("Word.Application",self.widget)
+    #     if not self.axWidget.setControl('Word.Application'):
+    #         return QMessageBox.critical(self, '错误', '没有安装%s' %'Word.Application')
+    #     self.horizontalLayout.addWidget(self.axWidget)
+    #     self.axWidget.dynamicCall('SetVisible (bool Visible)', 'false')
+    #     self.axWidget.setProperty("DisplayAlerts", False)
+    #     rect = self.widget.geometry()
+    #     self.axWidget.setGeometry(rect)
+    #     path1 = os.path.abspath('装备性能手册.docx')
+    #     self.axWidget.setControl(path1)
+    #     self.axWidget.show()
+    #
+    # def closeEvent(self, event):
+    #     self.axWidget.close()
+    #     self.axWidget.clear()
+    #     self.layout().removeWidget(self.axWidget)
+    #     del self.axWidget
+    #     super(Manual, self).closeEvent(event)
+
+
+
 
 
 

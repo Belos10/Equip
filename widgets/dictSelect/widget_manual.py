@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class widget_manual(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(907, 655)
+        Form.resize(1197, 748)
         self.horizontalLayout = QtWidgets.QHBoxLayout(Form)
         self.horizontalLayout.setContentsMargins(5, 5, 5, 5)
         self.horizontalLayout.setSpacing(5)
@@ -25,7 +25,7 @@ class widget_manual(object):
         self.tb_article = QtWidgets.QTextBrowser(Form)
         self.tb_article.setObjectName("tb_article")
         self.horizontalLayout.addWidget(self.tb_article)
-        self.horizontalLayout.setStretch(0, 2)
+        self.horizontalLayout.setStretch(0, 1)
         self.horizontalLayout.setStretch(1, 7)
 
         self.retranslateUi(Form)
