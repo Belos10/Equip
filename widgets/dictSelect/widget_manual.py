@@ -16,8 +16,6 @@ class widget_manual(object):
         Form.setObjectName("Form")
         Form.resize(1197, 748)
         self.horizontalLayout = QtWidgets.QHBoxLayout(Form)
-        self.horizontalLayout.setContentsMargins(5, 5, 5, 5)
-        self.horizontalLayout.setSpacing(5)
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.tw_catalog = QtWidgets.QTreeWidget(Form)
         self.tw_catalog.setObjectName("tw_catalog")
