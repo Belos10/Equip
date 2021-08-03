@@ -23,7 +23,7 @@ class widget_manual(object):
         self.tb_article = QtWidgets.QTextBrowser(Form)
         self.tb_article.setObjectName("tb_article")
         self.horizontalLayout.addWidget(self.tb_article)
-        self.horizontalLayout.setStretch(0, 1)
+        self.horizontalLayout.setStretch(0, 2)
         self.horizontalLayout.setStretch(1, 7)
 
         self.retranslateUi(Form)
