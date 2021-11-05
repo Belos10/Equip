@@ -135,7 +135,7 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
                 self.inputUnitInfoList = []
                 self.showInputResult.setWindowTitle("导入Excel数据到数据库Unit表中")
                 self.showInputResult.show()
-                title = ['单位编号', '单位名称', '上级单位编号', '单位别名', '是否为旅团']
+                title = ['单位编号', '单位名称', '上级单位编号', '单位代号', '是否为旅团']
 
                 self.showInputResult.tw_result.setColumnCount(self.workSheet.ncols)
                 self.showInputResult.tw_result.setHorizontalHeaderLabels(title)
@@ -224,7 +224,7 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
                     workSheet.write(0, 0, '单位编号', titileStyle)
                     workSheet.write(0, 1, '单位名称', titileStyle)
                     workSheet.write(0, 2, '上级单位编号', titileStyle)
-                    workSheet.write(0, 3, '单位别名', titileStyle)
+                    workSheet.write(0, 3, '单位代号', titileStyle)
                     for i,item in enumerate(self.resultList):
                         workSheet.write(i + 1,0,item[0],contentStyle)
                         workSheet.write(i + 1, 1, item[1],contentStyle)
@@ -326,7 +326,7 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
     def slotSetUnitAlias(self):
         if self.tb_result.currentRow() == -1:
             return
-        text, okPressed = QInputDialog.getText(self, "设置别名", "该单位别名为:", QLineEdit.Normal, "")
+        text, okPressed = QInputDialog.getText(self, "设置别名", "该单位代号为:", QLineEdit.Normal, "")
         if okPressed:
             print(text)
             updateUnitAlias(text, self.le_unitID.text())
@@ -403,7 +403,7 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
                 #从数据库中单位表中获取数据初始化单位目录，tableWidget显示所有的单位表
                 self._initUnitTableWidget()
             else:
-                header = ['单位编号', '单位名称', '上级单位编号', '单位别名']
+                header = ['单位编号', '单位名称', '上级单位编号', '单位代号']
                 self.tb_result.setColumnCount(len(header))
                 self.tb_result.setRowCount(0)
                 self.tb_result.setHorizontalHeaderLabels(header)
@@ -491,7 +491,7 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
             设置单元时的初始化tableWidget，显示整个单位表
     '''
     def _initUnitTableWidget(self):
-        header = ['单位编号', '单位名称', '上级单位编号','单位别名']
+        header = ['单位编号', '单位名称', '上级单位编号','单位代号']
         self.tb_result.setColumnCount(len(header))
         self.tb_result.setHorizontalHeaderLabels(header)
         self.resultList = []

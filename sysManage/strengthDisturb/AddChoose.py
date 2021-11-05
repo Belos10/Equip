@@ -29,7 +29,7 @@ class AddChoose(QDialog, Widget_AddUnitChoose):
 
     # 获取装备列表
     def initUnitList(self):
-        header = ['单位编号', '单位名称', '上级单位编号', '单位别名']
+        header = ['单位编号', '单位名称', '上级单位编号', '单位代号']
         self.tb_unitChoose.setColumnCount(len(header))
         self.tb_unitChoose.setRowCount(len(self.unitAllList))
         self.tb_unitChoose.setHorizontalHeaderLabels(header)
