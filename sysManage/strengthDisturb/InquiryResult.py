@@ -7,6 +7,7 @@ from widgets.strengthDisturb.inquiry_result import Widget_Inquiry_Result
 from database.strengthDisturbSql import *
 from sysManage.strengthDisturb.chooseFactoryYear import chooseFactoryYear
 from sysManage.strengthDisturb.InputStrength import InputStrength
+from sysManage.strengthDisturb.FilterTitle import FilterTitle
 from PyQt5.Qt import Qt
 
 regx = QRegExp("[0-9]*")
@@ -26,7 +27,9 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         self.equipList = []
         self.year = None
         self.resultList = []
+        self.titleList = []
         self.chooseFactoryYear = chooseFactoryYear(self)
+        self.filterTitle = FilterTitle()
         self.chooseFactoryYear.hide()
         self.currentFactoryYear = ''
         self.inputStrength = InputStrength()
@@ -40,11 +43,12 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         self.tw_inquiryResult.setHorizontalHeaderLabels(headerlist)
         self.tw_inquiryResult.setColumnCount(len(headerlist))
         self.tw_inquiryResult.setSelectionBehavior(QAbstractItemView.SelectRows)
+
+
     '''
         信号和槽连接
     '''
     def signalConnect(self):
-
         #当点击按装备展开时
         self.rb_equipShow.clicked.connect(self.slotClickedRB)
 
@@ -57,6 +61,9 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         #当只列存在偏差被点击时
         self.cb_showDistence.clicked.connect(self.slotClickedRB)
 
+        #当不显示0值被点击时
+        self.cb_showValue0.clicked.connect(self.slotClickedRB)
+
         #删除当前装备
         self.pb_clearCheck.clicked.connect(self.slotClearCurrentRow)
 
@@ -66,12 +73,18 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         #选择展示的出厂年份
         self.pb_factoryYear.clicked.connect(self.slotChooseFactoryYear)
 
+        #筛选表头
+        self.pb_filterTitle.clicked.connect(self.slotShowFilterTitle)
+
         self.pb_updateStrength.clicked.connect(self.slotUpdateStrength)
         self.inputStrength.pb_yes.clicked.connect(self.slotItemChange)
 
         self.chooseFactoryYear.tb_cancel.clicked.connect(self.slotCancelChooseFactoryYear)
 
         self.chooseFactoryYear.tb_yes.clicked.connect(self.slotChangeSeeMethod)
+
+        self.filterTitle.signal.connect(self.slotFilterTitle)
+        self.filterTitle.pb_Cancel.clicked.connect(self.slotFilterTitleHide)
         #导出数据至Excel
         self.pb_outputToExcel.clicked.connect(self.slotOutputToExcel)
 
@@ -93,20 +106,37 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                 self.lb_factoryYear.setText("当前查询出厂年份为：" + self.startFactoryYear + "年 至 " + self.endFactoryYear + "年")
                 self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
                 self.chooseFactoryYear.hide()
+
+
     '''
         信号和槽连接断开
     '''
     def slotDisconnect(self):
         pass
 
-    '''
-       清除当前结果页面所有的实力数
-    '''
 
     def slotChooseFactoryYear(self):
         self.chooseFactoryYear.initComBoxAboutYear()
         self.chooseFactoryYear.show()
 
+    # 筛选表头
+    def slotShowFilterTitle(self):
+        self.filterTitle.show()
+
+    def slotFilterTitle(self):
+        self.titleList = self.filterTitle.result
+        if len(self.unitList) < 1 or len(self.equipList) < 1:
+            self.tw_inquiryResult.setHorizontalHeaderLabels(self.titleList)
+            self.tw_inquiryResult.setColumnCount(len(self.titleList))
+        self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
+        # self.filterTitle.hide()
+
+    def slotFilterTitleHide(self):
+        self.filterTitle.hide()
+
+    '''
+        清除当前结果页面所有的实力数
+    '''
     def slotClearCurrentPage(self):
         if self.currentFactoryYear != "":
             reply = QMessageBox.question(self, '清除', '清除失败,请将出厂年份设置为全部', QMessageBox.Yes)
@@ -132,6 +162,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                 updateStrengthAboutStrengrh(Unit_ID, Equip_ID, year, "0", orginNum)
                 self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
 
+
     def changeCurrentFactoryYear(self):
         self.currentFactoryYear = self.chooseFactoryYear.cb_factoryYear.currentText()
 
@@ -147,6 +178,8 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
 
     def slotCancelChooseFactoryYear(self):
         self.chooseFactoryYear.hide()
+
+
     '''
         清除当前行的实力数
     '''
@@ -173,6 +206,8 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                         reply = QMessageBox.question(self, '清除', '是否清除当前行的实力数？', QMessageBox.Yes, QMessageBox.Cancel)
                         updateStrengthAboutStrengrh(Unit_ID, Equip_ID, year, "0", orginNum)
                         self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
+
+
     '''
         功能：
             当前表格中某个值被修改
@@ -251,6 +286,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                                 #     self.tw_inquiryResult.item(currentRow, currentColumn).setText(str(resultInfo[4]))
                                 #     return
 
+
     def slotUpdateStrength(self):
         self.inputStrength.le_inputText.setText('')
         self.inputStrength.show()
@@ -270,21 +306,28 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         self.equipList = EquipList
         self.year = year
         self.resultList = []
-        headerlist = ['单位名称', '装备名称', '实力数', '编制数', '现有数', '偏差', '准备退役数', '未到位数', '提前退役', '待核查无实物', '待核查无实力', '单独建账',
+        flagValue0 = False
+        if self.cb_showValue0.isChecked():
+            flagValue0 = True
+        if self.titleList:
+            headerlist = self.titleList
+        else:
+            headerlist = ['单位名称', '装备名称', '实力数', '编制数', '现有数', '偏差', '准备退役数', '未到位数', '提前退役', '待核查无实物', '待核查无实力', '单独建账',
                       '正常到位']
+        print("headerlist=",headerlist)
         self.tw_inquiryResult.setHorizontalHeaderLabels(headerlist)
         self.tw_inquiryResult.setColumnCount(len(headerlist))
         if self.rb_equipShow.isChecked():
             #按装备展开
-            self.resultList= selectAboutStrengthByEquipShow(UnitList, EquipList, year, self.currentFactoryYear, self.startFactoryYear, self.endFactoryYear)
+            self.resultList= selectAboutStrengthByEquipShow(UnitList, EquipList, year, self.currentFactoryYear, self.startFactoryYear, self.endFactoryYear,flagValue0)
         elif self.rb_unitShow.isChecked():
             #按单位展开
-            self.resultList = selectAboutStrengthByUnitShow(UnitList, EquipList, year, self.currentFactoryYear, self.startFactoryYear, self.endFactoryYear)
+            self.resultList = selectAboutStrengthByUnitShow(UnitList, EquipList, year, self.currentFactoryYear, self.startFactoryYear, self.endFactoryYear,flagValue0)
         else:
-            self.resultList = selectAboutStrengthByUnitListAndEquipList(UnitList, EquipList, year, self.currentFactoryYear, self.startFactoryYear, self.endFactoryYear)
+            self.resultList = selectAboutStrengthByUnitListAndEquipList(UnitList, EquipList, year, self.currentFactoryYear, self.startFactoryYear, self.endFactoryYear,flagValue0)
 
         if self.cb_showLast.isChecked():
-            self.resultList = selectAboutStrengthByLast(UnitList, EquipList, year, self.currentFactoryYear, self.startFactoryYear, self.endFactoryYear)
+            self.resultList = selectAboutStrengthByLast(UnitList, EquipList, year, self.currentFactoryYear, self.startFactoryYear, self.endFactoryYear,flagValue0)
             self.rb_unitShow.setCheckable(False)
             self.rb_equipShow.setCheckable(False)
             self.rb_equipShow.setDisabled(True)
@@ -303,11 +346,17 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                 if int(LineInfo[7]) != 0:
                     item = QTableWidgetItem(LineInfo[3])
                     item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-                    self.tw_inquiryResult.setItem(i, 0, item)
+                    try:
+                        self.tw_inquiryResult.setItem(i, headerlist.index('单位名称'), item)
+                    except ValueError:
+                        pass
 
                     item = QTableWidgetItem(LineInfo[2])
                     item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-                    self.tw_inquiryResult.setItem(i, 1, item)
+                    try:
+                        self.tw_inquiryResult.setItem(i, headerlist.index('装备名称'), item)
+                    except ValueError:
+                        pass
 
                     # item = QLineEdit()
                     # item.setText(str(LineInfo[4]))
@@ -317,41 +366,82 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                     # item.setValidator(validator)
                     # self.tw_inquiryResult.setCellWidget(i, 2, item)
                     item = QTableWidgetItem(str(LineInfo[4]))
-
                     item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-                    self.tw_inquiryResult.setItem(i, 2, item)
-
+                    try:
+                        self.tw_inquiryResult.setItem(i, headerlist.index('实力数'), item)
+                    except ValueError:
+                        pass
 
                     item = QTableWidgetItem(str(LineInfo[5]))
                     item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-                    self.tw_inquiryResult.setItem(i, 3, item)
+                    # self.tw_inquiryResult.setItem(i, 3, item)
+                    try:
+                        self.tw_inquiryResult.setItem(i, headerlist.index('编制数'), item)
+                    except ValueError:
+                        pass
                     item = QTableWidgetItem(str(LineInfo[6]))
                     item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-                    self.tw_inquiryResult.setItem(i, 4, item)
+                    # self.tw_inquiryResult.setItem(i, 4, item)
+                    try:
+                        self.tw_inquiryResult.setItem(i, headerlist.index('现有数'), item)
+                    except ValueError:
+                        pass
                     item = QTableWidgetItem(str(LineInfo[7]))
                     item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-                    self.tw_inquiryResult.setItem(i, 5, item)
+                    # self.tw_inquiryResult.setItem(i, 5, item)
+                    try:
+                        self.tw_inquiryResult.setItem(i, headerlist.index('偏差'), item)
+                    except ValueError:
+                        pass
                     item = QTableWidgetItem(str(LineInfo[8]))
                     item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-                    self.tw_inquiryResult.setItem(i, 6, item)
+                    # self.tw_inquiryResult.setItem(i, 6, item)
+                    try:
+                        self.tw_inquiryResult.setItem(i, headerlist.index('准备退役数'), item)
+                    except ValueError:
+                        pass
                     item = QTableWidgetItem(str(LineInfo[9]))
                     item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-                    self.tw_inquiryResult.setItem(i, 7, item)
+                    # self.tw_inquiryResult.setItem(i, 7, item)
+                    try:
+                        self.tw_inquiryResult.setItem(i, headerlist.index('未到位数'), item)
+                    except ValueError:
+                        pass
                     item = QTableWidgetItem(str(LineInfo[10]))
                     item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-                    self.tw_inquiryResult.setItem(i, 8, item)
+                    # self.tw_inquiryResult.setItem(i, 8, item)
+                    try:
+                        self.tw_inquiryResult.setItem(i, headerlist.index('提前退役'), item)
+                    except ValueError:
+                        pass
                     item = QTableWidgetItem(str(LineInfo[11]))
                     item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-                    self.tw_inquiryResult.setItem(i, 9, item)
+                    # self.tw_inquiryResult.setItem(i, 9, item)
+                    try:
+                        self.tw_inquiryResult.setItem(i, headerlist.index('待核查无实物'), item)
+                    except ValueError:
+                        pass
                     item = QTableWidgetItem(str(LineInfo[12]))
                     item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-                    self.tw_inquiryResult.setItem(i, 10, item)
+                    # self.tw_inquiryResult.setItem(i, 10, item)
+                    try:
+                        self.tw_inquiryResult.setItem(i, headerlist.index('待核查无实力'), item)
+                    except ValueError:
+                        pass
                     item = QTableWidgetItem(str(LineInfo[13]))
                     item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-                    self.tw_inquiryResult.setItem(i, 11, item)
+                    # self.tw_inquiryResult.setItem(i, 11, item)
+                    try:
+                        self.tw_inquiryResult.setItem(i, headerlist.index('单独建账'), item)
+                    except ValueError:
+                        pass
                     item = QTableWidgetItem(str(LineInfo[14]))
                     item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-                    self.tw_inquiryResult.setItem(i, 12, item)
+                    # self.tw_inquiryResult.setItem(i, 12, item)
+                    try:
+                        self.tw_inquiryResult.setItem(i, headerlist.index('正常到位'), item)
+                    except ValueError:
+                        pass
 
                     self.currentInquiryResult[i] = LineInfo
                     i = i + 1
@@ -360,44 +450,95 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
             else:
                 item = QTableWidgetItem(LineInfo[3])
                 item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-                self.tw_inquiryResult.setItem(i, 0, item)
+                # self.tw_inquiryResult.setItem(i, 0, item)
+                try:
+                    self.tw_inquiryResult.setItem(i, headerlist.index('单位名称'), item)
+                except ValueError:
+                    pass
                 item = QTableWidgetItem(LineInfo[2])
                 item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-                self.tw_inquiryResult.setItem(i, 1, item)
+                # self.tw_inquiryResult.setItem(i, 1, item)
+                try:
+                    self.tw_inquiryResult.setItem(i, headerlist.index('装备名称'), item)
+                except ValueError:
+                    pass
                 item = QTableWidgetItem(str(LineInfo[4]))
                 item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-                self.tw_inquiryResult.setItem(i, 2, item)
-
+                # self.tw_inquiryResult.setItem(i, 2, item)
+                try:
+                    self.tw_inquiryResult.setItem(i, headerlist.index('实力数'), item)
+                except ValueError:
+                    pass
                 item = QTableWidgetItem(str(LineInfo[5]))
                 item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-                self.tw_inquiryResult.setItem(i, 3, item)
+                # self.tw_inquiryResult.setItem(i, 3, item)
+                try:
+                    self.tw_inquiryResult.setItem(i, headerlist.index('编制数'), item)
+                except ValueError:
+                    pass
                 item = QTableWidgetItem(str(LineInfo[6]))
                 item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-                self.tw_inquiryResult.setItem(i, 4, item)
+                # self.tw_inquiryResult.setItem(i, 4, item)
+                try:
+                    self.tw_inquiryResult.setItem(i, headerlist.index('现有数'), item)
+                except ValueError:
+                    pass
                 item = QTableWidgetItem(str(LineInfo[7]))
                 item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-                self.tw_inquiryResult.setItem(i, 5, item)
+                # self.tw_inquiryResult.setItem(i, 5, item)
+                try:
+                    self.tw_inquiryResult.setItem(i, headerlist.index('偏差'), item)
+                except ValueError:
+                    pass
                 item = QTableWidgetItem(str(LineInfo[8]))
                 item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-                self.tw_inquiryResult.setItem(i, 6, item)
+                # self.tw_inquiryResult.setItem(i, 6, item)
+                try:
+                    self.tw_inquiryResult.setItem(i, headerlist.index('准备退役数'), item)
+                except ValueError:
+                    pass
                 item = QTableWidgetItem(str(LineInfo[9]))
                 item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-                self.tw_inquiryResult.setItem(i, 7, item)
+                # self.tw_inquiryResult.setItem(i, 7, item)
+                try:
+                    self.tw_inquiryResult.setItem(i, headerlist.index('未到位数'), item)
+                except ValueError:
+                    pass
                 item = QTableWidgetItem(str(LineInfo[10]))
                 item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-                self.tw_inquiryResult.setItem(i, 8, item)
+                # self.tw_inquiryResult.setItem(i, 8, item)
+                try:
+                    self.tw_inquiryResult.setItem(i, headerlist.index('提前退役'), item)
+                except ValueError:
+                    pass
                 item = QTableWidgetItem(str(LineInfo[11]))
                 item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-                self.tw_inquiryResult.setItem(i, 9, item)
+                # self.tw_inquiryResult.setItem(i, 9, item)
+                try:
+                    self.tw_inquiryResult.setItem(i, headerlist.index('待核查无实物'), item)
+                except ValueError:
+                    pass
                 item = QTableWidgetItem(str(LineInfo[12]))
                 item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-                self.tw_inquiryResult.setItem(i, 10, item)
+                # self.tw_inquiryResult.setItem(i, 10, item)
+                try:
+                    self.tw_inquiryResult.setItem(i, headerlist.index('待核查无实力'), item)
+                except ValueError:
+                    pass
                 item = QTableWidgetItem(str(LineInfo[13]))
                 item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-                self.tw_inquiryResult.setItem(i, 11, item)
+                # self.tw_inquiryResult.setItem(i, 11, item)
+                try:
+                    self.tw_inquiryResult.setItem(i, headerlist.index('单独建账'), item)
+                except ValueError:
+                    pass
                 item = QTableWidgetItem(str(LineInfo[14]))
                 item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-                self.tw_inquiryResult.setItem(i, 12, item)
+                # self.tw_inquiryResult.setItem(i, 12, item)
+                try:
+                    self.tw_inquiryResult.setItem(i, headerlist.index('正常到位'), item)
+                except ValueError:
+                    pass
 
                 self.currentInquiryResult[i] = LineInfo
                 i = i + 1

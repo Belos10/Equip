@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1146</width>
-    <height>829</height>
+    <width>954</width>
+    <height>769</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,100 +16,121 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QWidget" name="widget" native="true">
-     <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
-       <widget class="QRadioButton" name="rb_equipShow">
-        <property name="text">
-         <string>按装备展开显示</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="rb_unitShow">
-        <property name="text">
-         <string>按单位展开显示</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="cb_showLast">
-        <property name="text">
-         <string>展开到末级</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="cb_showDistence">
-        <property name="text">
-         <string>只列存在偏差</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="cb_showValue0">
-        <property name="text">
-         <string>不显示0值</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="pushButton">
-        <property name="text">
-         <string>表头筛选</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>12</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
         <item>
-         <widget class="QLabel" name="lb_factoryYear">
+         <widget class="QRadioButton" name="rb_equipShow">
           <property name="text">
-           <string>当前显示的出厂年份：全部</string>
+           <string>按装备展开显示</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pb_factoryYear">
+         <widget class="QRadioButton" name="rb_unitShow">
           <property name="text">
-           <string>选择显示出厂年份</string>
+           <string>按单位展开显示</string>
           </property>
          </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="cb_showLast">
+          <property name="text">
+           <string>展开到末级</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="cb_showDistence">
+          <property name="text">
+           <string>只列存在偏差</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="cb_showValue0">
+          <property name="text">
+           <string>不显示0值</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_6">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QLabel" name="lb_factoryYear">
+            <property name="text">
+             <string>当前显示的出厂年份：全部</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pb_factoryYear">
+            <property name="text">
+             <string>选择显示出厂年份</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </item>
       <item>
-       <widget class="QPushButton" name="pb_clearCheck">
-        <property name="text">
-         <string>清除选中装备</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="pb_clearAll">
-        <property name="text">
-         <string>清除全部装备</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="pb_updateStrength">
-        <property name="text">
-         <string>编辑实力数</string>
-        </property>
-       </widget>
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <item>
+         <widget class="QPushButton" name="pb_clearCheck">
+          <property name="text">
+           <string>清除选中装备</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pb_clearAll">
+          <property name="text">
+           <string>清除全部装备</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pb_updateStrength">
+          <property name="text">
+           <string>编辑实力数</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pb_filterTitle">
+          <property name="text">
+           <string>表头筛选</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>
