@@ -3,19 +3,21 @@ from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, \
     QAbstractItemView, QMessageBox,QInputDialog,QLineEdit,QFileDialog,QHeaderView
 from database.strengthDisturbSql import *
 from widgets.strengthDisturb.select_set import Widget_Select_Set
-from sysManage.strengthDisturb.equipUnitSet import equipUnitSet
 from sysManage.showInputResult import showInputResult
 from PyQt5.Qt import Qt
 import xlrd
 from sysManage.userInfo import get_value
-#new
+
+'''
+    装备/单位目录设置
+'''
 class strengthSelectSet(QWidget, Widget_Select_Set):
     def __init__(self, parent=None):
         super(strengthSelectSet, self).__init__(parent)
         self.setupUi(self)
 
-        self.tw_first.clear()           #删除单位目录所有数据显示
-        self.tw_second.clear()          #删除装备目录所有数据显示
+        self.tw_first.clear()           # 删除单位目录所有数据显示
+        self.tw_second.clear()          # 删除装备目录所有数据显示
         self.tw_first.header().setVisible(False)  # 不显示树窗口的title
         self.tw_second.header().setVisible(False)  # 不显示树窗口的title
         self.changeUnit = True  # 是否是修改单元的目录
