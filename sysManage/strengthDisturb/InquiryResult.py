@@ -1,4 +1,5 @@
 import sys
+from PyQt5.QtGui import QColor, QBrush
 from PyQt5.QtWidgets import QApplication, QWidget, QTextEdit, QTableWidgetItem, QAbstractItemView, QMessageBox, \
     QLineEdit, QHeaderView, QFileDialog
 from PyQt5.Qt import QRegExp, QRegExpValidator,QKeyEvent
@@ -6,7 +7,6 @@ from database.SD_EquipmentBanlanceSql import updateOneEquipmentBalanceData
 from widgets.strengthDisturb.inquiry_result import Widget_Inquiry_Result
 from database.strengthDisturbSql import *
 from sysManage.strengthDisturb.chooseFactoryYear import chooseFactoryYear
-from sysManage.strengthDisturb.InputStrength import InputStrength
 from sysManage.strengthDisturb.FilterTitle import FilterTitle
 from PyQt5.Qt import Qt
 
@@ -32,7 +32,6 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         self.filterTitle = FilterTitle()
         self.chooseFactoryYear.hide()
         self.currentFactoryYear = ''
-        self.inputStrength = InputStrength()
         self.NewStrength = None
         #信号和槽连接
         self.signalConnect()
@@ -77,7 +76,9 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         self.pb_filterTitle.clicked.connect(self.slotShowFilterTitle)
 
         self.pb_updateStrength.clicked.connect(self.slotUpdateStrength)
-        self.inputStrength.pb_yes.clicked.connect(self.slotItemChange)
+
+        #修改实力数
+        self.tw_inquiryResult.itemChanged.connect(self.slotItemChange)
 
         self.chooseFactoryYear.tb_cancel.clicked.connect(self.slotCancelChooseFactoryYear)
 
@@ -213,71 +214,39 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
             当前表格中某个值被修改
     '''
     def slotItemChange(self):
-        self.NewStrength = self.inputStrength.NewStrength
         currentRow = self.tw_inquiryResult.currentRow()
-        # currentColumn = self.tw_inquiryResult.currentColumn()
         currentColumn = 2
-        if self.NewStrength is not None:
-            if currentRow < 0:
-                reply = QMessageBox.information(self, "修改", "请选中某行", QMessageBox.Yes)
-                return
-            if currentColumn > 0:
+        # if currentRow < 0:
+        #     reply = QMessageBox.information(self, "修改", "请选中某行", QMessageBox.Yes)
+        #     return
+        if currentColumn > 0:
+            try:
                 for i, resultInfo in self.currentInquiryResult.items():
                     if i == currentRow:
                         Unit_ID = resultInfo[1]
                         Equip_ID = resultInfo[0]
-                        unitHaveChild = selectUnitIsHaveChild(Unit_ID)
-                        equipHaveChild = selectEquipIsHaveChild(Equip_ID)
-                        # if self.tw_inquiryResult.cellWidget(currentRow, currentColumn).text() == str(resultInfo[4]):
-                        #     return
-                        # if self.currentFactoryYear != "":
-                        #     reply = QMessageBox.question(self, '清除', '清除失败,请将出厂年份设置为全部', QMessageBox.Yes)
-                        #     self.tw_inquiryResult.cellWidget(currentRow, currentColumn).setText(resultInfo[4])
-                        #     return
-                        # if unitHaveChild or equipHaveChild:
-                        #     reply = QMessageBox.question(self, '修改', '只能修改末级实力数，修改失败', QMessageBox.Yes)
-                        #     self.tw_inquiryResult.cellWidget(currentRow, currentColumn).setText(str(resultInfo[4]))
-                        #     return
-                        # elif self.year == '全部':
-                        #     reply = QMessageBox.question(self, '修改', '只能某一年，修改失败', QMessageBox.Yes)
-                        #     self.tw_inquiryResult.cellWidget(currentRow, currentColumn).setText(resultInfo[4])
-                        #     return
-                        # else:
-                        #     if self.tw_inquiryResult.cellWidget(currentRow, currentColumn).text() != resultInfo[4]:
-                        #         try:
-                        #             updateSuccess = updateStrengthAboutStrengrh(Unit_ID, Equip_ID, self.year,
-                        #                                         self.tw_inquiryResult.cellWidget(currentRow,
-                        #                                                                    currentColumn).text(),
-                        #                                         str(resultInfo[4]))
-                        #             if updateSuccess != True:
-                        #                 QMessageBox.information(self, "修改", str(updateSuccess) + "修改失败", QMessageBox.Yes)
-                        #             # QMessageBox.information(self, "修改", "修改成功！", QMessageBox.Yes)
-                        #             # self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
-                        #         except ValueError:
-                        #             reply = QMessageBox.question(self, '修改失败', '只能修改为整数', QMessageBox.Yes)
-                        #             self.tw_inquiryResult.cellWidget(currentRow, currentColumn).setText(str(resultInfo[4]))
-                        #             return
+                        # unitHaveChild = selectUnitIsHaveChild(Unit_ID)
+                        # equipHaveChild = selectEquipIsHaveChild(Equip_ID)
                         if self.NewStrength == str(resultInfo[4]):
                             return
                         if self.currentFactoryYear != "":
                             reply = QMessageBox.question(self, '清除', '清除失败,请将出厂年份设置为全部', QMessageBox.Yes)
                             self.tw_inquiryResult.item(currentRow, currentColumn).setText(resultInfo[4])
                             return
-                        if unitHaveChild or equipHaveChild:
-                            reply = QMessageBox.question(self, '修改', '只能修改末级实力数，修改失败', QMessageBox.Yes)
-                            self.tw_inquiryResult.item(currentRow, currentColumn).setText(str(resultInfo[4]))
-                            return
+                        # if unitHaveChild or equipHaveChild:
+                        #     reply = QMessageBox.question(self, '修改', '只能修改末级实力数，修改失败', QMessageBox.Yes)
+                        #     self.tw_inquiryResult.item(currentRow, currentColumn).setText(str(resultInfo[4]))
+                        #     return
                         elif self.year == '全部':
                             reply = QMessageBox.question(self, '修改', '只能某一年，修改失败', QMessageBox.Yes)
                             self.tw_inquiryResult.item(currentRow, currentColumn).setText(resultInfo[4])
                             return
                         else:
                             if self.tw_inquiryResult.item(currentRow, currentColumn).text() != resultInfo[4]:
-                                # try:
-                                updateSuccess = updateStrengthAboutStrengrh(Unit_ID, Equip_ID, self.year,
-                                                            self.NewStrength,
-                                                            str(resultInfo[4]))
-                                if updateSuccess != True:
+                                num = self.tw_inquiryResult.item(currentRow,currentColumn).text()
+                                updateSuccess = updateStrengthAboutStrengrh\
+                                    (Unit_ID, Equip_ID, self.year,num,str(resultInfo[4]))
+                                if not updateSuccess:
                                     QMessageBox.information(self, "修改", str(updateSuccess) + "修改失败", QMessageBox.Yes)
                                     # QMessageBox.information(self, "修改", "修改成功！", QMessageBox.Yes)
                                 self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
@@ -285,11 +254,9 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                                 #     reply = QMessageBox.question(self, '修改失败', '只能修改为整数', QMessageBox.Yes)
                                 #     self.tw_inquiryResult.item(currentRow, currentColumn).setText(str(resultInfo[4]))
                                 #     return
-
-
-    def slotUpdateStrength(self):
-        self.inputStrength.le_inputText.setText('')
-        self.inputStrength.show()
+            except ValueError:
+                QMessageBox.information(self, "提示", "请输入正确的数字", QMessageBox.Yes)
+                # self.disturbResult.item(self.currentRow, self.currentColumn).setText(0)
 
 
     #当某个单击按钮被选中时
@@ -304,6 +271,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         self.tw_inquiryResult.setRowCount(0)
         self.unitList = UnitList
         self.equipList = EquipList
+        print("self.unitList=",self.unitList,"self.equipList=",self.equipList)
         self.year = year
         self.resultList = []
         flagValue0 = False
@@ -341,6 +309,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         self.tw_inquiryResult.setRowCount(len(self.resultList))
         isMinyear = selectIsMinStrengthYear(year)
         i = 0
+        index1=-1
         for LineInfo in self.resultList:
             if self.cb_showDistence.isChecked():
                 if int(LineInfo[7]) != 0:
@@ -365,12 +334,18 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                     # validator = QRegExpValidator(regx)
                     # item.setValidator(validator)
                     # self.tw_inquiryResult.setCellWidget(i, 2, item)
+
                     item = QTableWidgetItem(str(LineInfo[4]))
                     item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+                    # item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsEditable)
+                    # item.setBackground(QBrush(QColor(154, 200, 226)))
+                    # self.tw_inquiryResult.setItem(i, 2, item)
                     try:
-                        self.tw_inquiryResult.setItem(i, headerlist.index('实力数'), item)
+                        index1 = headerlist.index('实力数')
+                        self.tw_inquiryResult.setItem(i, index1, item)
                     except ValueError:
                         pass
+
 
                     item = QTableWidgetItem(str(LineInfo[5]))
                     item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
@@ -464,9 +439,12 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                     pass
                 item = QTableWidgetItem(str(LineInfo[4]))
                 item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+                # item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsEditable)
+                # item.setBackground(QBrush(QColor(154, 200, 226)))
                 # self.tw_inquiryResult.setItem(i, 2, item)
                 try:
-                    self.tw_inquiryResult.setItem(i, headerlist.index('实力数'), item)
+                    index1 = headerlist.index('实力数')
+                    self.tw_inquiryResult.setItem(i, index1, item)
                 except ValueError:
                     pass
                 item = QTableWidgetItem(str(LineInfo[5]))
@@ -543,6 +521,27 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                 self.currentInquiryResult[i] = LineInfo
                 i = i + 1
         self.tw_inquiryResult.setRowCount(i)
+        if self.equipList and self.unitList:
+            self.ifEquipAndUnitHaveNoChild(index1)
+
+    def ifEquipAndUnitHaveNoChild(self, index):
+        if index == -1:
+            return
+        row1=0
+        for i in self.unitList:
+            if selectUnitIsHaveChild(i):
+                row1+=len(self.equipList)
+                continue
+            for j in self.equipList:
+                if selectEquipIsHaveChild(j):
+                    row1+=1
+                else:
+                    item = self.tw_inquiryResult.item(row1, index)
+                    item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable)
+                    item.setBackground(QBrush(QColor(154, 200, 226)))
+                    row1+=1
+
+
 
 
     #导出至Excel
