@@ -9,7 +9,7 @@ from database.OrderManageSql import *
 from sysManage.alocatMange.ArmySchedule import ArmySchedule
 from sysManage.orderManage.selectCont import SelectCont
 from sysManage.alocatMange.armyTransfer import armyTransfer
-from sysManage.alocatMange.ScheduleFinish import ScheduleFisish
+from sysManage.alocatMange.ScheduleFinish import ScheduleFinish
 from sysManage.alocatMange.transferModel import transferModel
 from sysManage.orderManage.selectQua import SelectQua
 from sysManage.userInfo import get_value
@@ -26,7 +26,7 @@ class OrderAllotSchedule(QWidget, widget_OrderAllotSchedule):
         self.unitDisturbPlanList = {}
         self.currentEquipdict = {}
         self.contractSchedule = SelectCont(self)
-        self.scheduleFinish = ScheduleFisish(self)
+        self.scheduleFinish = ScheduleFinish(self)
         self.fileName = ""
         self.unitFlag = 0
         self.rocketSchedule = transferModel(self)

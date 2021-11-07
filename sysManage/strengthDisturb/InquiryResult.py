@@ -75,8 +75,6 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         #筛选表头
         self.pb_filterTitle.clicked.connect(self.slotShowFilterTitle)
 
-        self.pb_updateStrength.clicked.connect(self.slotUpdateStrength)
-
         #修改实力数
         self.tw_inquiryResult.itemChanged.connect(self.slotItemChange)
 
