@@ -11,6 +11,7 @@ from sysManage.alocatMange.ArmySchedule import ArmySchedule
 from sysManage.alocatMange.armyTransfer import armyTransfer
 from sysManage.alocatMange.ScheduleFinish import ScheduleFinish
 from sysManage.alocatMange.transferModel import transferModel
+from sysManage.orderManage.OrderScheduleFinish import OrderScheduleFinish
 from sysManage.userInfo import get_value
 
 '''
@@ -28,7 +29,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         self.unitDisturbPlanList = {}
         self.currentEquipdict = {}
         self.armySchedule = ArmySchedule(self)
-        self.scheduleFinish = ScheduleFinish(self)
+        self.scheduleFinish = ScheduleFinish()
         self.fileName = ""
         self.unitFlag = 0
         self.rocketSchedule = transferModel(self)
@@ -764,11 +765,11 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         if self.disturbResult.cellWidget(currentRow, currentColumn - 1).text() != "已完成":
             QMessageBox.information(self, "设置接装条件", "上一级未完成", QMessageBox.Yes)
             return
-        self.scheduleFinish.setWindowFlags(Qt.Dialog|Qt.WindowCloseButtonHint)
+        # self.scheduleFinish.setWindowFlags(Qt.Dialog|Qt.WindowCloseButtonHint)
         self.scheduleFinish.fileName = ""
-        self.scheduleFinish.initDict(self.currentUnitChilddict, self.currentEquipdict[currentRow][0])
-        self.scheduleFinish.initUnitFinish()
-        # self.setupUi(self.scheduleFinish)
+        # self.scheduleFinish.initDict(self.currentUnitChilddict,
+        #                              self.currentEquipdict[currentRow][0], self.currentYear)
+        # self.scheduleFinish.init1()
         self.scheduleFinish.show()
         self.scheduleFinish.signal.connect(self.updateFinish)
 

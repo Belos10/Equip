@@ -788,3 +788,23 @@ def findRetirePlanUnitChildInfo(unitId):
         return result
     else:
         return []
+
+
+def selectIfUnitScheduleFinish(unitID,equipID,year):
+    # conn, cur = connectMySql()
+    sql = "select Flag_ifFinish from disturbplan where Unit_Id = %s and " \
+          "Equip_Id = %s and Year = %s" %(unitID, equipID, year)
+    cur.execute(sql)
+    result = cur.fetchall()
+    conn.commit()
+    # disconnectMySql(conn, cur)
+    return result
+
+
+def updateUnitScheduleFinish(unitID,equipID,year):
+    # conn, cur = connectMySql()
+    sql = "update disturbplan set Flag_ifFinish = 'TRUE' where Unit_Id = %s " \
+          "and Equip_Id = %s and Year = %s" % (unitID, equipID, year)
+    print(sql)
+    cur.execute(sql)
+    conn.commit()
