@@ -29,7 +29,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         self.unitDisturbPlanList = {}
         self.currentEquipdict = {}
         self.armySchedule = ArmySchedule(self)
-        self.scheduleFinish = ScheduleFinish()
+        self.scheduleFinish = OrderScheduleFinish()
         self.fileName = ""
         self.unitFlag = 0
         self.rocketSchedule = transferModel(self)
