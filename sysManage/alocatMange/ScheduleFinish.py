@@ -179,14 +179,12 @@ class ScheduleFinish(QWidget, widget_ScheduleFinish):
 
 
     def closeEvent(self,event):
-        # self.signal = QtCore.pyqtSignal(str)
         for idx in range(self.layout1.count()):
             flag = False
             if self.layout1.itemAt(idx).widget().isChecked():
                 flag = True
             updateUnitScheduleFinish(self.UnitDict[idx][0], self.equipID, self.year,flag)
             # self.initUnitFinish()
-        print("!1111")
         self.signal.emit('1')
         return
 
