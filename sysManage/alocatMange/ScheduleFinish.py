@@ -16,6 +16,7 @@ class ScheduleFinish(QWidget, widget_ScheduleFinish):
         # self.setWindowTitle('完成接装')
         # self.cwd = os.getcwd() # 获取当前程序文件位置
         # self.resize(300,200)   # 设置窗体大小
+        # self.signal = QtCore.pyqtSignal(str)
         self.fileName = ""
         self.UnitDict = {}
         self.equipID = ''
@@ -178,13 +179,14 @@ class ScheduleFinish(QWidget, widget_ScheduleFinish):
 
 
     def closeEvent(self,event):
-        print("执行closeEvent")
+        # self.signal = QtCore.pyqtSignal(str)
         for idx in range(self.layout1.count()):
             flag = False
             if self.layout1.itemAt(idx).widget().isChecked():
                 flag = True
             updateUnitScheduleFinish(self.UnitDict[idx][0], self.equipID, self.year,flag)
             # self.initUnitFinish()
+        print("!1111")
         self.signal.emit('1')
         return
 

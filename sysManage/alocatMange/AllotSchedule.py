@@ -787,8 +787,16 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         currentRow = self.disturbResult.currentRow()
         fileName = self.scheduleFinish.returnFileName()
         print("fileName", fileName)
+        flag1 = True
+        for x in range(0, self.lenCurrentUnitChilddict):
+            flag = selectIfUnitScheduleFinish(self.currentUnitChilddict[x][0],
+                                              self.currentEquipdict[currentRow][0],
+                                              self.currentYear)
+            if flag[0][0] != 'TRUE':
+                flag1 = False
+                break
 
-        if fileName != "":
+        if (fileName != "") & flag1:
             item = QPushButton("已完成")
             if self.unitFlag == 1:
                 self.disturbResult.setCellWidget(currentRow, 8 + self.lenCurrentUnitChilddict, item)
@@ -797,6 +805,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                 self.disturbResult.setCellWidget(currentRow, 7 + self.lenCurrentUnitChilddict, item)
                 updateScheduleFinishBase(self.currentEquipdict[currentRow][0], self.currentYear, fileName)
         self.selectSchedule()
+        self.scheduleFinish.signal.disconnect()
 
     # 筛选调拨进度
     def selectSchedule(self):
