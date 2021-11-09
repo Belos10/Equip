@@ -9,7 +9,7 @@ from sysManage.orderManage.OrderAllotSchedule import OrderAllotSchedule
 from sysManage.orderManage.AdjustOrder import AdjustOrder
 '''
     功能：
-        调配管理主界面
+        订购管理主界面
 '''
 class OrderManage(QMainWindow, widget_orderManage):
     def __init__(self, parent=None):
