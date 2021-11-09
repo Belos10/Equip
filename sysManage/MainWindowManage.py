@@ -1,7 +1,7 @@
 from PyQt5.QtGui import QIcon
 
 from sysManage.contractMangement.contractMangementMain import ContractManagementMain
-from sysManage.serviceSupport.serviceSupportMain import yearServiceSupport
+from sysManage.maintainSupport.maintainSupportManage import MaintainSupportManage
 from widgets.manage_widget import Widget_Manage_Widgets
 from PyQt5.QtWidgets import QMainWindow, QWidget, QApplication, QMessageBox, QDesktopWidget
 from sysManage.strengthDisturb.strengthDisturb import strengthDisturb
@@ -26,7 +26,7 @@ class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
         self.strengthDisturb = strengthDisturb()
         self.alocatMange = alocatMange()
         self.purChasPlan = OrderManage()
-        self.mantanSupport = yearServiceSupport()
+        self.mantanSupport = MaintainSupportManage()
         self.warStorage = QWidget()
         self.contractMange = ContractManagementMain()
         self.dangerGoods = DangerGoods()

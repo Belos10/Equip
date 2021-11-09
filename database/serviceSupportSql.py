@@ -57,9 +57,7 @@ def deleteDataByServiceSupportNum(ServiceSupportNum):
 
 #num,projectName,compute_agent,price,amount,money,agent_allocation,agent_supply,progress_technology_state,progress_contract,progress_pay,project_year,other
 def insertContentOfServiceSupport(data):
-    sql = "insert into serviceSupport(num, projectName, compute_agent, price, amount, money," \
-          "agent_allocation, agent_supply, progress_technology_state, progress_contract, progress_pay, project_year, other)" \
-          "VALUES ('" + data[0] + "', '" + data[1] + "', '" + data[2] + "', '" + data[3] + \
+    sql = "insert into serviceSupport(num, projectName, compute_agent, price, amount, money,agent_allocation, agent_supply, progress_technology_state, progress_contract, progress_pay, project_year, other)VALUES ('" + data[0] + "', '" + data[1] + "', '" + data[2] + "', '" + data[3] + \
           "', '" + data[4] + "', '" + data[5] + "', '" + data[6] + "', '" + data[7] + "', '" \
           + data[8] + "', '" + data[9] + "', '" + data[10] + "', '" + data[11] + "', '" + data[12] + "')"
     # print(sql)

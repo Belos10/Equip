@@ -9,7 +9,7 @@ from widgets.serviceSupport.yearServiceSupport import Widget_ServiceSupport
 from sysManage.userInfo import get_value
 
 '''
-    维修保障
+    维修保障计划
 '''
 class yearServiceSupport(QDialog, Widget_ServiceSupport):
     def __init__(self, parent=None):
