@@ -238,7 +238,7 @@ def insertOneDataIntInstallation(rowData):
                                                           rowData[5],rowData[6],rowData[7],rowData[8],rowData[9],
                                                           rowData[10],rowData[11])
     print(sql)
-    executeCommit(sql)
+    return executeCommit(sql)
 '''
     功能：
         根据序号更新安装表数据
@@ -248,7 +248,8 @@ def updataOneDataIntInstallation(rowData):
           "is_prepare='%d',now_situation='%s',installation_time='%s',plan_time='%s',count='%s',prepare_situation='%s'," \
           "run_situation='%s',notes='%s' where installaction_Id='%d'"%(rowData[1],rowData[2],rowData[3],rowData[4],
                                                                        rowData[5],rowData[6],rowData[7],rowData[8],rowData[9],rowData[10],rowData[11],rowData[0])
-    executeCommit(sql)
+
+    return executeCommit(sql)
 
 
 
@@ -568,6 +569,9 @@ def insertData(equipmentId,unitId,count,status):
     sql = "insert into posengin_statistics(Unit_ID,Equip_ID,count,status) values ('%s','%s','%d','%s')"%(unitId,equipmentId,count,status)
     executeCommit(sql)
     return True
+
+def insertOneDataIntoPositionInstallation(lineInfo):
+    pass
 
 if __name__ == '__main__':
     data = ['3','003','钢铁雄心基地','xxxx',1,'准备到位','2020-06','2020-12',150,'未到位','未运行','无']

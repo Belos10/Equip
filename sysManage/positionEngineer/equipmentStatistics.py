@@ -41,8 +41,12 @@ class EquipmentStatistics(QWidget, PosEngneerStatisticsUI):
         # self.tb_delete.clicked.connect(self.slotDelete)
         self.pb_firstSelect.clicked.connect(self.slotSelectUnit)
         self.pb_secondSelect.clicked.connect(self.slotSelectEquip)
-        self.tb_output.clicked.connect(self.slotInput)
-        self.tb_output.clicked.connect(self.slotOutput)
+        # self.tb_output.clicked.connect(self.slotInput)
+        self.tb_input.setDisabled(True)
+        self.tb_input.setVisible(False)
+        self.tb_output.setDisabled(True)
+        self.tb_output.setVisible(False)
+        # self.tb_output.clicked.connect(self.slotOutput)
         self.pb_outputToExcel.clicked.connect(self.slotOutputToExcel)
         self.tw_result.itemChanged.connect(self.slotAlterAndSava)
         self.tw_second.itemChanged.connect(self.slotCheckedChange)
@@ -710,18 +714,18 @@ class EquipmentStatistics(QWidget, PosEngneerStatisticsUI):
                     for j in range(4, self.tw_result.columnCount()):
                         workSheet.write(4 + i, j, '', contentStyle)
 
-        try:
-            "%s阵地工程X生化防护装备统计表" % self.base['Unit_Name']
-            pathName = "%s/%s阵地工程X生化防护装备统计表.xls" % (
-            directoryPath, self.base['Unit_Name'])
-            workBook.save(pathName)
-            import win32api
-            win32api.ShellExecute(0, 'open', pathName, '', '', 1)
-            QMessageBox.about(self, "导出成功", "导出成功！")
-            return
-        except Exception as e:
-            QMessageBox.about(self, "导出失败", "导出表格被占用，请关闭正在使用的Execl！")
-            return
+            try:
+                "%s阵地工程X生化防护装备统计表" % self.base['Unit_Name']
+                pathName = "%s/%s阵地工程X生化防护装备统计表.xls" % (
+                directoryPath, self.base['Unit_Name'])
+                workBook.save(pathName)
+                import win32api
+                win32api.ShellExecute(0, 'open', pathName, '', '', 1)
+                QMessageBox.about(self, "导出成功", "导出成功！")
+                return
+            except Exception as e:
+                QMessageBox.about(self, "导出失败", "导出表格被占用，请关闭正在使用的Execl！")
+                return
         else:
             QMessageBox.about(self, "选取文件夹失败！", "请选择正确的文件夹！")
 

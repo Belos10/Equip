@@ -194,6 +194,7 @@ class AttachmentDialog(QDialog, AttachmentDialogUI):
             dataEdit = QDateEdit()
             dataEdit.setDisplayFormat("yyyy-MM-dd")
             dataEdit.setDate(QDate(int(parsedDateList[0]), int(parsedDateList[1]), int(parsedDateList[2])))
+            dataEdit.setEnabled(False)
             self.tw_result.setCellWidget(2 + i, 9, dataEdit)
 
             item = QTableWidgetItem(self.resultList[i][11])
@@ -231,6 +232,7 @@ class AttachmentDialog(QDialog, AttachmentDialogUI):
             dataEdit = QDateEdit()
             dataEdit.setDisplayFormat("yyyy-MM-dd")
             dataEdit.setDate(QDate(int(parsedDateList[0]),int(parsedDateList[1]),int(parsedDateList[2])))
+            dataEdit.setEnabled(False)
             self.tw_result.setCellWidget(2 + i, 16, dataEdit)
 
             item = QTableWidgetItem(self.resultList[i][18])

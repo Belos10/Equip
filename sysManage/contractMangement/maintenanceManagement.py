@@ -1,12 +1,15 @@
-from PyQt5.QtCore import Qt, QStringListModel, QDate
+import pickle
+
+from PyQt5.QtCore import Qt, QStringListModel, QDate, QDateTime
 
 from database.contractManagementSql import *
 from sysManage.contractMangement.AttachmentDialog import AttachmentDialog
+from sysManage.showInputResult import showInputResult
 from sysManage.userInfo import get_value
 from widgets.contractMangement.OrderManagementUI import OrderManagementUI
 import sys
 from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QTableWidget, QHeaderView, QTableWidgetItem, QComboBox, \
-    QMessageBox, QFileDialog, QListWidgetItem, QListView, QInputDialog, QPushButton, QDateEdit
+    QMessageBox, QFileDialog, QListWidgetItem, QListView, QInputDialog, QPushButton, QDateEdit, QAbstractItemView
 
 
 class MaintenanceManagement(QWidget, OrderManagementUI):
@@ -17,6 +20,9 @@ class MaintenanceManagement(QWidget, OrderManagementUI):
         self.contractName = ''
         self.contractNo = ''
         self.attachmentDialog = None
+        self.inputList = []
+        self.showInputResult = showInputResult(self)
+        self.showInputResult.hide()
         self.signalConnection()
         self.init()
 
@@ -31,6 +37,10 @@ class MaintenanceManagement(QWidget, OrderManagementUI):
         self.pb_addYear.clicked.connect(self.soltAddContractYear)
         self.tb_outputToExcel.clicked.connect(self.slotOutputToExcel)
         self.tw_result.itemChanged.connect(self.slotAlterAndSava)
+        self.tb_input.clicked.connect(self.slotInputData)
+        self.pb_output.clicked.connect(self.slotOutputData)
+        self.showInputResult.pb_confirm.clicked.connect(self.slotInputIntoDatabase)
+        self.showInputResult.pb_cancel.clicked.connect(self.slotCancelInputIntoDatabase)
 
 
     def initUserInfo(self):
@@ -69,6 +79,8 @@ class MaintenanceManagement(QWidget, OrderManagementUI):
         listModel = QStringListModel()
         listModel.setStringList(self.yearList)
         self.lv_year.setModel(listModel)
+        self.lv_year.setEditTriggers(QAbstractItemView.NoEditTriggers)
+
 
     '''
         新增年份
@@ -144,7 +156,7 @@ class MaintenanceManagement(QWidget, OrderManagementUI):
             self.tw_result.setItem(2, 0, item)
             self.tw_result.setSpan(2, 0, len(dataList),1)
             for i in range(len(dataList)):
-                item = QTableWidgetItem(str(dataList[i][0]))
+                item = QTableWidgetItem(str(i + 1))
                 item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
                 item.setFlags(Qt.ItemIsEnabled)
                 self.tw_result.setItem(2 + i, 1, item)
@@ -183,6 +195,7 @@ class MaintenanceManagement(QWidget, OrderManagementUI):
                 dataEdit = QDateEdit()
                 dataEdit.setDisplayFormat("yyyy-MM-dd")
                 dataEdit.setDate(QDate(int(parsedDateList[0]), int(parsedDateList[1]), int(parsedDateList[2])))
+                dataEdit.setEnabled(False)
                 self.tw_result.setCellWidget(2 + i, 9, dataEdit)
 
                 item = QTableWidgetItem(dataList[i][10])
@@ -355,6 +368,8 @@ class MaintenanceManagement(QWidget, OrderManagementUI):
                 else:
                     break
             else:
+                if i == 1:
+                    continue
                 item = self.tw_result.item(row, i)
                 if (item != None):
                     if (len(item.text()) > 0):
@@ -362,7 +377,7 @@ class MaintenanceManagement(QWidget, OrderManagementUI):
                 else:
                     break
 
-        if len(rowData) == self.tw_result.columnCount() - 1:
+        if len(rowData) == self.tw_result.columnCount() - 2:
             if(insertOneDataInToContractMaintenance(rowData) == True):
                 QMessageBox.warning(self, "注意", "插入成功！", QMessageBox.Yes, QMessageBox.Yes)
             else:
@@ -553,6 +568,133 @@ class MaintenanceManagement(QWidget, OrderManagementUI):
 
         pass
 
+    def slotOutputData(self):
+        if len(self.result) < 1:
+            reply = QMessageBox.warning(self, '警告', '未选中任何数据，无法导出', QMessageBox.Yes)
+            return
+        reply = QMessageBox.question(self, '导出数据包', '是否保存修改并导出数据包？', QMessageBox.Cancel, QMessageBox.Yes)
+        if reply == QMessageBox.Cancel:
+            self.displayData()
+            return
+        directoryPath = QFileDialog.getExistingDirectory(self, "请选择导出文件夹", "c:/")
+        if len(directoryPath) > 0:
+            # 填表数据
+            dataList = []
+            dataList.append("维修合同")
+            for i, item in enumerate(self.result):
+                attachInfo = getAttachmentInformation(item[0], item[1])
+                if len(attachInfo) > 0:
+                    attachInfo = attachInfo[0]
+                else:
+                    attachInfo = []
+                print("attachInfo")
+                print(attachInfo)
+                saveInfo = []
+                for i in range(1,len(item)):
+                    saveInfo.append(item[i])
+                attachUse = []
+                if attachInfo != None and len(attachInfo) > 0:
+                    attach = []
+                    for j in range(1, len(attachInfo)):
+                        attach.append(attachInfo[j])
+                    attachUse.append(attach.copy())
+                saveInfo.append(attachUse.copy())
+                dataList.append(saveInfo.copy())
+            print("维修合同")
+            print(dataList)  #
+            if dataList is None or len(dataList) == 1:
+                return
+            else:
+                date = QDateTime.currentDateTime()
+                installData = date.toString("yyyy年MM月dd日hh时mm分ss秒")  # hh:mm:ss
+                pathName = "%s/%s%s年维修合同.nms" % (
+                    directoryPath, installData, self.selectedYear)
+                with open(pathName, "wb") as file:
+                    pickle.dump(dataList, file)
+                QMessageBox.warning(self, "导出数据成功！", "导出成功！", QMessageBox.Yes)
+            pass
+        else:
+            QMessageBox.warning(self, "导出数据失败！", "请选择正确的文件夹！", QMessageBox.Yes)
+        pass
+
+        # 导入数据包
+
+    def slotInputData(self):
+        self.inputList = []
+        filename, _ = QFileDialog.getOpenFileName(self, "选中文件", '', "Excel Files (*.nms);;Excel Files (*.nms)")
+        if len(filename) < 2:
+            return
+        try:
+            with open(filename, "rb") as file:
+                self.inputList = pickle.load(file)
+                if self.inputList[0] != "维修合同":
+                    raise Exception("数据格式错误！")
+        except Exception as e:
+            print(e)
+            QMessageBox.warning(self, "加载文件失败！", "请检查文件格式及内容格式！", QMessageBox.Yes)
+            return
+        headerlist = ['年度', '合同编号', '合同名称', '甲方', '乙方', '单价（万元）', '数量/单位', '金额（万元）', '交付时间', '备注']
+        self.showInputResult.setWindowTitle("导入数据")
+        self.showInputResult.show()
+        # QTableWidget设置整行选中
+        self.showInputResult.tw_result.setColumnCount(len(headerlist))
+        self.showInputResult.tw_result.setHorizontalHeaderLabels(headerlist)
+        self.showInputResult.tw_result.setRowCount(len(self.inputList) - 1)
+
+        for i, LineInfo in enumerate(self.inputList):
+            if i == 0:
+                continue
+            i = i - 1
+            item = QTableWidgetItem(LineInfo[0])
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.showInputResult.tw_result.setItem(i, 0, item)
+            item = QTableWidgetItem(LineInfo[1])
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.showInputResult.tw_result.setItem(i, 1, item)
+            item = QTableWidgetItem(LineInfo[2])
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.showInputResult.tw_result.setItem(i, 2, item)
+
+            item = QTableWidgetItem(LineInfo[3])
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.showInputResult.tw_result.setItem(i, 3, item)
+            item = QTableWidgetItem(LineInfo[4])
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.showInputResult.tw_result.setItem(i, 4, item)
+            item = QTableWidgetItem(str(LineInfo[5]))
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.showInputResult.tw_result.setItem(i, 5, item)
+            item = QTableWidgetItem(str(LineInfo[6]))
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.showInputResult.tw_result.setItem(i, 6, item)
+            item = QTableWidgetItem(str(LineInfo[7]))
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.showInputResult.tw_result.setItem(i, 7, item)
+            item = QTableWidgetItem(LineInfo[8])
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.showInputResult.tw_result.setItem(i, 8, item)
+            item = QTableWidgetItem(LineInfo[9])
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.showInputResult.tw_result.setItem(i, 9, item)
+
+    def slotCancelInputIntoDatabase(self):
+        self.showInputResult.hide()
+        self.setDisabled(False)
+
+    def slotInputIntoDatabase(self):
+        for i, lineInfo in enumerate(self.inputList):
+            if i == 0:
+                continue
+            try:
+                if inputOneDataIntoContractMaintenance(lineInfo):
+                    pass
+            except Exception as e:
+                print(e)
+                QMessageBox.warning(self, "导入失败", "导入第%d数据失败！" % (i), QMessageBox.Yes)
+
+        self.showInputResult.hide()
+        self.setDisabled(False)
+        self.displayData()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

@@ -127,7 +127,10 @@ class regularManage(QWidget, Widget_Regular_Manage):
         if row != -1:
             fileInfo = self.result[row];
             import win32api
-            win32api.ShellExecute(0, 'open', fileInfo[3], '', '', 1)
+            try:
+                win32api.ShellExecute(0, 'open', fileInfo[3], '', '', 1)
+            except:
+                QMessageBox.information(self, "警告", "找不到指定文件", QMessageBox.Yes)
 
 
 

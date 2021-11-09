@@ -168,18 +168,30 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
             self.tw_result.setItem(starIndex + i, 7, item)
 
             date = typeData[i][9]
-            parsedDateList = date.split('-')
-            dataEdit = QDateEdit()
-            dataEdit.setDisplayFormat("yyyy-MM-dd")
-            dataEdit.setDate(QDate(int(parsedDateList[0]), int(parsedDateList[1]), int(parsedDateList[2])))
-            self.tw_result.setCellWidget(2 + i, 8, dataEdit)
+            item = QTableWidgetItem(date)
+            item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+            item.setFlags(Qt.ItemIsEnabled)
+            self.tw_result.setItem(starIndex + i, 8, item)
+
+
+            # parsedDateList = date.split('-')
+            # dataEdit = QDateEdit()
+            # dataEdit.setDisplayFormat("yyyy-MM-dd")
+            # dataEdit.setDate(QDate(int(parsedDateList[0]), int(parsedDateList[1]), int(parsedDateList[2])))
+            # self.tw_result.setCellWidget(2 + i, 8, dataEdit)
+            # dataEdit.dateChanged.connect(self.slotAlterAndSava)
 
             date = typeData[i][10]
-            parsedDateList = date.split('-')
-            dataEdit = QDateEdit()
-            dataEdit.setDisplayFormat("yyyy-MM-dd")
-            dataEdit.setDate(QDate(int(parsedDateList[0]), int(parsedDateList[1]), int(parsedDateList[2])))
-            self.tw_result.setCellWidget(2 + i, 9, dataEdit)
+            item = QTableWidgetItem(date)
+            item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+            item.setFlags(Qt.ItemIsEnabled)
+            self.tw_result.setItem(starIndex + i, 9, item)
+            # parsedDateList = date.split('-')
+            # dataEdit = QDateEdit()
+            # dataEdit.setDisplayFormat("yyyy-MM-dd")
+            # dataEdit.setDate(QDate(int(parsedDateList[0]), int(parsedDateList[1]), int(parsedDateList[2])))
+            # self.tw_result.setCellWidget(2 + i, 9, dataEdit)
+            # dataEdit.dateChanged.connect(self.slotAlterAndSava)
 
             item = QTableWidgetItem(typeData[i][11])
             item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
@@ -301,6 +313,7 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
         '''
     def slotAlterAndSava(self):
         selectRow = self.tw_result.selectedItems()
+        print('selectRow',selectRow)
         if len(selectRow) == 0:
             return
         else:
@@ -348,23 +361,17 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
         rowData = []
         rowData.append( self.info[row])
         for i in range(2, self.tw_result.columnCount()):
-            if i == 8 or i == 9:
-                item = self.tw_result.cellWidget(row, i)
+            item = self.tw_result.item(row, i)
+            if i == 12:
                 if item != None:
-                    date = item.date().toString(Qt.ISODate)
-                    rowData.append(date)
-            else:
-                item = self.tw_result.item(row, i)
-                if i == 12:
-                    if item != None:
-                        rowData.append(item.text())
-                    else:
-                        break
+                    rowData.append(item.text())
                 else:
-                    if item != None and len(item.text()) > 0:
-                        rowData.append(item.text())
-                    else:
-                        break
+                    break
+            else:
+                if item != None and len(item.text()) > 0:
+                    rowData.append(item.text())
+                else:
+                    break
         print(rowData)
         if len(rowData) == self.tw_result.columnCount() - 1:
             if (updataOneDataInDangerGood(rowData) == True):
@@ -429,9 +436,13 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
         if selectedRow < 2:
             QMessageBox.warning(self, "注意", "请选中有效单元格！", QMessageBox.Yes, QMessageBox.Yes)
         elif selectedRow >= 2 and selectedRow < self.dataLen + 2:
-            goodsId = self.info[selectedRow]
-            if deleteByDangerGoodsId(goodsId) == True:
-                self.tw_result.removeRow(selectedRow)
+            reply = QMessageBox.question(self, '警告', '是否删除该行数据？', QMessageBox.Cancel, QMessageBox.Yes)
+            if reply == QMessageBox.Yes:
+                goodsId = self.info[selectedRow]
+                if deleteByDangerGoodsId(goodsId) == True:
+                    self.tw_result.removeRow(selectedRow)
+            else:
+                return
         else:
             self.tw_result.removeRow(selectedRow)
 

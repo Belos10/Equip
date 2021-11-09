@@ -470,7 +470,7 @@ class AdjustOrder(QWidget, widget_adjustOrder):
             return
         reply = QMessageBox.question(self, '导出Excel', '是否保存修改并导出Excel？', QMessageBox.Cancel, QMessageBox.Yes)
         if reply == QMessageBox.Cancel:
-            self._initOrderAdjustByUnitListAndEquipList()
+            self._initOrderAdjustByUnitListAndEquipList(self.originalEquipDict, self.originalEquipDictTab)
             return
 
         directoryPath = QFileDialog.getExistingDirectory(self, "请选择导出文件夹", "c:/")

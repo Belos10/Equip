@@ -1,6 +1,4 @@
-import pymysql
 from database.connectAndDisSql import *
-#from database.alocatMangeSql import selectYearListAboutDisturbPlan
 from database.SD_EquipmentBanlanceSql import updateOneEquipmentBalanceData, deleteByYear, getFomatEquipmentName
 
 #new
@@ -2986,6 +2984,18 @@ def selectEquipInfoByEquipID(EquipID):
     result = cur.fetchall()
     return result
 
+def isHaveEquipment(EquipID):
+    sql = "select Equip_ID from equip where Equip_ID = '" + \
+          EquipID + "'"
+    print(sql)
+    cur.execute(sql)
+    result = cur.fetchall()
+    print(result)
+    if len(result) != 0:
+        return True
+    else:
+        return False
+
 def findEquipInfo(equipId):
     sql = "select * from equip where Equip_ID = '" + equipId + "'"
     cur.execute(sql)
@@ -3015,8 +3025,7 @@ def insertIntoRetire(ID, Unit_ID, EquipID, Equip_Name,Equip_Unit,strength,Weave,
 
 # 查询退休信息
 def selectInfoFromRetire(unitID, equipID, year):
-    sql = "select * from retire where Equip_ID = '" + \
-          equipID + "' and Unit_ID = '" + unitID + "' and year = '" + year + "'"
+    sql = "select * from retire where Unit_ID = '%s' and Equip_ID = '%s' and year = '%s'"%(unitID, equipID, year)
     print(sql)
     cur.execute(sql)
     result = cur.fetchall()
@@ -3391,7 +3400,7 @@ def inputIntoUnitFromExcel(unitInfoList):
         unitName = unitInfo[1]
         unitUper = unitInfo[2]
         unitAlias = unitInfo[3]
-        isGroup = unitInfo[4]
+        isGroup = ''
         if unitID == "":
             error = "第 " + str(i) + " 行导入失败，单位编号不能为空"
             errorInfo.append(error)
@@ -3457,6 +3466,94 @@ def isHaveStrengthYear(year):
         return True
     else:
         return False
+
+def insertOneDataIntoStrenth(lineInfo):
+    #['5', '10', 'A车', '六十一旅团一阵地', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '2000']
+    if selectIfExistsStrengthYear(lineInfo[-1]) == False:
+        year = str(lineInfo[-1])
+        sql = "insert into strengthyear(ID, year) values ('" + year + "', '" + year + "')"
+        # print(sql)
+        try:
+            cur.execute(sql)
+        except Exception as e:
+            conn.rollback()
+
+    result = selectStrengthInfo(lineInfo[0], lineInfo[1], lineInfo[-1])
+    if result == None or len(result) == 0:
+        sql = "insert into strength values('%s','%s','%s','%s','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%d','%s')"%(lineInfo[0], lineInfo[1], lineInfo[2],
+        lineInfo[3], lineInfo[4], lineInfo[5], lineInfo[6], lineInfo[7], lineInfo[8], lineInfo[9], lineInfo[10], lineInfo[11], lineInfo[12], lineInfo[13],
+        lineInfo[14], lineInfo[15])
+        try:
+            cur.execute(sql)
+        except Exception as e:
+            print(e)
+            conn.rollback()
+    else:
+        sql = "update strength set  Strength = '%d', Work = '%d', Now = '%d', Error = '%d', Retire = '%d', Delay = '%d', Pre = '%d', NonObject = '%d', NonStrength =" \
+              " '%d', Single = '%d', Arrive = '%d' where Equip_ID = '%s' and Unit_ID = '%s' " %(lineInfo[4],lineInfo[5], lineInfo[6], lineInfo[7], lineInfo[8], lineInfo[9], lineInfo[10], lineInfo[11], lineInfo[12], lineInfo[13],
+        lineInfo[14], lineInfo[0], lineInfo[1])
+        try:
+            cur.execute(sql)
+        except Exception as e:
+            print(e)
+            conn.rollback()
+    try:
+        conn.commit()
+        return True
+    except Exception as e:
+        print(e)
+        return False
+
+def insertOneDataIntoRetire(lineInfo):
+    # ['1022000', '10', '2', '        通用装备', '', 0, '0', '0', '0', '0', '', '', '2000', False]
+    if selectIfExistsRetireYear(lineInfo[-2]) == False:
+        year = str(lineInfo[-1])
+        sql = "insert into retireyear(year) values ('%s')"%year
+        # print(sql)
+        try:
+            cur.execute(sql)
+        except Exception as e:
+            conn.rollback()
+    result = selectInfoFromRetire(lineInfo[1], lineInfo[2], lineInfo[-2])
+    if result == None or len(result) == 0:
+        sql = "insert into retire values('%s','%s','%s','%s','%s','%d','%s','%s','%s','%s','%s','%s','%s')" % (
+        lineInfo[0], lineInfo[1], lineInfo[2],
+        lineInfo[3], lineInfo[4], lineInfo[5], lineInfo[6], lineInfo[7], lineInfo[8], lineInfo[9], lineInfo[10],
+        lineInfo[11], lineInfo[12])
+        try:
+            cur.execute(sql)
+        except Exception as e:
+            print(e)
+            conn.rollback()
+    else:
+        # ['1022000', '10', '2', '        通用装备', '', 0, '0', '0', '0', '0', '', '', '2000', False]
+        sql = "update retire set  Unit_ID = '%s', Equip_ID = '%s', Equip_Name = '%s', Equip_Unit = '%s', Strenth = '%d', Weave = '%s', Num = '%s', Now =" \
+              " '%s', Super = '%s',Apply = '%s', Other = '%s', year = '%s' where ID = '%s'" % (
+              lineInfo[1], lineInfo[2], lineInfo[3], lineInfo[4], lineInfo[5], lineInfo[6], lineInfo[7], lineInfo[8],
+              lineInfo[9], lineInfo[10],
+              lineInfo[11], lineInfo[12], lineInfo[0])
+        try:
+            cur.execute(sql)
+        except Exception as e:
+            print(e)
+            conn.rollback()
+    try:
+        conn.commit()
+        return True
+    except Exception as e:
+        print(e)
+        return False
+    pass
+
+def selectIfExistsRetireYear(year):
+    sql = "select year from strengthyear where year = %s"%year
+    cur.execute(sql)
+    result = cur.fetchall()
+    if result == None or len(result) < 1:
+        return False
+    else:
+        return True
+
 if __name__ == '__main__':
     print(len(findUnitNameFromID('10')))
     pass

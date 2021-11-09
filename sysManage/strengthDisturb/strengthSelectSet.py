@@ -85,28 +85,28 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
     def slotInputIntoMysql(self):
         if self.cb_setChoose.currentIndex() == 0:
             print(self.inputUnitInfoList)
-            # selectedItems = self.showInputResult.tw_result.selectedItems();
-            # currentSelectRowCount = len(selectedItems)
-            # for i in range(currentSelectRowCount):
-            #     firstItem = selectedItems.at(i).topRow()
-            #     lastItem = selectedItems.at(i).bottomRow()
-            #     for j in range(firstItem,lastItem):
-            #         self.showInputResult.tw_result.item(j,)
-            #         unitInfo = []
-            #         unitInfo.append(Unit_ID)
-            #         unitInfo.append(Unit_Name)
-            #         unitInfo.append(Unit_Uper)
-            #         unitInfo.append(Unit_Alias)
-            #         unitInfo.append(Is_Group)
-            #         self.inputUnitInfoList.append(unitInfo)
-
-
-
             inputSuccess = inputIntoUnitFromExcel(self.inputUnitInfoList)
             if inputSuccess != True:
                 for error in inputSuccess:
                     QMessageBox.information(self, "导入", error, QMessageBox.Yes)
             self.slotUnitDictInit()
+            self.setDisabled(False)
+            self.showInputResult.hide()
+        else:
+            print(self.inputEquipInfoList)
+            for i in range(len(self.inputEquipInfoList)):
+                try:
+                    isHaveEquipId = isHaveEquipment(self.inputEquipInfoList[i][0])
+                    if isHaveEquipId == False:
+                        addSuccess = addDataIntoEquip(self.inputEquipInfoList[i][0], self.inputEquipInfoList[i][1], self.inputEquipInfoList[i][2], self.inputEquipInfoList[i][3], self.inputEquipInfoList[i][4], self.inputEquipInfoList[i][5])
+                    else:
+                        QMessageBox.information(self, "导入", "导入第%d数据失败,存在重复数据%d" % i, QMessageBox.Yes)
+                except Exception as e:
+                    print(e)
+                    QMessageBox.information(self, "导入", "导入第%d数据失败"%i, QMessageBox.Yes)
+                    continue
+            reply = QMessageBox.information(self, '新增', '新增成功', QMessageBox.Yes)
+            self.slotEquipDictInit()
             self.setDisabled(False)
             self.showInputResult.hide()
 
@@ -128,48 +128,100 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
         self.setDisabled(True)
         self.showInputResult.setDisabled(False)
         if self.cb_setChoose.currentIndex() == 0:
-            filename, _ = QFileDialog.getOpenFileName(self, "选中文件", '', "Excel Files (*.xls, *.xlsx)")
+            filename, _ = QFileDialog.getOpenFileName(self, "选中文件", '', "Excel Files (*.xls);;Excel Files (*.xlsx)")
             try:
                 workBook = xlrd.open_workbook(filename)
                 self.workSheet = workBook.sheet_by_index(0)
                 self.inputUnitInfoList = []
-                self.showInputResult.setWindowTitle("导入Excel数据到数据库Unit表中")
-                self.showInputResult.show()
-                title = ['单位编号', '单位名称', '上级单位编号', '单位别名', '是否为旅团']
-
-                self.showInputResult.tw_result.setColumnCount(self.workSheet.ncols)
-                self.showInputResult.tw_result.setHorizontalHeaderLabels(title)
-                self.showInputResult.tw_result.setRowCount(self.workSheet.nrows - 1)
+                title = ['单位编号', '单位名称', '上级单位编号', '单位代号']
                 for r in range(1, self.workSheet.nrows):
-                    Unit_ID = str(int(self.workSheet.cell(r,0).value))
-                    Unit_Name = self.workSheet.cell(r,1).value
-                    Unit_Uper = str(int(self.workSheet.cell(r,2).value))
+                    Unit_Name = (self.workSheet.cell(r,1).value).strip()
+                    try:
+                        Unit_Uper = str(int(self.workSheet.cell(r, 2).value))
+                        Unit_ID = str(int(self.workSheet.cell(r, 0).value))
+                    except:
+                        continue;
                     Unit_Alias = self.workSheet.cell(r,3).value
-                    Is_Group = self.workSheet.cell(r, 4).value
-                    item = QTableWidgetItem(Unit_ID)
-                    self.showInputResult.tw_result.setItem(r-1, 0, item)
-                    item = QTableWidgetItem(Unit_Name)
-                    self.showInputResult.tw_result.setItem(r - 1, 1, item)
-                    item = QTableWidgetItem(Unit_Uper)
-                    self.showInputResult.tw_result.setItem(r - 1, 2, item)
-                    item = QTableWidgetItem(Unit_Alias)
-                    self.showInputResult.tw_result.setItem(r - 1, 3, item)
-                    item = QTableWidgetItem(Is_Group)
-                    self.showInputResult.tw_result.setItem(r - 1, 4, item)
                     unitInfo = []
                     unitInfo.append(Unit_ID)
                     unitInfo.append(Unit_Name)
                     unitInfo.append(Unit_Uper)
                     unitInfo.append(Unit_Alias)
-                    unitInfo.append(Is_Group)
                     self.inputUnitInfoList.append(unitInfo)
-                return
+                self.showInputResult.setWindowTitle("导入Excel数据到数据库单位表中")
+                self.showInputResult.tw_result.setColumnCount(len(title))
+                self.showInputResult.tw_result.setHorizontalHeaderLabels(title)
+                self.showInputResult.tw_result.setEditTriggers(QAbstractItemView.NoEditTriggers)
+                self.showInputResult.tw_result.setRowCount(len(self.inputUnitInfoList))
+                self.showInputResult.tw_result.verticalHeader().setVisible(False)
+                for r,list_item in enumerate(self.inputUnitInfoList):
+                    item = QTableWidgetItem(list_item[0])
+                    self.showInputResult.tw_result.setItem(r, 0, item)
+                    item = QTableWidgetItem(list_item[1])
+                    self.showInputResult.tw_result.setItem(r, 1, item)
+                    item = QTableWidgetItem(list_item[2])
+                    self.showInputResult.tw_result.setItem(r, 2, item)
+                    item = QTableWidgetItem(list_item[3])
+                    self.showInputResult.tw_result.setItem(r, 3, item)
+                self.showInputResult.show()
+
             except BaseException as e:
                 print(e)
                 QMessageBox.about(self, "打开失败", "打开文件失败，请检查文件")
                 self.setDisabled(False)
         else:
-            pass
+            filename, _ = QFileDialog.getOpenFileName(self, "选中文件", '', "Excel Files (*.xls);;Excel Files (*.xlsx)")
+            try:
+                workBook = xlrd.open_workbook(filename)
+                self.workSheet = workBook.sheet_by_index(0)
+                self.inputEquipInfoList = []
+                for r in range(1, self.workSheet.nrows):
+                    equipName = self.workSheet.cell(r, 1).value.strip()
+                    try:
+                        equipId = str(int(self.workSheet.cell(r, 0).value))
+                        equipUper = str(int(self.workSheet.cell(r, 2).value))
+                    except:
+                       continue
+                    inputType = self.workSheet.cell(r, 3).value.strip()
+                    equipType = self.workSheet.cell(r, 4).value.strip()
+                    if len(equipType) <= 1:
+                        continue
+                    equipUnit = self.workSheet.cell(r, 5).value.strip()
+                    euipmentInfo = []
+                    euipmentInfo.append(equipId)
+                    euipmentInfo.append(equipName)
+                    euipmentInfo.append(equipUper)
+                    euipmentInfo.append(inputType)
+                    euipmentInfo.append(equipType)
+                    euipmentInfo.append(equipUnit)
+                    self.inputEquipInfoList.append(euipmentInfo)
+
+                self.showInputResult.setWindowTitle("导入Excel数据到数据库装备表中")
+                title = ['装备编号', '装备名称', '上级装备号', '录入类型', '装备类型', '装备单位']
+                self.showInputResult.tw_result.setColumnCount(len(title))
+                self.showInputResult.tw_result.setHorizontalHeaderLabels(title)
+                self.showInputResult.tw_result.verticalHeader().setVisible(False)
+                self.showInputResult.tw_result.setEditTriggers(QAbstractItemView.NoEditTriggers)
+                self.showInputResult.tw_result.setRowCount(len(self.inputEquipInfoList))
+                for r, list_item in enumerate(self.inputEquipInfoList):
+                    item = QTableWidgetItem(list_item[0])
+                    self.showInputResult.tw_result.setItem(r, 0, item)
+                    item = QTableWidgetItem(list_item[1])
+                    self.showInputResult.tw_result.setItem(r, 1, item)
+                    item = QTableWidgetItem(list_item[2])
+                    self.showInputResult.tw_result.setItem(r, 2, item)
+                    item = QTableWidgetItem(list_item[3])
+                    self.showInputResult.tw_result.setItem(r, 3, item)
+                    item = QTableWidgetItem(list_item[4])
+                    self.showInputResult.tw_result.setItem(r, 4, item)
+                    item = QTableWidgetItem(list_item[5])
+                    self.showInputResult.tw_result.setItem(r, 5, item)
+                self.showInputResult.show()
+                return
+            except BaseException as e:
+                print(e)
+                QMessageBox.about(self, "打开失败", "打开文件失败，请检查文件")
+                self.setDisabled(False)
 
     '''
         功能：
@@ -224,7 +276,7 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
                     workSheet.write(0, 0, '单位编号', titileStyle)
                     workSheet.write(0, 1, '单位名称', titileStyle)
                     workSheet.write(0, 2, '上级单位编号', titileStyle)
-                    workSheet.write(0, 3, '单位别名', titileStyle)
+                    workSheet.write(0, 3, '单位代号', titileStyle)
                     for i,item in enumerate(self.resultList):
                         workSheet.write(i + 1,0,item[0],contentStyle)
                         workSheet.write(i + 1, 1, item[1],contentStyle)
@@ -326,7 +378,7 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
     def slotSetUnitAlias(self):
         if self.tb_result.currentRow() == -1:
             return
-        text, okPressed = QInputDialog.getText(self, "设置别名", "该单位别名为:", QLineEdit.Normal, "")
+        text, okPressed = QInputDialog.getText(self, "设置别名", "该单位代号为:", QLineEdit.Normal, "")
         if okPressed:
             print(text)
             updateUnitAlias(text, self.le_unitID.text())
@@ -368,23 +420,51 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
         self.tb_result.setEditTriggers(QAbstractItemView.NoEditTriggers)        #设置tablewidget不能修改
         #设置当前控件状态
         self.tw_second.setDisabled(True)     #设置装备目录为灰色
+
         self.le_second.setDisabled(True)
+        self.le_second.setVisible(False)
+
         self.pb_secondSelect.setDisabled(True)   #设置装备目录上面的查询为灰色
         self.tw_first.setDisabled(False)    #设置单位目录为可选中
         self.le_first.setDisabled(False)
         self.pb_firstSelect.setDisabled(False)
-
         self.le_unitID.setDisabled(False)
-        self.le_unitName.setDisabled(False)
-        self.le_equipID.setDisabled(True)
-        self.le_equipName.setDisabled(True)
-        self.cb_equipType.setDisabled(True)
 
+        self.le_equipID.setDisabled(True)
+        self.le_equipID.setVisible(False)
+        self.le_equipName.setDisabled(True)
+        self.le_equipName.setVisible(False)
+        self.cb_equipType.setDisabled(True)
+        self.cb_equipType.setVisible(False)
+
+        self.lb_unitID.setVisible(True)
+        self.lb_unitID.setDisabled(False)
+        self.cb_unitUper.setVisible(True)
         self.cb_unitUper.setDisabled(False)
+        self.le_unitName.setDisabled(False)
+        self.le_unitName.setVisible(True)
         self.le_unitAlias.setDisabled(False)
+        self.le_unitAlias.setVisible(True)
+
+
+        self.lb_unitUper.setVisible(True)
+        self.lb_equipName.setVisible(True)
+        self.lb_unitName.setVisible(True)
+
+        self.lb_equipID.setVisible(False)
+        self.lb_equipUper.setVisible(False)
+        self.lb_inputType.setVisible(False)
+        self.lb_equipType.setVisible(False)
+        self.label.setVisible(False)
+        self.label_2.setVisible(False)
+
+
         self.cb_equipUper.setDisabled(True)
+        self.cb_equipUper.setVisible(False)
         self.le_equipUnit.setDisabled(True)
+        self.le_equipUnit.setVisible(False)
         self.cb_inputType.setDisabled(True)
+        self.cb_inputType.setVisible(False)
         self.first_treeWidget_dict = {}
         self.unitIDList = []
 
@@ -403,7 +483,7 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
                 #从数据库中单位表中获取数据初始化单位目录，tableWidget显示所有的单位表
                 self._initUnitTableWidget()
             else:
-                header = ['单位编号', '单位名称', '上级单位编号', '单位别名']
+                header = ['单位编号', '单位名称', '上级单位编号', '单位代号']
                 self.tb_result.setColumnCount(len(header))
                 self.tb_result.setRowCount(0)
                 self.tb_result.setHorizontalHeaderLabels(header)
@@ -445,23 +525,48 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
         self.tb_result.setEditTriggers(QAbstractItemView.NoEditTriggers)  # 设置tablewidget不能修改
         # 设置当前控件状态
         self.tw_second.setDisabled(False)  # 设置装备目录为灰色
+        self.tw_second.setVisible(True)  # 设置装备目录为灰色
         self.le_second.setDisabled(False)
+        self.le_second.setVisible(True)
         self.pb_secondSelect.setDisabled(False)  # 设置装备目录上面的查询为灰色
         self.tw_first.setDisabled(True)  # 设置单位目录为可选中
         self.le_first.setDisabled(True)
         self.pb_firstSelect.setDisabled(True)
 
+        self.lb_unitID.setVisible(False)
+        self.lb_unitUper.setVisible(False)
+        self.lb_equipName.setVisible(False)
+        self.lb_unitName.setVisible(False)
+
+        self.lb_equipID.setVisible(True)
+        self.lb_equipUper.setVisible(True)
+        self.lb_inputType.setVisible(True)
+        self.lb_equipType.setVisible(True)
+        self.label.setVisible(True)
+        self.label_2.setVisible(True)
+
+
         self.le_unitID.setDisabled(True)
+        self.le_unitID.setVisible(False)
         self.le_unitName.setDisabled(True)
+        self.le_unitName.setVisible(False)
         self.le_equipID.setDisabled(False)
+        self.le_equipID.setVisible(True)
         self.le_equipName.setDisabled(False)
+        self.le_equipName.setVisible(True)
         self.cb_equipType.setDisabled(False)
+        self.cb_equipType.setVisible(True)
 
         self.cb_unitUper.setDisabled(True)
+        self.cb_unitUper.setVisible(False)
         self.le_unitAlias.setDisabled(True)
+        self.le_unitAlias.setVisible(False)
         self.cb_equipUper.setDisabled(False)
+        self.cb_equipUper.setVisible(True)
         self.le_equipUnit.setDisabled(False)
+        self.le_equipUnit.setVisible(True)
         self.cb_inputType.setDisabled(False)
+        self.cb_inputType.setVisible(True)
         self.second_treeWidget_dict = {}
         self.cb_equipUper.clear()
         self.cb_unitUper.clear()
@@ -491,7 +596,7 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
             设置单元时的初始化tableWidget，显示整个单位表
     '''
     def _initUnitTableWidget(self):
-        header = ['单位编号', '单位名称', '上级单位编号','单位别名']
+        header = ['单位编号', '单位名称', '上级单位编号','单位代号']
         self.tb_result.setColumnCount(len(header))
         self.tb_result.setHorizontalHeaderLabels(header)
         self.resultList = []
@@ -586,6 +691,9 @@ class strengthSelectSet(QWidget, Widget_Select_Set):
                     break
             self.le_unitAlias.setText(self.tb_result.item(currentRow, 3).text())
         else:
+            self.equipResultList = selectAllDataAboutEquip()
+            if len(self.equipResultList) == 0:
+                return
             self.le_equipID.setText((self.tb_result.item(currentRow,0).text()))
             self.le_equipName.setText((self.tb_result.item(currentRow, 1).text()))
             inputTypeList = ['空','逐号录入信息', '逐批录入信息']

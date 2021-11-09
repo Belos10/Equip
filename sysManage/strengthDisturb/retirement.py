@@ -1,7 +1,10 @@
-from PyQt5.QtCore import QVariant
+import pickle
+
+from PyQt5.QtCore import QVariant, QDateTime
 from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, QAbstractItemView, \
     QMessageBox, QListWidgetItem, QInputDialog, QHeaderView, QFileDialog
 
+from sysManage.showInputResult import showInputResult
 from utills.utillsComponent import CheckableComboBox
 from widgets.strengthDisturb.retirement import Widget_Retirement
 from database.strengthDisturbSql import *
@@ -18,6 +21,9 @@ class retirement(QWidget, Widget_Retirement):
 
         self.first_treeWidget_dict = {}
         self.second_treeWidget_dict = {}
+        self.inputList = []
+        self.showInputResult = showInputResult(self)
+        self.showInputResult.hide()
 
         self.tw_first.header().setVisible(False)
         self.tw_second.header().setVisible(False)
@@ -68,6 +74,10 @@ class retirement(QWidget, Widget_Retirement):
         self.tw_result.itemChanged.connect(self.soltCheckData)
         self.pb_secondSelect.clicked.connect(self.slotSelectEquip)
         self.pb_outputToExcel.clicked.connect(self.slotOutputToExcel)
+        self.pb_output.clicked.connect(self.slotOutputData)
+        self.pb_input.clicked.connect(self.slotInputData)
+        self.showInputResult.pb_confirm.clicked.connect(self.slotInputIntoDatabase)
+        self.showInputResult.pb_cancel.clicked.connect(self.slotCancelInputIntoDatabase)
 
     def slotSelectUnit(self):
         findText = self.le_first.text()
@@ -729,6 +739,125 @@ class retirement(QWidget, Widget_Retirement):
                 return
         else:
             QMessageBox.about(self, "选取文件夹失败！", "请选择正确的文件夹！")
+
+    #导出数据包
+    def slotOutputData(self):
+        if len(self.resultList) < 1:
+            reply = QMessageBox.warning(self, '警告', '未选中任何数据，无法导出', QMessageBox.Yes)
+            return
+        reply = QMessageBox.question(self, '导出数据包', '是否保存修改并导出数据包？', QMessageBox.Cancel, QMessageBox.Yes)
+        if reply == QMessageBox.Cancel:
+            self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList,
+                                                        self.currentYear)
+            return
+        for i, result in self.currentInquiryResult.items():
+            if result[13] == True:
+                checkbox = self.tw_result.cellWidget(i + 2, 5)
+                num = checkbox.itemText(0)
+                apply = self.tw_result.item(i + 2, 8).text()
+                other = self.tw_result.item(i + 2, 9).text()
+                updateRetireAboutRetire(num, apply, other, result)
+        self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList,
+                                                    self.currentYear)
+        directoryPath = QFileDialog.getExistingDirectory(self, "请选择导出文件夹", "c:/")
+        if len(directoryPath) > 0:
+            # 填表数据
+            dataList = self.resultList
+            dataList.insert(0, "退役需求表")
+            print("退役需求表")
+            print(dataList)  # ['实力查询数据'， ['5', '10', 'A车', '六十一旅团一阵地', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '2000']]
+            if dataList is None or len(dataList) == 1:
+                return
+            else:
+                date = QDateTime.currentDateTime()
+                installData = date.toString("yyyy年MM月dd日hh时mm分ss秒")  # hh:mm:ss
+                pathName = "%s/%s%s年%s装备补充及退役需求表.nms" % (directoryPath,installData,self.year, selectUnitNameByUnitID(self.currentCheckedUnitList[0]))
+                with open(pathName, "wb") as file:
+                    pickle.dump(dataList, file)
+                QMessageBox.warning(self, "导出数据成功！", "导出成功！", QMessageBox.Yes)
+            pass
+        else:
+            QMessageBox.warning(self, "导出数据失败！", "请选择正确的文件夹！", QMessageBox.Yes)
+        pass
+
+    #导入数据包
+    def slotInputData(self):
+        self.inputList = []
+        filename, _ = QFileDialog.getOpenFileName(self, "选中文件", '', "Excel Files (*.nms);;Excel Files (*.nms)")
+        if len(filename) < 2:
+            return
+        try:
+            with open(filename, "rb") as file:
+                self.inputList = pickle.load(file)
+                if self.inputList[0] != "退役需求表":
+                    raise Exception("数据格式错误！")
+        except Exception as e:
+            print(e)
+            QMessageBox.warning(self, "加载文件失败！", "请检查文件格式及内容格式！", QMessageBox.Yes)
+            return
+        headerlist = ['装备名称', '实力数', '编制数', '拟退役数', '现有数', '超缺编数', '申请需求', '提前退役', '备注']
+        self.showInputResult.setWindowTitle("导入数据")
+        self.showInputResult.show()
+        # QTableWidget设置整行选中
+        self.showInputResult.tw_result.setColumnCount(len(headerlist))
+        self.showInputResult.tw_result.setHorizontalHeaderLabels(headerlist)
+        self.showInputResult.tw_result.setRowCount(len(self.inputList) - 1)
+        #['退役需求表', ['1022000', '10', '2', '        通用装备', '', 0, '0', '0', '0', '0', '', '', '2000', False]]
+
+        for i, LineInfo in enumerate(self.inputList):
+            if i == 0:
+                continue
+            i = i - 1
+            item = QTableWidgetItem(LineInfo[3].strip())
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.showInputResult.tw_result.setItem(i, 0, item)
+            item = QTableWidgetItem(LineInfo[4])
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.showInputResult.tw_result.setItem(i, 1, item)
+            item = QTableWidgetItem(str(LineInfo[5]))
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.showInputResult.tw_result.setItem(i, 2, item)
+
+            item = QTableWidgetItem(LineInfo[6])
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.showInputResult.tw_result.setItem(i, 3, item)
+            item = QTableWidgetItem(LineInfo[7])
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.showInputResult.tw_result.setItem(i, 4, item)
+            item = QTableWidgetItem(LineInfo[8])
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.showInputResult.tw_result.setItem(i, 5, item)
+            item = QTableWidgetItem(LineInfo[9])
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.showInputResult.tw_result.setItem(i, 6, item)
+            item = QTableWidgetItem(LineInfo[10])
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.showInputResult.tw_result.setItem(i, 7, item)
+            item = QTableWidgetItem(LineInfo[11])
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.showInputResult.tw_result.setItem(i, 8, item)
+
+
+    def slotCancelInputIntoDatabase(self):
+        self.showInputResult.hide()
+        self.setDisabled(False)
+
+
+    def slotInputIntoDatabase(self):
+        for i,lineInfo in enumerate(self.inputList):
+            if i == 0:
+                continue
+            try:
+                if insertOneDataIntoRetire(lineInfo):
+                   pass
+            except Exception as e:
+                print(e)
+                QMessageBox.warning(self, "导入失败", "导入第%d数据失败！" % (i), QMessageBox.Yes)
+
+        self.showInputResult.hide()
+        self.setDisabled(False)
+
+
 
 
 

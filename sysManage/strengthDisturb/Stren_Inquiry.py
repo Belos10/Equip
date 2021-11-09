@@ -187,6 +187,8 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
 
         self.pb_secondSelect.clicked.connect(self.slotSelectEquip)
 
+
+
     def slotSelectUnit(self):
         findText = self.le_first.text()
         for i, item in self.first_treeWidget_dict.items():

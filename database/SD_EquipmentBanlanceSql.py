@@ -439,8 +439,11 @@ def insertOneEquipmentBalanceData(tempItem):
 
 
 def getEquipmentIdByName(equipmentName):
-    sql = "select Equip_ID from equip where Equip_Name='%s'"%equipmentName
+
+    sql = "select Equip_ID from equip where Equip_Name='%s'"%equipmentName.strip()
+    print(sql)
     equipment = selectOne(sql)
+    print('equipment',equipment)
     return equipment['Equip_ID']
 
 def getEquipmentBalanceIdByEquipmentIdAndUnitAndYear(equipmentId,unitId,year):
@@ -485,7 +488,7 @@ def getEquipmentBalanceIdByEquipmentId(equipmentId,unit,year):
 
 
 def saveEquipmentBalanceByRow(dataList,unit,year):
-    equipmentBalanceId = getEquipmentBalanceIdByEquipmentId(getEquipmentIdByName(dataList[0]), unit, year)
+    equipmentBalanceId = getEquipmentBalanceIdByEquipmentId(dataList[0], unit, year)
     if equipmentBalanceId is not None:
         # print(dataList)
         executeCommit("update eb_quality_status set issue_new_product='%s',issue_inferior_product='%s', issue_need_repaired='%s',"
