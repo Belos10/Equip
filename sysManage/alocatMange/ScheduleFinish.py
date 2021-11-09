@@ -1,9 +1,10 @@
 import sys
 import os
 from PyQt5.QtWidgets import *
-from PyQt5 import QtCore
+from PyQt5 import QtCore,QtGui
 from widgets.alocatMange.scheduleFinish import widget_ScheduleFinish
 from database.alocatMangeSql import selectIfUnitScheduleFinish, updateUnitScheduleFinish
+from PyQt5 import sip
 
 
 class ScheduleFinish(QWidget, widget_ScheduleFinish):
@@ -33,7 +34,6 @@ class ScheduleFinish(QWidget, widget_ScheduleFinish):
 
 
     def signalConnect(self):
-
         self.pb_chooseFile.clicked.connect(self.slot_btn_chooseFile)
         self.pb_openFile.clicked.connect(self.onOpen)
 
@@ -46,41 +46,88 @@ class ScheduleFinish(QWidget, widget_ScheduleFinish):
 
     def init1(self):
         self.initUnitFinish()
-        self.ifUnitScheduleFinish()
+        # self.ifUnitScheduleFinish()
+
+
+    def deleteItemsOfLayout(self,layout):
+        if layout is not None:
+            while layout.count():
+                item = layout.takeAt(0)
+                widget = item.widget()
+                if widget is not None:
+                    widget.setParent(None)
+                else:
+                    self.deleteItemsOfLayout(item.layout())
 
 
     def initUnitFinish(self):
-        aaa= self.layout1.count()
-        print("aaa====",aaa)
-        # while self.layout1.takeAt(0):
-        #     print("count()==",self.layout1.count())
-        #     self.layout1.removeWidget(QPushButton)
-        #     pwid = self.layout1.takeAt(0).widget()
-        #     pwid.__delattr__()
-        #     pwid.deleteLater()
+        try:
+            # aaa = self.layout1.count()
+            # print("aaa====", aaa)
+            # self.deleteItemsOfLayout(self.layout1)
+            # self.layout1 = QHBoxLayout()
+            # while self.layout1.takeAt(0):
+            #     print("count()==",self.layout1.count())
+            #     self.layout1.removeWidget(QPushButton)
+            #     pwid = self.layout1.takeAt(0).widget()
+            #     pwid.__delattr__()
+            #     pwid.deleteLater()
 
-        # btns = self.layout1.findChildren(QPushButton)
-        # for i in btns:
-        #     i.delete()
-        for i in range(self.layout1.count()):
-            self.layout1.removeWidget(self.layout1.itemAt(i).widget())
-        #     self.layout1.itemAt(i).widget().setParent(None)
-        bbb = self.layout1.count()
-        print("bbb=",bbb)
-        print("self.UnitDict = ", self.UnitDict, "self.equipID = ", self.equipID)
-        for key, item in self.UnitDict.items():
-            flag = selectIfUnitScheduleFinish(self.UnitDict[key][0], self.equipID, self.year)
-            pb1 = QPushButton()
-            if flag[0][0] == 'TRUE':
-                pb1.setObjectName(item[1])
-                pb1.setText("已完成")
-            else:
-                pb1.setObjectName(item[1])
-                pb1.setText(item[1])
-            self.layout1.addWidget(pb1)
-        self.w2_hbox.setLayout(self.layout1)
-        ccc = self.layout1.count()
-        print("ccc=",ccc)
+            # btns = self.layout1.findChildren(QPushButton)
+            # for i in btns:
+            #     i.delete()
+            # btns = self.layout1.findChildren(QPushButton)
+            # for btn in btns:
+            #     # self.layout1.removeItem(btn)
+            #     self.layout1.removeWidget(btn)
+            #     # btn.deleteLater()
+            #     sip.delete(btn)
+            for idx in range(self.layout1.count()+1,1,-1):
+                # print("idx ===",idx)
+                wid = self.layout1.itemAt(idx-2).widget()
+                self.layout1.removeWidget(wid)
+                sip.delete(wid)
+            # for i in range(self.layout1.count()):
+            #     item = self.layout1.itemAt(i)
+            #     self.layout1.removeItem(item)
+            #     # self.layout1.removeWidget(item)
+            #     # item.widget().deleteLater()
+            #     print("==========", i)
+            #     sip.delete(item)
+            #     self.layout1.itemAt(i).widget().setParent(None)
+            # bbb = self.layout1.count()
+            # print("bbb=",bbb)
+
+            print("Schedule::: self.UnitDict = ", self.UnitDict, "self.equipID = ", self.equipID)
+            for key,item in self.UnitDict.items():
+                flag = selectIfUnitScheduleFinish(self.UnitDict[key][0], self.equipID, self.year)
+                cb = QCheckBox()
+                cb.setText(item[1])
+                if flag[0][0] == 'TRUE':
+                    cb.setChecked(True)
+                else:
+                    cb.setChecked(False)
+                self.layout1.addWidget(cb)
+            self.w2_hbox.setLayout(self.layout1)
+
+
+            # print("self.UnitDict = ", self.UnitDict, "self.equipID = ", self.equipID)
+            # for key, item in self.UnitDict.items():
+            #     flag = selectIfUnitScheduleFinish(self.UnitDict[key][0], self.equipID, self.year)
+            #     pb1 = QPushButton()
+            #     if flag[0][0] == 'TRUE':
+            #         pb1.setObjectName(item[1])
+            #         pb1.setText("已完成")
+            #     else:
+            #         pb1.setObjectName(item[1])
+            #         pb1.setText(item[1])
+            #     self.layout1.addWidget(pb1)
+            # self.w2_hbox.setLayout(self.layout1)
+
+            # ccc = self.layout1.count()
+            # print("ccc=",ccc)
+        except Exception as e:
+            print("errrrrror", e)
 
 
     def ifUnitScheduleFinish(self):
@@ -88,10 +135,10 @@ class ScheduleFinish(QWidget, widget_ScheduleFinish):
         print("self.layout1.count()=", aaa)
         for i in range(self.layout1.count()):
             self.key = i
-            print("i=====",i)
+            # print("i=====",i)
             # flag = 'TRUE'
             flag = selectIfUnitScheduleFinish(self.UnitDict[i][0], self.equipID, self.year)
-            print("flag = ",flag)
+            # print("flag = ",flag)
             if not flag[0][0] == 'TRUE':
                 self.layout1.itemAt(i).widget().clicked.connect(self.setUnitScheduleFinish)
 
@@ -102,6 +149,7 @@ class ScheduleFinish(QWidget, widget_ScheduleFinish):
             updateUnitScheduleFinish(self.UnitDict[self.key][0], self.equipID, self.year)
             self.layout1.itemAt(self.key).widget().setText("已完成")
             self.initUnitFinish()
+
 
 
     def slot_btn_chooseFile(self):
@@ -123,12 +171,22 @@ class ScheduleFinish(QWidget, widget_ScheduleFinish):
             return
         os.startfile(self.fileName)
 
+
     def returnFileName(self):
         return self.fileName
 
 
+
     def closeEvent(self,event):
+        print("执行closeEvent")
+        for idx in range(self.layout1.count()):
+            flag = False
+            if self.layout1.itemAt(idx).widget().isChecked():
+                flag = True
+            updateUnitScheduleFinish(self.UnitDict[idx][0], self.equipID, self.year,flag)
+            # self.initUnitFinish()
         self.signal.emit('1')
+        return
 
 
 if __name__ == "__main__":
@@ -137,7 +195,7 @@ if __name__ == "__main__":
     dic = {0: ('3', '库存', '1', '', '否'), 1: ('4', '六十一基地', '2', '61', '否'),
            2: ('5', '六十二基地', '2', '62', '否'), 3: ('9', '六十三基地', '2', '63', '否'),
            4: ('10', '六十四基地', '2', '64', '否')}
-    mainForm.initDict(dic, '5')
+    mainForm.initDict(dic, '5',2000)
     mainForm.initUnitFinish()
     mainForm.show()
     sys.exit(app.exec_())

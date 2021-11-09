@@ -29,7 +29,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         self.unitDisturbPlanList = {}
         self.currentEquipdict = {}
         self.armySchedule = ArmySchedule(self)
-        self.scheduleFinish = OrderScheduleFinish()
+        self.scheduleFinish = ScheduleFinish()
         self.fileName = ""
         self.unitFlag = 0
         self.rocketSchedule = transferModel(self)
@@ -214,7 +214,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                 for resultInfo in result:
                     self.currentUnitChilddict[j] = resultInfo
                     j = j + 1
-        print("unit", self.currentUnitChilddict)
+        print("self.currentUnitChilddict", self.currentUnitChilddict)
         # 获取当前装备名
         j = 0
         for equipID, equipItem in self.second_treeWidget_dict.items():
@@ -286,8 +286,13 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                 for x in range(0, self.lenCurrentUnitChilddict):
                     item = QTableWidgetItem("")
                     item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-                    # 87,102,144(完成)
-                    item.setForeground(QBrush(QColor(219,125,116)))
+                    flag = selectIfUnitScheduleFinish(self.currentUnitChilddict[x][0],
+                                                      self.currentEquipdict[i][0],
+                                                      self.currentYear)
+                    if flag[0][0] == 'TRUE':
+                        item.setForeground(QBrush(QColor(87, 102, 144)))
+                    else:
+                        item.setForeground(QBrush(QColor(219, 125, 116)))
                     self.disturbResult.setItem(i, x + 5, item)
                     currentRowResult.append(item)
                 item = QTableWidgetItem("")
@@ -337,7 +342,13 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                 for x in range(0, self.lenCurrentUnitChilddict):
                     item = QTableWidgetItem("")
                     item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
-                    item.setForeground(QBrush(QColor(219,125,116)))
+                    flag = selectIfUnitScheduleFinish(self.currentUnitChilddict[x][0],
+                                                      self.currentEquipdict[i][0],
+                                                      self.currentYear)
+                    if flag[0][0] == 'TRUE':
+                        item.setForeground(QBrush(QColor(87,102,144)))
+                    else:
+                        item.setForeground(QBrush(QColor(219,125,116)))
                     self.disturbResult.setItem(i, x + 5, item)
                     currentRowResult.append(item)
                 item = QTableWidgetItem("")
@@ -405,7 +416,6 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
 
                     # 是否完成接装
                     flag4 = selectIfScheduleFinishUper(self.currentEquipdict[i][0], self.currentYear)
-                    # print("flag4",flag4)
                     item = QPushButton("设置进度")
                     item.clicked.connect(self.setScheduleFinish)
                     if flag4[0][0] != '0':
@@ -442,7 +452,6 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
 
                     # 是否完成接装
                     flag4 = selectIfScheduleFinishBase(self.currentEquipdict[i][0], self.currentYear)
-                    # print("flag4", flag4)
                     item = QPushButton("设置进度")
                     item.clicked.connect(self.setScheduleFinish)
                     if flag4[0][0] != '0':
@@ -462,7 +471,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         # print("currentYear:", self.currentYear)
         self.unitDisturbPlanList = selectDisturbPlanNumByList(self.currentUnitChilddict,
                                                               self.currentEquipdict, self.currentYear)
-        print("self.unitDisturbPlanList", self.unitDisturbPlanList)
+        # print("self.unitDisturbPlanList", self.unitDisturbPlanList)
         # 显示每个单位分配计划数
         num = 0
         for i in range(0, len(self.currentUnitChilddict)):
@@ -767,9 +776,9 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
             return
         # self.scheduleFinish.setWindowFlags(Qt.Dialog|Qt.WindowCloseButtonHint)
         self.scheduleFinish.fileName = ""
-        # self.scheduleFinish.initDict(self.currentUnitChilddict,
-        #                              self.currentEquipdict[currentRow][0], self.currentYear)
-        # self.scheduleFinish.init1()
+        self.scheduleFinish.initDict(self.currentUnitChilddict,
+                                     self.currentEquipdict[currentRow][0], self.currentYear)
+        self.scheduleFinish.init1()
         self.scheduleFinish.show()
         self.scheduleFinish.signal.connect(self.updateFinish)
 
@@ -778,6 +787,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         currentRow = self.disturbResult.currentRow()
         fileName = self.scheduleFinish.returnFileName()
         print("fileName", fileName)
+
         if fileName != "":
             item = QPushButton("已完成")
             if self.unitFlag == 1:
@@ -786,7 +796,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
             elif self.unitFlag == 2:
                 self.disturbResult.setCellWidget(currentRow, 7 + self.lenCurrentUnitChilddict, item)
                 updateScheduleFinishBase(self.currentEquipdict[currentRow][0], self.currentYear, fileName)
-
+        self.selectSchedule()
 
     # 筛选调拨进度
     def selectSchedule(self):

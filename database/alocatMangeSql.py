@@ -384,7 +384,7 @@ def selectDisturbPlanOther(EquipList, YearList):
             resultList.append(result)
         else:
             resultList.append([])
-    print("陆军调拨单resultList", resultList)
+    # print("陆军调拨单resultList", resultList)
     return resultList
 
 # # 读取火箭军计划数
@@ -801,10 +801,14 @@ def selectIfUnitScheduleFinish(unitID,equipID,year):
     return result
 
 
-def updateUnitScheduleFinish(unitID,equipID,year):
+def updateUnitScheduleFinish(unitID,equipID,year,flag):
     # conn, cur = connectMySql()
-    sql = "update disturbplan set Flag_ifFinish = 'TRUE' where Unit_Id = %s " \
-          "and Equip_Id = %s and Year = %s" % (unitID, equipID, year)
-    print(sql)
+    if flag:
+        sql = "update disturbplan set Flag_ifFinish = 'TRUE' where Unit_Id = %s " \
+              "and Equip_Id = %s and Year = %s" % (unitID, equipID, year)
+    else:
+        sql = "update disturbplan set Flag_ifFinish = 'FALSE' where Unit_Id = %s " \
+              "and Equip_Id = %s and Year = %s" % (unitID, equipID, year)
+    # print(sql)
     cur.execute(sql)
     conn.commit()
