@@ -484,6 +484,7 @@ class transferModel(QDialog, Widget_Transfer_Model):
 
 
         # 初始化前9行
+
     def initExcelTotalTableNinethRow(self, workSheet, stlye, crtColumnCount, first, second, row):
         workSheet.write(row,0,first,stlye)
         half = int((crtColumnCount - 2) / 2)
@@ -542,8 +543,6 @@ class transferModel(QDialog, Widget_Transfer_Model):
             else:
                 contextText = ""
             workSheet.write_merge(row, row, half + 2, crtColumnCount - 1, contextText,stlye)
-
-
 
     def initToExcelSingleTable(self,pageIndex, workSheet, style, unitInfo, equipInfo, requireInfo,year):
         crtColumnCount = 10
@@ -622,8 +621,6 @@ class transferModel(QDialog, Widget_Transfer_Model):
         self.initSingleTableExcelLastFourRow(pageIndex, workSheet, stlye, crtColumnCount,"经 办 人:", "", "经 办 人:", "", crtRowCount - 2, startColumn)
         self.initSingleTableExcelLastFourRow(pageIndex, workSheet, stlye, crtColumnCount,"日    期:", "", "日    期:", "", crtRowCount - 1, startColumn)
 
-
-
     def initSingleTableExcelNinethRow(self,pageIndex, workSheet, stlye, crtColumnCount, first, second, row, startColumn):
         half = int((crtColumnCount - 2) / 2)
         workSheet.write(row, startColumn, first, stlye)
@@ -638,7 +635,6 @@ class transferModel(QDialog, Widget_Transfer_Model):
         else:
             contextText = ""
         workSheet.write_merge(row, row, startColumn + half + 2,startColumn + crtColumnCount - 1 ,contextText, stlye)
-
 
     def initSingleTableExcelLastFourRow(self,pageIndex, workSheet, stlye, crtColumnCount, first, second, third, fourth, row, startColumn):
         #第一列

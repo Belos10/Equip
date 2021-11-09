@@ -2,7 +2,6 @@ from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, \
     QAbstractItemView, QMessageBox,QInputDialog,QLineEdit,QFileDialog,QHeaderView, QDialog
 from database.strengthDisturbSql import *
 from widgets.showInputResult import Widget_ShowInputResult
-from sysManage.strengthDisturb.equipUnitSet import equipUnitSet
 from PyQt5.Qt import Qt
 import xlrd
 from sysManage.userInfo import get_value

@@ -416,14 +416,14 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
             if equipItem.checkState(0) == Qt.Checked:
                 self.currentCheckedEquipList.append(equipID)
 
-        if self.currentCheckedUnitList == [] or self.currentCheckedEquipList == []:
-            headerlist = ['单位名称', '装备名称', '实力数', '编制数', '现有数', '偏差', '准备退役数', '未到位数', '提前退役', '待核查无实物', '待核查无实力',
-                          '单独建账',
-                          '正常到位']
-            self.inquiry_result.tw_inquiryResult.setHorizontalHeaderLabels(headerlist)
-            self.inquiry_result.tw_inquiryResult.setColumnCount(len(headerlist))
-            self.inquiry_result.tw_inquiryResult.setRowCount(0)
-            return
+        # if self.currentCheckedUnitList == [] or self.currentCheckedEquipList == []:
+        #     headerlist = ['单位名称', '装备名称', '实力数', '编制数', '现有数', '偏差', '准备退役数', '未到位数', '提前退役', '待核查无实物', '待核查无实力',
+        #                   '单独建账',
+        #                   '正常到位']
+        #     self.inquiry_result.tw_inquiryResult.setHorizontalHeaderLabels(headerlist)
+        #     self.inquiry_result.tw_inquiryResult.setColumnCount(len(headerlist))
+        #     self.inquiry_result.tw_inquiryResult.setRowCount(0)
+        #     return
 
         self.inquiry_result._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList,
                                                                    self.currentCheckedEquipList, self.currentYear)

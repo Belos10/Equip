@@ -12,48 +12,43 @@ class SelectCont(QDialog, widget_selectCont):
     def __init__(self, parent=None):
         super(SelectCont, self).__init__(parent)
         self.setupUi(self)
-        # 设置tablewidget左侧栏以及头部不显示
-        # self.seltCont.horizontalHeader().setVisible(False)
-        # self.seltCont.verticalHeader().setVisible(False)
         self.currentYear = ''
         # 初始化当前界面
         self._initSelf_()
-        # 存储当前结果，结构为：{i（行数）：一行数据}
-        # self.currentResult = {}
         self.pb_selectCont.clicked.connect(self.selectCont)
 
+
     def selectCont(self):
-        #print("self.seltCont.currentRow()",self.seltCont.currentRow())
+        self.row = self.seltCont.currentRow()
         if self.seltCont.currentRow() >= 0:
             self.signal.emit('1')
             self.close()
 
 
+    def returnNo(self):
+        return self.contData[self.row][2]
+
     def setYear(self, year):
         self.currentYear = year
         self.slotSelectResult()
 
-    '''
-        初始化当前界面，设置当前查询结果界面为灰
-    '''
+
+    # 初始化当前界面，设置当前查询结果界面为灰
     def _initSelf_(self):
         self.seltCont.clear()
 
 
-
-    '''
-        查找当前要显示的数据并显示到tablewidget上
-    '''
+    # 查找当前要显示的数据并显示到tablewidget上
     def slotSelectResult(self):
         self.seltCont.clear()
-        contData = selectDataFromContractOrder(self.currentYear)
+        self.contData = selectDataFromContractOrder(self.currentYear)
         headerlist = ['年份', '序号', '合同编号', '合同名称', '甲方', '乙方', '单价(万元)', '数量/单位','金额(万元)','交付时间','备注']
         self.lenHeaderList = len(headerlist)
         self.seltCont.setColumnCount(self.lenHeaderList)
-        self.seltCont.setRowCount(len(contData))
+        self.seltCont.setRowCount(len(self.contData))
         self.seltCont.setHorizontalHeaderLabels(headerlist)
         i = 0
-        for contDataInfo in contData:
+        for contDataInfo in self.contData:
             item = QTableWidgetItem()
             item.setText(contDataInfo[1])
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)

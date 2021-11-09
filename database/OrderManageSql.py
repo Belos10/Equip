@@ -235,8 +235,8 @@ def insertIntoOrderPlanYear(year):
         sql = "insert into orderallotplannote(Equip_id,Equip_Name,Year,Note) values " +\
                   "('" + EquipInfo[0] + "','" + EquipInfo[1] + "','" + str(year) +"', '' )"
         cur.execute(sql)
-        sql = "insert into orderallotschedule (Equip_Id,Equip_Name,army,allotconditionUper,rocketUper,finishUper,year) values " \
-              + "('" + EquipInfo[0] + "','" + EquipInfo[1] + "', '0','0','0','0','" + str(year) + "' )"
+        sql = "insert into orderallotschedule (Equip_Id,Equip_Name,contract,allotconditionUper,rocketUper,finishUper,year) values " \
+              + "('" + EquipInfo[0] + "','" + EquipInfo[1] + "', '','0','0','0','" + str(year) + "' )"
         cur.execute(sql)
         for UnitInfo in UnitList:
             sql = "insert into orderallotplan(Equip_id,Equip_Name,Unit_Id,Unit_Name,Year,OrderNum) values " +\
@@ -368,15 +368,15 @@ def updateOrderPlanNote(Equip_Id, Year, Note):
     conn.commit()
     # disconnectMySql(conn,cur)
 
-# 查询陆军调拨单进度
-def selectArmySchedule(Equip_Id,Year):
-    # conn, cur = connectMySql()
-    sql = "select army from orderallotschedule where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
+
+# 查询合同进度
+def selectContractSchedule(Equip_Id,Year):
+    sql = "select contract from orderallotschedule where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
     cur.execute(sql)
     result = cur.fetchall()
     conn.commit()
-    # disconnectMySql(conn, cur)
     return result
+
 
 # 查询是否具备条件进度(基地)
 def selectAllotConditionBase(Equip_Id, Year):
@@ -396,6 +396,20 @@ def selectAllotConditionUper(Equip_Id, Year):
     result = cur.fetchall()
     conn.commit()
     # disconnectMySql(conn, cur)
+    return result
+
+def selectRocketTransID(equip_ID,year):
+    sql = "select Trans_ID from rockettransfer where Equip_Id = '" + equip_ID + "'and year = '" + year + "'"
+    cur.execute(sql)
+    result = cur.fetchall()
+    conn.commit()
+    return result
+
+def selectRocketQua(equip_ID,year):
+    sql = "select Equip_Quity from rockettransfer where Equip_Id = '" + equip_ID + "'and year = '" + year + "'"
+    cur.execute(sql)
+    result = cur.fetchall()
+    conn.commit()
     return result
 
 # 查询火箭军调拨单进度(基地)
@@ -440,9 +454,9 @@ def selectIfScheduleFinishUper(Equip_Id, Year):
     return result
 
 # 更新陆军调拨单进度
-def updateArmySchedule(Equip_Id,Year):
+def updateContractSchedule(Equip_Id, Year, txt):
     # conn, cur = connectMySql()
-    sql = "update orderallotschedule set army = '1' where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
+    sql = "update orderallotschedule set contract = " + txt + " where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
     cur.execute(sql)
     conn.commit()
     # disconnectMySql(conn, cur)
@@ -498,14 +512,7 @@ def updateScheduleFinishUper(Equip_Id, Year, fileName):
     conn.commit()
     #disconnectMySql(conn, cur)
 
-# 陆军调拨号与装备质量
-def selectQuaAndID(Equip_ID, year):
-    sql = "select Equip_Quity,Trans_ID from armytransfer where Equip_ID = '" + Equip_ID + "'and year = '" + year + "'"
-    cur.execute(sql)
-    result = cur.fetchall()
-    # print("找质量和陆军单号result", result)
-    conn.commit()
-    return result
+
 
 # # 按装备ID列表从unit表复制数据至Orderplanunit表
 # def insertIntoDisturbPlanUnitFromList(UnitList):
@@ -717,7 +724,7 @@ def insertIntoOrderAdjustYear(year):
         cur.execute(sql)
         sql = "insert into orderAdjustCont (year,equip_Id,equip_Name,contSource,makeProj1,bid2,approval3,status1," \
               "signContract2,finish3) values " \
-              + "('" + str(year) + "','" + EquipInfo[0] + "','" + EquipInfo[1] + "','','0','0','0','0','0','0' )"
+              + "('" + str(year) + "','" + EquipInfo[0] + "','" + EquipInfo[1] + "','','0','0','0','0','','0' )"
         cur.execute(sql)
     conn.commit()
 
@@ -805,7 +812,7 @@ def updateContSource(contSource,equip_ID,Year):
     conn.commit()
 
 # 更新单一来源装备的合同进度表
-def udpateOrderAdjustContSingle(equip_ID,data,Year):
+def udpateOrderAdjustContBid(equip_ID, data, Year):
     sql = "update orderAdjustCont set makeProj1 = '" + data[1] + "' , bid2 = '" + data[2] \
           + "' , approval3 = '" + data[3] + "' , status1 = '" + data[0] \
           + "' , signContract2 = '" + data[4] + "' , finish3 = '" + data[5] + "' where equip_ID = '" + \
@@ -814,9 +821,9 @@ def udpateOrderAdjustContSingle(equip_ID,data,Year):
     conn.commit()
 
 # 更新招标来源装备的合同进度表
-def udpateOrderAdjustContBid(equip_ID, data, Year):
-    sql = "update orderAdjustCont set makeProj1 = '" + data[0] + "' , bid2 = '" + data[1] \
-          + "' , approval3 = '" + data[2] + "' where equip_ID = '" + \
+def udpateOrderAdjustContSingle(equip_ID, data, Year):
+    sql = "update orderAdjustCont set status1 = '" + data[0] + "' , signContract2 = '" + data[1] \
+          + "' , finish3 = '" + data[2] + "' where equip_ID = '" + \
           equip_ID + "' and year = '" + Year + "'"
     cur.execute(sql)
     conn.commit()

@@ -9,7 +9,7 @@ from PyQt5.Qt import Qt
 from sysManage.userInfo import get_value
 
 '''
-   编制数维护
+   装备平衡表
 '''
 class equipmentBalance(QWidget, Widget_Retirement):
     def __init__(self, parent=None):

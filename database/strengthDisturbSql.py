@@ -629,7 +629,7 @@ def addDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type, E
             return e
 
         sql = "insert into allotschedule (Equip_Id,Equip_Name,army,allotconditionUper,rocketUper,finishUper,year) values " \
-              + "('" + Equip_ID + "','" + Equip_Name + "', '0','0','0','0','" + disturbplanYearInfo + "' )"
+              + "('" + Equip_ID + "','" + Equip_Name + "', '','0','0','0','" + disturbplanYearInfo + "' )"
         try:
             cur.execute(sql)
         except Exception as e:
@@ -663,8 +663,8 @@ def addDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type, E
             conn.rollback()
             return e
 
-        sql = "insert into orderallotschedule (Equip_Id,Equip_Name,army,allotconditionUper,rocketUper,finishUper,year) values " \
-              + "('" + Equip_ID + "','" + Equip_Name + "', '0','0','0','0','" + orderallotplanYearInfo + "' )"
+        sql = "insert into orderallotschedule (Equip_Id,Equip_Name,contract,allotconditionUper,rocketUper,finishUper,year) values " \
+              + "('" + Equip_ID + "','" + Equip_Name + "', '','0','0','0','" + orderallotplanYearInfo + "' )"
         try:
             cur.execute(sql)
         except Exception as e:
@@ -684,7 +684,7 @@ def addDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type, E
             return e
         sql = "insert into orderAdjustCont (year,equip_Id,equip_Name,contSource,makeProj1,bid2,approval3,status1," \
               "signContract2,finish3) values " \
-              + "('" + orderadjustYearInfo + "','" + Equip_ID + "','" + Equip_Name + "','','0','0','0','0','0','0' )"
+              + "('" + orderadjustYearInfo + "','" + Equip_ID + "','" + Equip_Name + "','','0','0','0','0','','0' )"
         try:
             cur.execute(sql)
         except Exception as e:
@@ -1053,7 +1053,6 @@ def delDataInUnit(Unit_ID):
         for year in yearInfoList:
             for equip in endEquipList:
                 inputInfoTuple = selectInputInfoByEquipUnit(UnitID, equip[0], year[1])
-                #print("==================eeee", inputInfoTuple)
                 for inputInfo in inputInfoTuple:
                     delSuccess = delFromInputInfo(UnitID, equip[0], inputInfo[2], inputInfo[3], inputInfo[4], inputInfo[10])
                     if delSuccess != True:
@@ -1073,7 +1072,6 @@ def delDataInUnit(Unit_ID):
                           " where Equip_ID = '" + equipInfo[0] \
                           + "' and Unit_ID = '" + unitID + \
                           "' and year = '" + strengthYear[1] + "'"
-                            #print("=============", sql)
                             try:
                                 cur.execute(sql)
                             except Exception as e:
@@ -1528,6 +1526,7 @@ def selectAboutWeaveByEquipShow(UnitList, EquipList, yearList):
                     weave = list(resultInfo)
                     weave[3] = childEquipID[1]
                     resultList.append(weave)
+    print("equip===================", resultList)
     return resultList
 
 def isEquipUper(Equip_ID, Equip_Uper):
@@ -1541,7 +1540,7 @@ def isEquipUper(Equip_ID, Equip_Uper):
         return False
 
 # 按装备展开时根据单位列表、装备列表以及年份查询实力表
-def selectAboutStrengthByEquipShow(UnitList, EquipList, yearList,equipYear,startYear, endYear):
+def selectAboutStrengthByEquipShow(UnitList, EquipList, yearList,equipYear,startYear, endYear,flagValue0 = False):
     resultList = []
     for Unit_ID in UnitList:
         for Equip_ID in EquipList:
@@ -1556,34 +1555,63 @@ def selectAboutStrengthByEquipShow(UnitList, EquipList, yearList,equipYear,start
                         "' and Equip_ID = '" + childEquipID[0] + "' and year = '" + yearList + "'"
                     cur.execute(sql)
                     result = cur.fetchall()
-                    for resultInfo in result:
-                        info = list(resultInfo)
-                        info[7] = info[4] - info[6]
-                        info[2] = childEquipID[1]
-                        resultList.append(info)
-                        break
+                    if flagValue0:
+                        for resultInfo in result:
+                            info = list(resultInfo)
+                            if info[4] != 0:
+                                info[7] = info[4] - info[6]
+                                info[2] = childEquipID[1]
+                                resultList.append(info)
+                            break
+                    else:
+                        for resultInfo in result:
+                            info = list(resultInfo)
+                            info[7] = info[4] - info[6]
+                            info[2] = childEquipID[1]
+                            resultList.append(info)
+                            break
+
                 else:
                     sql = "select * from strength where Unit_ID = '" + Unit_ID + \
                           "' and Equip_ID = '" + childEquipID[0] + "' and year = '" + yearList + "'"
                     cur.execute(sql)
                     result = cur.fetchall()
                     if result:
-                        info = list(result[0])
-                        childEquipList = findChildNodeEquipIDList(childEquipID[0])
-                        childUnitList = findChildNodeUnitIDList(Unit_ID)
-                        info[6] = 0
-                        for unitID in childUnitList:
-                            for equipID in childEquipList:
-                                sql = "select * from inputinfo where Unit_ID = '" + unitID + \
-                                      "' and Equip_ID = '" + equipID + "' and inputYear = '" + yearList \
-                                      + "' and year between '" + startYear + "' and '" + endYear + "'"
-                                cur.execute(sql)
-                                result = cur.fetchall()
-                                for resultInfo in result:
-                                    info[6] = info[6] + int(resultInfo[3])
-                        info[7] = info[4] - info[6]
-                        info[2] = childEquipID[1]
-                        resultList.append(info)
+                        if flagValue0:
+                            info = list(result[0])
+                            if info[4] != 0:
+                                childEquipList = findChildNodeEquipIDList(childEquipID[0])
+                                childUnitList = findChildNodeUnitIDList(Unit_ID)
+                                info[6] = 0
+                                for unitID in childUnitList:
+                                    for equipID in childEquipList:
+                                        sql = "select * from inputinfo where Unit_ID = '" + unitID + \
+                                              "' and Equip_ID = '" + equipID + "' and inputYear = '" + yearList \
+                                              + "' and year between '" + startYear + "' and '" + endYear + "'"
+                                        cur.execute(sql)
+                                        result = cur.fetchall()
+                                        for resultInfo in result:
+                                            info[6] = info[6] + int(resultInfo[3])
+                                info[7] = info[4] - info[6]
+                                info[2] = childEquipID[1]
+                                resultList.append(info)
+                        else:
+                            info = list(result[0])
+                            childEquipList = findChildNodeEquipIDList(childEquipID[0])
+                            childUnitList = findChildNodeUnitIDList(Unit_ID)
+                            info[6] = 0
+                            for unitID in childUnitList:
+                                for equipID in childEquipList:
+                                    sql = "select * from inputinfo where Unit_ID = '" + unitID + \
+                                          "' and Equip_ID = '" + equipID + "' and inputYear = '" + yearList \
+                                          + "' and year between '" + startYear + "' and '" + endYear + "'"
+                                    cur.execute(sql)
+                                    result = cur.fetchall()
+                                    for resultInfo in result:
+                                        info[6] = info[6] + int(resultInfo[3])
+                            info[7] = info[4] - info[6]
+                            info[2] = childEquipID[1]
+                            resultList.append(info)
     return resultList
 
 
@@ -1602,31 +1630,27 @@ def selectUnitIsGroup(Unit_ID):
 # 按单位展开时根据单位列表、装备列表以及年份查询编制表
 def selectAboutWeaveByUnitShow(UnitList, EquipList, yearList):
     resultList = []
-    # 如果只查询某年的
-    # if len(yearList) == 1:
-    # 如果查询全部年的
-
     for Equip_ID in EquipList:
         for Unit_ID in UnitList:
             # 查询当前单位ID的孩子序列
             UnitIDChildList = []
             findChildUnitByWeave(Unit_ID, UnitIDChildList, "")
-            # print("==================", UnitIDChildList)
+            print("u1uu1it==================", UnitIDChildList)
             for childUnitID in UnitIDChildList:
                 sql = "select * from weave where Unit_ID = '" + childUnitID[0] + \
                             "' and Equip_ID = '" + Equip_ID + "' and year = '" + yearList + "'"
-                # print("==================", sql)
+                print("uiunit==================", sql)
                 cur.execute(sql)
                 result = cur.fetchall()
                 for resultInfo in result:
                     weave = list(resultInfo)
                     weave[2] = childUnitID[1]
                     resultList.append(weave)
-    # print("===================",resultList)
+    print("unit===================",resultList)
     return resultList
 
 #实力查询展开到末级
-def selectAboutStrengthByLast(UnitList, EquipList, year, equipYear, startFactoryYear, endFactoryYear):
+def selectAboutStrengthByLast(UnitList, EquipList, year, equipYear, startFactoryYear, endFactoryYear,flagValue0 = False):
     resultList = []
     if UnitList:
         UnitID = UnitList[0]
@@ -1646,17 +1670,31 @@ def selectAboutStrengthByLast(UnitList, EquipList, year, equipYear, startFactory
         return []
 
     if equipYear == "":
-        unitSpace = ""
-        for UnitID in childUnit:
-            for EquipID in childEquip:
-                strengthInfo = selectStrengthInfo(UnitID[0], EquipID[0], year)
-                for strength in strengthInfo:
-                    info = list(strength)
-                    info[7] = info[4] - info[6]
-                    info[2] = EquipID[1]
-                    info[3] = UnitID[1]
-                    resultList.append(info)
-                    break
+        if flagValue0:
+            unitSpace = ""
+            for UnitID in childUnit:
+                for EquipID in childEquip:
+                    strengthInfo = selectStrengthInfo(UnitID[0], EquipID[0], year)
+                    for strength in strengthInfo:
+                        info = list(strength)
+                        if info[4] != 0:
+                            info[7] = info[4] - info[6]
+                            info[2] = EquipID[1]
+                            info[3] = UnitID[1]
+                            resultList.append(info)
+                        break
+        else:
+            unitSpace = ""
+            for UnitID in childUnit:
+                for EquipID in childEquip:
+                    strengthInfo = selectStrengthInfo(UnitID[0], EquipID[0], year)
+                    for strength in strengthInfo:
+                        info = list(strength)
+                        info[7] = info[4] - info[6]
+                        info[2] = EquipID[1]
+                        info[3] = UnitID[1]
+                        resultList.append(info)
+                        break
     return resultList
 
 #判断是否是最小的实力年份
@@ -1697,10 +1735,11 @@ def selectAboutWeaveByLast(UnitList, EquipList, year):
                 info[2] = UnitID[1]
                 resultList.append(info)
                 break
+
     return resultList
 
 # 按单位展开时根据单位列表、装备列表以及年份查询实力表
-def selectAboutStrengthByUnitShow(UnitList, EquipList, yearList, equipYear, startFactoryYear, endFactoryYear):
+def selectAboutStrengthByUnitShow(UnitList, EquipList, yearList, equipYear, startFactoryYear, endFactoryYear,flagValue0 = False):
     resultList = []
     # 如果只查询某年的
     #if len(yearList) == 1:
@@ -1720,38 +1759,66 @@ def selectAboutStrengthByUnitShow(UnitList, EquipList, yearList, equipYear, star
                     cur.execute(sql)
                     print(sql)
                     result = cur.fetchall()
-                    for resultInfo in result:
-                        info = list(resultInfo)
-                        info[7] = info[4] - info[6]
-                        info[3] = childUnitID[1]
-                        resultList.append(info)
+                    if flagValue0:
+                        for resultInfo in result:
+                            info = list(resultInfo)
+                            if info[4] != 0:
+                                info[7] = info[4] - info[6]
+                                info[3] = childUnitID[1]
+                                resultList.append(info)
+                    else:
+                        for resultInfo in result:
+                            info = list(resultInfo)
+                            info[7] = info[4] - info[6]
+                            info[3] = childUnitID[1]
+                            resultList.append(info)
                 else:
                     sql = "select * from strength where Unit_ID = '" + childUnitID[0] + \
                           "' and Equip_ID = '" + Equip_ID + "' and year = '" + yearList + "'"
                     cur.execute(sql)
                     result = cur.fetchall()
                     if result:
-                        info = list(result[0])
-                        childEquipList = findChildNodeEquipIDList(Equip_ID)
-                        childUnitList = findChildNodeUnitIDList(childUnitID[0])
-                        info[6] = 0
-                        for unitID in childUnitList:
-                            for equipID in childEquipList:
-                                sql = "select * from inputinfo where Unit_ID = '" + unitID + \
-                              "' and Equip_ID = '" + equipID + "' and inputYear = '" + yearList \
-                              + "' and year between '" + startFactoryYear + "' and '" + endFactoryYear + "'"
-                                cur.execute(sql)
-                                result = cur.fetchall()
-                                for resultInfo in result:
-                                    info[6] = info[6] + int(resultInfo[3])
-                        info[7] = info[4] - info[6]
-                        info[3] = childUnitID[1]
-                        resultList.append(info)
+                        if flagValue0:
+                            info = list(result[0])
+                            if info[4] != 0:
+                                childEquipList = findChildNodeEquipIDList(Equip_ID)
+                                childUnitList = findChildNodeUnitIDList(childUnitID[0])
+                                info[6] = 0
+                                for unitID in childUnitList:
+                                    for equipID in childEquipList:
+                                        sql = "select * from inputinfo where Unit_ID = '" + unitID + \
+                                              "' and Equip_ID = '" + equipID + "' and inputYear = '" + yearList \
+                                              + "' and year between '" + startFactoryYear + "' and '" + endFactoryYear + "'"
+                                        cur.execute(sql)
+                                        result = cur.fetchall()
+                                        for resultInfo in result:
+                                            info[6] = info[6] + int(resultInfo[3])
+                                info[7] = info[4] - info[6]
+                                info[3] = childUnitID[1]
+                                resultList.append(info)
+                        else:
+                            info = list(result[0])
+                            childEquipList = findChildNodeEquipIDList(Equip_ID)
+                            childUnitList = findChildNodeUnitIDList(childUnitID[0])
+                            info[6] = 0
+                            for unitID in childUnitList:
+                                for equipID in childEquipList:
+                                    sql = "select * from inputinfo where Unit_ID = '" + unitID + \
+                                  "' and Equip_ID = '" + equipID + "' and inputYear = '" + yearList \
+                                  + "' and year between '" + startFactoryYear + "' and '" + endFactoryYear + "'"
+                                    cur.execute(sql)
+                                    result = cur.fetchall()
+                                    for resultInfo in result:
+                                        info[6] = info[6] + int(resultInfo[3])
+                            info[7] = info[4] - info[6]
+                            info[3] = childUnitID[1]
+                            resultList.append(info)
                     else:
-                        info = [Equip_ID, childUnitID, equipName, unitName, 0, 0, 0, 0,
-                                    0, 0, 0, 0, 0, 0, 0, 0,0]
-                        info[3] = childUnitID[1]
-                        resultList.append(info)
+                        if not flagValue0:
+                            info = [Equip_ID, childUnitID, equipName, unitName, 0, 0, 0, 0,
+                                        0, 0, 0, 0, 0, 0, 0, 0,0]
+                            info[3] = childUnitID[1]
+                            resultList.append(info)
     return resultList
 
 
@@ -2020,7 +2087,7 @@ def selectAboutWeaveByUnitListAndEquipList(UnitList, EquipList, yearList):
     return resultList
 
 #没有展开时根据单位列表、装备列表以及年份查询实力表
-def selectAboutStrengthByUnitListAndEquipList(UnitList, EquipList, yearList, equipYear, startFactoryYear, endFactoryYear):
+def selectAboutStrengthByUnitListAndEquipList(UnitList, EquipList, yearList, equipYear, startFactoryYear, endFactoryYear,flagValue0 = False):
     resultList = []
     #如果只查询某年的
     #if len(yearList) == 1:
@@ -2034,31 +2101,56 @@ def selectAboutStrengthByUnitListAndEquipList(UnitList, EquipList, yearList, equ
                 #print(sql)
                 cur.execute(sql)
                 result = cur.fetchall()
-                for resultInfo in result:
-                    Info = list(resultInfo)
-                    Info[7] = Info[4] - Info[6]
-                    resultList.append(Info)
+                if flagValue0:
+                    for resultInfo in result:
+                        Info = list(resultInfo)
+                        if Info[4] != 0:
+                            Info[7] = Info[4] - Info[6]
+                            resultList.append(Info)
+                else:
+                    for resultInfo in result:
+                        Info = list(resultInfo)
+                        Info[7] = Info[4] - Info[6]
+                        resultList.append(Info)
             else:
                 sql = "select * from strength where Unit_ID = '" + Unit_ID + \
                       "' and Equip_ID = '" + Equip_ID + "' and year = '" + yearList + "'"
                 cur.execute(sql)
                 result = cur.fetchall()
                 if result:
-                    info = list(result[0])
-                    childEquipList = findChildNodeEquipIDList(Equip_ID)
-                    childUnitList = findChildNodeUnitIDList(Unit_ID)
-                    info[6] = 0
-                    for unitID in childUnitList:
-                        for equipID in childEquipList:
-                            sql = "select * from inputinfo where Unit_ID = '" + unitID + \
-                                  "' and Equip_ID = '" + equipID + "' and inputYear = '" + yearList \
-                                  + "' and year between '" + startFactoryYear + "' and '" + endFactoryYear + "'"
-                            cur.execute(sql)
-                            result = cur.fetchall()
-                            for resultInfo in result:
-                                info[6] = info[6] + int(resultInfo[3])
-                    info[7] = info[4] - info[6]
-                    resultList.append(info)
+                    if flagValue0:
+                        info = list(result[0])
+                        if info[4] != 0:
+                            childEquipList = findChildNodeEquipIDList(Equip_ID)
+                            childUnitList = findChildNodeUnitIDList(Unit_ID)
+                            info[6] = 0
+                            for unitID in childUnitList:
+                                for equipID in childEquipList:
+                                    sql = "select * from inputinfo where Unit_ID = '" + unitID + \
+                                          "' and Equip_ID = '" + equipID + "' and inputYear = '" + yearList \
+                                          + "' and year between '" + startFactoryYear + "' and '" + endFactoryYear + "'"
+                                    cur.execute(sql)
+                                    result = cur.fetchall()
+                                    for resultInfo in result:
+                                        info[6] = info[6] + int(resultInfo[3])
+                            info[7] = info[4] - info[6]
+                            resultList.append(info)
+                    else:
+                        info = list(result[0])
+                        childEquipList = findChildNodeEquipIDList(Equip_ID)
+                        childUnitList = findChildNodeUnitIDList(Unit_ID)
+                        info[6] = 0
+                        for unitID in childUnitList:
+                            for equipID in childEquipList:
+                                sql = "select * from inputinfo where Unit_ID = '" + unitID + \
+                                      "' and Equip_ID = '" + equipID + "' and inputYear = '" + yearList \
+                                      + "' and year between '" + startFactoryYear + "' and '" + endFactoryYear + "'"
+                                cur.execute(sql)
+                                result = cur.fetchall()
+                                for resultInfo in result:
+                                    info[6] = info[6] + int(resultInfo[3])
+                        info[7] = info[4] - info[6]
+                        resultList.append(info)
     return resultList
 
 

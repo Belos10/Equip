@@ -52,9 +52,9 @@ class DisturbPlan(QWidget, yearList_Form):
         self.lw_yearChoose.itemClicked.connect(self.initDisturbPlanProof)
         # 点击第一目录结果
         self.tw_first.itemClicked.connect(self.slotDisturbStrengthResult)
-        self.tw_second.itemChanged.connect(self.slotCheckedChange)
         # 点击第二目录结果
         self.tw_second.itemClicked.connect(self.slotDisturbStrengthResult)
+        self.tw_second.itemChanged.connect(self.slotCheckedChange)
         # 新增年份
         self.tb_add.clicked.connect(self.slotAddNewYear)
         # 删除年份
@@ -118,7 +118,7 @@ class DisturbPlan(QWidget, yearList_Form):
     # 新增年份
     def slotAddNewYear(self):
         year = 0
-        year, ok = QInputDialog.getInt(self, "Get year", "year:", 0, 0, 100000, 1)
+        year, ok = QInputDialog.getInt(self, "输入年份", "year:", 0, 0, 100000, 1)
         if ok:
             haveYear = False
             allyear = selectYearListAboutDisturbPlan()
@@ -137,7 +137,7 @@ class DisturbPlan(QWidget, yearList_Form):
 
     # 删除年份
     def slotDelYear(self):
-        reply = QMessageBox.question(self, "删除", "是否删除所有？", QMessageBox.Yes, QMessageBox.Cancel)
+        reply = QMessageBox.question(self, "删除", "是否删除该年份及其数据？", QMessageBox.Yes, QMessageBox.Cancel)
         if reply == QMessageBox.Yes:
             currentYear = self.lw_yearChoose.currentItem()
             # print("currentYear.text()",currentYear.text())

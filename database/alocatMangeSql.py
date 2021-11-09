@@ -278,7 +278,7 @@ def insertIntoDisturbPlanYear(year):
                   "('" + EquipInfo[0] + "','" + EquipInfo[1] + "','" + str(year) +"', '' )"
         cur.execute(sql)
         sql = "insert into allotschedule (Equip_Id,Equip_Name,army,allotconditionUper,rocketUper,finishUper,year) values " \
-              + "('" + EquipInfo[0] + "','" + EquipInfo[1] + "', '0','0','0','0','" + str(year) + "' )"
+              + "('" + EquipInfo[0] + "','" + EquipInfo[1] + "', '','0','0','0','" + str(year) + "' )"
         cur.execute(sql)
         for UnitInfo in UnitList:
             sql = "insert into disturbplan(Equip_id,Equip_Name,Unit_Id,Unit_Name,Year,DisturbNum) values " +\
@@ -384,7 +384,7 @@ def selectDisturbPlanOther(EquipList, YearList):
             resultList.append(result)
         else:
             resultList.append([])
-    print("陆军调拨单resultList", resultList)
+    # print("陆军调拨单resultList", resultList)
     return resultList
 
 # # 读取火箭军计划数
@@ -503,9 +503,9 @@ def selectIfScheduleFinishUper(Equip_Id, Year):
     return result
 
 # 更新陆军调拨单进度
-def updateArmySchedule(Equip_Id,Year):
+def updateArmySchedule(Equip_Id,Year,txt):
     # conn, cur = connectMySql()
-    sql = "update allotschedule set army = '1' where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
+    sql = "update allotschedule set army = " + txt + " where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
     cur.execute(sql)
     conn.commit()
     # disconnectMySql(conn, cur)
@@ -788,3 +788,27 @@ def findRetirePlanUnitChildInfo(unitId):
         return result
     else:
         return []
+
+
+def selectIfUnitScheduleFinish(unitID,equipID,year):
+    # conn, cur = connectMySql()
+    sql = "select Flag_ifFinish from disturbplan where Unit_Id = %s and " \
+          "Equip_Id = %s and Year = %s" %(unitID, equipID, year)
+    cur.execute(sql)
+    result = cur.fetchall()
+    conn.commit()
+    # disconnectMySql(conn, cur)
+    return result
+
+
+def updateUnitScheduleFinish(unitID,equipID,year,flag):
+    # conn, cur = connectMySql()
+    if flag:
+        sql = "update disturbplan set Flag_ifFinish = 'TRUE' where Unit_Id = %s " \
+              "and Equip_Id = %s and Year = %s" % (unitID, equipID, year)
+    else:
+        sql = "update disturbplan set Flag_ifFinish = 'FALSE' where Unit_Id = %s " \
+              "and Equip_Id = %s and Year = %s" % (unitID, equipID, year)
+    # print(sql)
+    cur.execute(sql)
+    conn.commit()

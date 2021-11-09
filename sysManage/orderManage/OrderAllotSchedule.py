@@ -1,17 +1,17 @@
 import sys
 from PyQt5.QtWidgets import *
-#new
 from database.SD_EquipmentBanlanceSql import updateOneEquipmentBalanceData
 from widgets.orderManage.Widget_OrderAllotSchedule import widget_OrderAllotSchedule
 from database.strengthDisturbSql import *
 from PyQt5.Qt import Qt
 from PyQt5.QtGui import QColor, QBrush,QFont
 from database.OrderManageSql import *
-##################################################
 from sysManage.alocatMange.ArmySchedule import ArmySchedule
+from sysManage.orderManage.selectCont import SelectCont
 from sysManage.alocatMange.armyTransfer import armyTransfer
-from sysManage.alocatMange.ScheduleFinish import ScheduleFisish
+from sysManage.orderManage.OrderScheduleFinish import OrderScheduleFinish
 from sysManage.alocatMange.transferModel import transferModel
+from sysManage.orderManage.selectQua import SelectQua
 from sysManage.userInfo import get_value
 
 class OrderAllotSchedule(QWidget, widget_OrderAllotSchedule):
@@ -25,11 +25,12 @@ class OrderAllotSchedule(QWidget, widget_OrderAllotSchedule):
         self.currentUnitDisturbPlanNum = {}
         self.unitDisturbPlanList = {}
         self.currentEquipdict = {}
-        self.armySchedule = ArmySchedule(self)
-        self.scheduleFinish = ScheduleFisish(self)
+        self.contractSchedule = SelectCont(self)
+        self.scheduleFinish = OrderScheduleFinish(self)
         self.fileName = ""
         self.unitFlag = 0
         self.rocketSchedule = transferModel(self)
+        self.selectQua = SelectQua()
         self.signalConnect()
 
 
@@ -237,7 +238,7 @@ class OrderAllotSchedule(QWidget, widget_OrderAllotSchedule):
             if len(self.currentUnitChilddict):
                 for i in self.currentUnitChilddict.values():
                     headerlist.append(i[1])
-            headerlist.append('陆军调拨单进度')
+            headerlist.append('合同进度')
             headerlist.append('接装条件')
             headerlist.append('火箭军调拨单进度')
             headerlist.append('完成接装')
@@ -287,7 +288,6 @@ class OrderAllotSchedule(QWidget, widget_OrderAllotSchedule):
             if len(self.currentUnitChilddict):
                 for i in self.currentUnitChilddict.values():
                     headerlist.append(i[1])
-            # headerlist.append('陆军调拨单进度')
             headerlist.append('火箭军调拨单进度')
             headerlist.append('接装条件')
             headerlist.append('完成接装')
@@ -364,11 +364,11 @@ class OrderAllotSchedule(QWidget, widget_OrderAllotSchedule):
             for i in self.currentEquipdict:
                 if not selectEquipIsHaveChild(self.currentEquipdict[i][0]):
                     # 陆军调拨单进度
-                    flag1 = selectArmySchedule(self.currentEquipdict[i][0],self.currentYear)
+                    flag1 = selectContractSchedule(self.currentEquipdict[i][0],self.currentYear)
                     item = QPushButton("设置进度")
-                    item.clicked.connect(self.setArmySchedule)
-                    if flag1[0][0] != '0':
-                        item = QPushButton("已完成")
+                    item.clicked.connect(self.setContractSchedule)
+                    if flag1[0][0] != '':
+                        item = QPushButton(flag1[0][0])
                     self.disturbResult.setCellWidget(i, 5 + self.lenCurrentUnitChilddict, item)
 
                     # 是否具备接装条件
@@ -382,8 +382,10 @@ class OrderAllotSchedule(QWidget, widget_OrderAllotSchedule):
                     # 火箭军调拨单进度
                     flag3 = selectRocketScheduleUper(self.currentEquipdict[i][0], self.currentYear)
                     item = QPushButton("设置进度")
-                    item.clicked.connect(self.setRocketSchedule)
+                    item.clicked.connect(self.setQua)
                     if int(flag3[0][0]):
+                        # txt = selectRocketTransID(self.currentEquipdict[i][0], self.currentYear)
+                        # item = QPushButton(txt[0][0])
                         item = QPushButton("已完成")
                         item.clicked.connect(self.showRocket)
                     self.disturbResult.setCellWidget(i, 7 + self.lenCurrentUnitChilddict, item)
@@ -400,19 +402,21 @@ class OrderAllotSchedule(QWidget, widget_OrderAllotSchedule):
         elif self.unitFlag == 2:
             for i in self.currentEquipdict:
                 if not selectEquipIsHaveChild(self.currentEquipdict[i][0]):
-                    # # 陆军调拨单进度
-                    # flag1 = selectArmySchedule(self.currentEquipdict[i][0], self.currentYear)
+                    # # 合同进度
+                    # flag1 = selectContractSchedule(self.currentEquipdict[i][0], self.currentYear)
                     # item = QPushButton("设置进度")
-                    # item.clicked.connect(self.setArmySchedule)
-                    # if flag1[0][0] != '0':
-                    #     item = QPushButton("已完成")
+                    # item.clicked.connect(self.setContractSchedule)
+                    # if flag1[0][0] != '':
+                    #     item = QPushButton(flag1[0][0])
                     # self.disturbResult.setCellWidget(i, 5 + self.lenCurrentUnitChilddict, item)
 
                     # 火箭军调拨单进度
                     flag2 = selectRocketScheduleBase(self.currentEquipdict[i][0], self.currentYear)
                     item = QPushButton("设置进度")
-                    item.clicked.connect(self.setRocketSchedule)
+                    item.clicked.connect(self.setQua)
                     if int(flag2[0][0]):
+                        # txt = selectRocketTransID(self.currentEquipdict[i][0], self.currentYear)
+                        # item = QPushButton(txt[0][0])
                         item = QPushButton("已完成")
                         item.clicked.connect(self.showRocket)
                     self.disturbResult.setCellWidget(i, 5 + self.lenCurrentUnitChilddict, item)
@@ -616,21 +620,22 @@ class OrderAllotSchedule(QWidget, widget_OrderAllotSchedule):
                             self.disturbResult.item(row, 2).setText(str(sum))
 
 
-    # 进度1 陆军调拨
-    def setArmySchedule(self):
-        self.armySchedule.setYear(self.currentYear)
-        self.armySchedule.setWindowTitle("陆军调拨单选择")
-        self.armySchedule.setWindowFlags(Qt.Dialog|Qt.WindowCloseButtonHint)
-        self.armySchedule._initSelf_()
-        self.armySchedule.show()
-        self.armySchedule.signal.connect(self.updateArmy)
+    # 进度1 合同
+    def setContractSchedule(self):
+        self.contractSchedule._initSelf_()
+        self.contractSchedule.setYear(self.currentYear)
+        self.contractSchedule.setWindowTitle("合同选择")
+        self.contractSchedule.setWindowFlags(Qt.Dialog | Qt.WindowCloseButtonHint)
+        self.contractSchedule.show()
+        self.contractSchedule.signal.connect(self.updateContract)
 
-    # 更新进度1 陆军调拨
-    def updateArmy(self):
+    # 更新进度1 合同
+    def updateContract(self):
+        txt = self.contractSchedule.returnNo()
         currentRow = self.disturbResult.currentRow()
-        item = QPushButton("已完成")
+        item = QPushButton(txt)
         self.disturbResult.setCellWidget(currentRow, 5 + self.lenCurrentUnitChilddict, item)
-        updateArmySchedule(self.currentEquipdict[currentRow][0], self.currentYear)
+        updateContractSchedule(self.currentEquipdict[currentRow][0], self.currentYear,txt)
 
     # 进度2 接装条件
     def setCondition(self):
@@ -640,7 +645,7 @@ class OrderAllotSchedule(QWidget, widget_OrderAllotSchedule):
             return
         if currentColumn - 1 < 0:
             return
-        if self.disturbResult.cellWidget(currentRow, currentColumn - 1).text() != "已完成":
+        if self.disturbResult.cellWidget(currentRow, currentColumn - 1).text() == "设置进度":
             QMessageBox.information(self, "设置接装条件", "上一级未完成", QMessageBox.Yes)
             return
         reply = QMessageBox.question(self,"设置接装条件","是否具备接装条件？",QMessageBox.Yes,QMessageBox.Cancel)
@@ -652,8 +657,16 @@ class OrderAllotSchedule(QWidget, widget_OrderAllotSchedule):
             elif self.unitFlag == 2:
                 updateAllotConditionBase(self.currentEquipdict[currentRow][0], self.currentYear)
 
+    # 设置装备质量
+    def setQua(self):
+        self.selectQua._init()
+        self.selectQua.show()
+        self.selectQua.signal.connect(self.setRocketSchedule)
+
+
     # 进度3 火箭军调拨
     def setRocketSchedule(self):
+        QuaTxt = self.selectQua.returnQua()
         row = self.disturbResult.currentRow()
         column = self.disturbResult.currentColumn()
         if row < 0 or column < 0:
@@ -661,21 +674,22 @@ class OrderAllotSchedule(QWidget, widget_OrderAllotSchedule):
         if column - 1 < 0:
             return
         if self.unitFlag == 1:
-            if self.disturbResult.cellWidget(row, column - 1).text() != "已完成":
+            if self.disturbResult.cellWidget(row, column - 1).text() == "设置进度":
                 QMessageBox.information(self, "设置接装条件", "上一级未完成", QMessageBox.Yes)
                 return
         currentUnit=[]
         for i in self.currentUnitChilddict.values():
             currentUnit.append(i)
         if row != -1:
-            # 存放质量和陆军单号
-            result1 = selectQuaAndID(self.currentEquipdict[row][0],self.currentYear)
-            if result1:
-                info1=[result1[0][0],self.disturbResult.item(row,4).text()]
+            self.selectQua.show()
+            # 存放质量和合同单号
+            Notxt = selectContractSchedule(self.currentEquipdict[row][0],self.currentYear)
+            if Notxt[0][0] != '':
+                info1=[QuaTxt, self.disturbResult.item(row,4).text()]
                 for i in range(0,self.lenCurrentUnitChilddict):
                     info1.append(self.disturbResult.item(row,5+i).text())
                 info1.append(self.tb_proof.toPlainText())
-                info1.append(result1[0][1])
+                info1.append(Notxt[0][0])
                 # 单位Info 当前选中装备Info 当前年份 [质量 此次分配合计数 各单位分配数 依据 陆军单号]
                 self.rocketSchedule.getUnitIDList(currentUnit,self.currentEquipdict[self.disturbResult.currentRow()],self.currentYear,info1)
             else:
@@ -706,27 +720,27 @@ class OrderAllotSchedule(QWidget, widget_OrderAllotSchedule):
             return
         if currentColumn - 1 < 0:
             return
-        if self.unitFlag == 1:
-            if self.disturbResult.cellWidget(row, currentColumn - 1).text() != "已完成":
-                QMessageBox.information(self, "设置接装条件", "上一级未完成", QMessageBox.Yes)
-                return
+        # if self.unitFlag == 1:
+        #     if self.disturbResult.cellWidget(row, currentColumn - 1).text() == "设置进度":
+        #         QMessageBox.information(self, "设置接装条件", "上一级未完成", QMessageBox.Yes)
+        #         return
         currentUnit = []
         for i in self.currentUnitChilddict.values():
             currentUnit.append(i)
         if row != -1:
             # 存放质量和陆军单号
-            result1 = selectQuaAndID(self.currentEquipdict[row][0], self.currentYear)
-            if result1:
-                info1 = [result1[0][0], self.disturbResult.item(row, 4).text()]
+            QuaTxt = selectRocketQua(self.currentEquipdict[row][0], self.currentYear)
+            txt = selectContractSchedule(self.currentEquipdict[row][0], self.currentYear)
+            if txt[0][0] != '':
+                info1 = [QuaTxt[0][0], self.disturbResult.item(row, 4).text()]
                 for i in range(0, self.lenCurrentUnitChilddict):
                     info1.append(self.disturbResult.item(row, 5 + i).text())
                 info1.append(self.tb_proof.toPlainText())
-                info1.append(result1[0][1])
+                info1.append(txt[0][0])
                 ShowRocket.getUnitIDList(currentUnit, self.currentEquipdict[self.disturbResult.currentRow()],
                                                   self.currentYear, info1)
             else:
-                ShowRocket.getUnitIDList("", "",
-                                                  "", "")
+                ShowRocket.getUnitIDList("", "", "", "")
             ShowRocket.setWindowFlags(Qt.Dialog | Qt.WindowCloseButtonHint)
             ShowRocket.pb_output.setDisabled(1)
             ShowRocket.pb_input.setDisabled(1)
@@ -746,7 +760,7 @@ class OrderAllotSchedule(QWidget, widget_OrderAllotSchedule):
             return
         if currentColumn - 1 < 0:
             return
-        if self.disturbResult.cellWidget(currentRow, currentColumn - 1).text() != "已完成":
+        if self.disturbResult.cellWidget(currentRow, currentColumn - 1).text() == "设置进度":
             QMessageBox.information(self, "设置接装条件", "上一级未完成", QMessageBox.Yes)
             return
         self.scheduleFinish.setWindowFlags(Qt.Dialog|Qt.WindowCloseButtonHint)
@@ -782,7 +796,7 @@ class OrderAllotSchedule(QWidget, widget_OrderAllotSchedule):
                 equipDictTab = {}
                 j = 0
                 for equipID, equipItem in self.second_treeWidget_dict.items():
-                    flag1 = selectArmySchedule(equipID, self.currentYear)
+                    flag1 = selectContractSchedule(equipID, self.currentYear)
                     if flag1[0][0] != '0':
                         if equipItem.checkState(0) == Qt.Checked:
                             equipInfo = findEquipInfo(equipID)

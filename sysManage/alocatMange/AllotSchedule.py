@@ -9,10 +9,14 @@ from PyQt5.QtGui import QColor, QBrush,QFont
 from database.alocatMangeSql import *
 from sysManage.alocatMange.ArmySchedule import ArmySchedule
 from sysManage.alocatMange.armyTransfer import armyTransfer
-from sysManage.alocatMange.ScheduleFinish import ScheduleFisish
+from sysManage.alocatMange.ScheduleFinish import ScheduleFinish
 from sysManage.alocatMange.transferModel import transferModel
+from sysManage.orderManage.OrderScheduleFinish import OrderScheduleFinish
 from sysManage.userInfo import get_value
 
+'''
+    调拨进度
+'''
 class AllotSchedule(QWidget,widget_AllotSchedule):
     def __init__(self,parent=None):
         super(AllotSchedule, self).__init__(parent)
@@ -25,7 +29,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         self.unitDisturbPlanList = {}
         self.currentEquipdict = {}
         self.armySchedule = ArmySchedule(self)
-        self.scheduleFinish = ScheduleFisish(self)
+        self.scheduleFinish = ScheduleFinish()
         self.fileName = ""
         self.unitFlag = 0
         self.rocketSchedule = transferModel(self)
@@ -210,7 +214,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                 for resultInfo in result:
                     self.currentUnitChilddict[j] = resultInfo
                     j = j + 1
-        #print("unit", self.currentUnitChilddict)
+        print("self.currentUnitChilddict", self.currentUnitChilddict)
         # 获取当前装备名
         j = 0
         for equipID, equipItem in self.second_treeWidget_dict.items():
@@ -282,6 +286,13 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                 for x in range(0, self.lenCurrentUnitChilddict):
                     item = QTableWidgetItem("")
                     item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                    flag = selectIfUnitScheduleFinish(self.currentUnitChilddict[x][0],
+                                                      self.currentEquipdict[i][0],
+                                                      self.currentYear)
+                    if flag[0][0] == 'TRUE':
+                        item.setForeground(QBrush(QColor(87, 102, 144)))
+                    else:
+                        item.setForeground(QBrush(QColor(219, 125, 116)))
                     self.disturbResult.setItem(i, x + 5, item)
                     currentRowResult.append(item)
                 item = QTableWidgetItem("")
@@ -331,6 +342,13 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                 for x in range(0, self.lenCurrentUnitChilddict):
                     item = QTableWidgetItem("")
                     item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                    flag = selectIfUnitScheduleFinish(self.currentUnitChilddict[x][0],
+                                                      self.currentEquipdict[i][0],
+                                                      self.currentYear)
+                    if flag[0][0] == 'TRUE':
+                        item.setForeground(QBrush(QColor(87,102,144)))
+                    else:
+                        item.setForeground(QBrush(QColor(219,125,116)))
                     self.disturbResult.setItem(i, x + 5, item)
                     currentRowResult.append(item)
                 item = QTableWidgetItem("")
@@ -376,7 +394,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                     item = QPushButton("设置进度")
                     item.clicked.connect(self.setArmySchedule)
                     if flag1[0][0] != '0':
-                        item = QPushButton("已完成")
+                        item = QPushButton(flag1[0][0])
                     self.disturbResult.setCellWidget(i, 5 + self.lenCurrentUnitChilddict, item)
 
                     # 是否具备接装条件
@@ -398,7 +416,6 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
 
                     # 是否完成接装
                     flag4 = selectIfScheduleFinishUper(self.currentEquipdict[i][0], self.currentYear)
-                    print("flag4",flag4)
                     item = QPushButton("设置进度")
                     item.clicked.connect(self.setScheduleFinish)
                     if flag4[0][0] != '0':
@@ -435,7 +452,6 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
 
                     # 是否完成接装
                     flag4 = selectIfScheduleFinishBase(self.currentEquipdict[i][0], self.currentYear)
-                    print("flag4", flag4)
                     item = QPushButton("设置进度")
                     item.clicked.connect(self.setScheduleFinish)
                     if flag4[0][0] != '0':
@@ -455,7 +471,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         # print("currentYear:", self.currentYear)
         self.unitDisturbPlanList = selectDisturbPlanNumByList(self.currentUnitChilddict,
                                                               self.currentEquipdict, self.currentYear)
-        print("self.unitDisturbPlanList", self.unitDisturbPlanList)
+        # print("self.unitDisturbPlanList", self.unitDisturbPlanList)
         # 显示每个单位分配计划数
         num = 0
         for i in range(0, len(self.currentUnitChilddict)):
@@ -635,10 +651,11 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
 
     # 更新进度1 陆军调拨
     def updateArmy(self):
+        txt = self.armySchedule.returnID()
         currentRow = self.disturbResult.currentRow()
-        item = QPushButton("已完成")
+        item = QPushButton(txt)
         self.disturbResult.setCellWidget(currentRow, 5 + self.lenCurrentUnitChilddict, item)
-        updateArmySchedule(self.currentEquipdict[currentRow][0], self.currentYear)
+        updateArmySchedule(self.currentEquipdict[currentRow][0], self.currentYear,txt)
 
     # 进度2 接装条件
     def setCondition(self):
@@ -648,7 +665,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
             return
         if currentColumn - 1 < 0:
             return
-        if self.disturbResult.cellWidget(currentRow, currentColumn - 1).text() != "已完成":
+        if self.disturbResult.cellWidget(currentRow, currentColumn - 1).text() == "设置进度":
             QMessageBox.information(self, "设置接装条件", "上一级未完成", QMessageBox.Yes)
             return
         reply = QMessageBox.question(self,"设置接装条件","是否具备接装条件？",QMessageBox.Yes,QMessageBox.Cancel)
@@ -757,7 +774,11 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         if self.disturbResult.cellWidget(currentRow, currentColumn - 1).text() != "已完成":
             QMessageBox.information(self, "设置接装条件", "上一级未完成", QMessageBox.Yes)
             return
-        self.scheduleFinish.setWindowFlags(Qt.Dialog|Qt.WindowCloseButtonHint)
+        # self.scheduleFinish.setWindowFlags(Qt.Dialog|Qt.WindowCloseButtonHint)
+        self.scheduleFinish.fileName = ""
+        self.scheduleFinish.initDict(self.currentUnitChilddict,
+                                     self.currentEquipdict[currentRow][0], self.currentYear)
+        self.scheduleFinish.init1()
         self.scheduleFinish.show()
         self.scheduleFinish.signal.connect(self.updateFinish)
 
@@ -766,7 +787,16 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         currentRow = self.disturbResult.currentRow()
         fileName = self.scheduleFinish.returnFileName()
         print("fileName", fileName)
-        if fileName != "":
+        flag1 = True
+        for x in range(0, self.lenCurrentUnitChilddict):
+            flag = selectIfUnitScheduleFinish(self.currentUnitChilddict[x][0],
+                                              self.currentEquipdict[currentRow][0],
+                                              self.currentYear)
+            if flag[0][0] != 'TRUE':
+                flag1 = False
+                break
+
+        if (fileName != "") & flag1:
             item = QPushButton("已完成")
             if self.unitFlag == 1:
                 self.disturbResult.setCellWidget(currentRow, 8 + self.lenCurrentUnitChilddict, item)
@@ -774,7 +804,8 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
             elif self.unitFlag == 2:
                 self.disturbResult.setCellWidget(currentRow, 7 + self.lenCurrentUnitChilddict, item)
                 updateScheduleFinishBase(self.currentEquipdict[currentRow][0], self.currentYear, fileName)
-
+        self.selectSchedule()
+        self.scheduleFinish.signal.disconnect()
 
     # 筛选调拨进度
     def selectSchedule(self):

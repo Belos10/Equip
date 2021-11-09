@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Widget_Rocket_Transfer(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(942, 774)
+        Form.resize(1229, 774)
         self.horizontalLayout = QtWidgets.QHBoxLayout(Form)
         self.horizontalLayout.setContentsMargins(0, 5, 0, 0)
         self.horizontalLayout.setSpacing(0)
@@ -181,11 +181,6 @@ class Widget_Rocket_Transfer(object):
         self.horizontalLayout_2.addWidget(self.pb_outputToExcel)
         spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem3)
-        self.pb_showRocket = QtWidgets.QPushButton(self.groupBox_2)
-        self.pb_showRocket.setObjectName("pb_showRocket")
-        self.horizontalLayout_2.addWidget(self.pb_showRocket)
-        spacerItem4 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_2.addItem(spacerItem4)
         self.verticalLayout_2.addLayout(self.horizontalLayout_2)
         self.horizontalLayout.addWidget(self.groupBox_2)
 
@@ -300,4 +295,3 @@ class Widget_Rocket_Transfer(object):
         self.pb_input.setText(_translate("Form", "导入"))
         self.pb_output.setText(_translate("Form", "导出"))
         self.pb_outputToExcel.setText(_translate("Form", "导出至Excel"))
-        self.pb_showRocket.setText(_translate("Form", "查看调拨单"))

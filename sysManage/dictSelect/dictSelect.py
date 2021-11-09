@@ -1,6 +1,7 @@
 from sysManage.dictSelect.AgentRoom import AgentRoom
 from widgets.strengthDisturb.StrengthDisturb import Strength_Disturb_Widget
 import sys
+from sysManage.dictSelect.manual import Manual
 from PyQt5.QtWidgets import QMainWindow,QApplication,QWidget
 from widgets.dictSelect.dictSelect import Widget_Dict_Select
 from sysManage.dictSelect.regularManage import regularManage
@@ -11,7 +12,7 @@ class dictSelect(QMainWindow, Widget_Dict_Select):
         super(dictSelect, self).__init__(parent)
         self.setupUi(self)
 
-        self.equipHandbook = QWidget(self)
+        self.equipHandbook = Manual(self)
         self.factoryDict = factorySet(self)
         self.presentRoom = AgentRoom(self)
         self.regularManage = regularManage(self)
