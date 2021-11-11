@@ -1,7 +1,10 @@
-import pymysql
+
 from database.connectAndDisSql import *
 
 # 读取年份
+from database.contractManagementSql import insertOneDataInToContractMaintenance, updataOneDataToContractMaintenance
+
+
 def selectYearListAboutServiceSupport():
     yearList = []
     sql = "select year from servicesupportyear "
@@ -71,3 +74,127 @@ def updateContentOfServiceSupport(data):
     # print(sql)
     cur.execute(sql)
     conn.commit()
+
+def getYearsFromServiceSupportYear():
+    result = []
+    sql = "select year from servicesupportyear  order by year desc "
+    years = executeSql(sql)
+    if years != None and len(years) != 0:
+        for year in years:
+            result.append(year[0])
+    return result
+
+def isHaveServiceSupportYear(year):
+    sql = "select * from servicesupportyear where year ='" + year + "'"
+    cur.execute(sql)
+    result = cur.fetchall()
+    if result:
+        return True
+    else:
+        return False
+
+def addServiceSupportYear(year):
+    sql = "insert into servicesupportyear(year) values('%s') "%year
+    return executeCommit(sql)
+
+def getResult(year,maintanceType):
+    result = []
+    if maintanceType == '全选':
+        result = findAllServiceSupportData(year)
+        return result
+    elif maintanceType == '装备大修':
+        sql = "select * from service_support where type = '%d' and year = '%s' order by  id asc"%(0, year)
+    elif maintanceType == '装备中修':
+        sql = "select * from service_support where type = '%d' and year = '%s' order by  id asc" %(1, year)
+    elif maintanceType == '维修器材购置':
+        sql = "select * from service_support where type = '%d' and year = '%s' order by  id asc" %(2, year)
+    elif maintanceType == '修理能力建设':
+        sql = "select * from service_support where type = '%d' and year = '%s' order by  id asc" %(3,year)
+    result = executeSql(sql)
+    return result
+
+def findAllServiceSupportData(year):
+    sql = "select * from service_support where year = '%s'  order by id asc "%year
+    return executeSql(sql)
+
+def getMaintanceContractNos():
+    sql = "select no from contract_maintenance "
+    data = executeSql(sql)
+    if len(data) > 0:
+        return data
+    else:
+        return []
+
+def insertOneDataInToServiceSuppot(rowData):
+    print(rowData)
+            #[0, '2', '2', '2', '2', '4.0', '2', '2', 0, 0, 'null', 0, '2001', '2']
+    sql = "insert into service_support(type, name, unit, price, amount, money, allocation, supply, technology_state, contract, contract_no, paying, year, note) values " \
+          "('%d','%s','%s','%s','%s','%s','%s','%s','%d','%d','%s','%d','%s', '%s')" \
+          % (rowData[0], rowData[1], rowData[2], rowData[3], rowData[4], rowData[5], rowData[6], rowData[7], rowData[8],
+             rowData[9], rowData[10], rowData[11], rowData[12], rowData[13])
+    return executeCommit(sql)
+
+def updataOneDataToServiceSuppot(rowData):
+    print(rowData)
+    #[2, 0, '2', '3', '2.0', '2', '4.0', '2', '2', 0, 0, 'null', 2, '2001', '2']
+    sql = "update  service_support set name = '%s', unit = '%s', price = '%s', amount = '%s', money = '%s', allocation = '%s',supply = '%s', technology_state = '%d', contract = '%d', contract_no = '%s',paying = '%d', year = '%s', note = '%s' where id = '%d'" \
+          %(rowData[2], rowData[3],rowData[4],rowData[5],rowData[6],rowData[7],rowData[8],rowData[9],rowData[10],rowData[11], rowData[12], rowData[13], rowData[14], rowData[0])
+    return executeCommit(sql)
+
+def deleteDataByServiceSuppotIdAndYear(id,year):
+    sql = "delete from service_support where id = '%d' and year = '%s'"%(id,year)
+    return executeCommit(sql)
+
+def getMaintanceContractInfo(no):
+    sql = "select * from contract_maintenance where no = '%s'"%no
+    result = executeSql(sql)
+    if len(result) > 0:
+        return result[0]
+    else:
+        return []
+def inputOneDataIntoServiceSuppot(lineInfo):
+    try:
+        if isHaveServiceSuppotYear(lineInfo[-3]) == False:
+            addServiceSuppotYear(lineInfo[-3])
+        #[2, '0001', '0001', 2.0, 2, 4.0, '0001', '0001', 1, 1, '0001', 1, '2002', '无', ('2002', '0001', '0001', '01', '02', 2.0, 2, 4.0, '2000-01-01', '2')]
+        if lineInfo[9] == 1:
+            sql = "select id from contract_maintenance where no = '%s' and year = '%s'" % (
+            lineInfo[10], lineInfo[-1][0])
+            result = executeSql(sql)
+            print('oringnal')
+            print(result)
+            if len(result) == 0:
+                print('插入')
+                data = list(lineInfo[-1])
+                data[-3] = str(data[-3])
+                data[-4] = str(data[-4])
+                data[-5] = str(data[-5])
+                insertOneDataInToContractMaintenance(data)
+            else:
+                print('更新')
+                print(result)
+                data = list(lineInfo[-1])
+                data.insert(0, result[0][0])
+                data[-3] = str(data[-3])
+                data[-4] = str(data[-4])
+                data[-5] = str(data[-5])
+                print(data)
+                updataOneDataToContractMaintenance(data)
+        insertOneDataInToServiceSuppot(lineInfo[0:-1])
+        return True
+    except Exception as e:
+        print(e)
+        raise e
+
+def isHaveServiceSuppotYear(year):
+    sql = "select * from service_support_year where year ='" + year + "'"
+    cur.execute(sql)
+    result = cur.fetchall()
+    if result:
+        return True
+    else:
+        return False
+
+def addServiceSuppotYear(year):
+    sql = "insert into service_support_year(year) values('%s') "%year
+    return executeCommit(sql)

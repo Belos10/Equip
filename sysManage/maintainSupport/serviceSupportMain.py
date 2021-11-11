@@ -51,10 +51,7 @@ class serviceSupport(QDialog, Widget_ServiceSupport):
         self.selectButton.clicked.connect(self.setTypeServiceSupportTitle)
         self.pb_outputToExcel.clicked.connect(self.slotOutputToExcel)
 
-        # # 新增年份
-        # self.tb_add.clicked.connect(self.slotAddNewYear)
-        # # 删除年份
-        # self.tb_del.clicked.connect(self.slotDelYear)
+
 
 
     '''
@@ -95,40 +92,6 @@ class serviceSupport(QDialog, Widget_ServiceSupport):
         self.selectContentBox.setCurrentIndex(0)
         self.initServiceSupportTitle()
         self.showContentOfServiceSupport()
-
-
-
-    # '''
-    #     功能：新增年份
-    # '''
-    # def slotAddNewYear(self):
-    #     year = 0
-    #     year, ok = QInputDialog.getInt(self, "Get year", "year:", 0, 0, 100000, 1)
-    #     if ok:
-    #         haveYear = False
-    #         allyear = selectYearListAboutServiceSupport()
-    #         for yearInfo in allyear:
-    #             if str(year) == yearInfo:
-    #                 haveYear = True
-    #         if haveYear == True:
-    #             reply = QMessageBox.information(self, '添加', '添加失败，该年份已存在', QMessageBox.Yes)
-    #             return
-    #
-    #         insertIntoServiceSupportYear(year)
-    #         self._initYearWidget_()
-    #         return
-
-    # '''
-    #     功能：删除年份
-    # '''
-    # def slotDelYear(self):
-    #     reply = QMessageBox.question(self, "删除", "是否删除所选？", QMessageBox.Yes, QMessageBox.Cancel)
-    #     if reply == QMessageBox.Yes:
-    #         currentYear = self.lw_yearChoose.currentItem()
-    #         # print("currentYear.text()",currentYear.text())
-    #         deleteServiceSupportYear(currentYear.text())
-    #         # deleteByYear(currentYear.text())
-    #         self._initYearWidget_()
 
 
 

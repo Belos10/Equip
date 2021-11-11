@@ -46,11 +46,11 @@ class AgentRoom(QWidget, AgentRoomUI):
         agentRoomName = self.le_agentName.text()
         manufacturerName = self.le_manufacturer.text()
         self.result = getResultFromAgentRoom(agentRoomName,manufacturerName)
-        self.tw_result.setColumnCount(6)
+        self.tw_result.setColumnCount(7)
         if len(self.result) != 0:
             self.pb_output.setDisabled(False)
         self.tw_result.setRowCount(len(self.result))
-        header = ['序号','代表室名称','厂家名称','军代表','军代表联系方式','行政区']
+        header = ['序号','军代局','代表室名称','厂家名称','军代表','军代表联系方式','行政区']
         self.tw_result.verticalHeader().setVisible(False)
         self.tw_result.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
         self.tw_result.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
@@ -87,6 +87,11 @@ class AgentRoom(QWidget, AgentRoomUI):
             item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             # item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
             self.tw_result.setItem(i, 5, item)
+
+            item = QTableWidgetItem(info[6])
+            item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+            # item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
+            self.tw_result.setItem(i, 6, item)
         self.tw_result.itemChanged.connect(self.slotAlterAndSava)
 
         if len(self.result) == 0:
@@ -117,7 +122,7 @@ class AgentRoom(QWidget, AgentRoomUI):
 
         self.showInputResult.setWindowTitle("导入数据")
         self.showInputResult.show()
-        title = ['代表室名称', '厂家名称', '军代表', '军代表联系方式', '行政区']
+        title = ['军代局','代表室名称', '厂家名称', '军代表', '军代表联系方式', '行政区']
         # QTableWidget设置整行选中
         self.showInputResult.tw_result.setColumnCount(len(title))
         self.showInputResult.tw_result.setHorizontalHeaderLabels(title)
@@ -126,23 +131,27 @@ class AgentRoom(QWidget, AgentRoomUI):
             if i == 0:
                 continue
             i = i - 1
-            item = QTableWidgetItem(LineInfo[0])
-            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-            self.showInputResult.tw_result.setItem(i, 0, item)
             item = QTableWidgetItem(LineInfo[1])
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-            self.showInputResult.tw_result.setItem(i, 1, item)
+            self.showInputResult.tw_result.setItem(i, 0, item)
             item = QTableWidgetItem(LineInfo[2])
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.showInputResult.tw_result.setItem(i, 1, item)
+            item = QTableWidgetItem(LineInfo[3])
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.showInputResult.tw_result.setItem(i, 2, item)
 
-            item = QTableWidgetItem(LineInfo[3])
+            item = QTableWidgetItem(LineInfo[4])
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.showInputResult.tw_result.setItem(i, 3, item)
 
-            item = QTableWidgetItem(LineInfo[4])
+            item = QTableWidgetItem(LineInfo[5])
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.showInputResult.tw_result.setItem(i, 4, item)
+
+            item = QTableWidgetItem(LineInfo[6])
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.showInputResult.tw_result.setItem(i, 5, item)
 
 
 
@@ -201,13 +210,10 @@ class AgentRoom(QWidget, AgentRoomUI):
         for i in range(1, self.tw_result.columnCount()):
             item = self.tw_result.item(row, i)
             if item != None:
-                if i == 12:
+                if len(item.text()) > 0:
                     rowData.append(item.text())
                 else:
-                    if len(item.text()) > 0:
-                        rowData.append(item.text())
-                    else:
-                        break
+                    break
             else:
                 break
         if len(rowData) < self.tw_result.columnCount() - 1:
@@ -227,13 +233,10 @@ class AgentRoom(QWidget, AgentRoomUI):
         for i in range(1,self.tw_result.columnCount()):
             item = self.tw_result.item(row, i)
             if item != None:
-                if i == 5:
+                if len(item.text()) > 0:
                     rowData.append(item.text())
                 else:
-                    if len(item.text()) > 0:
-                        rowData.append(item.text())
-                    else:
-                        break
+                    break
             else:
                 break
         print(rowData)

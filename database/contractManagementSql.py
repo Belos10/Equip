@@ -68,7 +68,15 @@ def getResultFromContractMaintenance(year,no,name):
         sql = sql + " order by id asc"
         result = executeSql(sql)
         return result
-
+#检查合同是否重复
+def checkedNo(no):
+    result = []
+    sql = "select no from contract_maintenance where no = '%s'"%no
+    result = executeSql(sql)
+    if len(result) < 1:
+        return True
+    else:
+        return False
 def findAllContractMaintenanceData(year):
     sql = "select * from contract_maintenance where year = '%s'  order by id asc "%year
     return executeSql(sql)
@@ -86,8 +94,8 @@ def insertOneDataInToContractOrder(rowData):
     return executeCommit(sql)
 
 def insertOneDataInToContractMaintenance(rowData):
-    sql = "insert into contract_maintenance(year,no,name,part_A,part_B,unit_price,count,amount,delivery_time,note) values ('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')"\
-          %(rowData[0],rowData[1],rowData[2],rowData[3],rowData[4],rowData[5],rowData[6],rowData[7],rowData[8],rowData[9])
+    sql = "insert into contract_maintenance(year,no,name,part_A,part_B,unit_price,count,amount,sign_time, delivery_time,note) values ('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')"\
+          %(rowData[0],rowData[1],rowData[2],rowData[3],rowData[4],rowData[5],rowData[6],rowData[7],rowData[8],rowData[9], rowData[10])
     return executeCommit(sql)
 
 def updataOneDataToContractOrder(rowData):
@@ -100,8 +108,8 @@ def updataOneDataToContractOrder(rowData):
     return executeCommit(sql)
 
 def updataOneDataToContractMaintenance(rowData):
-    sql = "update  contract_maintenance set no = '%s', name = '%s', part_A = '%s', part_B = '%s', unit_price = '%s', count = '%s', amount = '%s',delivery_time = '%s', note = '%s' where year = '%s' and id = '%s'" \
-          %(rowData[2],rowData[3],rowData[4],rowData[5],rowData[6],rowData[7],rowData[8],rowData[9],rowData[10],rowData[0],rowData[1])
+    sql = "update  contract_maintenance set no = '%s', name = '%s', part_A = '%s', part_B = '%s', unit_price = '%s', count = '%s', amount = '%s', sign_time = '%s',delivery_time = '%s', note = '%s' where year = '%s' and id = '%s'" \
+          %(rowData[2],rowData[3],rowData[4],rowData[5],rowData[6],rowData[7],rowData[8],rowData[9],rowData[10],rowData[11],rowData[1],rowData[0])
     return executeCommit(sql)
 
 def deleteDataByContractOrderIdAndYear(id,year):
@@ -114,6 +122,8 @@ def deleteDataByContractMaintenance(id,year):
     sql = "delete from contract_maintenance where id = '%d' and year = '%s'"%(id,year)
     sqls.append(sql)
     sql = "delete from contract_attachment where maintenance_id = '%d' and year = '%s'"%(id,year)
+    sqls.append(sql)
+    sql = "delete from service_support where contract_no = '%s' and  year = '%s'"%(id, year)
     sqls.append(sql)
     return excuteupdata(sqls)
 
@@ -148,11 +158,11 @@ def insertOneDataIntoContractOrder(lineInfo):
     if isHaveContractOrderYear(lineInfo[1]) == False:
         addContractOrderYear(lineInfo[1])
     #(1, '2003', '2', '2', '2', '2', 2.0, 2, 4.0, '2000-01-01', '2')
-    sql = "select * from contract_order where no = '%s' and name = '%s' and year = '%s'"%(lineInfo[2], lineInfo[3], lineInfo[1])
+    sql = "select no from contract_maintenance where no = '%s' "%(lineInfo[2])
     result = executeSql(sql)
     try:
         if result == None or len(result) == 0:
-            data = lineInfo[1:]
+            data = lineInfo[-1]
             insertOneDataInToContractOrder(data)
         else:
             data = []
@@ -174,11 +184,11 @@ def inputOneDataIntoContractMaintenance(lineInfo):
         addContractOrderYear(lineInfo[0])
     try:
         #['2002', '3', '3', '2', '2', 2.0, 2, 4.0, '2000-01-01', '2', [[]]]
-        insertOneDataInToContractMaintenance(lineInfo[0:10])
+        insertOneDataInToContractMaintenance(lineInfo[0:11])
         lastId = executeSql("select max(id) from contract_maintenance")[0][0]
         print("lastId")
         print(lastId)
-        for item in lineInfo[10]:
+        for item in lineInfo[11]:
             if len(item) > 0:
                 item.insert(0, lastId)
                 insertOneDataInToContractAttachment(item)

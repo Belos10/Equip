@@ -1,5 +1,7 @@
 import sys
 # from fbs_runtime.application_context.PyQt5 import ApplicationContext
+import threading
+
 from PyQt5.Qt import QObject
 from PyQt5.QtWidgets import QApplication
 from sysManage.MainWindowManage import Manage_Widgets
@@ -31,12 +33,13 @@ class mainManage(QObject):
 
 if __name__ == "__main__":
     # appctxt = ApplicationContext()
+    os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
     app = QApplication(sys.argv)
     widget = Manage_Widgets()
     basepath=os.path.split(os.path.abspath(__file__))[0]
     path = basepath + "\\icons\\ElegantDark.qss"
     # path=os.path.join(basepath,"./icons/ElegantDark.qss")
-    # print(path)
+    # print(path)e
     with open(path, 'r') as f:
         qssStyle = f.read()
     widget.setStyleSheet(qssStyle)
