@@ -45,7 +45,6 @@ class yearServiceSupport(QDialog, Widget_ServiceSupport):
         self.showAllYearData.clicked.connect(self.showAllYearServiceSupportData)
         # self.serviceSupportResult.itemChanged.connect(self.updateChangeDataOfServiceSupport)
         self.serviceSupportResult.itemChanged.connect(self.slotAlterAndSava)
-
         # 新增年份
         self.tb_add.clicked.connect(self.slotAddNewYear)
         # 删除年份
@@ -62,11 +61,10 @@ class yearServiceSupport(QDialog, Widget_ServiceSupport):
         self.lw_yearChoose.itemClicked.disconnect(self.showYearContentOfServiceSupport)
         self.add_data.clicked.disconnect(self.slotAdd)
         self.delete_data.clicked.disconnect(self.slotDelete)
-        self.save_data.clicked.disconnect(self.saveContentOfserviceSupport)
+        # self.save_data.clicked.disconnect(self.saveContentOfserviceSupport)
         self.showAllYearData.clicked.disconnect(self.showAllYearServiceSupportData)
         # self.serviceSupportResult.itemChanged.disconnect(self.updateChangeDataOfServiceSupport)
         self.serviceSupportResult.itemChanged.disconnect(self.slotAlterAndSava)
-
         # 新增年份
         self.tb_add.clicked.disconnect(self.slotAddNewYear)
         # 删除年份

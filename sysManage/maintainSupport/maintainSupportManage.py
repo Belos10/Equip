@@ -42,7 +42,7 @@ class MaintainSupportManage(QMainWindow, widget_MaintainSupport):
         self.tb_yearSerSup.clicked.connect(self.slotYearSerSup)
         self.tb_maintainSchedule.clicked.connect(self.slotMaintainSchedule)
         self.tb_materialManage.clicked.connect(self.slotMaterialManage)
-        # self.transferManage.armyTransfer.pb_equipSet.clicked.connect(self.slotSetEquip)
+
 
     '''
         功能：
@@ -64,7 +64,7 @@ class MaintainSupportManage(QMainWindow, widget_MaintainSupport):
         self.tb_maintainSchedule.setDisabled(False)
         self.tb_materialManage.setDisabled(0)
         self.yearSerSup.initAll()
-        # self.disturbPlan.initAll()
+
 
     '''
         功能：
@@ -76,7 +76,6 @@ class MaintainSupportManage(QMainWindow, widget_MaintainSupport):
         self.tb_maintainSchedule.setDisabled(1)
         self.tb_materialManage.setDisabled(0)
 
-        # self.allotSchedule.initAll()
 
     '''
         功能：
@@ -87,4 +86,3 @@ class MaintainSupportManage(QMainWindow, widget_MaintainSupport):
         self.tb_yearSerSup.setDisabled(False)
         self.tb_maintainSchedule.setDisabled(False)
         self.tb_materialManage.setDisabled(True)
-
