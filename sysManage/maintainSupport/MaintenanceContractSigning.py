@@ -1,13 +1,14 @@
 import base64
 import pickle
 
-from PyQt5.QtCore import Qt, QDate, QDateTime
-from database.positionEngneerSql import *
-from sysManage.showInputResult import showInputResult
+from PyQt5.QtCore import Qt, QDate, QDateTime, pyqtSlot
+
+from database.contractManagementSql import getContractMaintenanceInfoByNo
+from database.contractSigningSql import *
 from sysManage.userInfo import get_value
 import sys
 from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QTableWidget, QHeaderView, QTableWidgetItem, QComboBox, \
-    QMessageBox, QFileDialog, QDateEdit, QCheckBox
+    QMessageBox, QFileDialog, QDateEdit, QCheckBox, QPushButton
 
 from widgets.serviceSupport.maintenanceContractSigningUI import MaintenanceContractSigningUI
 
@@ -18,12 +19,11 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
         self.setupUi(self)
         self.startInfo = None
         self.infoDict = {}
-        self.signalConnection()
         self.init()
 
     result = []
-    contactNo = []
-    manufacturer = []
+    contactNo = ''
+    bureauName = ''
     currentLastRow = 0
 
     # 信号和槽连接
@@ -32,6 +32,7 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
         self.tb_add.clicked.connect(self.slotAdd)
         self.tb_del.clicked.connect(self.slotDelete)
         self.tw_result.itemChanged.connect(self.slotAlterAndSava)
+        
         self.tb_outputToExcel.clicked.connect(self.slotOutputToExcel)
 
 
@@ -48,6 +49,7 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
         if self.userInfo:
             from database.strengthDisturbSql import selectUnitInfoByUnitID
             self.startInfo = selectUnitInfoByUnitID(self.userInfo[0][4])
+        self.signalConnection()
         self.displayData()
         pass
 
@@ -60,15 +62,18 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
     '''
 
     def slotSelect(self):
-        self.contactNo = []
-        self.manufacturer = []
-
+        self.pb_select.disconnect()
         if len(self.le_contactNo.text()) > 0:
-            self.contactNo.append(self.le_contactNo.text())
+            self.contactNo = self.le_contactNo.text()
+        else:
+            self.contactNo = ''
         if len(self.le_Unit.text()) > 0:
-            self.manufacturer.append(self.le_Unit.text())
-        print(self.contactNo, self.manufacturer)
+            self.bureauName = self.le_Unit.text()
+        else:
+            self.bureauName = ''
         self.displayData()
+        self.pb_select.clicked.connect(self.slotSelect)
+
 
     '''
         功能：
@@ -77,9 +82,9 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
 
     def displayData(self):
         self.tw_result.itemChanged.disconnect(self.slotAlterAndSava)
-        self.result = getResult(self.contactNo, self.manufacturer)
+        self.result = getResult(self.contactNo, self.bureauName)
         self.tw_result.clear()
-        self.tw_result.setColumnCount(30)
+        self.tw_result.setColumnCount(31)
         dataList = self.result
         if dataList is None or len(dataList) == 0:
             self.tw_result.setRowCount(3)
@@ -88,86 +93,247 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
             self.tw_result.setRowCount(3 + len(dataList))
             self.initTableHeader()
             for i in range(len(dataList)):
+                contactInfo = getContractMaintenanceInfoByNo(dataList[i][4])
                 item = QTableWidgetItem(str(i + 1))
                 item.setFlags(Qt.ItemIsEnabled)
                 item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
                 self.tw_result.setItem(3 + i, 0, item)
 
-                item = QTableWidgetItem(getUnitNameById(dataList[i][1]))
-                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                bureauNames = getBureauNamesFromAgentRoom()
+                item = QComboBox()
+                item.setEditable(False)
+                itemElement = [dataList[i][1]]
+                if len(bureauNames) > 0:
+                    for j in range(len(bureauNames)):
+                        if bureauNames[j][0] != dataList[i][1]:
+                            itemElement.append(bureauNames[j][0])
+                item.addItems(itemElement)
+                self.tw_result.setCellWidget(3 + i, 1, item)
+                item.activated.connect(self.bureauNameChange)
+
+                agentIds, agentNames = getAgentNamesAndIds(dataList[i][2])
+                combox = QComboBox()
+                for j in range(len(agentNames)):
+                    combox.addItem(agentNames[j], agentIds[j])
+                combox.setEditable(False)
+                self.tw_result.setCellWidget(3 + i, 2, combox)
+                combox.activated.connect(self.slotAlterAndSava)
+
+                #合同乙方
+                item = QTableWidgetItem(contactInfo[5])
                 item.setFlags(Qt.ItemIsEnabled)
-                self.tw_result.setItem(3 + i, 1, item)
-
-                item = QTableWidgetItem(dataList[i][2])
-                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-                self.tw_result.setItem(3 + i, 2, item)
-
-                item = QTableWidgetItem(dataList[i][3])
                 item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
                 self.tw_result.setItem(3 + i, 3, item)
 
+                #合同号
+                print('dataList-i',dataList[i])
                 item = QTableWidgetItem(dataList[i][4])
+                item.setFlags(Qt.ItemIsEnabled)
                 item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
                 self.tw_result.setItem(3 + i, 4, item)
 
-                if dataList[i][5] == 1:
-                    comboBox = QComboBox()
-                    comboBox.addItems(['是'])
+                #价格批复件
+                item = QTableWidgetItem(dataList[i][5])
+                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                self.tw_result.setItem(3 + i, 5, item)
 
-                else:
-                    comboBox = QComboBox()
-                    comboBox.addItems(['否'])
-                comboBox.setEnabled(False)
-                self.tw_result.setCellWidget(3 + i, 5, comboBox)
-
+                #价格情况合同
                 item = QTableWidgetItem(dataList[i][6])
                 item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
                 self.tw_result.setItem(3 + i, 6, item)
 
+                #价格工作依据
                 item = QTableWidgetItem(dataList[i][7])
                 item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-                item.setFlags(Qt.ItemIsEnabled)
                 self.tw_result.setItem(3 + i, 7, item)
-                # parsedDateList = date.split('-')
-                # dataEdit = QDateEdit()
-                # dataEdit.setDisplayFormat("yyyy-MM-dd")
-                # dataEdit.setDate(QDate(int(parsedDateList[0]), int(parsedDateList[1]), int(parsedDateList[2])))
-                # self.tw_result.setCellWidget(3 + i, 7, dataEdit)
 
-                date = dataList[i][8]
+                #进度
                 item = QTableWidgetItem(dataList[i][8])
                 item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-                item.setFlags(Qt.ItemIsEnabled)
                 self.tw_result.setItem(3 + i, 8, item)
-                # parsedDateList = date.split('-')
-                # dataEdit = QDateEdit()
-                # dataEdit.setDisplayFormat("yyyy-MM-dd")
-                # dataEdit.setDate(QDate(int(parsedDateList[0]), int(parsedDateList[1]), int(parsedDateList[2])))
-                # self.tw_result.setCellWidget(3 + i, 8, dataEdit)
 
-
-                item = QTableWidgetItem(str(dataList[i][9]))
+                #价格方案依据
+                item = QTableWidgetItem(dataList[i][9])
                 item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
                 self.tw_result.setItem(3 + i, 9, item)
 
-                if dataList[i][10] == '已到位':
-                    comboBox = QComboBox()
-                    comboBox.addItems(['已到位'])
-                else:
-                    comboBox = QComboBox()
-                    comboBox.addItems(['未到位'])
-                comboBox.setEnabled(False)
-                self.tw_result.setCellWidget(3 + i, 10, comboBox)
+                #合同签订时间
+                item = QTableWidgetItem(contactInfo[-3])
+                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                item.setFlags(Qt.ItemIsEnabled)
+                self.tw_result.setItem(3 + i, 10, item)
 
-                item = QTableWidgetItem(dataList[i][11])
+                # 交付签订时间
+                item = QTableWidgetItem(contactInfo[-2])
+                item.setFlags(Qt.ItemIsEnabled)
                 item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
                 self.tw_result.setItem(3 + i, 11, item)
 
-                item = QTableWidgetItem(dataList[i][12])
+                #合同名称
+                item = QTableWidgetItem(contactInfo[3])
+                item.setFlags(Qt.ItemIsEnabled)
                 item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
                 self.tw_result.setItem(3 + i, 12, item)
+
+                #送修单位
+                if len(getAllocationByContractNo(contactInfo[2])) > 0:
+                    allocationUnit = getAllocationByContractNo(contactInfo[2])[0][0]
+                else:
+                    allocationUnit = ''
+                item = QTableWidgetItem(allocationUnit)
+                item.setFlags(Qt.ItemIsEnabled)
+                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                self.tw_result.setItem(3 + i, 13, item)
+
+                #总体进度
+                item = QTableWidgetItem(dataList[i][10])
+                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                self.tw_result.setItem(3 + i, 14, item)
+
+                #计划年度
+                item = QTableWidgetItem(dataList[i][11])
+                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                self.tw_result.setItem(3 + i, 15, item)
+
+                #数量计划
+                item = QTableWidgetItem(dataList[i][12])
+                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                self.tw_result.setItem(3 + i, 16, item)
+
+                # 数量明细
+                item = QTableWidgetItem(dataList[i][13])
+                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                self.tw_result.setItem(3 + i, 17, item)
+
+                # 计划价格单价
+                item = QTableWidgetItem(dataList[i][14])
+                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                self.tw_result.setItem(3 + i, 18, item)
+
+                # 计划价格单价
+                item = QTableWidgetItem(dataList[i][15])
+                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                self.tw_result.setItem(3 + i, 19, item)
+
+                # 报价单位
+                item = QTableWidgetItem(dataList[i][16])
+                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                self.tw_result.setItem(3 + i, 20, item)
+
+                # 报价金额
+                item = QTableWidgetItem(dataList[i][17])
+                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                self.tw_result.setItem(3 + i, 21, item)
+
+                # 合同单价
+                item = QTableWidgetItem(str(contactInfo[-6]))
+                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                item.setFlags(Qt.ItemIsEnabled)
+                self.tw_result.setItem(3 + i, 22, item)
+
+                # 合同金额
+                item = QTableWidgetItem(str(contactInfo[-4]))
+                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                item.setFlags(Qt.ItemIsEnabled)
+                self.tw_result.setItem(3 + i, 23, item)
+
+                #已支付金额
+                item = QTableWidgetItem(str(dataList[i][18]))
+                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                self.tw_result.setItem(3 + i, 24, item)
+
+                #待支付金额
+                item = QTableWidgetItem(str(dataList[i][19]))
+                item.setFlags(Qt.ItemIsEnabled)
+                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                self.tw_result.setItem(3 + i, 25, item)
+
+                # 目前进度
+                item = QTableWidgetItem(str(dataList[i][20]))
+                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                self.tw_result.setItem(3 + i, 26, item)
+
+                # 是否入库
+                item = QComboBox()
+                if dataList[i][21] == 1:
+                    itemElement = ['是', '否']
+                else:
+                    itemElement = ['否', '是']
+                item.addItems(itemElement)
+                self.tw_result.setCellWidget(3 + i, 27, item)
+                item.activated.connect(self.slotAlterAndSava)
+                #开具调拨单
+                item = QPushButton()
+                item.setText('开具调拨单')
+                if dataList[i][22] == 1:
+                    item.setEnabled(False)
+                self.tw_result.setCellWidget(3 + i, 28, item)
+                item.clicked.connect(self.formDialOrder)
+                item.clicked.connect(self.slotAlterAndSava)
+
+                # 完成调拨
+                item = QComboBox()
+                if dataList[i][23] == 1:
+                    itemElement = ['是']
+                    item.setEnabled(True)
+                else:
+                    itemElement = ['否', '是']
+                item.addItems(itemElement)
+                self.tw_result.setCellWidget(3 + i, 29, item)
+                item.activated.connect(self.slotAlterAndSava)
+
+                # 备注
+                item = QTableWidgetItem(dataList[i][24])
+                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                self.tw_result.setItem(3 + i, 30, item)
         self.tw_result.itemChanged.connect(self.slotAlterAndSava)
 
+
+    def bureauNameChange(self):
+        currentRow = self.tw_result.currentIndex().row()
+        item = self.tw_result.cellWidget(currentRow, 1)
+        if item != None:
+            item.activated.disconnect(self.bureauNameChange)
+            agentNameCombox = self.tw_result.cellWidget(currentRow, 2)
+            currentBureauName = item.currentText()
+            agentIds, agentNames = getAgentNamesAndIds(currentBureauName)
+            agentNameCombox.clear()
+            for i in range(len(agentNames)):
+                agentNameCombox.addItem(agentNames[i], agentIds[i])
+            item.activated.connect(self.bureauNameChange)
+
+
+
+    #开具调拨单
+    def formDialOrder(self):
+        basepath = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+        sourceDirectoryPath = basepath + "\\resource\\装备实物资产调拨回执凭证.docx"
+        print('sourceDirectoryPath')
+        print(sourceDirectoryPath)
+        savaDirectoryPath = QFileDialog.getExistingDirectory(self, "请选择调拨单保存目录", "c:/")
+        if len(savaDirectoryPath) > 0:
+            try:
+                savaDirectoryPath = savaDirectoryPath + "\\装备实物资产调拨回执凭证.docx"
+                with open(sourceDirectoryPath, "rb") as source_file:
+                    with open(savaDirectoryPath, "wb") as aim_file:
+                        while True:
+                            data = source_file.read(1024)
+                            if data:
+                                aim_file.write(data)
+                            else:
+                                # count += 1
+                                # self.progerss.setValue(count)
+                                break
+                import win32api
+                win32api.ShellExecute(0, 'open', savaDirectoryPath, '', '', 1)
+                currentRow = self.tw_result.currentIndex().row()
+                item = self.tw_result.cellWidget(currentRow, 28)
+                if item != None:
+                    item.setEnabled(False)
+            except Exception as e:
+                print(e)
+                QMessageBox.about(self, "开具调拨单失败！", "请检查文件名是否正确、文件是否已存在、是否安装word或word正在被占用！")
+                return
     '''
         功能：
             画表头,行数至少有3行
@@ -178,7 +344,8 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
         self.tw_result.horizontalHeader().setVisible(False)
         # self.tw_result.setEditTriggers(QTableWidget.NoEditTriggers)
         self.tw_result.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
-        self.tw_result.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.tw_result.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        #self.tw_result.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.tw_result.resizeColumnsToContents()
         self.tw_result.resizeRowsToContents()
 
@@ -187,7 +354,7 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.tw_result.setItem(0, 0, item)
         item.setFlags(Qt.ItemIsEnabled)
-        self.tw_result.setSpan(0, 0, 1, 30)
+        self.tw_result.setSpan(0, 0, 1, 31)
 
         item = QTableWidgetItem("序号")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
@@ -310,8 +477,8 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
         item = QTableWidgetItem("计划价格")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         item.setFlags(Qt.ItemIsEnabled)
-        self.tw_result.setItem(2, 18, item)
-        self.tw_result.setSpan(2, 18, 1, 2)
+        self.tw_result.setItem(1, 18, item)
+        self.tw_result.setSpan(1, 18, 1, 2)
 
         item = QTableWidgetItem("单价")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
@@ -395,7 +562,7 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         item.setFlags(Qt.ItemIsEnabled)
         self.tw_result.setItem(1, 30, item)
-        self.tw_result.setSpan(1, 30, 1, 2)
+        self.tw_result.setSpan(1, 30, 2, 1)
     '''
         功能：
             新增一行的数据
@@ -403,65 +570,98 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
 
     def slotAlterAndSava(self):
         selectRow = self.tw_result.selectedItems()
-        if len(selectRow) != 0:
+
+        if len(selectRow) > 0:
             currentRow = selectRow[0].row()
+        else:
+            currentRow = self.tw_result.currentIndex().row()
+
+        if self.checkData(currentRow):
+            print('currentRow',currentRow)
+            print('currentLastRow',self.currentLastRow)
             if currentRow == self.currentLastRow:
                 self.savaRowData(currentRow)
-            else:
+            elif currentRow > 2:
                 self.alterRowData(currentRow)
+        else:
+            return
+
+    def checkData(self,row):
+        if row < 3:
+            return False
+        self.tw_result.itemChanged.disconnect(self.slotAlterAndSava)
+        
+        checkColomns = [20, 21, 22, 23, 24]
+        for i in range(len(checkColomns)):
+            item = self.tw_result.item(row, checkColomns[i])
+            if item != None:
+                text = item.text()
+                from utills.CommomHelper import CommonHelper
+                if len(text) > 0 and CommonHelper.isNumber(text):
+                    continue
+                else:
+                    item.setText('')
+                    self.tw_result.itemChanged.connect(self.slotAlterAndSava)
+                    
+                    return False
+            else:
+                self.tw_result.itemChanged.connect(self.slotAlterAndSava)
+                
+                return False
+        contractMoney = float(self.tw_result.item(row,checkColomns[-2]).text())
+        paidMoney = float(self.tw_result.item(row,checkColomns[-1]).text())
+        dueMonet = contractMoney - paidMoney
+        self.tw_result.item(row, 25).setText(str(dueMonet))
+        self.tw_result.itemChanged.connect(self.slotAlterAndSava)
+        
+        return True
 
     def savaRowData(self, row):
-        # print('保存一行')
+        print('保存一行')
         rowData = []
         for i in range(1, self.tw_result.columnCount()):
-            if i == 5:
+            if i == 1 or i == 2 or i == 4 or i == 27 or i == 28 or i == 29:
                 item = self.tw_result.cellWidget(row, i)
                 if item != None:
-                    if item.currentText() == '是':
-                        rowData.append(1)
-                    else:
-                        rowData.append(0)
+                    if i == 1 or i == 4:
+                        rowData.append(item.currentText())
+                    elif i == 2:
+                        rowData.append(item.currentText())
+                        rowData.append(item.currentData())
+                    elif i == 27:
+                        if item.currentText() == '是':
+                            rowData.append(1)
+                        else:
+                            rowData.append(0)
+                    elif i == 28:
+                        if item.isEnabled() == True:
+                            rowData.append(0)
+                        else:
+                            rowData.append(1)
+                    elif i == 29:
+                        if item.currentText() == '是':
+                            rowData.append(1)
+                        else:
+                            rowData.append(0)
                 else:
+                    print('item', item)
+                    print('colomn',i)
                     return
-            elif i == 10:
-                item = self.tw_result.cellWidget(row, i)
-                if item != None:
-                    rowData.append(item.currentText())
-                else:
-                    return
-            elif i == 1:
-                item = self.tw_result.cellWidget(row, i)
-                if item != None:
-                    rowData.append(getUnitIdbyName(item.currentText()))
-                else:
-                    return
-            elif i == 7 or i == 8:
-                item = self.tw_result.cellWidget(row, i)
-                if item != None:
-                    date = item.date().toString(Qt.ISODate)
-                    rowData.append(date)
-            else:
+            elif i == 5 or i == 6 or i == 7 or i == 8 or i == 9 or i == 14 or  i == 15 or i == 16 or i == 17 or i == 18 or i== 19 or i == 20 or i == 21 or i == 24 or i == 25 or i == 26 or  i == 30:
                 item = self.tw_result.item(row, i)
                 if item != None:
-                    if i == 12:
-                        rowData.append(item.text())
-                    if i == 1:
-                        if getUnitIdbyName(item.text()) != None:
-                            rowData.append(getUnitIdbyName(item.text()))
-                        else:
-                            QMessageBox.warning(self, "注意", "该基地名称尚未加入基地目录！", QMessageBox.Yes, QMessageBox.Yes)
-                            break
-                    else:
-                        if len(item.text()) > 0:
-                            rowData.append(item.text())
-                        else:
-                            break
+                    rowData.append(item.text())
                 else:
-                    break
-        if len(rowData) < self.tw_result.columnCount() - 1:
-            return False
+                    print('item', item)
+                    return
+            else:
+                continue
+        print('rowData',rowData)
+        print('length', len(rowData))
+        if len(rowData) < 24:
+            return
         else:
-            insertOneDataIntInstallation(rowData)
+            insertOneDataIntContactSign(rowData)
             self.currentLastRow = -1
             QMessageBox.warning(self, "注意", "插入成功！", QMessageBox.Yes, QMessageBox.Yes)
             self.displayData()
@@ -470,160 +670,50 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
         print("修改一行数据")
         rowData = []
         rowData.append(self.result[row - 3][0])
-        for i in range(2,self.tw_result.columnCount()):
-            if i == 5:
+        for i in range(1,self.tw_result.columnCount()):
+            if i == 1 or i == 2 or i == 27 or i == 28 or i == 29:
                 item = self.tw_result.cellWidget(row, i)
                 if item != None:
-                    if item.currentText() == '是':
-                        rowData.append(1)
-                    else:
-                        rowData.append(0)
+                    if i == 1:
+                        rowData.append(item.currentText())
+                    elif i == 2:
+                        rowData.append(item.currentText())
+                        rowData.append(item.currentData())
+                    elif i == 27:
+                        if item.currentText() == '是':
+                            rowData.append(1)
+                        else:
+                            rowData.append(0)
+                    elif i == 28:
+                        if item.isEnabled() == True:
+                            rowData.append(0)
+                        else:
+                            rowData.append(1)
+                    elif i == 29:
+                        if item.currentText() == '是':
+                            rowData.append(1)
+                        else:
+                            rowData.append(0)
                 else:
                     return
-            elif i == 10:
-                item = self.tw_result.cellWidget(row, i)
-                if item != None:
-                    rowData.append(item.currentText())
-                else:
-                    return
-            else:
+            elif i == 4 or i == 5 or i == 6 or i == 7 or i == 8 or i == 9 or i == 14 or i == 15 or i == 16 or i == 17 or i == 18 or i == 19 or i == 20 or i == 21 or i == 24 or i == 25 or i == 26 or i == 30:
                 item = self.tw_result.item(row, i)
                 if item != None:
-                    if i == 12:
-                        rowData.append(item.text())
-                    else:
-                        if len(item.text()) > 0:
-                            rowData.append(item.text())
-                        else:
-                            break
+                    rowData.append(item.text())
                 else:
-                    break
+                    return
+            else:
+                continue
         print(rowData)
-        if len(rowData) < self.tw_result.columnCount() - 2:
-            return False
+        print(len(rowData))
+        if len(rowData) < 25:
+            return
         else:
-            if (updataOneDataIntInstallation(rowData) == True):
+            if (updataOneDataIntoContractSign(rowData) == True):
                 QMessageBox.warning(self, "修改成功", "修改成功！", QMessageBox.Yes, QMessageBox.Yes)
             else:
-                QMessageBox.warning(self, "警告", "插入失败！", QMessageBox.Yes, QMessageBox.Yes)
+                QMessageBox.warning(self, "警告", "修改失败！", QMessageBox.Yes, QMessageBox.Yes)
             self.displayData()
-
-    def slotCancelInputIntoDatabase(self):
-        self.showInputResult.hide()
-        self.setDisabled(False)
-        self.displayData()
-
-    def slotInputIntoDatabase(self):
-        for i, lineInfo in enumerate(self.inputList):
-            if i == 0:
-                continue
-            try:
-                #(6, '4', '2', '2', '2', 1, '3', '2000-01-01', '2000-01-01', 3, '已到位', '2', '2')
-                if insertOneDataIntInstallation(lineInfo[1:]):
-                    pass
-            except Exception as e:
-                print(e)
-                QMessageBox.warning(self, "导入失败", "导入第%d数据失败！" % (i), QMessageBox.Yes)
-
-        self.showInputResult.hide()
-        self.setDisabled(False)
-        self.displayData()
-    # 组件
-    def slotInput(self):
-        self.inputList = []
-        filename, _ = QFileDialog.getOpenFileName(self, "选中文件", '', "Excel Files (*.nms);;Excel Files (*.nms)")
-        if len(filename) < 2:
-            return
-        try:
-            with open(filename, "rb") as file:
-                self.inputList = pickle.load(file)
-                if self.inputList[0] != '防护安装情况':
-                    raise Exception("数据格式错误！")
-        except Exception as e:
-            print(e)
-            QMessageBox.warning(self, "加载文件失败！", "请检查文件格式及内容格式！", QMessageBox.Yes)
-            return
-
-        self.showInputResult.setWindowTitle("导入数据")
-        self.showInputResult.show()
-        title = ['基地','番号','阵地代号','具体位置','是否具备安装最新型装备条件','目前安装情况','安装时间','计划安装时间','数量（套）','装备到位情况','装备运行情况','备注']
-        # QTableWidget设置整行选中
-        self.showInputResult.tw_result.setColumnCount(len(title))
-        self.showInputResult.tw_result.setHorizontalHeaderLabels(title)
-        self.showInputResult.tw_result.setRowCount(len(self.inputList) - 1)
-        for i, LineInfo in enumerate(self.inputList):
-            if i == 0:
-                continue
-            i = i - 1
-            item = QTableWidgetItem(getUnitNameById(LineInfo[1]))
-            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-            self.showInputResult.tw_result.setItem(i, 0, item)
-            item = QTableWidgetItem(LineInfo[2])
-            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-            self.showInputResult.tw_result.setItem(i, 1, item)
-            item = QTableWidgetItem(LineInfo[3])
-            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-            self.showInputResult.tw_result.setItem(i, 2, item)
-
-            item = QTableWidgetItem(LineInfo[4])
-            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-            self.showInputResult.tw_result.setItem(i, 3, item)
-            if LineInfo[5] == 1:
-                item = QTableWidgetItem('是')
-            else:
-                item = QTableWidgetItem('否')
-            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-            self.showInputResult.tw_result.setItem(i, 4, item)
-
-            item = QTableWidgetItem(LineInfo[6])
-            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-            self.showInputResult.tw_result.setItem(i, 5, item)
-            item = QTableWidgetItem(LineInfo[7])
-            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-            self.showInputResult.tw_result.setItem(i, 6, item)
-            item = QTableWidgetItem(LineInfo[8])
-            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-            self.showInputResult.tw_result.setItem(i, 7, item)
-            item = QTableWidgetItem(str(LineInfo[9]))
-            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-            self.showInputResult.tw_result.setItem(i, 8, item)
-            item = QTableWidgetItem(LineInfo[10])
-            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-            self.showInputResult.tw_result.setItem(i, 9, item)
-            item = QTableWidgetItem(LineInfo[11])
-            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-            self.showInputResult.tw_result.setItem(i, 10, item)
-            item = QTableWidgetItem(LineInfo[12])
-            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-            self.showInputResult.tw_result.setItem(i, 11, item)
-
-
-
-    def slotOutput(self):
-        if len(self.result) < 1:
-            reply = QMessageBox.warning(self, '警告', '未选中任何数据，无法导出', QMessageBox.Yes)
-            return
-        reply = QMessageBox.question(self, '导出数据包', '是否保存修改并导出数据包？', QMessageBox.Cancel, QMessageBox.Yes)
-        if reply == QMessageBox.Cancel:
-            self.displayData()
-            return
-        self.displayData()
-        directoryPath = QFileDialog.getExistingDirectory(self, "请选择导出文件夹", "c:/")
-        if len(directoryPath) > 0:
-            # 填表数据
-            dataList = self.result
-            if dataList is None or len(dataList) == 0:
-                return
-            else:
-                dataList.insert(0,'防护安装情况')
-                print(dataList)
-                date = QDateTime.currentDateTime()
-                installData = date.toString("yyyy年MM月dd日hh时mm分ss秒")  # hh:mm:ss
-                pathName = "%s/%s阵地工程x生化防护装备安装情况.nms" % (directoryPath,installData)
-                with open(pathName, "wb") as file:
-                    pickle.dump(dataList, file)
-                QMessageBox.about(self, "导出成功", "导出数据包成功！")
-
 
 
     '''
@@ -631,9 +721,13 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
             新增按钮槽函数
     '''
 
+    @pyqtSlot()
     def slotAdd(self):
+        print('SlotAdd')
+        self.tb_add.disconnect()
         if self.tw_result.rowCount() <= 3 + len(self.result):
             self.tw_result.itemChanged.disconnect(self.slotAlterAndSava)
+            
             rowCount = self.tw_result.rowCount()
             self.currentLastRow = rowCount
             self.tw_result.insertRow(rowCount)
@@ -650,29 +744,119 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
                 item.setFlags(Qt.ItemIsEnabled)
                 self.tw_result.setItem(rowCount, 0, item)
 
+            bureauNames = getBureauNamesFromAgentRoom()
+            print('bureauNames')
+            print(bureauNames)
+            item = QComboBox()
+            item.setEditable(False)
+            itemElement = []
+            if len(bureauNames) > 0:
+                for j in range(len(bureauNames)):
+                    itemElement.append(bureauNames[j][0])
+            item.addItems(itemElement)
+            self.tw_result.setCellWidget(rowCount, 1, item)
+            item.activated.connect(self.bureauNameChange)
 
-            comboBox = QComboBox()
-            comboBox.addItems(self.baseNames)
-            self.tw_result.setCellWidget(rowCount, 1, comboBox)
-            comboBox = QComboBox()
-            comboBox.addItems(['是', '否'])
-            self.tw_result.setCellWidget(rowCount, 5, comboBox)
-            comboBox = QComboBox()
-            comboBox.addItems(['已到位', '未到位'])
-            self.tw_result.setCellWidget(rowCount, 10, comboBox)
+            item = QComboBox()
+            if len(bureauNames) > 0:
+                agentIds, agentNames = getAgentNamesAndIds(itemElement[0])
+                for i in range(len(agentNames)):
+                    item.addItem(agentNames[i], agentIds[i])
+                item.setEditable(False)
+            self.tw_result.setCellWidget(rowCount, 2, item)
 
-            installDate = QDateEdit()
-            installDate.setDisplayFormat("yyyy-MM-dd")
-            self.tw_result.setCellWidget(rowCount, 7, installDate)
+            contractNos = getContractNos()
+            print('contractNos')
+            print(contractNos)
+            contractInfo = []
+            item = QTableWidgetItem('')
+            item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+            item.setFlags(Qt.ItemIsEnabled)
+            if len(contractNos) > 0:
+                contractInfo = getContractMaintenanceInfoByNo(contractNos[0])
+                if len(contractNos) > 0:
+                    item.setText(contractInfo[5])
+            self.tw_result.setItem(rowCount, 3, item)
 
-            plenDate = QDateEdit()
-            plenDate.setDisplayFormat("yyyy-MM-dd")
-            self.tw_result.setCellWidget(rowCount, 8, plenDate)
+            item = QComboBox()
+            item.activated.connect(self.contactNoChange)
+            item.setEditable(False)
+            item.addItems(contractNos)
+            self.tw_result.setCellWidget(rowCount, 4, item)
+
+            allocationUnit = []
+            if len(contractNos) > 0:
+                allocationUnit = getAllocationByContractNo(contractNos[0])
+            if len(allocationUnit) > 0:
+                item = QTableWidgetItem(allocationUnit[0][0])
+            else:
+                item = QTableWidgetItem('')
+            item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+            item.setFlags(Qt.ItemIsEnabled)
+            self.tw_result.setItem(rowCount, 13, item)
+
+            contractInfo = []
+            if len(contractNos) > 0:
+                contractInfo = getContractMaintenanceInfoByNo(contractNos[0])
+            self.setContractInfo(contractInfo, rowCount)
+
+            item = QTableWidgetItem('')
+            item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+            item.setFlags(Qt.ItemIsEnabled)
+            self.tw_result.setItem(rowCount, 25, item)
+
+            item = QComboBox()
+            item.setEditable(False)
+            item.addItems(['否', '是'])
+            self.tw_result.setCellWidget(rowCount, 27, item)
+
+            # 开具调拨单
+            item = QPushButton()
+            item.clicked.connect(self.formDialOrder)
+            item.setText('开具调拨单')
+            self.tw_result.setCellWidget(rowCount, 28, item)
+
+            item = QComboBox()
+            item.setEditable(False)
+            item.addItems(['否', '是'])
+            self.tw_result.setCellWidget(rowCount, 29, item)
+
             self.tw_result.itemChanged.connect(self.slotAlterAndSava)
+            self.tb_add.clicked.connect(self.slotAdd)
+            
         else:
-            QMessageBox.warning(self, "注意", "请先将数据补充完整！", QMessageBox.Yes, QMessageBox.Yes)
+            QMessageBox.warning(self, "注意", "请先将数据补充完整！", QMessageBox.Yes)
+            return
 
+
+    def contactNoChange(self):
+        currentRow = self.tw_result.currentIndex().row()
+        item = self.tw_result.cellWidget(currentRow, 4)
+        if item != None:
+            contractNo = item.currentText()
+            contractInfo = getContractMaintenanceInfoByNo(contractNo)
+            self.setContractInfo(contractInfo, currentRow)
+
+    def setContractInfo(self,contractInfo, row):
+        columns = [3, 10, 11, 12, 22, 23]
+        if len(contractInfo) == 0:
+            for i in range(len(columns)):
+                item = QTableWidgetItem('')
+                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                item.setFlags(Qt.ItemIsEnabled)
+                self.tw_result.setItem(row, columns[i], item)
+        else:
+            infos = [contractInfo[5], contractInfo[-3], contractInfo[-2], contractInfo[3], str(contractInfo[6]), str(contractInfo[-4])]
+            for i in range(len(columns)):
+                item = QTableWidgetItem(infos[i])
+                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                item.setFlags(Qt.ItemIsEnabled)
+                self.tw_result.setItem(row, columns[i], item)
+
+
+    @pyqtSlot()
     def slotDelete(self):
+        self.tb_del.disconnect()
         rowCount = self.tw_result.currentRow()
         if self.result == None:
             resultCount = 0
@@ -684,16 +868,19 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
         elif rowCount >= 3 and rowCount < 3 + resultCount:
             reply = QMessageBox.question(self, '警告', '是否删除该行数据？', QMessageBox.Cancel, QMessageBox.Yes)
             if reply == QMessageBox.Yes:
-                deleteDataByInstallationId(self.result[rowCount - 3][0])
+                deleteDataByContractSignId(self.result[rowCount - 3][0])
                 self.tw_result.removeRow(rowCount)
             else:
                 return
         else:
             self.tw_result.removeRow(rowCount)
+        self.tb_del.clicked.connect(self.slotDelete)
 
 
     #导出至Excel
     def slotOutputToExcel(self):
+        self.tb_outputToExcel.disconnect()
+
         if len(self.result) < 1:
             reply = QMessageBox.warning(self, '警告', '未选中任何数据，无法导出', QMessageBox.Yes)
             return
@@ -741,22 +928,49 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
             contentStyle.alignment = alignment
             contentStyle.borders = borders
 
-            workSheet.write_merge(0, 0, 0, 12, "阵地工程x生化防护装备安装情况",titileStyle)
+            workSheet.write_merge(0, 0, 0, 30, "装备维修合同签订情况",titileStyle)
             workSheet.write_merge(1, 2, 0, 0,'序号', titileStyle)
-            workSheet.write_merge(1, 1, 1, 2, '单位', titileStyle)
-            workSheet.write(2, 1, "基地", titileStyle)
-            workSheet.write(2, 2, "番号", titileStyle)
-            workSheet.write_merge(1, 2, 3, 3, '阵地代号', titileStyle)
-            workSheet.write_merge(1, 2, 4, 4, '具体位置', titileStyle)
-            workSheet.write_merge(1, 2, 5, 5, '是否具备安装新型装备条件', titileStyle)
-            workSheet.write_merge(1, 1, 6, 10, '安装情况', titileStyle)
-            workSheet.write(2, 6, "目前安装情况", titileStyle)
-            workSheet.write(2, 7, "安装时间", titileStyle)
-            workSheet.write(2, 8, "计划安装时间", titileStyle)
-            workSheet.write(2, 9, "数量（套）", titileStyle)
-            workSheet.write(2, 10, "装备到位情况", titileStyle)
-            workSheet.write_merge(1, 2, 11, 11, '装备运行状态', titileStyle)
-            workSheet.write_merge(1, 2, 12, 12, '备注', titileStyle)
+            workSheet.write_merge(1, 1, 1, 2, '分管军代机构', titileStyle)
+            workSheet.write(2, 1, "军代局", titileStyle)
+            workSheet.write(2, 2, "军代室", titileStyle)
+            workSheet.write_merge(1, 2, 3, 3, '承制单位', titileStyle)
+            workSheet.write_merge(1, 2, 4, 4, '批准的合同号', titileStyle)
+            workSheet.write_merge(1, 2, 5, 5, '价格批复件', titileStyle)
+            workSheet.write_merge(1, 1, 6, 9, '价格情况', titileStyle)
+            workSheet.write(2, 6, "合同", titileStyle)
+            workSheet.write(2, 7, "价格工作依据", titileStyle)
+            workSheet.write(2, 8, "进度", titileStyle)
+            workSheet.write(2, 9, "价格方案依据", titileStyle)
+            workSheet.write_merge(1, 2, 10, 10, '合同签订时间', titileStyle)
+            workSheet.write_merge(1, 2, 11, 11, '交付时间', titileStyle)
+            workSheet.write_merge(1, 1, 12, 13, '合同项目', titileStyle)
+            workSheet.write(2, 12, "合同名称", titileStyle)
+            workSheet.write(2, 13, "送修单位", titileStyle)
+            workSheet.write_merge(1, 2, 14, 14, '总体进度', titileStyle)
+            workSheet.write_merge(1, 2, 15, 15, '计划年度', titileStyle)
+            workSheet.write_merge(1, 1, 16, 17, '数量', titileStyle)
+            workSheet.write(2, 16, "计划", titileStyle)
+            workSheet.write(2, 17, "明细", titileStyle)
+            workSheet.write_merge(1, 1, 18, 19, '计划价格', titileStyle)
+            workSheet.write(2, 18, "单价", titileStyle)
+            workSheet.write(2, 19, "金额", titileStyle)
+            workSheet.write_merge(1, 1, 20, 21, '报价', titileStyle)
+            workSheet.write(2, 20, "单价", titileStyle)
+            workSheet.write(2, 21, "金额", titileStyle)
+            workSheet.write_merge(1, 1, 22, 23, '合同', titileStyle)
+            workSheet.write(2, 22, "单价", titileStyle)
+            workSheet.write(2, 23, "金额", titileStyle)
+            workSheet.write_merge(1, 2, 24, 24, '已支付金额', titileStyle)
+            workSheet.write_merge(1, 2, 25, 25, '待支付金额', titileStyle)
+            workSheet.write_merge(1, 2, 26, 26, '目前进度', titileStyle)
+            workSheet.write_merge(1, 2, 27, 27, '是否入库', titileStyle)
+            workSheet.write_merge(1, 1, 28, 29, '调拨情况', titileStyle)
+            workSheet.write(2, 28, "开具调拨单", titileStyle)
+            workSheet.write(2, 29, "完成装接", titileStyle)
+            workSheet.write_merge(1, 2, 30, 30, '调拨情况', titileStyle)
+
+
+
 
             #填表数据
             dataList = self.result
@@ -764,25 +978,54 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
                 return
             else:
                 for i in range(len(dataList)):
-                    workSheet.write(3 + i, 0, str(dataList[i][0]), contentStyle)
-                    workSheet.write(3 + i, 1, getUnitNameById(dataList[i][1]), contentStyle)
+
+                    contactInfo = getContractMaintenanceInfoByNo(dataList[i][4])
+                    workSheet.write(3 + i, 0, str(i + 1), contentStyle)
+                    workSheet.write(3 + i, 1, dataList[i][1], contentStyle)
                     workSheet.write(3 + i, 2, dataList[i][2], contentStyle)
-                    workSheet.write(3 + i, 3, dataList[i][3], contentStyle)
+                    workSheet.write(3 + i, 3, contactInfo[5], contentStyle)
                     workSheet.write(3 + i, 4, dataList[i][4], contentStyle)
-                    if dataList[i][5] == 1:
-                        workSheet.write(3 + i, 5, '是', contentStyle)
-                    else:
-                        workSheet.write(3 + i, 5, '否', contentStyle)
+                    workSheet.write(3 + i, 5, dataList[i][5], contentStyle)
                     workSheet.write(3 + i, 6, dataList[i][6], contentStyle)
                     workSheet.write(3 + i, 7, dataList[i][7], contentStyle)
                     workSheet.write(3 + i, 8, dataList[i][8], contentStyle)
                     workSheet.write(3 + i, 9, dataList[i][9], contentStyle)
-                    workSheet.write(3 + i, 10, dataList[i][10], contentStyle)
-                    workSheet.write(3 + i, 11, dataList[i][11], contentStyle)
-                    workSheet.write(3 + i, 12, dataList[i][12], contentStyle)
+                    workSheet.write(3 + i, 10, contactInfo[-3], contentStyle)
+                    workSheet.write(3 + i, 11, contactInfo[-2], contentStyle)
+                    workSheet.write(3 + i, 12, contactInfo[3], contentStyle)
+                    # 送修单位
+                    allocationUnit = getAllocationByContractNo(contactInfo[2])[0][0]
+                    workSheet.write(3 + i, 13, allocationUnit, contentStyle)
+                    workSheet.write(3 + i, 14, dataList[i][10], contentStyle)
+                    workSheet.write(3 + i, 15, dataList[i][11], contentStyle)
+                    workSheet.write(3 + i, 16, dataList[i][12], contentStyle)
+                    workSheet.write(3 + i, 17, dataList[i][13], contentStyle)
+                    workSheet.write(3 + i, 18, dataList[i][14], contentStyle)
+                    workSheet.write(3 + i, 19, dataList[i][15], contentStyle)
+                    workSheet.write(3 + i, 20, dataList[i][16], contentStyle)
+                    workSheet.write(3 + i, 21, dataList[i][17], contentStyle)
+                    workSheet.write(3 + i, 22, str(contactInfo[-6]), contentStyle)
+                    workSheet.write(3 + i, 23, str(contactInfo[-4]), contentStyle)
+                    workSheet.write(3 + i, 24, str(dataList[i][18]), contentStyle)
+                    workSheet.write(3 + i, 25, str(dataList[i][19]), contentStyle)
+                    workSheet.write(3 + i, 26, str(dataList[i][20]), contentStyle)
+                    if dataList[i][21] == 1:
+                        workSheet.write(3 + i, 27, '是', contentStyle)
+                    else:
+                        workSheet.write(3 + i, 27, '否', contentStyle)
+                    if dataList[i][22] == 1:
+                        workSheet.write(3 + i, 28, '是', contentStyle)
+                    else:
+                        workSheet.write(3 + i, 28, '否', contentStyle)
+
+                    if dataList[i][23] == 1:
+                        workSheet.write(3 + i, 29, '是', contentStyle)
+                    else:
+                        workSheet.write(3 + i, 29, '否', contentStyle)
+                    workSheet.write(3 + i, 30, dataList[i][24], contentStyle)
 
             try:
-                pathName = "%s/阵地工程x生化防护装备安装情况.xls" % (directoryPath)
+                pathName = "%s/装备维修合同签订情况.xls" % (directoryPath)
                 workBook.save(pathName)
                 import win32api
                 win32api.ShellExecute(0, 'open', pathName, '', '', 1)
@@ -791,6 +1034,7 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
             except Exception as e:
                 QMessageBox.about(self, "导出失败", "导出表格被占用，请关闭正在使用的Execl！")
                 return
+        self.tb_outputToExcel.clicked.connect(self.slotOutputToExcel)
 
 if __name__ == "__main__":
     arr = ['1dads','2','3',[2]]

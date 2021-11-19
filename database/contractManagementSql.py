@@ -123,8 +123,15 @@ def deleteDataByContractMaintenance(id,year):
     sqls.append(sql)
     sql = "delete from contract_attachment where maintenance_id = '%d' and year = '%s'"%(id,year)
     sqls.append(sql)
-    sql = "delete from service_support where contract_no = '%s' and  year = '%s'"%(id, year)
-    sqls.append(sql)
+
+    sql = " select  no from  contract_maintenance where id = '%s'"%id
+    contratcNo = list(executeSql(sql))
+    print(contratcNo)
+    if len(contratcNo) > 0:
+        sql = "delete from service_support where contract_no = '%s' and  year = '%s'" % (contratcNo[0][0], year)
+        sqls.append(sql)
+        sql = "delete from contract_sign where contract_no = '%s'"%contratcNo[0][0]
+        sqls.append(sql)
     return excuteupdata(sqls)
 
 def deleteAttachmentDataByMaintenance(id,year):
@@ -196,6 +203,15 @@ def inputOneDataIntoContractMaintenance(lineInfo):
     except Exception as e:
         print(e)
         return False
+
+def getContractMaintenanceInfoByNo(contractNo):
+    sql = "select * from contract_maintenance where no = '%s'"%contractNo
+    result = list(executeSql(sql))
+    print('result',result)
+    if len(result) > 0:
+        return result[0]
+    else:
+        return []
 
 
 

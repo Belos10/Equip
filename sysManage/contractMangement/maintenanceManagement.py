@@ -368,8 +368,11 @@ class MaintenanceManagement(QWidget, OrderManagementUI):
                 self.alterRowData(currentRow)
         else:
             currentRow = self.tw_result.currentIndex().row()
+            print(currentRow)
             if currentRow == self.currentLastRow:
                 self.savaRowData(currentRow)
+            elif currentRow == -1:
+                return
             else:
                 self.alterRowData(currentRow)
 

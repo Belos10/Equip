@@ -198,3 +198,6 @@ def isHaveServiceSuppotYear(year):
 def addServiceSuppotYear(year):
     sql = "insert into service_support_year(year) values('%s') "%year
     return executeCommit(sql)
+
+
+

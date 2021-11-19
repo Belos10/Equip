@@ -1,5 +1,7 @@
 
 from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget
+
+from sysManage.maintainSupport.MaintenanceContractSigning import MaintenanceContractSigning
 from sysManage.maintainSupport.ServiceSupport import ServiceSupport
 from widgets.serviceSupport.MaintainSupport import widget_MaintainSupport
 '''
@@ -12,7 +14,7 @@ class MaintainSupportManage(QMainWindow, widget_MaintainSupport):
         self.setupUi(self)
 
         self.yearSerSup = ServiceSupport()          # 维修计划
-        self.maintainSchedule = QWidget()                # 维修进度
+        self.maintainSchedule = MaintenanceContractSigning()                # 维修进度
         self.materialManage = QWidget(self)             # 物资管理
 
         self.userInfo = None
@@ -75,8 +77,7 @@ class MaintainSupportManage(QMainWindow, widget_MaintainSupport):
         self.tb_yearSerSup.setDisabled(0)
         self.tb_maintainSchedule.setDisabled(1)
         self.tb_materialManage.setDisabled(0)
-
-        # self.allotSchedule.initAll()
+        self.maintainSchedule.init()
 
     '''
         功能：
