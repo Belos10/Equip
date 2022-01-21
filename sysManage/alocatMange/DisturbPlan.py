@@ -408,6 +408,7 @@ class DisturbPlan(QWidget, yearList_Form):
         for i in range(0, len(self.currentUnitChilddict)):
             for j in range(0, len(self.currentEquipdict)):
                 item = self.disturbResult.item(j, 5 + i)
+                # print("self.unitDisturbPlanList",self.unitDisturbPlanList,"num",num)
                 if self.unitDisturbPlanList[num] != '':
                     item.setText(self.unitDisturbPlanList[num])
                 item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable)

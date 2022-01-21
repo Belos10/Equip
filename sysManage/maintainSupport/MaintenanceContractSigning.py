@@ -1,10 +1,10 @@
 import base64
 import pickle
-
 from PyQt5.QtCore import Qt, QDate, QDateTime, pyqtSlot
-
 from database.contractManagementSql import getContractMaintenanceInfoByNo
 from database.contractSigningSql import *
+from sysManage.maintainSupport.MaintenanceContractSignTransferModel import MaintenanceContractSignTransferModel
+
 from sysManage.userInfo import get_value
 import sys
 from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QTableWidget, QHeaderView, QTableWidgetItem, QComboBox, \
@@ -108,13 +108,18 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
                         if bureauNames[j][0] != dataList[i][1]:
                             itemElement.append(bureauNames[j][0])
                 item.addItems(itemElement)
+                item.setCurrentIndex(0)
                 self.tw_result.setCellWidget(3 + i, 1, item)
                 item.activated.connect(self.bureauNameChange)
 
-                agentIds, agentNames = getAgentNamesAndIds(dataList[i][2])
+                agentIds, agentNames = getAgentNamesAndIds(dataList[i][1])
+                # print("agentIds:" ,agentIds)
+                # print("agentNames:", agentNames)
                 combox = QComboBox()
                 for j in range(len(agentNames)):
                     combox.addItem(agentNames[j], agentIds[j])
+                    if agentIds[j] == dataList[i][3]:
+                        combox.setCurrentIndex(j)
                 combox.setEditable(False)
                 self.tw_result.setCellWidget(3 + i, 2, combox)
                 combox.activated.connect(self.slotAlterAndSava)
@@ -306,6 +311,17 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
 
     #开具调拨单
     def formDialOrder(self):
+        ShowRocket = MaintenanceContractSignTransferModel()
+        ShowRocket.setWindowFlags(Qt.Dialog | Qt.WindowCloseButtonHint)
+        ShowRocket.pb_output.setDisabled(1)
+        ShowRocket.pb_input.setDisabled(1)
+        ShowRocket.pb_confirm.setDisabled(1)
+        ShowRocket.pb_saveSingle.setDisabled(1)
+        ShowRocket.pb_saveTotal.setDisabled(1)
+        ShowRocket.getUnitIDList([['', '', '', '' ], ['','', '', ''],['', '', '', '' ]], ['', '', '', '', '', ''],'',('', "", '', '', '', '', ''))
+        ShowRocket.show()
+        ShowRocket.exec_()
+
         basepath = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
         sourceDirectoryPath = basepath + "\\resource\\装备实物资产调拨回执凭证.docx"
         print('sourceDirectoryPath')

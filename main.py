@@ -39,7 +39,7 @@ if __name__ == "__main__":
     basepath=os.path.split(os.path.abspath(__file__))[0]
     path = basepath + "\\icons\\ElegantDark.qss"
     # path=os.path.join(basepath,"./icons/ElegantDark.qss")
-    # print(path)e
+    # print(path)
     with open(path, 'r') as f:
         qssStyle = f.read()
     widget.setStyleSheet(qssStyle)

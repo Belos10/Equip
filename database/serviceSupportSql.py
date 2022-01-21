@@ -201,3 +201,29 @@ def addServiceSuppotYear(year):
 
 
 
+
+
+
+# 读取物资管理表-数据内容
+def selectContentOfMaterialManagement():
+    sql = "select * from materialManagement order by Number"
+    cur.execute(sql)
+    rows = cur.fetchall()
+    return rows
+
+def insertContentOfMaterialManagement(data):
+    sql = "insert into materialManagement(Number, VoucherNumber, AssetName, ContractNumber, SettlementTime, NumberOfContracts, ContractUnitPrice, ContractAmount, FinancialValuationAccountingQuantity, FinancialValuationAccountingPrice, other, AllocationSituation) VALUES ('" + data[0] + "', '" + data[1] + "', '" + data[2] + "', '" + data[3] + \
+          "', '" + data[4] + "', '" + data[5] + "', '" + data[6] + "', '" + data[7] + "', '" \
+          + data[8] + "', '" + data[9] + "', '" + data[10] + "', '" + data[11] + "')"
+    # print(sql)
+    executeCommit(sql)
+
+def updateContentOfMaterialManagement(data):
+    sql = "update materialManagement set VoucherNumber = '" + data[1] + "', AssetName = '" + data[2] + "', ContractNumber = '" + data[3] + "', SettlementTime = '" + data[4] + "', NumberOfContracts = '" + data[5] + "', ContractUnitPrice = '" + data[6] + "', ContractAmount = '" + data[7] + "', FinancialValuationAccountingQuantity = '" + data[8] + "', FinancialValuationAccountingPrice = '" + data[9] + "', other = '" + data[10] + "',  AllocationSituation = '" + data[11] + "' where Number = '" + data[0] + "'"
+    # print(sql)
+    cur.execute(sql)
+    conn.commit()
+
+def deleteDataByMaterialManagementNum(MaterialManagementNum):
+    sql = "delete from MaterialManagement where Number ='%s'" % MaterialManagementNum
+    executeCommit(sql)

@@ -59,7 +59,7 @@ QPushButton:disabled{
 	border-bottom-color: rgb(58, 58, 58);
 	border-bottom-width: 1px;
 	border-style: solid;
-	color: rgb(0, 0, 0);
+	color: rgb(200, 200,200);
 	padding: 2px;
 	background-color: qlineargradient(spread:pad, x1:0.5, y1:1, x2:0.5, y2:0, stop:0 rgba(57, 57, 57, 255), stop:1 rgba(77, 77, 77, 255));
 }
@@ -145,28 +145,29 @@ QGroupBox{
 }
 QToolButton{
 
-    font-size:14px;
+    font-size:23px;
     background-color:rgb(82,82,82);
     color: rgb(255, 255, 255);
 
 }
 QToolButton:!enabled{
      color:rgb(133,203,248);
-     font-size:16px;
+     font-size:23px;
 }
 QToolButton:selected, QToolButton:last:selected, QToolButton:hover,QToolButton:checked,QToolButton:pressed{
       color:rgb(240,240,240);
-     font-size:16px;
+     font-size:23px;
 }
 
 QTabBar::tab {
-    font-size:16px;
+    font-size:23px;
 	padding:2px;
 	color:rgb(250,250,250);
   	background-color: qlineargradient(spread:pad, x1:0.5, y1:1, x2:0.5, y2:0, stop:0 rgba(77, 77, 77, 255), stop:1 rgba(97, 97, 97, 255));
 	border-style: solid;
 	border-width: 5px;
-	width:80px;
+	width:120px;
+	height:40px;
   	border-top-right-radius:4px;
    border-top-left-radius:4px;
 	border-top-color: qlineargradient(spread:pad, x1:0.5, y1:0.6, x2:0.5, y2:0.4, stop:0 rgba(115, 115, 115, 255), stop:1 rgba(95, 92, 93, 255));

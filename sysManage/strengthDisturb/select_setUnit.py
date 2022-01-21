@@ -17,13 +17,13 @@ class select_setUnit(QWidget,widget_Select_SetUnit):
         self.tw_first.header().setVisible(False)  # 不显示树窗口的title
         # self.tw_second.header().setVisible(False)  # 不显示树窗口的title
         self.changeUnit = True  # 是否是修改单元的目录
+        self.inputUnitInfoList = []
         self.showInputResult = showInputResult(self)
         self.showInputResult.hide()
         # QTableWidget设置整行选中
         self.tb_result.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tb_result.setSelectionMode(QAbstractItemView.SingleSelection)
         self.tb_result.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-
         self.first_treeWidget_dict = {}  # 当前单位目录列表对象，结构为：{'行号':对应的item}
         # self.second_treeWidget_dict = {}  # 当前装备目录列表对象，结构为：{'行号':对应的item}
         self.currentUnitTableResult = []
@@ -301,50 +301,52 @@ class select_setUnit(QWidget,widget_Select_SetUnit):
             reply = QMessageBox.question(self, '删除', '删除失败', QMessageBox.Yes)
             return
 
-
     def slotInputDataByExcel(self):
         self.setDisabled(True)
         self.showInputResult.setDisabled(False)
-        filename, _ = QFileDialog.getOpenFileName(self, "选中文件", '', "Excel Files (*.xls, *.xlsx)")
+        filename, _ = QFileDialog.getOpenFileName(self, "选中文件", '', "Excel Files (*.xls);;Excel Files (*.xlsx)")
         try:
             workBook = xlrd.open_workbook(filename)
             self.workSheet = workBook.sheet_by_index(0)
             self.inputUnitInfoList = []
-            self.showInputResult.setWindowTitle("导入Excel数据到数据库Unit表中")
-            self.showInputResult.show()
-            title = ['单位编号', '单位名称', '上级单位编号', '单位代号', '是否为旅团']
-
-            self.showInputResult.tw_result.setColumnCount(self.workSheet.ncols)
-            self.showInputResult.tw_result.setHorizontalHeaderLabels(title)
-            self.showInputResult.tw_result.setRowCount(self.workSheet.nrows - 1)
+            title = ['单位编号', '单位名称', '上级单位编号', '单位代号']
             for r in range(1, self.workSheet.nrows):
-                Unit_ID = str(int(self.workSheet.cell(r,0).value))
-                Unit_Name = self.workSheet.cell(r,1).value
-                Unit_Uper = str(int(self.workSheet.cell(r,2).value))
-                Unit_Alias = self.workSheet.cell(r,3).value
-                Is_Group = self.workSheet.cell(r, 4).value
-                item = QTableWidgetItem(Unit_ID)
-                self.showInputResult.tw_result.setItem(r-1, 0, item)
-                item = QTableWidgetItem(Unit_Name)
-                self.showInputResult.tw_result.setItem(r - 1, 1, item)
-                item = QTableWidgetItem(Unit_Uper)
-                self.showInputResult.tw_result.setItem(r - 1, 2, item)
-                item = QTableWidgetItem(Unit_Alias)
-                self.showInputResult.tw_result.setItem(r - 1, 3, item)
-                item = QTableWidgetItem(Is_Group)
-                self.showInputResult.tw_result.setItem(r - 1, 4, item)
+                Unit_Name = (self.workSheet.cell(r, 1).value).strip()
+                try:
+                    Unit_Uper = str(int(self.workSheet.cell(r, 2).value))
+                    Unit_ID = str(int(self.workSheet.cell(r, 0).value))
+                except:
+                    continue;
+                Unit_Alias = self.workSheet.cell(r, 3).value
                 unitInfo = []
                 unitInfo.append(Unit_ID)
                 unitInfo.append(Unit_Name)
                 unitInfo.append(Unit_Uper)
                 unitInfo.append(Unit_Alias)
-                unitInfo.append(Is_Group)
                 self.inputUnitInfoList.append(unitInfo)
-            return
+            self.showInputResult.setWindowTitle("导入Excel数据到数据库单位表中")
+            self.showInputResult.tw_result.setColumnCount(len(title))
+            self.showInputResult.tw_result.setHorizontalHeaderLabels(title)
+            self.showInputResult.tw_result.setEditTriggers(QAbstractItemView.NoEditTriggers)
+            self.showInputResult.tw_result.setRowCount(len(self.inputUnitInfoList))
+            self.showInputResult.tw_result.verticalHeader().setVisible(False)
+            for r, list_item in enumerate(self.inputUnitInfoList):
+                item = QTableWidgetItem(list_item[0])
+                self.showInputResult.tw_result.setItem(r, 0, item)
+                item = QTableWidgetItem(list_item[1])
+                self.showInputResult.tw_result.setItem(r, 1, item)
+                item = QTableWidgetItem(list_item[2])
+                self.showInputResult.tw_result.setItem(r, 2, item)
+                item = QTableWidgetItem(list_item[3])
+                self.showInputResult.tw_result.setItem(r, 3, item)
+            self.showInputResult.show()
+
         except BaseException as e:
             print(e)
             QMessageBox.about(self, "打开失败", "打开文件失败，请检查文件")
             self.setDisabled(False)
+
+
 
 
     '''
@@ -421,23 +423,9 @@ class select_setUnit(QWidget,widget_Select_SetUnit):
         self.showInputResult.hide()
         self.setDisabled(False)
 
+
     def slotInputIntoMysql(self):
         print(self.inputUnitInfoList)
-        # selectedItems = self.showInputResult.tw_result.selectedItems();
-        # currentSelectRowCount = len(selectedItems)
-        # for i in range(currentSelectRowCount):
-        #     firstItem = selectedItems.at(i).topRow()
-        #     lastItem = selectedItems.at(i).bottomRow()
-        #     for j in range(firstItem,lastItem):
-        #         self.showInputResult.tw_result.item(j,)
-        #         unitInfo = []
-        #         unitInfo.append(Unit_ID)
-        #         unitInfo.append(Unit_Name)
-        #         unitInfo.append(Unit_Uper)
-        #         unitInfo.append(Unit_Alias)
-        #         unitInfo.append(Is_Group)
-        #         self.inputUnitInfoList.append(unitInfo)
-
         inputSuccess = inputIntoUnitFromExcel(self.inputUnitInfoList)
         if inputSuccess != True:
             for error in inputSuccess:
@@ -445,3 +433,4 @@ class select_setUnit(QWidget,widget_Select_SetUnit):
         self.slotUnitDictInit()
         self.setDisabled(False)
         self.showInputResult.hide()
+

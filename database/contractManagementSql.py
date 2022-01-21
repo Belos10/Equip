@@ -213,7 +213,16 @@ def getContractMaintenanceInfoByNo(contractNo):
     else:
         return []
 
+def getContractMaintenanceInfoByMaintanceId(maintenceId):
+    sql = "select * from contract_maintenance where id = '%d'"%maintenceId
+    result = list(executeSql(sql))
+    print('result', result)
+    if len(result) > 0:
+        return result[0]
+    else:
+        return []
+
 
 
 if __name__ == '__main__':
-    print(getResult('2001','',''))
+    print(getContractMaintenanceInfoByMaintanceId('2001','',''))

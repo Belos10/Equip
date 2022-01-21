@@ -247,25 +247,40 @@ class AttachmentDialog(QDialog, AttachmentDialogUI):
         if len(selectRow) != 0:
             currentRow = selectRow[0].row()
             currentColumn = selectRow[0].column()
-            if (currentColumn == 5 or currentColumn == 6 and currentRow >= 2):
+            if (currentColumn == 8 or currentColumn == 4 or currentColumn == 5 or currentColumn == 6 and currentRow >= 2):
                 item0 = self.tw_result.item(currentRow, 5)
                 item1 = self.tw_result.item(currentRow, 6)
-                if (item1 != None and item0 != None):
-                    if (len(item0.text()) > 0 and len(item1.text()) > 0):
+                item2 = self.tw_result.item(currentRow, 4)
+                item3 = self.tw_result.item(currentRow, 8)
+                if (item1 != None and item0 != None and item2 != None and item3 != None):
+                    if (len(item0.text()) > 0 and len(item1.text()) > 0 and len(item2.text()) > 0 and len(item3.text()) > 0):
                         self.tw_result.itemChanged.disconnect(self.slotAlterAndSava)
                         count = 0
                         unit = 0
                         try:
                             count = int(item1.text())
                         except ValueError:
-                            QMessageBox.warning(self, "注意", "请输入整数！", QMessageBox.Yes, QMessageBox.Yes)
+                            QMessageBox.warning(self, "注意", "请输入整数！")
                             item1.setText('')
                         try:
                             unit = float(item0.text())
                         except:
-                            QMessageBox.warning(self, "注意", "请输入正确的数字！", QMessageBox.Yes, QMessageBox.Yes)
                             item0.setText('')
-                        amount = round(count * unit, 4)
+                            QMessageBox.warning(self, "注意", "请输入正确的数字！")
+
+                        try:
+                            float(item2.text())
+                        except:
+                            item2.setText('')
+                            QMessageBox.warning(self, "注意", "请输入正确的数字！")
+
+                        try:
+                            float(item3.text())
+                        except:
+                            item3.setText('')
+                            QMessageBox.warning(self, "注意", "请输入正确的数字！")
+
+                        amount = round(count * unit, 6)
                         if (amount != 0):
                             item = self.tw_result.item(currentRow, 7)
                             if (item != None):
@@ -342,6 +357,7 @@ class AttachmentDialog(QDialog, AttachmentDialogUI):
     def soltAdd(self):
         if self.tw_result.rowCount() <= 2 + len(self.resultList):
             self.tw_result.itemChanged.disconnect(self.slotAlterAndSava)
+            maintenceData = getContractMaintenanceInfoByMaintanceId(self.maintenanceId)
             rowCount = self.tw_result.rowCount()
             self.currentLastRow = rowCount
             self.tw_result.insertRow(rowCount)
@@ -351,23 +367,65 @@ class AttachmentDialog(QDialog, AttachmentDialogUI):
                 item.setFlags(Qt.ItemIsEnabled)
                 self.tw_result.setItem(2, 0, item)
             else:
-                lastNo = int(self.tw_result.item(rowCount - 1,1).text())
+                lastNo = int(self.tw_result.item(rowCount - 1,0).text())
                 item = QTableWidgetItem(str(lastNo + 1))
                 item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
                 item.setFlags(Qt.ItemIsEnabled)
                 self.tw_result.setItem(rowCount, 0, item)
 
-            item = QTableWidgetItem('')
+            #合同号
+            item = QTableWidgetItem(maintenceData[2])
+            item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+            item.setFlags(Qt.ItemIsEnabled)
+            self.tw_result.setItem(rowCount, 1, item)
+
+            #合同名称
+            item = QTableWidgetItem(maintenceData[3])
+            item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+            item.setFlags(Qt.ItemIsEnabled)
+            self.tw_result.setItem(rowCount, 2, item)
+
+            #预算金额
+            # 合同名称
+            item = QTableWidgetItem("")
             item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             item.setFlags(Qt.ItemIsEnabled)
             self.tw_result.setItem(rowCount, 7, item)
 
-            signingDate = QDateEdit()
-            signingDate.setDisplayFormat("yyyy-MM-dd")
-            self.tw_result.setCellWidget(rowCount, 9, signingDate)
-            deliveryDate = QDateEdit()
-            deliveryDate.setDisplayFormat("yyyy-MM-dd")
-            self.tw_result.setCellWidget(rowCount, 16, deliveryDate)
+            #签订日期
+            date = maintenceData[9]
+            parsedDateList = date.split('-')
+            dataEdit = QDateEdit()
+            dataEdit.setDisplayFormat("yyyy-MM-dd")
+            dataEdit.setDate(QDate(int(parsedDateList[0]), int(parsedDateList[1]), int(parsedDateList[2])))
+            dataEdit.setEnabled(False)
+            self.tw_result.setCellWidget(rowCount, 9, dataEdit)
+
+            #甲方
+            item = QTableWidgetItem(maintenceData[4])
+            item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+            item.setFlags(Qt.ItemIsEnabled)
+            self.tw_result.setItem(rowCount, 10, item)
+
+            # 乙方
+            item = QTableWidgetItem(maintenceData[5])
+            item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+            item.setFlags(Qt.ItemIsEnabled)
+            self.tw_result.setItem(rowCount, 13, item)
+
+            date = maintenceData[-2]
+            parsedDateList = date.split('-')
+            dataEdit = QDateEdit()
+            dataEdit.setDisplayFormat("yyyy-MM-dd")
+            dataEdit.setDate(QDate(int(parsedDateList[0]), int(parsedDateList[1]), int(parsedDateList[2])))
+            dataEdit.setEnabled(False)
+            self.tw_result.setCellWidget(rowCount, 16, dataEdit)
+
+            item = QTableWidgetItem(maintenceData[-1])
+            item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+            item.setFlags(Qt.ItemIsEnabled)
+            self.tw_result.setItem(rowCount, 17, item)
+
             self.tw_result.itemChanged.connect(self.slotAlterAndSava)
         else:
             QMessageBox.warning(self, "注意", "请先将数据补充完整！", QMessageBox.Yes, QMessageBox.Yes)

@@ -11,6 +11,9 @@
 from PyQt5 import QtCore, QtGui, QtWidgets,Qt
 
 #new
+from PyQt5.QtCore import QSize
+
+
 class Strength_Disturb_Widget(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -39,6 +42,7 @@ class Strength_Disturb_Widget(object):
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(":/pic/select.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.tb_strengthSelect.setIcon(icon)
+        self.tb_strengthSelect.setIconSize(QSize(10,10))
         self.tb_strengthSelect.setObjectName("tb_strengthSelect")
         self.tb_strengthSelect.setToolButtonStyle(Qt.Qt.ToolButtonTextUnderIcon)
 
@@ -46,6 +50,7 @@ class Strength_Disturb_Widget(object):
         icon1 = QtGui.QIcon()
         icon1.addPixmap(QtGui.QPixmap(":/pic/wave.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.tb_maintenMange.setIcon(icon1)
+        self.tb_maintenMange.setIconSize(QSize(10, 10))
         self.tb_maintenMange.setObjectName("tb_maintenMange")
         self.tb_maintenMange.setToolButtonStyle(Qt.Qt.ToolButtonTextUnderIcon)
 
@@ -87,5 +92,5 @@ class Strength_Disturb_Widget(object):
         self.tb_maintenMange.setText(_translate("MainWindow", "编制数维护"))
         self.tb_equipBalance.setText(_translate("MainWindow", "装备平衡表"))
         self.tb_applyRetire.setText(_translate("MainWindow", "申请退役"))
-        self.tb_strengthDisturbSet.setText(_translate("MainWindow", "实力分布设置"))
+        self.tb_strengthDisturbSet.setText(_translate("MainWindow", "目录设置"))
 import icons.resource_rc

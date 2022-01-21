@@ -55,6 +55,8 @@ def insertOneDataIntContactSign(rowData):
     return executeCommit(sql)
 
 def updataOneDataIntoContractSign(rowData):
+    print("rowDate")
+    print(rowData)
     sql = "update contract_sign  set bureau_name = '%s',  agent_name = '%s',  agent_id = '%d',  contract_no = '%s',  price_reply = '%s',  price_contract = '%s'," \
           "  work_basis = '%s',  price_progress = '%s',  plan_basis = '%s',  overall_progress = '%s', plan_annual = '%s', " \
           "  count_plan = '%s',  count_detail = '%s',  plan_price_unit = '%s',  plan_price_count = '%s',  offer_unit = '%s',  offer_count = '%s',  paid_amount = '%s'," \
