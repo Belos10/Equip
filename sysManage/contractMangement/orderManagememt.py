@@ -562,7 +562,6 @@ class OrderManagement(QWidget, OrderManagementUI):
         pass
 
         # 导入数据包
-
     def slotInputData(self):
         self.inputList = []
         filename, _ = QFileDialog.getOpenFileName(self, "选中文件", '', "Excel Files (*.nms);;Excel Files (*.nms)")

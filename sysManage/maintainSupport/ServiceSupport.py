@@ -105,6 +105,7 @@ class ServiceSupport(QWidget, ServiceSupportNewUI):
         self.tb_input.setDisabled(True)
         #初始化年份列表
         self.initYearList()
+        self.cb_selectedType.clear()
         self.cb_selectedType.addItems(['全选', '装备大修', '装备中修', '维修器材购置', '修理能力建设'])
                                             #    0            1           2             3
         pass
@@ -128,7 +129,7 @@ class ServiceSupport(QWidget, ServiceSupportNewUI):
     '''
     def soltAddContractYear(self):
         year = 0
-        year, ok = QInputDialog.getInt(self, "Get year", "year:", 0, 0, 100000, 1)
+        year, ok = QInputDialog.getInt(self, "年份", "年份:", 0, 0, 100000, 1)
         if ok:
             if isHaveServiceSupportYear(str(year)):
                 QMessageBox.information(self, "新增", "该年份已经存在，拒绝添加！", QMessageBox.Yes)

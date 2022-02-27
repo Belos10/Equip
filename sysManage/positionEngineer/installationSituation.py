@@ -685,7 +685,7 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
                 return
             else:
                 for i in range(len(dataList)):
-                    workSheet.write(3 + i, 0, str(dataList[i][0]), contentStyle)
+                    workSheet.write(3 + i, 0, str(i + 1), contentStyle)
                     workSheet.write(3 + i, 1, getUnitNameById(dataList[i][1]), contentStyle)
                     workSheet.write(3 + i, 2, dataList[i][2], contentStyle)
                     workSheet.write(3 + i, 3, dataList[i][3], contentStyle)

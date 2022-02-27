@@ -46,6 +46,10 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
         self.initUserInfo()
         self.tw_result.clear()
         self.tw_first.header().setVisible(False)
+        self.tb_input.setDisabled(True)
+        self.tb_input.setVisible(False)
+        self.tb_output.setDisabled(True)
+        self.tb_output.setVisible(False)
 
         self.first_treeWidget_dict = {}
         # 当前选中的单位列表和装备列表

@@ -28,6 +28,7 @@ class retirement(QWidget, Widget_Retirement):
         self.tw_first.header().setVisible(False)
         self.tw_second.header().setVisible(False)
         self.userInfo = None
+        self.inputList = []
         self._initAll_()
         self.signalConnect()
 
@@ -95,15 +96,14 @@ class retirement(QWidget, Widget_Retirement):
 
     def slotDelYear(self):
         currentRow = self.lw_year.currentRow()
-
-        if currentRow == 0:
-            reply = QMessageBox.question(self, '删除', '是否删除所有年份以及年份下所有数据？', QMessageBox.Yes, QMessageBox.Cancel)
-            if reply == QMessageBox.Cancel:
-                return
-            else:
-                delRetireYearALLYear()
-                self._initAll_()
-                return
+        # if currentRow == 0:
+        #     reply = QMessageBox.question(self, '删除', '是否删除所有年份以及年份下所有数据？', QMessageBox.Yes, QMessageBox.Cancel)
+        #     if reply == QMessageBox.Cancel:
+        #         return
+        #     else:
+        #         delRetireYearALLYear()
+        #         self._initAll_()
+        #         return
         if currentRow < 0:
             reply = QMessageBox.question(self, '删除', '请选中某年进行删除', QMessageBox.Yes)
         else:
@@ -118,8 +118,7 @@ class retirement(QWidget, Widget_Retirement):
 
     def slotAddNewYear(self):
         year = 0
-        year, ok = QInputDialog.getInt(self, "Get year", "year:", 0, 0, 100000, 1)
-
+        year, ok = QInputDialog.getInt(self, "年份", "年份:", 0, 0, 100000, 1)
         if year:
             allyearInfo = selectAllRetirementYearInfo()
             haveYear = False
@@ -292,7 +291,7 @@ class retirement(QWidget, Widget_Retirement):
             item = QListWidgetItem()
             item.setText(year)
             self.lw_year.addItem(item)
-            self.currentYearListItem[year[1]] = item
+            self.currentYearListItem[year] = item
 
     # 初始化单位目录
     def _initUnitTreeWidget(self, root, mother):

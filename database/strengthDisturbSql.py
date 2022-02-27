@@ -3056,6 +3056,16 @@ def selectAllRetirementYearInfo():
     result = cur.fetchall()
     return result
 
+def selectLastYear():
+    sql = "select ID from retireyear order by ID desc limit 1"
+    cur.execute(sql)
+    result = cur.fetchall()
+    lastYear = -1
+    if len(result) > 0:
+        lastYear = result[0][0]
+    return lastYear
+
+
 def isHaveRecord(UnitID, EquipID, year):
     sql = "select * from retire where Equip_ID = '" + \
           EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + year + "'"

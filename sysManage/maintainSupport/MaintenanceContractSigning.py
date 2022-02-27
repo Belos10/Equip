@@ -761,8 +761,7 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
                 self.tw_result.setItem(rowCount, 0, item)
 
             bureauNames = getBureauNamesFromAgentRoom()
-            print('bureauNames')
-            print(bureauNames)
+
             item = QComboBox()
             item.setEditable(False)
             itemElement = []
@@ -782,9 +781,6 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
             self.tw_result.setCellWidget(rowCount, 2, item)
 
             contractNos = getContractNos()
-            print('contractNos')
-            print(contractNos)
-            contractInfo = []
             item = QTableWidgetItem('')
             item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             item.setFlags(Qt.ItemIsEnabled)
@@ -836,13 +832,13 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
             item.setEditable(False)
             item.addItems(['否', '是'])
             self.tw_result.setCellWidget(rowCount, 29, item)
-
             self.tw_result.itemChanged.connect(self.slotAlterAndSava)
-            self.tb_add.clicked.connect(self.slotAdd)
-            
+
+
         else:
             QMessageBox.warning(self, "注意", "请先将数据补充完整！", QMessageBox.Yes)
-            return
+        self.tb_add.clicked.connect(self.slotAdd)
+
 
 
     def contactNoChange(self):

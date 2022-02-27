@@ -31,13 +31,10 @@ class EquipmentStatistics(QWidget, PosEngneerStatisticsUI):
     # 信号与槽的连接
     def signalConnectSlot(self):
         # 当前单位目录被点击
-        self.tw_first.itemChanged.connect(self.slotEquipmentStatisticsResult)
+        self.tw_first.clicked.connect(self.slotEquipmentStatisticsResult)
         # 当前装备目录被点击
         self.tw_second.itemChanged.connect(self.slotEquipmentStatisticsResult)
-
         # #新增某个年份
-
-
         # self.tb_delete.clicked.connect(self.slotDelete)
         self.pb_firstSelect.clicked.connect(self.slotSelectUnit)
         self.pb_secondSelect.clicked.connect(self.slotSelectEquip)
@@ -188,6 +185,7 @@ class EquipmentStatistics(QWidget, PosEngneerStatisticsUI):
         for unitID, unitItem in self.first_treeWidget_dict.items():
             if unitItem == self.tw_first.currentItem():
                 self.currentCheckedUnitList.append(unitID)
+        print("self.currentCheckedUnitList ", self.currentCheckedUnitList)
         if len(self.currentCheckedUnitList) == 1 and len(self.currentCheckedEquipList) > 0:
             if gradeInUnit(self.currentCheckedUnitList[0]) == 3:
                 self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList)
@@ -686,6 +684,8 @@ class EquipmentStatistics(QWidget, PosEngneerStatisticsUI):
                                 # self.tw_result.setItem(currentRow, positionStartColum, item)
                                 workSheet.write(currentRow, positionStartColum, "%d" % data[3], contentStyle)
                                 workSheet.write(currentRow, positionStartColum + 1, "%s" % data[4], contentStyle)
+                            else:
+                                pass
 
                             positionStartColum = positionStartColum + 2
                             currentColumn = positionStartColum
@@ -715,9 +715,7 @@ class EquipmentStatistics(QWidget, PosEngneerStatisticsUI):
                         workSheet.write(4 + i, j, '', contentStyle)
 
             try:
-                "%s阵地工程X生化防护装备统计表" % self.base['Unit_Name']
-                pathName = "%s/%s阵地工程X生化防护装备统计表.xls" % (
-                directoryPath, self.base['Unit_Name'])
+                pathName = "%s/%s阵地工程X生化防护装备统计表.xls" % (directoryPath, self.base['Unit_Name'])
                 workBook.save(pathName)
                 import win32api
                 win32api.ShellExecute(0, 'open', pathName, '', '', 1)

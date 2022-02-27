@@ -528,7 +528,7 @@ class equipmentBalance(QWidget, Widget_Retirement):
                         itemList.append('')
                     else:
                         itemList.append(item.text())
-            saveEquipmentBalanceByRow(itemList,self.currentCheckedUnitList[0], self.currentYear)
+            saveEquipmentBalanceByRow(itemList, self.resultList[row - 4]['equip_balance_id'])
             itemList.clear()
         self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList,
                                                    self.currentYear)
