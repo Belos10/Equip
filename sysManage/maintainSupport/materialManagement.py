@@ -305,7 +305,7 @@ class materialManagement(QWidget, materialManagementUI):
             else:
                 currentRow = self.tw_result.currentRow()
                 # print("currentRow:", currentRow)
-                currentRowNum = currentRow -2
+                currentRowNum = currentRow - 2
                 # print("currentRowNum:", currentRowNum)
                 currentRowNumKeyValue = self.datadict[str(currentRowNum)][0]
                 # print("currentRowNumKeyValue:", currentRowNumKeyValue)
