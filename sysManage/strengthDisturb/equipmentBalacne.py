@@ -53,6 +53,10 @@ class equipmentBalance(QWidget, Widget_Retirement):
         self.year = '全部'
         self.groupBox_2.setDisabled(True)
         self.groupBox_3.setDisabled(True)
+        self.pb_input.setDisabled(True)
+        self.pb_input.setVisible(False)
+        self.pb_output.setDisabled(True)
+        self.pb_output.setVisible(False)
 
         # 信号连接
     def signalConnect(self):
@@ -137,6 +141,7 @@ class equipmentBalance(QWidget, Widget_Retirement):
             for resultInfo in result:
                 stack.append(resultInfo)
                 root.append(item)
+        self.tw_second.expandAll()
 
     '''
                 功能：
@@ -155,6 +160,7 @@ class equipmentBalance(QWidget, Widget_Retirement):
             for resultInfo in result:
                 stack.append(resultInfo)
                 root.append(item)
+        self.tw_first.expandAll()
 
         # 查看当前被选中的单位和装备并初始化
     def slotInquryEquipmentBalanceResult(self):
@@ -522,7 +528,7 @@ class equipmentBalance(QWidget, Widget_Retirement):
                         itemList.append('')
                     else:
                         itemList.append(item.text())
-            saveEquipmentBalanceByRow(itemList,self.currentCheckedUnitList[0], self.currentYear)
+            saveEquipmentBalanceByRow(itemList, self.resultList[row - 4]['equip_balance_id'])
             itemList.clear()
         self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList,
                                                    self.currentYear)
@@ -928,14 +934,18 @@ class equipmentBalance(QWidget, Widget_Retirement):
         itemList = []
         for row in range(4, len(self.equipList) + 4):
             for column in range(self.lenOfColumn):
-                item = self.tw_result.item(row, column)
-                if item is None:
-                    itemList.append('')
+                if column == 0:
+                    itemList.append(self.equipList[row - 4])
+                    continue
                 else:
-                    if len(item.text()) == 0:
+                    item = self.tw_result.item(row, column)
+                    if item is None:
                         itemList.append('')
                     else:
-                        itemList.append(item.text())
+                        if len(item.text()) == 0:
+                            itemList.append('')
+                        else:
+                            itemList.append(item.text())
             saveEquipmentBalanceByRow(itemList, self.currentCheckedUnitList[0], self.currentYear)
             itemList.clear()
 

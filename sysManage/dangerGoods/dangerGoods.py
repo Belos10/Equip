@@ -16,9 +16,10 @@ class DangerGoods(QMainWindow, Danger_Goods_Widget):
         self.stackedWidget.addWidget(self.strengthStatistics)
         # self.stackedWidget.addWidget(self.directoryMaintenance)
         self.stackedWidget.setCurrentIndex(0)
-        self.strengthStatistics.setDisabled(True)
+        self.strengthStatistics.setDisabled(False)
         # self.directoryMaintenance.setDisabled(True)
         self.connectSignal()
+
 
 
     def connectSignal(self):
@@ -36,11 +37,10 @@ class DangerGoods(QMainWindow, Danger_Goods_Widget):
         self.tb_strengthStatistics.setDisabled(True)
         # self.tb_directoryMaintenance.setDisabled(False)
 
-        self.slotDisconnect()
         self.stackedWidget.setCurrentIndex(0)
         self.stackedWidget.currentWidget().setDisabled(False)
         self.strengthStatistics.init()
-        self.connectSignal()
+
 
     # def slotDirectoryMaintenance(self):
     #     self.tb_strengthStatistics.setDisabled(False)

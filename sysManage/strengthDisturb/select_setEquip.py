@@ -30,6 +30,7 @@ class select_setEquip(QWidget,widget_Select_SetEquip):
         self.currentUnitTableResult = []
         # self.unitIDList = []
         self.equipIDList = []
+        self.inputEquipInfoList = []
         # self.cb_setChoose.setCurrentIndex(0)
         self.signalConnect()
 
@@ -346,13 +347,82 @@ class select_setEquip(QWidget,widget_Select_SetEquip):
 
 
     def slotInputIntoMysql(self):
-        pass
+        print(self.inputEquipInfoList)
+        for i in range(len(self.inputEquipInfoList)):
+            try:
+                isHaveEquipId = isHaveEquipment(self.inputEquipInfoList[i][0])
+                if isHaveEquipId == False:
+                    addSuccess = addDataIntoEquip(self.inputEquipInfoList[i][0], self.inputEquipInfoList[i][1],
+                                                  self.inputEquipInfoList[i][2], self.inputEquipInfoList[i][3],
+                                                  self.inputEquipInfoList[i][4], self.inputEquipInfoList[i][5])
+                else:
+                    QMessageBox.information(self, "导入", "导入第%d数据失败,存在重复数据%d" % i, QMessageBox.Yes)
+            except Exception as e:
+                print(e)
+                QMessageBox.information(self, "导入", "导入第%d数据失败" % i, QMessageBox.Yes)
+                continue
+        reply = QMessageBox.information(self, '新增', '新增成功', QMessageBox.Yes)
+        self.slotEquipDictInit()
+        self.setDisabled(False)
+        self.showInputResult.hide()
 
 
     def slotInputDataByExcel(self):
         self.setDisabled(True)
         self.showInputResult.setDisabled(False)
-        pass
+        filename, _ = QFileDialog.getOpenFileName(self, "选中文件", '', "Excel Files (*.xls);;Excel Files (*.xlsx)")
+        try:
+            workBook = xlrd.open_workbook(filename)
+            self.workSheet = workBook.sheet_by_index(0)
+            self.inputEquipInfoList = []
+            for r in range(1, self.workSheet.nrows):
+                equipName = self.workSheet.cell(r, 1).value.strip()
+                try:
+                    equipId = str(int(self.workSheet.cell(r, 0).value))
+                    equipUper = str(int(self.workSheet.cell(r, 2).value))
+                except:
+                    continue
+                inputType = self.workSheet.cell(r, 3).value.strip()
+                equipType = self.workSheet.cell(r, 4).value.strip()
+                if len(equipType) <= 1:
+                    continue
+                equipUnit = self.workSheet.cell(r, 5).value.strip()
+                euipmentInfo = []
+                euipmentInfo.append(equipId)
+                euipmentInfo.append(equipName)
+                euipmentInfo.append(equipUper)
+                euipmentInfo.append(inputType)
+                euipmentInfo.append(equipType)
+                euipmentInfo.append(equipUnit)
+                self.inputEquipInfoList.append(euipmentInfo)
+
+            self.showInputResult.setWindowTitle("导入Excel数据到数据库装备表中")
+            title = ['装备编号', '装备名称', '上级装备号', '录入类型', '装备类型', '装备单位']
+            self.showInputResult.tw_result.setColumnCount(len(title))
+            self.showInputResult.tw_result.setHorizontalHeaderLabels(title)
+            self.showInputResult.tw_result.verticalHeader().setVisible(False)
+            self.showInputResult.tw_result.setEditTriggers(QAbstractItemView.NoEditTriggers)
+            self.showInputResult.tw_result.setRowCount(len(self.inputEquipInfoList))
+            for r, list_item in enumerate(self.inputEquipInfoList):
+                item = QTableWidgetItem(list_item[0])
+                self.showInputResult.tw_result.setItem(r, 0, item)
+                item = QTableWidgetItem(list_item[1])
+                self.showInputResult.tw_result.setItem(r, 1, item)
+                item = QTableWidgetItem(list_item[2])
+                self.showInputResult.tw_result.setItem(r, 2, item)
+                item = QTableWidgetItem(list_item[3])
+                self.showInputResult.tw_result.setItem(r, 3, item)
+                item = QTableWidgetItem(list_item[4])
+                self.showInputResult.tw_result.setItem(r, 4, item)
+                item = QTableWidgetItem(list_item[5])
+                self.showInputResult.tw_result.setItem(r, 5, item)
+            self.showInputResult.show()
+            return
+        except BaseException as e:
+            print(e)
+            QMessageBox.about(self, "打开失败", "打开文件失败，请检查文件")
+            self.setDisabled(False)
+
 
 
     '''

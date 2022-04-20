@@ -365,5 +365,5 @@ class rocketTransfer(QWidget, Widget_Rocket_Transfer):
         else:
             QMessageBox.about(self, "选取文件夹失败！", "请选择正确的文件夹！")
         pass
-        pass
+
 

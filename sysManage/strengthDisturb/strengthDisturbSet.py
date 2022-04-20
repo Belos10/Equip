@@ -9,7 +9,6 @@ class strengthDisturbSet(QMainWindow, Widget_Strength_Disturb_Set):
     def __init__(self, parent=None):
         super(strengthDisturbSet, self).__init__(parent)
         self.setupUi(self)
-
         self.strengthSelectSet = strengthSelectSet(self)
         self.maintenManageSet = maintenManageSet(self)
 

@@ -1,3 +1,4 @@
+from sysManage.dictSelect.AgentRoom import AgentRoom
 from widgets.strengthDisturb.StrengthDisturb import Strength_Disturb_Widget
 import sys
 from sysManage.dictSelect.manual import Manual
@@ -13,7 +14,7 @@ class dictSelect(QMainWindow, Widget_Dict_Select):
 
         self.equipHandbook = Manual(self)
         self.factoryDict = factorySet(self)
-        self.presentRoom = QWidget(self)
+        self.presentRoom = AgentRoom(self)
         self.regularManage = regularManage(self)
 
         self.sw_dictSelectMange.addWidget(self.equipHandbook)
@@ -61,6 +62,7 @@ class dictSelect(QMainWindow, Widget_Dict_Select):
         self.tb_factoryDict.setDisabled(False)
         self.tb_presentRoom.setDisabled(True)
         self.tb_regularManage.setDisabled(False)
+        self.presentRoom.init()
 
     def slotRegularManage(self):
         self.sw_dictSelectMange.setCurrentIndex(3)

@@ -1,7 +1,10 @@
-import sys
+
 from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget
+
+from sysManage.maintainSupport.MaintenanceContractSigning import MaintenanceContractSigning
+from sysManage.maintainSupport.ServiceSupport import ServiceSupport
+from sysManage.maintainSupport.materialManagement import materialManagement
 from widgets.serviceSupport.MaintainSupport import widget_MaintainSupport
-from sysManage.maintainSupport.serviceSupportMain import yearServiceSupport
 '''
     功能：
         维修保障主界面
@@ -11,9 +14,9 @@ class MaintainSupportManage(QMainWindow, widget_MaintainSupport):
         super(MaintainSupportManage, self).__init__(parent)
         self.setupUi(self)
 
-        self.yearSerSup = yearServiceSupport()          # 维修计划
-        self.maintainSchedule = QWidget()                # 维修进度
-        self.materialManage = QWidget(self)             # 物资管理
+        self.yearSerSup = ServiceSupport()          # 维修计划
+        self.maintainSchedule = MaintenanceContractSigning()                # 维修进度
+        self.materialManage = materialManagement()             # 物资管理
 
         self.userInfo = None
 
@@ -42,7 +45,7 @@ class MaintainSupportManage(QMainWindow, widget_MaintainSupport):
         self.tb_yearSerSup.clicked.connect(self.slotYearSerSup)
         self.tb_maintainSchedule.clicked.connect(self.slotMaintainSchedule)
         self.tb_materialManage.clicked.connect(self.slotMaterialManage)
-
+        # self.transferManage.armyTransfer.pb_equipSet.clicked.connect(self.slotSetEquip)
 
     '''
         功能：
@@ -63,8 +66,8 @@ class MaintainSupportManage(QMainWindow, widget_MaintainSupport):
         self.tb_yearSerSup.setDisabled(1)
         self.tb_maintainSchedule.setDisabled(False)
         self.tb_materialManage.setDisabled(0)
-        self.yearSerSup.initAll()
-
+        self.yearSerSup.init()
+        # self.disturbPlan.initAll()
 
     '''
         功能：
@@ -75,7 +78,7 @@ class MaintainSupportManage(QMainWindow, widget_MaintainSupport):
         self.tb_yearSerSup.setDisabled(0)
         self.tb_maintainSchedule.setDisabled(1)
         self.tb_materialManage.setDisabled(0)
-
+        self.maintainSchedule.init()
 
     '''
         功能：
@@ -86,3 +89,4 @@ class MaintainSupportManage(QMainWindow, widget_MaintainSupport):
         self.tb_yearSerSup.setDisabled(False)
         self.tb_maintainSchedule.setDisabled(False)
         self.tb_materialManage.setDisabled(True)
+

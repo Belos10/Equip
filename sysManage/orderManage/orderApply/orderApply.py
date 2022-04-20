@@ -1,6 +1,6 @@
 from PyQt5.QtCore import QVariant
 from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, QAbstractItemView, \
-    QMessageBox, QListWidgetItem, QInputDialog, QHeaderView, QFileDialog
+    QMessageBox, QListWidgetItem, QInputDialog, QHeaderView, QFileDialog, QTreeWidgetItemIterator
 
 from database.OrderApplySql import *
 from utills.utillsComponent import CheckableComboBox
@@ -177,6 +177,7 @@ class OrderApply(QWidget, Widget_Retirement):
             for resultInfo in result:
                 stack.append(resultInfo)
                 root.append(item)
+        self.tw_second.expandAll()
 
     '''
                 功能：
@@ -195,6 +196,7 @@ class OrderApply(QWidget, Widget_Retirement):
             for resultInfo in result:
                 stack.append(resultInfo)
                 root.append(item)
+        self.tw_first.expandAll()
 
         # 查看当前被选中的单位和装备并初始化
     def slotInquryStrengthResult(self):
@@ -337,6 +339,7 @@ class OrderApply(QWidget, Widget_Retirement):
                 parent_item.setCheckState(num, 2)
             else:
                 parent_item.setCheckState(num, 1)
+        self.tw_second.expandAll()
 
     def _initTableWidgetByUnitListAndEquipList(self, currentCheckedUnitList, currentCheckedEquipList,currentYear):
         self.tw_result.itemChanged.disconnect(self.soltCheckData)

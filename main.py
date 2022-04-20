@@ -1,5 +1,7 @@
 import sys
 # from fbs_runtime.application_context.PyQt5 import ApplicationContext
+import threading
+
 from PyQt5.Qt import QObject
 from PyQt5.QtWidgets import QApplication
 from sysManage.MainWindowManage import Manage_Widgets
@@ -11,8 +13,6 @@ import os
 '''
     显示主界面
 '''
-#new
-
 class mainManage(QObject):
     def __init__(self):
         self.login = login()
@@ -33,6 +33,7 @@ class mainManage(QObject):
 
 if __name__ == "__main__":
     # appctxt = ApplicationContext()
+    os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
     app = QApplication(sys.argv)
     widget = Manage_Widgets()
     basepath=os.path.split(os.path.abspath(__file__))[0]

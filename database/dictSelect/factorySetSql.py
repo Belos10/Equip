@@ -1,6 +1,7 @@
+from database.agentRoomSql import insertOneDataAgentRoom, findMaxId
 from database.connectAndDisSql import *
 def selectAllDataAboutFactory():
-    sql = "select * from factory"
+    sql = "select factory.ID, name, address, connect, tel1,agent_name,contact,phone_number,agent_id from factory  inner join agent_room on factory.agent_id = agent_room.id"
     cur.execute(sql)
     result = cur.fetchall()
     return result
@@ -23,10 +24,8 @@ def haveFactoryID(id):
     else:
         return False
 
-def updateInfoIntoFactory(ID, name, address, connect, tel1, represent, tel2):
-    sql = "update factory set address = '" + address + "', connect = '" \
-          + connect + "', tel1 = '" + tel1 + "', represent = '" + represent + "', tel2 = '" + tel2\
-          + "' where name = '" + name + "'"
+def updateInfoIntoFactory(ID, name, address, connect, tel1,agentRoomId):
+    sql = "update factory set address = '%s', connect = '%s',tel1 = '%s',agent_id = '%d' where name = '%s'"%(address,connect,tel1,agentRoomId,name)
     try:
         cur.execute(sql)
         conn.commit()
@@ -43,9 +42,8 @@ def updateInfoIntoFactory(ID, name, address, connect, tel1, represent, tel2):
     # except Exception as e:
     #     return e
 
-def addInfoIntoFactory(ID, name, address, connect, tel1, represent, tel2):
-    sql = "insert into factory(ID, name, address, connect, tel1, represent, tel2) values('" + ID + "', '" + name \
-          + "', '" + address + "', '" + connect + "', '" + tel1 + "', '" + represent + "', '" + tel2 + "')"
+def addInfoIntoFactory(ID, name, address, connect, tel1, agentRoomId):
+    sql = "insert into factory(ID, name, address, connect, tel1, agent_id) values('%s','%s','%s','%s','%s','%d')"%(ID,name,address,connect,tel1,agentRoomId)
     try:
         cur.execute(sql)
         conn.commit()
@@ -71,3 +69,29 @@ def selectAllNameAboutFactory():
     for resultInfo in result:
         resultList.append(resultInfo[0])
     return resultList
+
+def getFactoryById(id):
+    sql = "select ID from factory where ID == '%s'"%id
+    return executeSql(sql)
+def getAgentRoomComboxDate():
+    result = []
+    sql = "select id,agent_name,contact,phone_number from agent_room order by id asc "
+    data = executeSql(sql)
+    if data != None:
+        for item in data:
+            result.append(item)
+    return result
+
+def insertOneDataFatorySet(lineInfo):
+    try:
+        insertOneDataAgentRoom(lineInfo[5])
+        agentId = findMaxId()[0]
+        factoryId = getFactoryById(lineInfo[0])
+        if len(factoryId) > 0:
+            updateInfoIntoFactory(lineInfo[0], lineInfo[1], lineInfo[2], lineInfo[3], lineInfo[4], agentId[0])
+        else:
+            addInfoIntoFactory(lineInfo[0], lineInfo[1], lineInfo[2], lineInfo[3], lineInfo[4],agentId[0])
+        return True
+    except Exception as e:
+        print(e)
+        return False

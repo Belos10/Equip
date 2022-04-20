@@ -1,6 +1,5 @@
 import sqlite3
 import os
-import pymysql
 from database.config import ConnectMySqlDict
 
 

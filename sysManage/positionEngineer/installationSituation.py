@@ -1,10 +1,14 @@
-from PyQt5.QtCore import Qt
+import base64
+import pickle
+
+from PyQt5.QtCore import Qt, QDate, QDateTime
 from database.positionEngneerSql import *
+from sysManage.showInputResult import showInputResult
 from sysManage.userInfo import get_value
 from widgets.positionEngineer.posEngneerInstallationUI import PosEngneerInstallationUI
 import sys
 from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QTableWidget, QHeaderView, QTableWidgetItem, QComboBox, \
-    QMessageBox, QFileDialog
+    QMessageBox, QFileDialog, QDateEdit, QCheckBox
 
 
 class InstallationSituation(QWidget, PosEngneerInstallationUI):
@@ -14,6 +18,9 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
         self.startInfo = None
         self.infoDict = {}
         self.baseNames = []
+        self.inputList = []
+        self.showInputResult = showInputResult(self)
+        self.showInputResult.hide()
         self.signalConnection()
         self.init()
 
@@ -33,6 +40,9 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
         self.tb_del.clicked.connect(self.slotDelete)
         self.tw_result.itemChanged.connect(self.slotAlterAndSava)
         self.tb_outputToExcel.clicked.connect(self.slotOutputToExcel)
+        self.showInputResult.pb_confirm.clicked.connect(self.slotInputIntoDatabase)
+        self.showInputResult.pb_cancel.clicked.connect(self.slotCancelInputIntoDatabase)
+
 
     def initUserInfo(self):
         self.userInfo = get_value("totleUserInfo")
@@ -52,7 +62,6 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
         if self.startInfo:
             stack.append(self.startInfo)
             self.initUnitComboxs(stack)
-
         self.displayData()
         pass
 
@@ -89,24 +98,25 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
         for i in range(len(self.base)):
             self.base[i] = getUnitIdbyName(self.base[i])
 
-        if len(self.le_designation.text()) > 1:
+        if len(self.le_designation.text()) > 0:
             if len(self.designation) == 0:
                 self.designation.append(self.le_designation.text())
             else:
                 self.designation[0] = self.le_designation.text()
 
-        if len(self.le_positionCode.text()) > 1:
+        if len(self.le_positionCode.text()) > 0:
             if len(self.positionCode) == 0:
                 self.positionCode.append(self.le_positionCode.text())
             else:
                 self.positionCode[0] = self.le_positionCode.text()
 
-        if len(self.cb_prepare.currentText()) > 1:
+        if len(self.cb_prepare.currentText()) > 0:
             if len(self.prepare) == 0:
                 self.prepare.append(self.cb_prepare.currentText())
             else:
                 self.prepare[0] = self.cb_prepare.currentText()
 
+        print(self.base, self.designation,self.positionCode,self.prepare)
         self.displayData()
 
     '''
@@ -115,6 +125,7 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
     '''
 
     def displayData(self):
+        self.tw_result.itemChanged.disconnect(self.slotAlterAndSava)
         self.result = getResult(self.base, self.designation, self.positionCode, self.prepare)
         self.tw_result.clear()
         self.tw_result.setColumnCount(13)
@@ -126,12 +137,14 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
             self.tw_result.setRowCount(3 + len(dataList))
             self.initTableHeader()
             for i in range(len(dataList)):
-                item = QTableWidgetItem(str(dataList[i][0]))
+                item = QTableWidgetItem(str(i + 1))
+                item.setFlags(Qt.ItemIsEnabled)
                 item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
                 self.tw_result.setItem(3 + i, 0, item)
 
                 item = QTableWidgetItem(getUnitNameById(dataList[i][1]))
                 item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                item.setFlags(Qt.ItemIsEnabled)
                 self.tw_result.setItem(3 + i, 1, item)
 
                 item = QTableWidgetItem(dataList[i][2])
@@ -148,11 +161,12 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
 
                 if dataList[i][5] == 1:
                     comboBox = QComboBox()
-                    comboBox.addItems(['是', '否'])
+                    comboBox.addItems(['是'])
 
                 else:
                     comboBox = QComboBox()
-                    comboBox.addItems(['否', '是'])
+                    comboBox.addItems(['否'])
+                comboBox.setEnabled(False)
                 self.tw_result.setCellWidget(3 + i, 5, comboBox)
 
                 item = QTableWidgetItem(dataList[i][6])
@@ -161,11 +175,25 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
 
                 item = QTableWidgetItem(dataList[i][7])
                 item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                item.setFlags(Qt.ItemIsEnabled)
                 self.tw_result.setItem(3 + i, 7, item)
+                # parsedDateList = date.split('-')
+                # dataEdit = QDateEdit()
+                # dataEdit.setDisplayFormat("yyyy-MM-dd")
+                # dataEdit.setDate(QDate(int(parsedDateList[0]), int(parsedDateList[1]), int(parsedDateList[2])))
+                # self.tw_result.setCellWidget(3 + i, 7, dataEdit)
 
+                date = dataList[i][8]
                 item = QTableWidgetItem(dataList[i][8])
                 item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                item.setFlags(Qt.ItemIsEnabled)
                 self.tw_result.setItem(3 + i, 8, item)
+                # parsedDateList = date.split('-')
+                # dataEdit = QDateEdit()
+                # dataEdit.setDisplayFormat("yyyy-MM-dd")
+                # dataEdit.setDate(QDate(int(parsedDateList[0]), int(parsedDateList[1]), int(parsedDateList[2])))
+                # self.tw_result.setCellWidget(3 + i, 8, dataEdit)
+
 
                 item = QTableWidgetItem(str(dataList[i][9]))
                 item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
@@ -173,10 +201,11 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
 
                 if dataList[i][10] == '已到位':
                     comboBox = QComboBox()
-                    comboBox.addItems(['已到位', '未到位'])
+                    comboBox.addItems(['已到位'])
                 else:
                     comboBox = QComboBox()
-                    comboBox.addItems(['未到位', '已到位'])
+                    comboBox.addItems(['未到位'])
+                comboBox.setEnabled(False)
                 self.tw_result.setCellWidget(3 + i, 10, comboBox)
 
                 item = QTableWidgetItem(dataList[i][11])
@@ -186,8 +215,7 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
                 item = QTableWidgetItem(dataList[i][12])
                 item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
                 self.tw_result.setItem(3 + i, 12, item)
-
-    pass
+        self.tw_result.itemChanged.connect(self.slotAlterAndSava)
 
     '''
         功能：
@@ -309,36 +337,6 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
         for i in range(1, self.tw_result.columnCount()):
             if i == 5:
                 item = self.tw_result.cellWidget(row, i)
-                if item.currentText() == '是':
-                    rowData.append(1)
-                else:
-                    rowData.append(0)
-            elif i == 10:
-                item = self.tw_result.cellWidget(row, i)
-                rowData.append(item.currentText())
-            elif i == 1:
-                item = self.tw_result.cellWidget(row, i)
-                if item != None:
-                    rowData.append(getUnitIdbyName(item.currentText()))
-            else:
-                item = self.tw_result.item(row, i)
-                if item != None and len(item.text()) > 0:
-                    rowData.append(item.text())
-                else:
-                    break
-        if len(rowData) < self.tw_result.columnCount() - 1:
-            return False
-        else:
-            insertOneDataIntInstallation(rowData)
-            QMessageBox.warning(self, "注意", "插入成功！", QMessageBox.Yes, QMessageBox.Yes)
-            self.displayData()
-
-    def alterRowData(self, row):
-        # print("修改一行数据")
-        rowData = []
-        for i in range(self.tw_result.columnCount()):
-            if i == 5:
-                item = self.tw_result.cellWidget(row, i)
                 if item != None:
                     if item.currentText() == '是':
                         rowData.append(1)
@@ -358,10 +356,16 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
                     rowData.append(getUnitIdbyName(item.currentText()))
                 else:
                     return
-
+            elif i == 7 or i == 8:
+                item = self.tw_result.cellWidget(row, i)
+                if item != None:
+                    date = item.date().toString(Qt.ISODate)
+                    rowData.append(date)
             else:
                 item = self.tw_result.item(row, i)
-                if item != None and len(item.text()) > 0:
+                if item != None:
+                    if i == 12:
+                        rowData.append(item.text())
                     if i == 1:
                         if getUnitIdbyName(item.text()) != None:
                             rowData.append(getUnitIdbyName(item.text()))
@@ -369,21 +373,179 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
                             QMessageBox.warning(self, "注意", "该基地名称尚未加入基地目录！", QMessageBox.Yes, QMessageBox.Yes)
                             break
                     else:
-                        rowData.append(item.text())
+                        if len(item.text()) > 0:
+                            rowData.append(item.text())
+                        else:
+                            break
                 else:
                     break
-        if len(rowData) < self.tw_result.columnCount():
+        if len(rowData) < self.tw_result.columnCount() - 1:
             return False
         else:
-            updataOneDataIntInstallation(rowData)
-        pass
+            insertOneDataIntInstallation(rowData)
+            self.currentLastRow = -1
+            QMessageBox.warning(self, "注意", "插入成功！", QMessageBox.Yes, QMessageBox.Yes)
+            self.displayData()
 
+    def alterRowData(self, row):
+        print("修改一行数据")
+        rowData = []
+        rowData.append(self.result[row - 3][0])
+        for i in range(2,self.tw_result.columnCount()):
+            if i == 5:
+                item = self.tw_result.cellWidget(row, i)
+                if item != None:
+                    if item.currentText() == '是':
+                        rowData.append(1)
+                    else:
+                        rowData.append(0)
+                else:
+                    return
+            elif i == 10:
+                item = self.tw_result.cellWidget(row, i)
+                if item != None:
+                    rowData.append(item.currentText())
+                else:
+                    return
+            else:
+                item = self.tw_result.item(row, i)
+                if item != None:
+                    if i == 12:
+                        rowData.append(item.text())
+                    else:
+                        if len(item.text()) > 0:
+                            rowData.append(item.text())
+                        else:
+                            break
+                else:
+                    break
+        print(rowData)
+        if len(rowData) < self.tw_result.columnCount() - 2:
+            return False
+        else:
+            if (updataOneDataIntInstallation(rowData) == True):
+                QMessageBox.warning(self, "修改成功", "修改成功！", QMessageBox.Yes, QMessageBox.Yes)
+            else:
+                QMessageBox.warning(self, "警告", "插入失败！", QMessageBox.Yes, QMessageBox.Yes)
+            self.displayData()
+
+    def slotCancelInputIntoDatabase(self):
+        self.showInputResult.hide()
+        self.setDisabled(False)
+        self.displayData()
+
+    def slotInputIntoDatabase(self):
+        for i, lineInfo in enumerate(self.inputList):
+            if i == 0:
+                continue
+            try:
+                #(6, '4', '2', '2', '2', 1, '3', '2000-01-01', '2000-01-01', 3, '已到位', '2', '2')
+                if insertOneDataIntInstallation(lineInfo[1:]):
+                    pass
+            except Exception as e:
+                print(e)
+                QMessageBox.warning(self, "导入失败", "导入第%d数据失败！" % (i), QMessageBox.Yes)
+
+        self.showInputResult.hide()
+        self.setDisabled(False)
+        self.displayData()
     # 组件
     def slotInput(self):
-        pass
+        self.inputList = []
+        filename, _ = QFileDialog.getOpenFileName(self, "选中文件", '', "Excel Files (*.nms);;Excel Files (*.nms)")
+        if len(filename) < 2:
+            return
+        try:
+            with open(filename, "rb") as file:
+                self.inputList = pickle.load(file)
+                if self.inputList[0] != '防护安装情况':
+                    raise Exception("数据格式错误！")
+        except Exception as e:
+            print(e)
+            QMessageBox.warning(self, "加载文件失败！", "请检查文件格式及内容格式！", QMessageBox.Yes)
+            return
+
+        self.showInputResult.setWindowTitle("导入数据")
+        self.showInputResult.show()
+        title = ['基地','番号','阵地代号','具体位置','是否具备安装最新型装备条件','目前安装情况','安装时间','计划安装时间','数量（套）','装备到位情况','装备运行情况','备注']
+        # QTableWidget设置整行选中
+        self.showInputResult.tw_result.setColumnCount(len(title))
+        self.showInputResult.tw_result.setHorizontalHeaderLabels(title)
+        self.showInputResult.tw_result.setRowCount(len(self.inputList) - 1)
+        for i, LineInfo in enumerate(self.inputList):
+            if i == 0:
+                continue
+            i = i - 1
+            item = QTableWidgetItem(getUnitNameById(LineInfo[1]))
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.showInputResult.tw_result.setItem(i, 0, item)
+            item = QTableWidgetItem(LineInfo[2])
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.showInputResult.tw_result.setItem(i, 1, item)
+            item = QTableWidgetItem(LineInfo[3])
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.showInputResult.tw_result.setItem(i, 2, item)
+
+            item = QTableWidgetItem(LineInfo[4])
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.showInputResult.tw_result.setItem(i, 3, item)
+            if LineInfo[5] == 1:
+                item = QTableWidgetItem('是')
+            else:
+                item = QTableWidgetItem('否')
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.showInputResult.tw_result.setItem(i, 4, item)
+
+            item = QTableWidgetItem(LineInfo[6])
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.showInputResult.tw_result.setItem(i, 5, item)
+            item = QTableWidgetItem(LineInfo[7])
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.showInputResult.tw_result.setItem(i, 6, item)
+            item = QTableWidgetItem(LineInfo[8])
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.showInputResult.tw_result.setItem(i, 7, item)
+            item = QTableWidgetItem(str(LineInfo[9]))
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.showInputResult.tw_result.setItem(i, 8, item)
+            item = QTableWidgetItem(LineInfo[10])
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.showInputResult.tw_result.setItem(i, 9, item)
+            item = QTableWidgetItem(LineInfo[11])
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.showInputResult.tw_result.setItem(i, 10, item)
+            item = QTableWidgetItem(LineInfo[12])
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.showInputResult.tw_result.setItem(i, 11, item)
+
+
 
     def slotOutput(self):
-        pass
+        if len(self.result) < 1:
+            reply = QMessageBox.warning(self, '警告', '未选中任何数据，无法导出', QMessageBox.Yes)
+            return
+        reply = QMessageBox.question(self, '导出数据包', '是否保存修改并导出数据包？', QMessageBox.Cancel, QMessageBox.Yes)
+        if reply == QMessageBox.Cancel:
+            self.displayData()
+            return
+        self.displayData()
+        directoryPath = QFileDialog.getExistingDirectory(self, "请选择导出文件夹", "c:/")
+        if len(directoryPath) > 0:
+            # 填表数据
+            dataList = self.result
+            if dataList is None or len(dataList) == 0:
+                return
+            else:
+                dataList.insert(0,'防护安装情况')
+                print(dataList)
+                date = QDateTime.currentDateTime()
+                installData = date.toString("yyyy年MM月dd日hh时mm分ss秒")  # hh:mm:ss
+                pathName = "%s/%s阵地工程x生化防护装备安装情况.nms" % (directoryPath,installData)
+                with open(pathName, "wb") as file:
+                    pickle.dump(dataList, file)
+                QMessageBox.about(self, "导出成功", "导出数据包成功！")
+
+
 
     '''
         功能：
@@ -392,9 +554,24 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
 
     def slotAdd(self):
         if self.tw_result.rowCount() <= 3 + len(self.result):
+            self.tw_result.itemChanged.disconnect(self.slotAlterAndSava)
             rowCount = self.tw_result.rowCount()
             self.currentLastRow = rowCount
             self.tw_result.insertRow(rowCount)
+
+            if (rowCount + 1 == 4):
+                item = QTableWidgetItem('1')
+                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                item.setFlags(Qt.ItemIsEnabled)
+                self.tw_result.setItem(3, 0, item)
+            else:
+                lastNo = int(self.tw_result.item(rowCount - 1, 0).text())
+                item = QTableWidgetItem(str(lastNo + 1))
+                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                item.setFlags(Qt.ItemIsEnabled)
+                self.tw_result.setItem(rowCount, 0, item)
+
+
             comboBox = QComboBox()
             comboBox.addItems(self.baseNames)
             self.tw_result.setCellWidget(rowCount, 1, comboBox)
@@ -404,11 +581,19 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
             comboBox = QComboBox()
             comboBox.addItems(['已到位', '未到位'])
             self.tw_result.setCellWidget(rowCount, 10, comboBox)
+
+            installDate = QDateEdit()
+            installDate.setDisplayFormat("yyyy-MM-dd")
+            self.tw_result.setCellWidget(rowCount, 7, installDate)
+
+            plenDate = QDateEdit()
+            plenDate.setDisplayFormat("yyyy-MM-dd")
+            self.tw_result.setCellWidget(rowCount, 8, plenDate)
+            self.tw_result.itemChanged.connect(self.slotAlterAndSava)
         else:
             QMessageBox.warning(self, "注意", "请先将数据补充完整！", QMessageBox.Yes, QMessageBox.Yes)
 
     def slotDelete(self):
-
         rowCount = self.tw_result.currentRow()
         if self.result == None:
             resultCount = 0
@@ -418,10 +603,12 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
         if rowCount < 3:
             QMessageBox.warning(self, "注意", "请选中有效单元格！", QMessageBox.Yes, QMessageBox.Yes)
         elif rowCount >= 3 and rowCount < 3 + resultCount:
-            item = self.tw_result.item(rowCount, 0)
-            if item != None and int(item.text()) > 0:
-                deleteDataByInstallationId(item.text())
+            reply = QMessageBox.question(self, '警告', '是否删除该行数据？', QMessageBox.Cancel, QMessageBox.Yes)
+            if reply == QMessageBox.Yes:
+                deleteDataByInstallationId(self.result[rowCount - 3][0])
                 self.tw_result.removeRow(rowCount)
+            else:
+                return
         else:
             self.tw_result.removeRow(rowCount)
 
@@ -495,13 +682,10 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
             #填表数据
             dataList = self.result
             if dataList is None or len(dataList) == 0:
-                self.tw_result.setRowCount(3)
-                self.initTableHeader()
+                return
             else:
-                self.tw_result.setRowCount(3 + len(dataList))
-                self.initTableHeader()
                 for i in range(len(dataList)):
-                    workSheet.write(3 + i, 0, str(dataList[i][0]), contentStyle)
+                    workSheet.write(3 + i, 0, str(i + 1), contentStyle)
                     workSheet.write(3 + i, 1, getUnitNameById(dataList[i][1]), contentStyle)
                     workSheet.write(3 + i, 2, dataList[i][2], contentStyle)
                     workSheet.write(3 + i, 3, dataList[i][3], contentStyle)
@@ -529,15 +713,12 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
                 QMessageBox.about(self, "导出失败", "导出表格被占用，请关闭正在使用的Execl！")
                 return
 
-        pass
-
-
-
-
-        pass
-
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    widget = InstallationSituation()
-    widget.show()
-    sys.exit(app.exec_())
+    arr = ['1dads','2','3',[2]]
+    with open("test.nms","wb") as file:
+        pickle.dump(arr,file)
+
+    with open("test.nms","rb") as file:
+        arr1 = pickle.load(file)
+    print(arr1)
+

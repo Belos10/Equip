@@ -1,28 +1,69 @@
 import pickle
 
 from PyQt5.QtCore import Qt, QStringListModel, QDate, QDateTime
-
-from database.contractManagementSql import *
+from database.serviceSupportSql import *
 from sysManage.showInputResult import showInputResult
 from sysManage.userInfo import get_value
-from widgets.contractMangement.OrderManagementUI import OrderManagementUI
 import sys
 from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QTableWidget, QHeaderView, QTableWidgetItem, QComboBox, \
     QMessageBox, QFileDialog, QListWidgetItem, QListView, QInputDialog, QDateEdit, QAbstractItemView
 
+from widgets.serviceSupport.ServiceSupportNewUI import ServiceSupportNewUI
 
-class OrderManagement(QWidget, OrderManagementUI):
+
+class ServiceSupport(QWidget, ServiceSupportNewUI):
     def __init__(self, parent=None):
-        super(OrderManagement, self).__init__(parent)
+        super(ServiceSupport, self).__init__(parent)
         self.setupUi(self)
         self.selectedYear = ''
-        self.contractName = ''
-        self.contractNo = ''
+        self.maintanceType = '全选'
         self.inputList = []
         self.showInputResult = showInputResult(self)
         self.showInputResult.hide()
         self.signalConnection()
         self.init()
+        self.maintanceTypeEnem = {
+            0 : '装备大修',
+            1 : '装备中修',
+            2 : '维修器材购置',
+            3 : '修理能力建设'
+        }
+        self.maintanceTypeReverseEnem = {
+            '装备大修' : 0,
+            '装备中修' : 1,
+            '维修器材购置' : 2,
+            '修理能力建设' : 3
+        }
+        self.technologyStateEnem = {
+            0 : '不涉及',
+            1 : '是',
+            2 : '否'
+        }
+        self.technologyStateReverseEnem = {
+            '不涉及' : 0,
+            '是' : 1,
+            '否' : 2
+        }
+        self.contractEnem = {
+            0 : '不涉及',
+            1 : '是',
+            2 : '否'
+        }
+        self.contractReverseEnem = {
+            '不涉及' : 0,
+            '是' : 1,
+            '否' : 2
+        }
+        self.payingEnem = {
+            0: '不涉及',
+            1: '是',
+            2: '否'
+        }
+        self.payingReverseEnem = {
+            '不涉及' : 0,
+            '是' : 1,
+            '否' : 2
+        }
 
     # 信号和槽连接
     def signalConnection(self):
@@ -33,6 +74,7 @@ class OrderManagement(QWidget, OrderManagementUI):
         self.pb_addYear.clicked.connect(self.soltAddContractYear)
         self.tb_outputToExcel.clicked.connect(self.slotOutputToExcel)
         self.tw_result.itemChanged.connect(self.slotAlterAndSava)
+        
         self.tb_input.clicked.connect(self.slotInputData)
         self.pb_output.clicked.connect(self.slotOutputData)
         self.showInputResult.pb_confirm.clicked.connect(self.slotInputIntoDatabase)
@@ -63,6 +105,9 @@ class OrderManagement(QWidget, OrderManagementUI):
         self.tb_input.setDisabled(True)
         #初始化年份列表
         self.initYearList()
+        self.cb_selectedType.clear()
+        self.cb_selectedType.addItems(['全选', '装备大修', '装备中修', '维修器材购置', '修理能力建设'])
+                                            #    0            1           2             3
         pass
 
     '''
@@ -72,7 +117,7 @@ class OrderManagement(QWidget, OrderManagementUI):
 
     def initYearList(self):
         self.yearList = []
-        self.yearList = getYearsFromContractOrder()
+        self.yearList = getYearsFromServiceSupportYear()
         listModel = QStringListModel()
         listModel.setStringList(self.yearList)
         self.lv_year.setModel(listModel)
@@ -84,13 +129,13 @@ class OrderManagement(QWidget, OrderManagementUI):
     '''
     def soltAddContractYear(self):
         year = 0
-        year, ok = QInputDialog.getInt(self, "Get year", "year:", 0, 0, 100000, 1)
+        year, ok = QInputDialog.getInt(self, "年份", "年份:", 0, 0, 100000, 1)
         if ok:
-            if isHaveContractOrderYear(str(year)):
+            if isHaveServiceSupportYear(str(year)):
                 QMessageBox.information(self, "新增", "该年份已经存在，拒绝添加！", QMessageBox.Yes)
                 return
             else:
-                insertSuccess = addContractOrderYear(year)
+                insertSuccess = addServiceSupportYear(year)
                 if insertSuccess == True:
                     QMessageBox.information(self, "新增", "新增成功！", QMessageBox.Yes)
                 else:
@@ -119,8 +164,7 @@ class OrderManagement(QWidget, OrderManagementUI):
     '''
 
     def slotSelect(self):
-        self.contractName = self.le_contractName.text()
-        self.contractNo =  self.le_contractNo.text()
+        self.maintanceType = self.cb_selectedType.currentText()
         self.displayData()
 
     '''
@@ -130,9 +174,9 @@ class OrderManagement(QWidget, OrderManagementUI):
 
     def displayData(self):
         self.tw_result.itemChanged.disconnect(self.slotAlterAndSava)
-        self.result = getResult(self.selectedYear, self.contractNo, self.contractName)
+        self.result = getResult(self.selectedYear, self.maintanceType)
         self.tw_result.clear()
-        self.tw_result.setColumnCount(11)
+        self.tw_result.setColumnCount(14)
         self.currentLastRow = 0
         dataList = self.result
         if dataList is None or len(dataList) == 0:
@@ -141,13 +185,13 @@ class OrderManagement(QWidget, OrderManagementUI):
         else:
             self.tw_result.setRowCount(2 + len(dataList))
             self.initTableHeader()
-            item = QTableWidgetItem(self.selectedYear + '年')
-            item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-            item.setFlags(Qt.ItemIsEnabled)
-            self.tw_result.setItem(2, 0, item)
-            self.tw_result.setSpan(2,0,len(dataList),1)
             for i in range(len(dataList)):
                 item = QTableWidgetItem(str(i + 1))
+                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                item.setFlags(Qt.ItemIsEnabled)
+                self.tw_result.setItem(2 + i, 0, item)
+
+                item = QTableWidgetItem(self.maintanceTypeEnem[dataList[i][1]])
                 item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
                 item.setFlags(Qt.ItemIsEnabled)
                 self.tw_result.setItem(2 + i, 1, item)
@@ -160,11 +204,11 @@ class OrderManagement(QWidget, OrderManagementUI):
                 item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
                 self.tw_result.setItem(2 + i, 3, item)
 
-                item = QTableWidgetItem(dataList[i][4])
+                item = QTableWidgetItem(str(dataList[i][4]))
                 item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
                 self.tw_result.setItem(2 + i, 4, item)
 
-                item = QTableWidgetItem(dataList[i][5])
+                item = QTableWidgetItem(str(dataList[i][5]))
                 item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
                 self.tw_result.setItem(2 + i, 5, item)
 
@@ -172,29 +216,83 @@ class OrderManagement(QWidget, OrderManagementUI):
                 item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
                 self.tw_result.setItem(2 + i, 6, item)
 
-                item = QTableWidgetItem(str(dataList[i][7]))
+                item = QTableWidgetItem(dataList[i][7])
                 item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
                 self.tw_result.setItem(2 + i, 7, item)
 
-                item = QTableWidgetItem(str(dataList[i][8]))
+                item = QTableWidgetItem(dataList[i][8])
                 item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-                item.setFlags(Qt.ItemIsEnabled)
                 self.tw_result.setItem(2 + i, 8, item)
 
-                date = dataList[i][9]
-                parsedDateList = date.split('-')
-                dataEdit = QDateEdit()
-                dataEdit.setDisplayFormat("yyyy-MM-dd")
-                dataEdit.setDate(QDate(int(parsedDateList[0]), int(parsedDateList[1]), int(parsedDateList[2])))
-                dataEdit.setEnabled(False)
-                self.tw_result.setCellWidget(2 + i, 9, dataEdit)
+                comboBox = QComboBox()
+                comboBoxItem = []
+                if dataList[i][1] == 0 or dataList[i][1] == 1:
+                    comboBoxItem = ['不涉及']
+                else:
 
+                    if dataList[i][9] == 1:
+                        comboBoxItem = ['是', '否']
+                    else:
+                        comboBoxItem = ['否', '是']
+                comboBox.addItems(comboBoxItem)
+                comboBox.setEditable(False)
+                comboBox.activated.connect(self.slotAlterAndSava)
+                self.tw_result.setCellWidget(2 + i, 9, comboBox)
 
-                item = QTableWidgetItem(dataList[i][10])
+                comboBox = QComboBox()
+                comboBoxItem = []
+                if dataList[i][10] == 0:
+                    comboBoxItem = ['不涉及']
+                else:
+
+                    maintanceContractNos = getMaintanceContractNos()
+                    print('maintanceContractNos')
+                    print(maintanceContractNos)
+                    if dataList[i][10] == 1:
+                        #关联数据
+                        comboBoxItem.append(dataList[i][11])
+                        comboBoxItem.append('否')
+                        for j in range(len(maintanceContractNos)):
+                            if maintanceContractNos[j][0] == dataList[i][11]:
+                                continue
+                            else:
+                                comboBoxItem.append(maintanceContractNos[j][0])
+                    else:
+                        comboBoxItem.append('否')
+                        for j in range(len(maintanceContractNos)):
+                            comboBoxItem.append(maintanceContractNos[j][0])
+                print(comboBoxItem)
+                comboBox.addItems(comboBoxItem)
+                comboBox.setEditable(False)
+                comboBox.activated.connect(self.slotAlterAndSava)
+                self.tw_result.setCellWidget(2 + i, 10, comboBox)
+
+                comboBox = QComboBox()
+                comboBoxItem = []
+                if dataList[i][12] == 0:
+                    comboBoxItem = ['不涉及']
+                else:
+
+                    if dataList[i][12] == 1:
+                        comboBoxItem = ['是', '否']
+                    else:
+                        comboBoxItem = ['否', '是']
+                comboBox.addItems(comboBoxItem)
+                comboBox.setEditable(False)
+                comboBox.activated.connect(self.slotAlterAndSava)
+                self.tw_result.setCellWidget(2 + i, 11, comboBox)
+
+                item = QTableWidgetItem(dataList[i][13])
                 item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-                # item.setFlags(Qt.ItemIsEnabled)
-                self.tw_result.setItem(2 + i, 10, item)
+                item.setFlags(Qt.ItemIsEnabled)
+                self.tw_result.setItem(2 + i, 12, item)
+
+                item = QTableWidgetItem(dataList[i][14])
+                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                self.tw_result.setItem(2 + i, 13, item)
+
         self.tw_result.itemChanged.connect(self.slotAlterAndSava)
+        
 
     '''
         功能：
@@ -211,84 +309,115 @@ class OrderManagement(QWidget, OrderManagementUI):
         self.tw_result.resizeRowsToContents()
 
         # 绘制表头
-        item = QTableWidgetItem("订购计划--合同")
+        item = QTableWidgetItem("序号")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.tw_result.setItem(0, 0, item)
         item.setFlags(Qt.ItemIsEnabled)
-        self.tw_result.setSpan(0, 0, 1, 11)
+        self.tw_result.setSpan(0, 0, 2, 1)
 
-        item = QTableWidgetItem("年度")
+        item = QTableWidgetItem("项目类型")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tw_result.setItem(1, 0, item)
+        self.tw_result.setItem(0, 1, item)
         item.setFlags(Qt.ItemIsEnabled)
+        self.tw_result.setSpan(0, 1, 2, 1)
 
-
-        item = QTableWidgetItem("序号")
+        item = QTableWidgetItem("项目名称")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        self.tw_result.setItem(1, 1, item)
+        self.tw_result.setItem(0, 2, item)
         item.setFlags(Qt.ItemIsEnabled)
+        self.tw_result.setSpan(0, 2, 2, 1)
 
-        item = QTableWidgetItem("合同编号")
+        item = QTableWidgetItem("计量单位")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        self.tw_result.setItem(0, 3, item)
         item.setFlags(Qt.ItemIsEnabled)
-        self.tw_result.setItem(1, 2, item)
+        self.tw_result.setSpan(0, 3, 2, 1)
 
-        item = QTableWidgetItem("合同名称")
+        item = QTableWidgetItem("审核")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        self.tw_result.setItem(0, 4, item)
         item.setFlags(Qt.ItemIsEnabled)
-        self.tw_result.setItem(1, 3, item)
+        self.tw_result.setSpan(0, 4, 1, 3)
 
-        item = QTableWidgetItem("（甲方）")
+        item = QTableWidgetItem("单价")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-        item.setFlags(Qt.ItemIsEnabled)
         self.tw_result.setItem(1, 4, item)
-
-
-        item = QTableWidgetItem("（乙方）")
-        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         item.setFlags(Qt.ItemIsEnabled)
+
+        item = QTableWidgetItem("数量")
+        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.tw_result.setItem(1, 5, item)
-
-
-        item = QTableWidgetItem("单价（万元）")
-        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         item.setFlags(Qt.ItemIsEnabled)
+
+        item = QTableWidgetItem("金额")
+        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.tw_result.setItem(1, 6, item)
-
-
-        item = QTableWidgetItem("数量/单位")
-        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         item.setFlags(Qt.ItemIsEnabled)
+
+        item = QTableWidgetItem("单位")
+        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        self.tw_result.setItem(0, 7, item)
+        item.setFlags(Qt.ItemIsEnabled)
+        self.tw_result.setSpan(0, 7, 1, 2)
+
+        item = QTableWidgetItem("分配（送修）")
+        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.tw_result.setItem(1, 7, item)
-
-        item = QTableWidgetItem("金额（万元）")
-        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         item.setFlags(Qt.ItemIsEnabled)
+
+        item = QTableWidgetItem("供货（承修）")
+        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.tw_result.setItem(1, 8, item)
-
-        item = QTableWidgetItem("交付时间")
-        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         item.setFlags(Qt.ItemIsEnabled)
+
+        item = QTableWidgetItem("计价挂账进度")
+        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        self.tw_result.setItem(0, 9, item)
+        item.setFlags(Qt.ItemIsEnabled)
+        self.tw_result.setSpan(0, 9, 1, 3)
+
+        item = QTableWidgetItem("确定技术状态")
+        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.tw_result.setItem(1, 9, item)
+        item.setFlags(Qt.ItemIsEnabled)
+
+        item = QTableWidgetItem("签订合同")
+        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        self.tw_result.setItem(1, 10, item)
+        item.setFlags(Qt.ItemIsEnabled)
+
+        item = QTableWidgetItem("支付")
+        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        self.tw_result.setItem(1, 11, item)
+        item.setFlags(Qt.ItemIsEnabled)
+
+        item = QTableWidgetItem("年份/时间")
+        item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        self.tw_result.setItem(0, 12, item)
+        item.setFlags(Qt.ItemIsEnabled)
+        self.tw_result.setSpan(0, 12, 2, 1)
 
         item = QTableWidgetItem("备注")
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+        self.tw_result.setItem(0, 13, item)
         item.setFlags(Qt.ItemIsEnabled)
-        self.tw_result.setItem(1, 10, item)
+        self.tw_result.setSpan(0, 13, 2, 1)
+
+
 
     '''
         功能：
             新增一行的数据
     '''
-
-    def slotAlterAndSava(self):
+    def slotAlterAndSava(self, index):
+        print('修改保存')
         selectRow = self.tw_result.selectedItems()
         if len(selectRow) != 0:
             currentRow = selectRow[0].row()
             currentColumn = selectRow[0].column()
-            if (currentColumn == 6 or currentColumn == 7 and currentRow >= 2):
-                item0 = self.tw_result.item(currentRow, 6)
-                item1 = self.tw_result.item(currentRow, 7)
+            if (currentColumn == 4 or currentColumn == 5 and currentRow >= 2):
+                item0 = self.tw_result.item(currentRow, 4)
+                item1 = self.tw_result.item(currentRow, 5)
                 if (item1 != None and item0 != None):
                     if (len(item0.text()) > 0 and len(item1.text()) > 0):
                         self.tw_result.itemChanged.disconnect(self.slotAlterAndSava)
@@ -305,7 +434,7 @@ class OrderManagement(QWidget, OrderManagementUI):
                             QMessageBox.warning(self, "注意", "请输入正确的数字！", QMessageBox.Yes, QMessageBox.Yes)
                             item0.setText('')
                         amount = round(count * unit, 4)
-                        item = self.tw_result.item(currentRow,8)
+                        item = self.tw_result.item(currentRow,6)
                         if(item != None):
                             item.setText(str(amount))
                             item.setFlags(Qt.ItemIsEnabled)
@@ -313,29 +442,44 @@ class OrderManagement(QWidget, OrderManagementUI):
                             item = QTableWidgetItem(str(amount))
                             item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
                             item.setFlags(Qt.ItemIsEnabled)
-                            self.tw_result.setItem(currentRow, 8, item)
+                            self.tw_result.setItem(currentRow, 6, item)
                         self.tw_result.itemChanged.connect(self.slotAlterAndSava)
+                        
 
             if currentRow == self.currentLastRow:
                 self.savaRowData(currentRow)
             else:
                 self.alterRowData(currentRow)
+        else:
 
+            currentRow = self.tw_result.currentIndex().row()
+            if currentRow == self.currentLastRow:
+                self.savaRowData(currentRow)
+            else:
+                self.alterRowData(currentRow)
 
     def savaRowData(self, row):
         # print('保存一行')
         rowData = []
-        rowData.append(self.selectedYear)
         for i in range(1, self.tw_result.columnCount()):
-            if i == 1:
-                continue
-            if i == 9:
+            if i == 1 or i == 9 or i == 10 or i == 11:
                 item = self.tw_result.cellWidget(row, i)
                 if item != None:
-                    date = item.date().toString(Qt.ISODate)
-                    rowData.append(date)
-                else:
-                    break
+                    text = item.currentText()
+                    if len(text) > 0:
+                        if i == 1:
+                            rowData.append(self.maintanceTypeReverseEnem[text])
+                        elif i == 9:
+                            rowData.append(self.technologyStateReverseEnem[text])
+                        elif i == 10:
+                            if text == '否' or text == '不涉及':
+                                rowData.append(self.contractReverseEnem[text])
+                                rowData.append('null')
+                            else:
+                                rowData.append(self.payingReverseEnem['是'])
+                                rowData.append(text)
+                        elif i == 11:
+                                rowData.append(self.payingReverseEnem[text])
             else:
                 item = self.tw_result.item(row, i)
                 if (item != None):
@@ -343,8 +487,8 @@ class OrderManagement(QWidget, OrderManagementUI):
                         rowData.append(item.text())
                 else:
                     break
-        if len(rowData) == self.tw_result.columnCount() - 1:
-            if(insertOneDataInToContractOrder(rowData) == True):
+        if len(rowData) == self.tw_result.columnCount():
+            if(insertOneDataInToServiceSuppot(rowData) == True):
                 QMessageBox.warning(self, "注意", "插入成功！", QMessageBox.Yes, QMessageBox.Yes)
             else:
                 QMessageBox.warning(self, "警告", "插入失败！", QMessageBox.Yes, QMessageBox.Yes)
@@ -355,24 +499,39 @@ class OrderManagement(QWidget, OrderManagementUI):
         rowData = []
         rowData.append(self.result[row - 2][0])
         for i in range(1, self.tw_result.columnCount()):
-            if i == 1:
-                continue
-            if i == 9:
+            if i == 9 or i == 10 or i == 11:
                 item = self.tw_result.cellWidget(row, i)
                 if item != None:
-                    date = item.date().toString(Qt.ISODate)
-                    rowData.append(date)
+                    text = item.currentText()
+                    if i == 9:
+                        rowData.append(self.technologyStateReverseEnem[text])
+                    elif i == 10:
+                        if text == '否' or text == '不涉及':
+                            rowData.append(self.contractReverseEnem[text])
+                            rowData.append('null')
+                        else:
+                            rowData.append(self.payingReverseEnem['是'])
+                            rowData.append(text)
+                    elif i == 11:
+                        rowData.append(self.payingReverseEnem[text])
+
                 else:
                     break
             else:
                 item = self.tw_result.item(row, i)
                 if (item != None):
-                    if (len(item.text()) > 0):
-                        rowData.append(item.text())
+                    text = item.text()
+                    if (len(text) > 0):
+                        if i == 1:
+                            rowData.append(self.maintanceTypeReverseEnem[text])
+                        else:
+                            rowData.append(text)
+                    else:
+                        break
                 else:
                     break
-        if len(rowData) == self.tw_result.columnCount() - 1:
-            if (updataOneDataToContractOrder(rowData) == True):
+        if len(rowData) == self.tw_result.columnCount() + 1:
+            if (updataOneDataToServiceSuppot(rowData) == True):
                 QMessageBox.warning(self, "注意", "修改成功！", QMessageBox.Yes, QMessageBox.Yes)
             else:
                 QMessageBox.warning(self, "警告", "修改失败！", QMessageBox.Yes, QMessageBox.Yes)
@@ -391,33 +550,89 @@ class OrderManagement(QWidget, OrderManagementUI):
             rowCount = self.tw_result.rowCount()
             self.currentLastRow = rowCount
             self.tw_result.insertRow(rowCount)
-            item = QTableWidgetItem(self.selectedYear + '年')
-            item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-            item.setFlags(Qt.ItemIsEnabled)
-            self.tw_result.setItem(2, 0, item)
-            self.tw_result.setSpan(2, 0, rowCount + 1, 1)
+
             if (rowCount + 1 == 3):
                 item = QTableWidgetItem('1')
                 item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
                 item.setFlags(Qt.ItemIsEnabled)
-                self.tw_result.setItem(2, 1, item)
+                self.tw_result.setItem(2, 0, item)
             else:
-                lastNo = int(self.tw_result.item(rowCount - 1,1).text())
-                item = QTableWidgetItem(str(lastNo + 1))
+                item = QTableWidgetItem(str(rowCount - 1 ))
                 item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
                 item.setFlags(Qt.ItemIsEnabled)
-                self.tw_result.setItem(rowCount, 1, item)
-            item = QTableWidgetItem('')
+                self.tw_result.setItem(rowCount, 0, item)
+
+            combox = QComboBox()
+            comboxItems = ['装备大修', '装备中修', '维修器材购置', '修理能力建设']
+            combox.addItems(comboxItems)
+            combox.setEditable(False)
+            combox.activated.connect(self.changeCombox)
+            self.tw_result.setCellWidget(rowCount, 1, combox)
+
+            combox = QComboBox()
+            comboxItems = ['不涉及']
+            combox.addItems(comboxItems)
+            combox.setEditable(False)
+            combox.activated.connect(self.slotAlterAndSava)
+            self.tw_result.setCellWidget(rowCount, 9, combox)
+
+            combox = QComboBox()
+            comboxItems = ['不涉及']
+            combox.addItems(comboxItems)
+            combox.setEditable(False)
+            combox.activated.connect(self.slotAlterAndSava)
+            self.tw_result.setCellWidget(rowCount, 10, combox)
+
+            combox = QComboBox()
+            comboxItems = ['不涉及']
+            combox.addItems(comboxItems)
+            combox.setEditable(False)
+            self.tw_result.setCellWidget(rowCount, 11, combox)
+
+            item = QTableWidgetItem(self.selectedYear)
             item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             item.setFlags(Qt.ItemIsEnabled)
-            self.tw_result.setItem(rowCount, 8, item)
-            deliveryDate = QDateEdit()
-            deliveryDate.setDisplayFormat("yyyy-MM-dd")
-            self.tw_result.setCellWidget(rowCount, 9, deliveryDate)
+            self.tw_result.setItem(rowCount, 12, item)
+
             self.tw_result.itemChanged.connect(self.slotAlterAndSava)
+            
 
         else:
             QMessageBox.warning(self, "注意", "请先将数据补充完整！", QMessageBox.Yes, QMessageBox.Yes)
+
+    def changeCombox(self, index):
+        print('index')
+        print(index)
+        row = self.tw_result.rowCount()
+        item = self.tw_result.cellWidget(row -1,1)
+        if item != None:
+            if index == 0 or index == 1:
+                pass
+            else:
+                combox = QComboBox()
+                comboxItems = ['是', '否']
+                combox.addItems(comboxItems)
+                combox.setEditable(False)
+                self.tw_result.setCellWidget(row - 1, 9, combox)
+
+                combox = QComboBox()
+                comboxItems = ['否']
+                maintanceContractNos = getMaintanceContractNos()
+                print('maintanceContractNos')
+                print(maintanceContractNos)
+                for i in range(len(maintanceContractNos)):
+                    comboxItems.append(maintanceContractNos[i][0])
+
+                print(comboxItems)
+                combox.addItems(comboxItems)
+                combox.setEditable(False)
+                self.tw_result.setCellWidget(row - 1, 10, combox)
+                combox = QComboBox()
+                comboxItems = ['是', '否']
+                combox.addItems(comboxItems)
+                combox.setEditable(False)
+                self.tw_result.setCellWidget(row - 1, 11, combox)
+
 
     def slotDelete(self):
 
@@ -428,7 +643,7 @@ class OrderManagement(QWidget, OrderManagementUI):
         elif rowCount >= 2 and rowCount < 2 + resultCount:
             reply = QMessageBox.question(self, '警告', '是否删除该行数据？', QMessageBox.Cancel, QMessageBox.Yes)
             if reply == QMessageBox.Yes:
-                deleteDataByContractOrderIdAndYear(self.result[rowCount - 2][0],self.selectedYear)
+                deleteDataByServiceSuppotIdAndYear(self.result[rowCount - 2][0],self.selectedYear)
                 self.tw_result.removeRow(rowCount)
             else:
                 return
@@ -467,7 +682,7 @@ class OrderManagement(QWidget, OrderManagementUI):
             titileStyle.font = font  # 设定样式
             titileStyle.alignment = alignment
             titileStyle.borders = borders
-            for i in range(11):
+            for i in range(13):
                 workSheet.col(i).width = 5000
             contentStyle = xlwt.XFStyle()  # 初始化样式
             font = xlwt.Font()  # 为样式创建字体
@@ -486,35 +701,49 @@ class OrderManagement(QWidget, OrderManagementUI):
             contentStyle.borders = borders
 
             #画表头
-            workSheet.write_merge(0, 0, 0, 10, "订购计划--合同",titileStyle)
-            workSheet.write(1, 0, "年度", titileStyle)
-            workSheet.write(1, 1, "序号", titileStyle)
-            workSheet.write(1, 2, "合同编号", titileStyle)
-            workSheet.write(1, 3, "合同名称", titileStyle)
-            workSheet.write(1, 4, "（甲方）", titileStyle)
-            workSheet.write(1, 5, "（乙方）", titileStyle)
-            workSheet.write(1, 6, "单价（万元）", titileStyle)
-            workSheet.write(1, 7, "数量/单位i额", titileStyle)
-            workSheet.write(1, 8, "金额（万元）", titileStyle)
-            workSheet.write(1, 9, "交付日期", titileStyle)
-            workSheet.write(1, 10, "备注", titileStyle)
+            workSheet.write_merge(0, 0, 0, 13, "核化装备维修保障计划及预算明细表", titileStyle)
+            workSheet.write_merge(1, 2, 0, 0, '序号', titileStyle)
+            workSheet.write_merge(1, 2, 1, 1, '项目类型', titileStyle)
+            workSheet.write_merge(1, 2, 2, 2, '项目名称', titileStyle)
+            workSheet.write_merge(1, 2, 3, 3, '计量单位', titileStyle)
+            workSheet.write_merge(1, 1, 4, 6, '审核', titileStyle)
+            workSheet.write(2, 4, "单价", titileStyle)
+            workSheet.write(2, 5, "数量", titileStyle)
+            workSheet.write(2, 6, "金额", titileStyle)
+            workSheet.write_merge(1, 1, 7, 8, '单位', titileStyle)
+            workSheet.write(2, 7, "分配（送修）", titileStyle)
+            workSheet.write(2, 8, "供货（承修）", titileStyle)
+            workSheet.write_merge(1, 1, 9, 11, '计价挂账进度', titileStyle)
+            workSheet.write(2, 9, "确定技术状态", titileStyle)
+            workSheet.write(2, 10, "签订合同", titileStyle)
+            workSheet.write(2, 11, "支付", titileStyle)
+            workSheet.write_merge(1, 2, 12, 12, '年份/时间', titileStyle)
+            workSheet.write_merge(1, 2, 13, 13, '备注', titileStyle)
 
 
             #填表数据
             dataList = self.result
             if len(dataList) > 0:
-                workSheet.write_merge(2, 1 + len(dataList), 0, 0, self.selectedYear + '年', contentStyle)
-                for i in range(len(dataList)):
-                    workSheet.write(2 + i, 1, str(dataList[i][0]), contentStyle)
-                    workSheet.write(2 + i, 2, dataList[i][2], contentStyle)
-                    workSheet.write(2 + i, 3, dataList[i][3], contentStyle)
-                    workSheet.write(2 + i, 4, dataList[i][4], contentStyle)
-                    workSheet.write(2 + i, 5, dataList[i][5], contentStyle)
-                    workSheet.write(2 + i, 6, str(dataList[i][6]), contentStyle)
-                    workSheet.write(2 + i, 7, str(dataList[i][7]), contentStyle)
-                    workSheet.write(2 + i, 8, str(dataList[i][8]), contentStyle)
-                    workSheet.write(2 + i, 9, dataList[i][9], contentStyle)
-                    workSheet.write(2 + i, 10, dataList[i][10], contentStyle)
+                for i in range(len(self.result)):
+                    workSheet.write(3 + i, 0, str(i + 1), contentStyle)
+                    print('self.result[i][1]')
+                    print(self.result[i][1])
+                    workSheet.write(3 + i, 1, self.maintanceTypeEnem[self.result[i][1]], contentStyle)
+                    workSheet.write(3 + i, 2, self.result[i][2], contentStyle)
+                    workSheet.write(3 + i, 3, self.result[i][3], contentStyle)
+                    workSheet.write(3 + i, 4, str(self.result[i][4]), contentStyle)
+                    workSheet.write(3 + i, 5, str(self.result[i][5]), contentStyle)
+                    workSheet.write(3 + i, 6, str(self.result[i][6]), contentStyle)
+                    workSheet.write(3 + i, 7, self.result[i][7], contentStyle)
+                    workSheet.write(3 + i, 8, self.result[i][8], contentStyle)
+                    workSheet.write(3 + i, 9, self.technologyStateEnem[self.result[i][9]], contentStyle)
+                    if self.result[i][10] == 1:
+                        workSheet.write(3 + i, 10, self.result[i][11], contentStyle)
+                    else:
+                        workSheet.write(3 + i, 10, self.contractEnem[self.result[i][10]], contentStyle)
+                    workSheet.write(3 + i, 11, self.payingEnem[self.result[i][12]], contentStyle)
+                    workSheet.write(3 + i, 12, self.result[i][13], contentStyle)
+                    workSheet.write(3 + i, 13, self.result[i][14], contentStyle)
 
             try:
                 pathName = "%s/%s年订购计划--合同.xls" % (directoryPath,self.selectedYear)
@@ -542,17 +771,30 @@ class OrderManagement(QWidget, OrderManagementUI):
         directoryPath = QFileDialog.getExistingDirectory(self, "请选择导出文件夹", "c:/")
         if len(directoryPath) > 0:
             # 填表数据
-            dataList = self.result
-            dataList.insert(0, "订单合同")
-            print("订单合同")
-            print(dataList)  # ['实力查询数据'， ['5', '10', 'A车', '六十一旅团一阵地', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '2000']]
-            if dataList is None or len(dataList) == 1:
+            dataList = ['维修计划']
+            for _,element in enumerate(self.result):
+                rowData = []
+                contractInof = []
+                for i in range(len(element)):
+                    if i == 0 or i == 11:
+                        continue
+                    elif i == 10:
+                        rowData.append(element[10])
+                        rowData.append(element[11])
+                        if element[10] == 1:
+                            contractInof = getMaintanceContractInfo(element[11])
+                            contractInof = contractInof[1:]
+                    else:
+                        rowData.append(element[i])
+                rowData.append(contractInof)
+                dataList.append(rowData.copy())
+            if len(dataList) == 1:
                 return
             else:
                 date = QDateTime.currentDateTime()
                 installData = date.toString("yyyy年MM月dd日hh时mm分ss秒")  # hh:mm:ss
-                pathName = "%s/%s%s年订购计划合同.nms" % (
-                directoryPath, installData, self.selectedYear)
+                pathName = "%s/%s%s年维修计划.nms" % (
+                directoryPath, installData, dataList[1][-3])
                 with open(pathName, "wb") as file:
                     pickle.dump(dataList, file)
                 QMessageBox.warning(self, "导出数据成功！", "导出成功！", QMessageBox.Yes)
@@ -562,6 +804,7 @@ class OrderManagement(QWidget, OrderManagementUI):
         pass
 
         # 导入数据包
+
     def slotInputData(self):
         self.inputList = []
         filename, _ = QFileDialog.getOpenFileName(self, "选中文件", '', "Excel Files (*.nms);;Excel Files (*.nms)")
@@ -570,13 +813,13 @@ class OrderManagement(QWidget, OrderManagementUI):
         try:
             with open(filename, "rb") as file:
                 self.inputList = pickle.load(file)
-                if self.inputList[0] != "订单合同":
+                if self.inputList[0] != "维修计划":
                     raise Exception("数据格式错误！")
         except Exception as e:
             print(e)
             QMessageBox.warning(self, "加载文件失败！", "请检查文件格式及内容格式！", QMessageBox.Yes)
             return
-        headerlist = ['年度', '序号', '合同编号', '合同名称', '甲方', '乙方', '单价（万元）', '数量/单位', '金额（万元）', '交付时间', '备注']
+        headerlist = ['项目类型', '项目名称', '计量单位', '单价', '数量', '金额', '分配（送修）', '供货（承修）', '技术状态', '签订合同', '支付', '年份', '备注' ]
         self.showInputResult.setWindowTitle("导入数据")
         self.showInputResult.show()
         # QTableWidget设置整行选中
@@ -586,40 +829,62 @@ class OrderManagement(QWidget, OrderManagementUI):
 
 
         for i, LineInfo in enumerate(self.inputList):
+            print(LineInfo)
             if i == 0:
                 continue
             i = i - 1
-            item = QTableWidgetItem(LineInfo[1])
+            #[2, '2', '2', 2.0, 3, 6.0, '2', '3', 1, 1, '23', 1, '2001', '2',('2021', '23', '2', '2', '2', 2.0, 2, 2.0, 2, '2')]
+
+            item = QTableWidgetItem(self.maintanceTypeEnem[LineInfo[0]])
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.showInputResult.tw_result.setItem(i, 0, item)
-            item = QTableWidgetItem(LineInfo[2])
+            item = QTableWidgetItem(LineInfo[1])
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.showInputResult.tw_result.setItem(i, 1, item)
-            item = QTableWidgetItem(LineInfo[3])
+            item = QTableWidgetItem(LineInfo[2])
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.showInputResult.tw_result.setItem(i, 2, item)
 
-            item = QTableWidgetItem(LineInfo[4])
+            item = QTableWidgetItem(str(LineInfo[3]))
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.showInputResult.tw_result.setItem(i, 3, item)
-            item = QTableWidgetItem(str(LineInfo[5]))
+            item = QTableWidgetItem(str(LineInfo[4]))
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.showInputResult.tw_result.setItem(i, 4, item)
-            item = QTableWidgetItem(str(LineInfo[6]))
+            item = QTableWidgetItem(str(LineInfo[5]))
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.showInputResult.tw_result.setItem(i, 5, item)
-            item = QTableWidgetItem(str(LineInfo[7]))
+            item = QTableWidgetItem(LineInfo[6])
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.showInputResult.tw_result.setItem(i, 6, item)
-            item = QTableWidgetItem(str(LineInfo[8]))
+            item = QTableWidgetItem(LineInfo[7])
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.showInputResult.tw_result.setItem(i, 7, item)
-            item = QTableWidgetItem(LineInfo[9])
+            item = QTableWidgetItem(self.technologyStateEnem[LineInfo[8]])
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.showInputResult.tw_result.setItem(i, 8, item)
-            item = QTableWidgetItem(LineInfo[10])
+
+            if LineInfo[9] != 1:
+                item = QTableWidgetItem(self.contractEnem[LineInfo[9]])
+                item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+                self.showInputResult.tw_result.setItem(i, 9, item)
+            else:
+                item = QTableWidgetItem(LineInfo[10])
+                item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+                self.showInputResult.tw_result.setItem(i, 9, item)
+
+            item = QTableWidgetItem(self.payingEnem[LineInfo[11]])
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-            self.showInputResult.tw_result.setItem(i, 9, item)
+            self.showInputResult.tw_result.setItem(i, 10, item)
+
+
+            item = QTableWidgetItem(LineInfo[12])
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.showInputResult.tw_result.setItem(i, 11, item)
+
+            item = QTableWidgetItem(LineInfo[13])
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.showInputResult.tw_result.setItem(i, 12, item)
 
     def slotCancelInputIntoDatabase(self):
         self.showInputResult.hide()
@@ -630,7 +895,7 @@ class OrderManagement(QWidget, OrderManagementUI):
             if i == 0:
                 continue
             try:
-                if insertOneDataIntoContractOrder(lineInfo):
+                if inputOneDataIntoServiceSuppot(lineInfo):
                     pass
             except Exception as e:
                 print(e)

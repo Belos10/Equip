@@ -138,7 +138,7 @@ def gradeInEquip(equipmentId):
 
 def getFomatEquipmentName(equipmentId):
     grade = gradeInEquip(equipmentId)
-    space = '    '
+    space = ' '
     header = ''
     for i in range(grade):
         header = header + space
@@ -439,8 +439,11 @@ def insertOneEquipmentBalanceData(tempItem):
 
 
 def getEquipmentIdByName(equipmentName):
-    sql = "select Equip_ID from equip where Equip_Name='%s'"%equipmentName
+
+    sql = "select Equip_ID from equip where Equip_Name='%s'"%equipmentName.strip()
+    print(sql)
     equipment = selectOne(sql)
+    print('equipment',equipment)
     return equipment['Equip_ID']
 
 def getEquipmentBalanceIdByEquipmentIdAndUnitAndYear(equipmentId,unitId,year):
@@ -484,9 +487,8 @@ def getEquipmentBalanceIdByEquipmentId(equipmentId,unit,year):
 
 
 
-def saveEquipmentBalanceByRow(dataList,unit,year):
-    equipmentBalanceId = getEquipmentBalanceIdByEquipmentId(getEquipmentIdByName(dataList[0]), unit, year)
-    if equipmentBalanceId is not None:
+def saveEquipmentBalanceByRow(dataList, equipmentBalanceId):
+    if equipmentBalanceId is not None and len(equipmentBalanceId) > 0:
         # print(dataList)
         executeCommit("update eb_quality_status set issue_new_product='%s',issue_inferior_product='%s', issue_need_repaired='%s',"
                  "issue_need_retire='%s',report_new_product='%s',report_inferior_product='%s',report_need_repaired='%s',"
