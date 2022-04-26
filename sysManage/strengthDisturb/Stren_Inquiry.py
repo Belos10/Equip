@@ -13,6 +13,7 @@ from sysManage.userInfo import get_value
 '''
     类功能：
         管理查询结果界面，包含查询结果相关逻辑代码
+        实力查询 左边部分 年份、单位、装备xxx
 '''
 # 更新
 first_treeWidget_dict = {}
@@ -47,22 +48,53 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         self.yearList = []
         #设置当前查询的年份
         self.currentYear = None
-
         # 信号连接
         self.signalConnectSlot()
 
+    # 登录用户权限判断
     def initUserInfo(self):
         self.userInfo = get_value("totleUserInfo")
+
+
+    # 信号与槽的连接
+    def signalConnectSlot(self):
+        # 点击某个年份后显示单位和装备目录
+        self.lw_chooseYear.clicked.connect(self.slotClickedInqury)
+
+        # 当前单位目录被点击
+        self.tw_first.itemChanged.connect(self.slotInquryStrengthResult)
+
+        # 当前装备目录被点击
+        self.tw_second.itemChanged.connect(self.slotInquryStrengthResult)
+
+        # 双击某行进入录入界面
+        self.inquiry_result.tw_inquiryResult.doubleClicked.connect(self.slotInputStrengthInfo)
+
+        # 录入界面返回按钮
+        self.add_strenth_info.pb_back.clicked.connect(self.slotAddWidgetReturn)
+
+        # 录入界面保存按钮
+        self.add_strenth_info.pb_Save.clicked.connect(self.slotSaveUpdate)
+
+        # 新增某个年份
+        self.tb_add.clicked.connect(self.slotAddNewYear)
+
+        self.tb_del.clicked.connect(self.slotDelYear)
+
+        self.pb_firstSelect.clicked.connect(self.slotSelectUnit)
+
+        self.pb_secondSelect.clicked.connect(self.slotSelectEquip)
+
 
     '''
         功能：
             当选择出厂年份时，设置当前可选项和不可选项,并初始化年份目录
     '''
-
     def initStrenInquiry(self):
         self.inquiry_result.tw_inquiryResult.clear()
         self.initUserInfo()
         self.tw_first.clear()
+        self.tw_second.clear()
         self.tw_first.header().setVisible(False)
         self.tw_second.header().setVisible(False)
         self.le_first.setDisabled(True)
@@ -83,7 +115,7 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         self.yearList = []
 
         #初始化年份选择列表
-        self._initSelectYear_()
+        self.initSelectYear()
 
     '''
         功能：
@@ -103,6 +135,7 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         self.tw_first.setDisabled(False)
         self.tw_second.setDisabled(False)
         self.inquiry_result.setDisabled(True)
+        self.inquiry_result.allButtonDisabled()
 
         self.currentYear = self.lw_chooseYear.currentItem().text()
         print("currentYear :", self.currentYear)
@@ -158,35 +191,6 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
                 stack.append(resultInfo)
                 root.append(item)
 
-    # 信号与槽的连接
-    def signalConnectSlot(self):
-        #点击某个年份后显示单位和装备目录
-        self.lw_chooseYear.clicked.connect(self.slotClickedInqury)
-
-        # 当前单位目录被点击
-        self.tw_first.itemChanged.connect(self.slotInquryStrengthResult)
-
-        # 当前装备目录被点击
-        self.tw_second.itemChanged.connect(self.slotInquryStrengthResult)
-
-        # 双击某行进入录入界面
-        self.inquiry_result.tw_inquiryResult.doubleClicked.connect(self.slotInputStrengthInfo)
-
-        # 录入界面返回按钮
-        self.add_strenth_info.pb_back.clicked.connect(self.slotAddWidgetReturn)
-
-        # 录入界面保存按钮
-        self.add_strenth_info.pb_Save.clicked.connect(self.slotSaveUpdate)
-
-        #新增某个年份
-        self.tb_add.clicked.connect(self.slotAddNewYear)
-
-        self.tb_del.clicked.connect(self.slotDelYear)
-
-        self.pb_firstSelect.clicked.connect(self.slotSelectUnit)
-
-        self.pb_secondSelect.clicked.connect(self.slotSelectEquip)
-
 
 
     def slotSelectUnit(self):
@@ -203,6 +207,7 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
                 self.tw_second.setCurrentItem(item)
                 break
 
+    # 删除年份
     def slotDelYear(self):
         currentRow = self.lw_chooseYear.currentRow()
         if currentRow < 0:
@@ -216,9 +221,10 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
                     reply = QMessageBox.information(self, '删除', str(delSuccess) + ',删除失败', QMessageBox.Yes)
                     return
                 QMessageBox.information(self, '删除', '删除成功', QMessageBox.Yes)
-                self._initSelectYear_()
+                self.initSelectYear()
             else:
                 return
+
 
     def slotAddNewYear(self):
         year = 0
@@ -234,14 +240,15 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
                     QMessageBox.information(self, "新增", "新增成功！", QMessageBox.Yes)
                 else:
                     QMessageBox.information(self, "新增", str(insertSuccess) + ",新增失败！", QMessageBox.Yes)
-                self._initSelectYear_()
+                self.initSelectYear()
 
     # 信号与槽连接的断开
     def signalDisconnectSlot(self):
         pass
 
+
     #初始化年份listwidget
-    def _initSelectYear_(self):
+    def initSelectYear(self):
         self.yearList = []
         self.lw_chooseYear.clear()
         allyearList = selectAllStrengthYear()
@@ -257,6 +264,8 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
             self.tb_add.setDisabled(1)
         else:
             self.tb_add.setDisabled(0)
+
+
     #当信息录入界面点击保存按钮时
     def slotSaveUpdate(self):
         Unit_ID = self.add_strenth_info.strgenthInfo[1]
@@ -415,7 +424,8 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         for equipID, equipItem in self.second_treeWidget_dict.items():
             if equipItem.checkState(0) == Qt.Checked:
                 self.currentCheckedEquipList.append(equipID)
-
+        if(self.currentCheckedUnitList and self.currentCheckedEquipList):
+            self.inquiry_result.allButtonAvailabled()
         # if self.currentCheckedUnitList == [] or self.currentCheckedEquipList == []:
         #     headerlist = ['单位名称', '装备名称', '实力数', '编制数', '现有数', '偏差', '准备退役数', '未到位数', '提前退役', '待核查无实物', '待核查无实力',
         #                   '单独建账',

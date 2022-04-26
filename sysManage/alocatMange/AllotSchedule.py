@@ -231,13 +231,13 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                 self.originalEquipDictTab[j] = equipInfo[0]
                 j = j + 1
         #print("self.originalEquipDict",self.originalEquipDict)
-        self._initDisturbPlanByUnitListAndEquipList(self.originalEquipDict,self.originalEquipDictTab)
+        self.initDisturbPlanByUnitListAndEquipList(self.originalEquipDict, self.originalEquipDictTab)
 
 
     '''
         初始化分配计划结果
     '''
-    def _initDisturbPlanByUnitListAndEquipList(self,equipDict,equipDictTab={}):
+    def initDisturbPlanByUnitListAndEquipList(self, equipDict, equipDictTab={}):
         self.disturbResult.clear()
         self.disturbResult.setRowCount(0)
         self.currentEquipdict = equipDict
@@ -813,7 +813,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
             index = self.cb_schedule.currentIndex()
             # 未选择状态
             if index == 0:
-                self._initDisturbPlanByUnitListAndEquipList(self.originalEquipDict,self.originalEquipDictTab)
+                self.initDisturbPlanByUnitListAndEquipList(self.originalEquipDict, self.originalEquipDictTab)
 
             # 完成进度一
             elif index == 1:
@@ -835,7 +835,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                             equipInfo = self.addTab(equipInfo)
                             equipDictTab[j] = equipInfo[0]
                             j = j + 1
-                self._initDisturbPlanByUnitListAndEquipList(equipDict,equipDictTab)
+                self.initDisturbPlanByUnitListAndEquipList(equipDict, equipDictTab)
 
             # 完成进度二
             elif index == 2:
@@ -857,7 +857,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                             equipInfo = self.addTab(equipInfo)
                             equipDictTab[j] = equipInfo[0]
                             j = j + 1
-                self._initDisturbPlanByUnitListAndEquipList(equipDict,equipDictTab)
+                self.initDisturbPlanByUnitListAndEquipList(equipDict, equipDictTab)
 
             # 完成进度三
             elif index == 3:
@@ -879,7 +879,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                             equipInfo = self.addTab(equipInfo)
                             equipDictTab[j] = equipInfo[0]
                             j = j + 1
-                self._initDisturbPlanByUnitListAndEquipList(equipDict,equipDictTab)
+                self.initDisturbPlanByUnitListAndEquipList(equipDict, equipDictTab)
 
             # 完成进度四
             elif index == 4:
@@ -901,12 +901,12 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                             equipInfo = self.addTab(equipInfo)
                             equipDictTab[j] = equipInfo[0]
                             j = j + 1
-                self._initDisturbPlanByUnitListAndEquipList(equipDict,equipDictTab)
+                self.initDisturbPlanByUnitListAndEquipList(equipDict, equipDictTab)
         elif self.unitFlag == 2:
             index = self.cb_schedule.currentIndex()
             # 未选择状态
             if index == 0:
-                self._initDisturbPlanByUnitListAndEquipList(self.originalEquipDict,self.originalEquipDictTab)
+                self.initDisturbPlanByUnitListAndEquipList(self.originalEquipDict, self.originalEquipDictTab)
             # 完成进度二
             elif index == 2:
                 equipDict = {}
@@ -927,7 +927,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                             equipInfo = self.addTab(equipInfo)
                             equipDictTab[j] = equipInfo[0]
                             j = j + 1
-                self._initDisturbPlanByUnitListAndEquipList(equipDict,equipDictTab)
+                self.initDisturbPlanByUnitListAndEquipList(equipDict, equipDictTab)
 
             # 完成进度一
             elif index == 1:
@@ -949,7 +949,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                             equipInfo = self.addTab(equipInfo)
                             equipDictTab[j] = equipInfo[0]
                             j = j + 1
-                self._initDisturbPlanByUnitListAndEquipList(equipDict,equipDictTab)
+                self.initDisturbPlanByUnitListAndEquipList(equipDict, equipDictTab)
 
             # 完成进度三
             elif index == 3:
@@ -971,4 +971,4 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                             equipInfo = self.addTab(equipInfo)
                             equipDictTab[j] = equipInfo[0]
                             j = j + 1
-                self._initDisturbPlanByUnitListAndEquipList(equipDict,equipDictTab)
+                self.initDisturbPlanByUnitListAndEquipList(equipDict, equipDictTab)

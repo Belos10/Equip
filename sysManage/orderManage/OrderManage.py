@@ -76,7 +76,7 @@ class OrderManage(QMainWindow, widget_orderManage):
         self.tb_orderAllotPlan.setDisabled(0)
         self.tb_orderSchedule.setDisabled(False)
         self.tb_retirePlan.setDisabled(False)
-        # self.disturbPlan.initAll()
+        self.orderPlan.initAll()
 
     '''
         功能：
@@ -89,7 +89,7 @@ class OrderManage(QMainWindow, widget_orderManage):
         self.tb_orderAllotPlan.setDisabled(0)
         self.tb_orderSchedule.setDisabled(False)
         self.tb_retirePlan.setDisabled(False)
-        # self.allotSchedule.initAll()
+        self.adjustOrder.initAll()
 
     '''
         功能：
@@ -115,6 +115,7 @@ class OrderManage(QMainWindow, widget_orderManage):
         self.tb_orderAllotPlan.setDisabled(False)
         self.tb_orderSchedule.setDisabled(True)
         self.tb_retirePlan.setDisabled(False)
+        self.orderSchedule.initAll()
 
     '''
         功能：
@@ -127,3 +128,4 @@ class OrderManage(QMainWindow, widget_orderManage):
         self.tb_orderAllotPlan.setDisabled(False)
         self.tb_orderSchedule.setDisabled(False)
         self.tb_retirePlan.setDisabled(True)
+        self.retirePlan.initAll()

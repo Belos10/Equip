@@ -2825,7 +2825,6 @@ def selectAllStrengthYear():
     yearListTuple = cur.fetchall()
     for yearInfo in yearListTuple:
         yearList.append(yearInfo[1])
-
     return yearList
 
 

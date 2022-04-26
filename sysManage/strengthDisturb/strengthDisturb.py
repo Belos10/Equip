@@ -8,6 +8,7 @@ from sysManage.strengthDisturb.maintenMange import maintenManage
 from sysManage.strengthDisturb.retirement import retirement
 from sysManage.userInfo import get_value
 #new
+
 class strengthDisturb(QMainWindow, Strength_Disturb_Widget):
     def __init__(self, parent=None):
         super(strengthDisturb, self).__init__(parent)
@@ -54,7 +55,6 @@ class strengthDisturb(QMainWindow, Strength_Disturb_Widget):
         self.tb_strengthDisturbSet.clicked.disconnect(self.slotStrengthDisturbSet)
 
     def slotSelectStrength(self):
-
         self.tb_strengthSelect.setDisabled(True)
         self.tb_applyRetire.setDisabled(False)
         self.tb_equipBalance.setDisabled(False)

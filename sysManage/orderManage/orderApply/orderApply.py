@@ -23,13 +23,14 @@ class OrderApply(QWidget, Widget_Retirement):
         self.tw_first.header().setVisible(False)
         self.tw_second.header().setVisible(False)
         self.userInfo = None
-        self._initAll_()
+        self.initAll()
         self.signalConnect()
 
         # 初始化编制数维护界面
     def getUserInfo(self):
         self.userInfo = get_value("totleUserInfo")
-    def _initAll_(self):
+
+    def initAll(self):
         self.getUserInfo()
         self.tw_result.setRowCount(0)
         self.tw_result.setColumnCount(0)
@@ -93,7 +94,7 @@ class OrderApply(QWidget, Widget_Retirement):
                 return
             else:
                 clearOrderApply()
-                self._initAll_()
+                self.initAll()
                 return
         if currentRow < 0:
             reply = QMessageBox.question(self, '删除', '请选中某年进行删除', QMessageBox.Yes)
@@ -102,7 +103,7 @@ class OrderApply(QWidget, Widget_Retirement):
             reply = QMessageBox.question(self, '删除', '是否删除当前年份以及当前年份下所有数据？', QMessageBox.Yes, QMessageBox.Cancel)
             if reply == QMessageBox.Yes:
                 deleteOrderApplyYearByYear(currentYear)
-                self._initAll_()
+                self.initAll()
             else:
                 return
 
