@@ -13,6 +13,7 @@ from sysManage.userInfo import get_value
 '''
     类功能：
         管理查询结果界面，包含查询结果相关逻辑代码
+        实力查询 左边部分 年份、单位、装备xxx
 '''
 # 更新
 first_treeWidget_dict = {}
@@ -103,6 +104,7 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         self.tw_first.setDisabled(False)
         self.tw_second.setDisabled(False)
         self.inquiry_result.setDisabled(True)
+        self.inquiry_result.allButtonDisabled()
 
         self.currentYear = self.lw_chooseYear.currentItem().text()
         print("currentYear :", self.currentYear)
@@ -203,8 +205,10 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
                 self.tw_second.setCurrentItem(item)
                 break
 
+    # 删除年份
     def slotDelYear(self):
         currentRow = self.lw_chooseYear.currentRow()
+        print(currentRow)
         if currentRow < 0:
             return
         else:
@@ -219,6 +223,7 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
                 self._initSelectYear_()
             else:
                 return
+
 
     def slotAddNewYear(self):
         year = 0
@@ -240,6 +245,7 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
     def signalDisconnectSlot(self):
         pass
 
+
     #初始化年份listwidget
     def _initSelectYear_(self):
         self.yearList = []
@@ -257,6 +263,8 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
             self.tb_add.setDisabled(1)
         else:
             self.tb_add.setDisabled(0)
+
+
     #当信息录入界面点击保存按钮时
     def slotSaveUpdate(self):
         Unit_ID = self.add_strenth_info.strgenthInfo[1]
@@ -415,7 +423,8 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         for equipID, equipItem in self.second_treeWidget_dict.items():
             if equipItem.checkState(0) == Qt.Checked:
                 self.currentCheckedEquipList.append(equipID)
-
+        if(self.currentCheckedUnitList and self.currentCheckedEquipList):
+            self.inquiry_result.allButtonAvailabled()
         # if self.currentCheckedUnitList == [] or self.currentCheckedEquipList == []:
         #     headerlist = ['单位名称', '装备名称', '实力数', '编制数', '现有数', '偏差', '准备退役数', '未到位数', '提前退役', '待核查无实物', '待核查无实力',
         #                   '单独建账',

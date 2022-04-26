@@ -2,6 +2,7 @@
 # !/usr/bin/python
 # -*- coding: utf-8 -*-
 
+#登录时用户权限
 def _init():
     global _global_dict
     _global_dict = {}

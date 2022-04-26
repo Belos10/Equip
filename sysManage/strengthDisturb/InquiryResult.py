@@ -19,6 +19,7 @@ regx = QRegExp("[0-9]*")
 '''
     类功能：
         管理实力分布下实力查询结果界面，包含查询结果相关逻辑代码
+        实力查询 右边部分 结果界面
 '''
 class Inquiry_Result(QWidget, Widget_Inquiry_Result):
     def __init__(self, parent=None):
@@ -100,6 +101,59 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         # 导入数据到数据库
         self.showInputResult.pb_confirm.clicked.connect(self.slotInputIntoDatabase)
         self.showInputResult.pb_cancel.clicked.connect(self.slotCancelInputIntoDatabase)
+
+    def allButtonDisabled(self):
+        # self.pb_input.setCheckable(False)
+        # self.pb_output.setCheckable(False)
+        # self.pb_outputToExcel.setCheckable(False)
+        self.cb_showLast.setChecked(False)
+        self.cb_showDistence.setChecked(False)
+        self.cb_showValue0.setChecked(False)
+        # self.pb_clearCheck.setCheckable(False)
+        # self.pb_clearAll.setCheckable(False)
+        # self.pb_factoryYear.setCheckable(False)
+        # self.pb_filterTitle.setCheckable(False)
+        self.rb_equipShow.setChecked(False)
+        self.rb_unitShow.setChecked(False)
+        self.pb_input.setDisabled(True)
+        self.pb_output.setDisabled(True)
+        self.pb_outputToExcel.setDisabled(True)
+        self.cb_showLast.setDisabled(True)
+        self.cb_showDistence.setDisabled(True)
+        self.cb_showValue0.setDisabled(True)
+        self.pb_clearCheck.setDisabled(True)
+        self.pb_clearAll.setDisabled(True)
+        self.pb_factoryYear.setDisabled(True)
+        self.pb_filterTitle.setDisabled(True)
+        self.rb_equipShow.setDisabled(True)
+        self.rb_unitShow.setDisabled(True)
+
+    def allButtonAvailabled(self):
+        # self.pb_input.setCheckable(False)
+        # self.pb_output.setCheckable(False)
+        # self.pb_outputToExcel.setCheckable(False)
+        self.cb_showLast.setChecked(False)
+        self.cb_showDistence.setChecked(False)
+        self.cb_showValue0.setChecked(False)
+        # self.pb_clearCheck.setCheckable(False)
+        # self.pb_clearAll.setCheckable(False)
+        # self.pb_factoryYear.setCheckable(False)
+        # self.pb_filterTitle.setCheckable(False)
+        self.rb_equipShow.setChecked(False)
+        self.rb_unitShow.setChecked(False)
+        self.pb_input.setDisabled(False)
+        self.pb_output.setDisabled(False)
+        self.pb_outputToExcel.setDisabled(False)
+        self.cb_showLast.setDisabled(False)
+        self.cb_showDistence.setDisabled(False)
+        self.cb_showValue0.setDisabled(False)
+        self.pb_clearCheck.setDisabled(False)
+        self.pb_clearAll.setDisabled(False)
+        self.pb_factoryYear.setDisabled(False)
+        self.pb_filterTitle.setDisabled(False)
+        self.rb_equipShow.setDisabled(False)
+        self.rb_unitShow.setDisabled(False)
+
 
     def slotChangeSeeMethod(self):
         if self.chooseFactoryYear.selectAll:

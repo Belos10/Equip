@@ -8,6 +8,7 @@ from sysManage.strengthDisturb.maintenMange import maintenManage
 from sysManage.strengthDisturb.retirement import retirement
 from sysManage.userInfo import get_value
 #new
+
 class strengthDisturb(QMainWindow, Strength_Disturb_Widget):
     def __init__(self, parent=None):
         super(strengthDisturb, self).__init__(parent)
