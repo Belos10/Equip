@@ -108,4 +108,6 @@ class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
     def slotCurrentChange(self):
         if self.tb_ManageWidget.currentWidget() == self.setLogin:
             self.setLogin.initWidgets()
+        if self.tb_ManageWidget.currentWidget() == self.strengthDisturb:
+            self.strengthDisturb.strenSelect.initSelectYear()
 

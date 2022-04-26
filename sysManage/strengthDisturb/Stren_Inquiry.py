@@ -48,22 +48,53 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         self.yearList = []
         #设置当前查询的年份
         self.currentYear = None
-
         # 信号连接
         self.signalConnectSlot()
 
+    # 登录用户权限判断
     def initUserInfo(self):
         self.userInfo = get_value("totleUserInfo")
+
+
+    # 信号与槽的连接
+    def signalConnectSlot(self):
+        # 点击某个年份后显示单位和装备目录
+        self.lw_chooseYear.clicked.connect(self.slotClickedInqury)
+
+        # 当前单位目录被点击
+        self.tw_first.itemChanged.connect(self.slotInquryStrengthResult)
+
+        # 当前装备目录被点击
+        self.tw_second.itemChanged.connect(self.slotInquryStrengthResult)
+
+        # 双击某行进入录入界面
+        self.inquiry_result.tw_inquiryResult.doubleClicked.connect(self.slotInputStrengthInfo)
+
+        # 录入界面返回按钮
+        self.add_strenth_info.pb_back.clicked.connect(self.slotAddWidgetReturn)
+
+        # 录入界面保存按钮
+        self.add_strenth_info.pb_Save.clicked.connect(self.slotSaveUpdate)
+
+        # 新增某个年份
+        self.tb_add.clicked.connect(self.slotAddNewYear)
+
+        self.tb_del.clicked.connect(self.slotDelYear)
+
+        self.pb_firstSelect.clicked.connect(self.slotSelectUnit)
+
+        self.pb_secondSelect.clicked.connect(self.slotSelectEquip)
+
 
     '''
         功能：
             当选择出厂年份时，设置当前可选项和不可选项,并初始化年份目录
     '''
-
     def initStrenInquiry(self):
         self.inquiry_result.tw_inquiryResult.clear()
         self.initUserInfo()
         self.tw_first.clear()
+        self.tw_second.clear()
         self.tw_first.header().setVisible(False)
         self.tw_second.header().setVisible(False)
         self.le_first.setDisabled(True)
@@ -84,7 +115,7 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         self.yearList = []
 
         #初始化年份选择列表
-        self._initSelectYear_()
+        self.initSelectYear()
 
     '''
         功能：
@@ -160,35 +191,6 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
                 stack.append(resultInfo)
                 root.append(item)
 
-    # 信号与槽的连接
-    def signalConnectSlot(self):
-        #点击某个年份后显示单位和装备目录
-        self.lw_chooseYear.clicked.connect(self.slotClickedInqury)
-
-        # 当前单位目录被点击
-        self.tw_first.itemChanged.connect(self.slotInquryStrengthResult)
-
-        # 当前装备目录被点击
-        self.tw_second.itemChanged.connect(self.slotInquryStrengthResult)
-
-        # 双击某行进入录入界面
-        self.inquiry_result.tw_inquiryResult.doubleClicked.connect(self.slotInputStrengthInfo)
-
-        # 录入界面返回按钮
-        self.add_strenth_info.pb_back.clicked.connect(self.slotAddWidgetReturn)
-
-        # 录入界面保存按钮
-        self.add_strenth_info.pb_Save.clicked.connect(self.slotSaveUpdate)
-
-        #新增某个年份
-        self.tb_add.clicked.connect(self.slotAddNewYear)
-
-        self.tb_del.clicked.connect(self.slotDelYear)
-
-        self.pb_firstSelect.clicked.connect(self.slotSelectUnit)
-
-        self.pb_secondSelect.clicked.connect(self.slotSelectEquip)
-
 
 
     def slotSelectUnit(self):
@@ -208,7 +210,6 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
     # 删除年份
     def slotDelYear(self):
         currentRow = self.lw_chooseYear.currentRow()
-        print(currentRow)
         if currentRow < 0:
             return
         else:
@@ -220,7 +221,7 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
                     reply = QMessageBox.information(self, '删除', str(delSuccess) + ',删除失败', QMessageBox.Yes)
                     return
                 QMessageBox.information(self, '删除', '删除成功', QMessageBox.Yes)
-                self._initSelectYear_()
+                self.initSelectYear()
             else:
                 return
 
@@ -239,7 +240,7 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
                     QMessageBox.information(self, "新增", "新增成功！", QMessageBox.Yes)
                 else:
                     QMessageBox.information(self, "新增", str(insertSuccess) + ",新增失败！", QMessageBox.Yes)
-                self._initSelectYear_()
+                self.initSelectYear()
 
     # 信号与槽连接的断开
     def signalDisconnectSlot(self):
@@ -247,7 +248,7 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
 
 
     #初始化年份listwidget
-    def _initSelectYear_(self):
+    def initSelectYear(self):
         self.yearList = []
         self.lw_chooseYear.clear()
         allyearList = selectAllStrengthYear()

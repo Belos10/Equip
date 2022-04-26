@@ -55,7 +55,6 @@ class strengthDisturb(QMainWindow, Strength_Disturb_Widget):
         self.tb_strengthDisturbSet.clicked.disconnect(self.slotStrengthDisturbSet)
 
     def slotSelectStrength(self):
-
         self.tb_strengthSelect.setDisabled(True)
         self.tb_applyRetire.setDisabled(False)
         self.tb_equipBalance.setDisabled(False)

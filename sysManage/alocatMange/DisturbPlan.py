@@ -143,6 +143,7 @@ class DisturbPlan(QWidget, yearList_Form):
             # print("currentYear.text()",currentYear.text())
             deleteDisturbPlanYear(currentYear.text())
             deleteByYear(currentYear.text())
+            delStrengthYearByYear(currentYear.text())
             self._initYearWidget_()
 
     # 初始化年份
