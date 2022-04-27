@@ -3644,7 +3644,7 @@ def insertOneDataIntoRetire(lineInfo):
     except Exception as e:
         print(e)
         return False
-    pass
+
 
 def selectIfExistsRetireYear(year):
     sql = "select year from strengthyear where year = %s"%year

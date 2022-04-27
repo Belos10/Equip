@@ -812,3 +812,60 @@ def updateUnitScheduleFinish(unitID,equipID,year,flag):
     # print(sql)
     cur.execute(sql)
     conn.commit()
+
+# disturbplanyear是否存在该年份
+def selectIfExistsDisturbPlanYear(year):
+    allYear = selectAllDataAboutDisturbPlanYear()
+    #print("allYear",allYear)
+    for i in allYear:
+        if i[1] == str(year):
+            return True
+    return False
+
+# 返回disturbplanyear表中所有信息
+def selectAllDataAboutDisturbPlanYear():
+    yearInfoList = []
+    sql = "select * from disturbplanyear order by year"
+    cur.execute(sql)
+
+    result = cur.fetchall()
+    for resultInfo in result:
+        yearInfoList.append(resultInfo)
+    # 测试结果
+    # print(result)
+    return yearInfoList
+
+# 查询DisturbPlan信息
+def selectDisturbPlanInfo(unitID, EquipID, year):
+    sql = "select * from strength where Equip_ID = '" + \
+          EquipID + "' and Unit_ID = '" + unitID + "' and year = '" + year + "'"
+    cur.execute(sql)
+    result = cur.fetchall()
+    return result
+
+
+# 插入数据包用 插入数据 disturbplan表
+def insertOrUpdateOneDataIntoDisturbPlan(unitInfo, equipInfo, year, num):
+    if not selectIfExistsDisturbPlanYear(year):
+        insertIntoDisturbPlanYear(year)
+    # 改num
+    originDisturbPlanNum = selectDisturbPlanNumByList({0: unitInfo}, {0: equipInfo}, year)
+    originStrengthNum = selectStrengthNum(unitInfo[0], equipInfo[0], year)
+    if originStrengthNum[0] != '':
+        updateDisturbPlanNum(equipInfo[0],
+                             unitInfo[0],
+                             year, num, originDisturbPlanNum[0])
+        updateOneEquipmentBalanceData(year, equipInfo[0],
+                                      unitInfo[0])
+
+
+# 插入数据包用 disturbplannote表
+def insertOrUpdateOneDataIntoDisturbPlanNote(equipInfo, year, inputNum, note, unitFlag):
+    # 备注
+    updateDisturbPlanNote(equipInfo[0], year, note)
+    # 自定义计划数
+    if unitFlag == 1:
+        updateDisturbPlanInputNumUpmost(equipInfo[0], year, inputNum)
+    elif unitFlag == 2:
+        updateDisturbPlanInputNumBase(equipInfo[0], year, inputNum)
+
