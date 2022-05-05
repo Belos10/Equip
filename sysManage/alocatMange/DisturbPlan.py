@@ -1,4 +1,5 @@
 import sys
+import pickle
 from PyQt5.QtWidgets import *
 # new
 from database.SD_EquipmentBanlanceSql import updateOneEquipmentBalanceData, deleteByYear
@@ -9,6 +10,8 @@ from PyQt5.QtGui import QColor, QBrush, QFont
 from database.alocatMangeSql import *
 from sysManage.userInfo import get_value
 from sysManage.alocatMange.InputProof_Disturb import InputProof
+from sysManage.showInputResult import showInputResult
+from PyQt5.QtCore import QDateTime
 
 '''
     分配调整计划
@@ -67,6 +70,10 @@ class DisturbPlan(QWidget, yearList_Form):
         self.pb_secondSelect.clicked.connect(self.slotSelectEquip)
         self.inputProof.signal.connect(self.initDisturbPlanProof)
         self.pb_outputToExcel.clicked.connect(self.slotOutputToExcel)
+        self.pb_input.clicked.connect(self.slotInputData)
+        self.pb_output.clicked.connect(self.slotOutputData)
+        # self.showInputResult.pb_confirm.clicked.connect(self.slotInputIntoDatabase)
+        # self.showInputResult.pb_cancel.clicked.connect(self.slotCancelInputIntoDatabase)
 
     # 查询单位
     def slotSelectUnit(self):
@@ -288,8 +295,8 @@ class DisturbPlan(QWidget, yearList_Form):
     def _initDisturbPlanByUnitListAndEquipList(self):
         self.disturbResult.clear()
         self.disturbResult.setRowCount(0)
-        self.lenCurrentUnitChilddict = len(self.currentUnitChilddict)
-        self.lenCurrentEquipdict = len(self.currentEquipdict)
+        self.lenCurrentUnitChilddict = len(self.currentUnitChilddict)   # 选择单位个数
+        self.lenCurrentEquipdict = len(self.currentEquipdict)   # 选择装备个数
         # 选择机关或其他
         if self.unitFlag == 1:
             headerlist = ['装备名称及规格型号', '单位', '陆军调拨单开具数', '机关分配计划数', '此次分配合计数']
@@ -472,7 +479,6 @@ class DisturbPlan(QWidget, yearList_Form):
         功能：
             设置级目录联选中状态
     '''
-
     def slotCheckedChange(self, item, num):
         # 如果是顶部节点，只考虑Child：
         if item.childCount() and not item.parent():  # 判断是顶部节点，也就是根节点
@@ -515,10 +521,10 @@ class DisturbPlan(QWidget, yearList_Form):
             else:
                 parent_item.setCheckState(num, 1)
 
+
     '''
         改变 分配计划数、备注、自定义计划数
     '''
-
     def slotItemChange(self):
         self.currentRow = self.disturbResult.currentRow()
         self.currentColumn = self.disturbResult.currentColumn()
@@ -587,6 +593,7 @@ class DisturbPlan(QWidget, yearList_Form):
                     item.setText(str(unitDisturbPlanInputNumList[i]))
                 item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable)
 
+
     # 读取初始分配计划备注
     def initDisturbPlanNote(self):
         self.unitDisturbPlanNoteList = selectDisturbPlanNote(self.currentEquipdict, self.currentYear)
@@ -596,6 +603,7 @@ class DisturbPlan(QWidget, yearList_Form):
             if self.unitDisturbPlanNoteList[i] is not None:
                 item.setText(str(self.unitDisturbPlanNoteList[i]))
             item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable)
+
 
     # 读取调拨单开具数计划数与装备单位
     def initDisturbPlanOther(self):
@@ -648,6 +656,7 @@ class DisturbPlan(QWidget, yearList_Form):
                                     sum = sum + int(num)
                         if sum != 0:
                             self.disturbResult.item(row, 2).setText(str(sum))
+
 
     # 导出到Excel表格
     def slotOutputToExcel(self):
@@ -777,3 +786,127 @@ class DisturbPlan(QWidget, yearList_Form):
                 return
         else:
             QMessageBox.about(self, "选取文件夹失败！", "请选择正确的文件夹！")
+
+
+    # 导出分配调整计划数据
+    def slotOutputData(self):
+        self.disturbPlanList = {}
+        if self.disturbResult.rowCount() <= 0:
+            reply = QMessageBox.warning(self, '警告', '未选中任何数据，无法导出', QMessageBox.Yes)
+            return
+        reply = QMessageBox.question(self, '导出数据包', '是否导出数据包？', QMessageBox.Cancel, QMessageBox.Yes)
+        if reply == QMessageBox.Cancel:
+            self._initDisturbPlanByUnitListAndEquipList()
+            return
+        self.disturbPlanList["currentUnit"] = self.currentUnitChilddict
+        self.disturbPlanList["currentYear"] = self.currentYear
+        self.disturbPlanList["currentEquip"] = self.currentEquipdict
+        self.disturbPlanList["disturbPlanListFlag"]="分配调整计划数据"
+        self.disturbPlanList["unitFlag"]=self.unitFlag
+        # 获取表数据
+        for i,equipInfo in self.currentEquipdict.items():
+            inputNum = self.disturbResult.item(i, 3).text()
+            note = self.disturbResult.item(i, 5+self.lenCurrentUnitChilddict).text()
+            numList = []
+            for unitInfo in self.currentUnitChilddict.values():
+                numList.append(selectDisturbPlanNum(unitInfo[0],equipInfo[0],self.currentYear))
+            self.disturbPlanList[i] = (equipInfo[0], equipInfo[1], equipInfo[5],inputNum,note,tuple(numList))
+
+        directoryPath = QFileDialog.getExistingDirectory(self, "请选择导出文件夹", "c:/")
+        if len(directoryPath) > 0:
+            print("导出数据包dataList",self.disturbPlanList)  # ['实力查询数据'， ['5', '10', 'A车', '六十一旅团一阵地', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '2000']]
+            if self.disturbPlanList is None or len(self.disturbPlanList) == 1:
+                return
+            else:
+                date = QDateTime.currentDateTime()
+                installData = date.toString("yyyy年MM月dd日hh时mm分ss秒")  # hh:mm:ss
+                pathName = "%s/%s分配调整计划.nms" % (directoryPath, installData)
+                with open(pathName, "wb") as file:
+                    pickle.dump(self.disturbPlanList, file)
+                QMessageBox.about(self, "导出成功", "导出成功！")
+        else:
+            QMessageBox.warning(self, "导出数据失败！", "请选择正确的文件夹！", QMessageBox.Yes)
+
+
+
+    # 导入分配调整计划数据
+    def slotInputData(self):
+        self.inputDict = {}
+        filename, _ = QFileDialog.getOpenFileName(self, "选中文件", '', "Excel Files (*.nms);;Excel Files (*.nms)")
+        if len(filename) < 2:
+            return
+        try:
+            # 拿到上述数据文件
+            with open(filename, "rb") as file:
+                self.inputDict = pickle.load(file)
+                if self.inputDict["disturbPlanListFlag"] != "分配调整计划数据":
+                    raise Exception("数据格式错误！")
+        except Exception as e:
+            print(e)
+            QMessageBox.warning(self, "加载文件失败！", "请检查文件格式及内容格式！", QMessageBox.Yes)
+            return
+        print("导入数据self.inputDict", self.inputDict)
+        self.showInputResult = showInputResult(self)
+        self.showInputResult.hide()
+        headerlist = ['装备名称及规格型号', '单位', '机关分配计划数']
+        self.showInputResult.setWindowTitle("导入数据")
+        self.showInputResult.show()
+        lenEquip = len(self.inputDict["currentEquip"])
+        lenUnit = len(self.inputDict["currentUnit"])
+        if lenUnit:
+            for i in self.inputDict["currentUnit"].values():
+                headerlist.append(i[1])
+        headerlist.append('备注')
+        # QTableWidget设置整行选中
+        self.showInputResult.tw_result.setColumnCount(len(headerlist))
+        self.showInputResult.tw_result.setHorizontalHeaderLabels(headerlist)
+        self.showInputResult.tw_result.setRowCount(lenEquip)
+        self.showInputResult.tw_result.setColumnWidth(0, 200)
+        for i, LineInfo in self.inputDict.items():
+            if not isinstance(i, int):
+                continue
+            item = QTableWidgetItem(LineInfo[1])
+            item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+            self.showInputResult.tw_result.setItem(i, 0, item)
+            item = QTableWidgetItem(LineInfo[2])
+            item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+            self.showInputResult.tw_result.setItem(i, 1, item)
+            item = QTableWidgetItem(LineInfo[3])
+            item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+            self.showInputResult.tw_result.setItem(i, 2, item)
+            for x in range(0, lenUnit):
+                item = QTableWidgetItem(LineInfo[-1][x])
+                item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                self.showInputResult.tw_result.setItem(i, x + 3, item)
+            item = QTableWidgetItem(LineInfo[4])
+            item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+            self.showInputResult.tw_result.setItem(i, 3 + lenUnit, item)
+            i = i + 1
+        self.showInputResult.tw_result.setColumnWidth(2, 150)
+
+    def slotCancelInputIntoDatabase(self):
+        self.showInputResult.hide()
+        self.setDisabled(False)
+
+    def slotInputIntoDatabase(self):
+        for dataIndex, dataInfo in self.inputDict.items():
+            if not (isinstance(i, int) and EquipNotHaveChild(self.inputDict["currentEquip"][dataIndex])):
+                continue
+            try:
+                for unitIndex, unitInfo in self.inputDict["currentUnit"].items():
+                    # insertOrUpdateOneDataIntoDisturbPlan(unitInfo, equipInfo, year, num)
+                    insertOrUpdateOneDataIntoDisturbPlan(unitInfo,
+                                                         self.inputDict["currentEquip"][dataIndex],
+                                                         self.inputDict["currentYear"],
+                                                         dataInfo[-1][unitIndex])
+                    # insertOrUpdateOneDataIntoDisturbPlanNote(equipInfo, year, inputNum, note, unitFlag)
+                    insertOrUpdateOneDataIntoDisturbPlanNote(self.inputDict["currentEquip"][dataIndex],
+                                                             self.inputDict["currentYear"],
+                                                             dataInfo[3],
+                                                             dataInfo[4],
+                                                             self.inputDict["unitFlag"])
+            except Exception as e:
+                print(e)
+                QMessageBox.warning(self, "导入失败", "导入第%d数据失败！" % (i), QMessageBox.Yes)
+        self.showInputResult.hide()
+        self.setDisabled(False)
