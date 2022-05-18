@@ -75,11 +75,15 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
         self.cb_base.clear()
         unitId = stack.pop()
         bases = findBases(unitId[0])
+        print("unitId[0]")
+        print(unitId[0])
         self.baseNames = []
         for base in bases:
             unitName = getUnitNameByIdInUnit(base)
             self.infoDict[unitName] = base
             self.baseNames.append(unitName)
+        print('self.baseNames')
+        print(self.baseNames)
         self.cb_base.addItems(self.baseNames)
 
     '''

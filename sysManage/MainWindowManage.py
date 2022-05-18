@@ -2,6 +2,7 @@ from PyQt5.QtGui import QIcon
 
 from sysManage.contractMangement.contractMangementMain import ContractManagementMain
 from sysManage.maintainSupport.maintainSupportManage import MaintainSupportManage
+from sysManage.warStore.WarStoreMain import WarStoreMain
 from widgets.manage_widget import Widget_Manage_Widgets
 from PyQt5.QtWidgets import QMainWindow, QWidget, QApplication, QMessageBox, QDesktopWidget
 from sysManage.strengthDisturb.strengthDisturb import strengthDisturb
@@ -27,12 +28,12 @@ class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
         self.alocatMange = alocatMange()
         self.purChasPlan = OrderManage()
         self.mantanSupport = MaintainSupportManage()
-        self.warStorage = QWidget()
+        self.warStorage = WarStoreMain()
         self.contractMange = ContractManagementMain()
         self.dangerGoods = DangerGoods()
         self.PosEngin = PositionEngineerMain()
         self.dictSelect = dictSelect()
-        self.sysConfig = QWidget()
+        # self.sysConfig = QWidget()
 
         self.setWindowTitle("核化装备管理系统")
         self.setWindowIcon(QIcon(":/pic/system.png"))
@@ -46,7 +47,7 @@ class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
         self.tb_ManageWidget.addTab(self.dangerGoods, "防化危险品")
         self.tb_ManageWidget.addTab(self.PosEngin, "阵地工程")
         self.tb_ManageWidget.addTab(self.dictSelect, "目录查询")
-        self.tb_ManageWidget.addTab(self.sysConfig, "系统配置")
+        # self.tb_ManageWidget.addTab(self.sysConfig, "系统配置")
         self.tb_ManageWidget.addTab(self.setLogin, "登录设置")
 
         self.login = login()
@@ -110,4 +111,6 @@ class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
             self.setLogin.initWidgets()
         if self.tb_ManageWidget.currentWidget() == self.strengthDisturb:
             self.strengthDisturb.strenSelect.initSelectYear()
+        if self.tb_ManageWidget.currentWidget() == self.PosEngin:
+            self.PosEngin.slotInstallation()
 

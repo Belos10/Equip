@@ -39,6 +39,7 @@ class retirePlan(QWidget, retirePlan_Form):
         self.retirePlanResult.clear()
         self._initYearWidget_()
 
+
     def signalConnect(self):
         # 点击选择年份后刷新页面 初始化，点击年份之后一共做了这两件事情
         self.lw_yearChoose.itemClicked.connect(self.slotClickedInqury)
