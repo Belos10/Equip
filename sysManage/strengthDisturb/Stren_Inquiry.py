@@ -1,7 +1,7 @@
 from database.SD_EquipmentBanlanceSql import deleteByYear
 from widgets.strengthDisturb.stren_inquiry import Widget_Stren_Inquiry
 from PyQt5.QtWidgets import QWidget, QTreeWidgetItemIterator, QTreeWidgetItem, QMessageBox, \
-    QCheckBox, QListWidgetItem, QInputDialog
+    QCheckBox, QListWidgetItem, QInputDialog, QHeaderView, QAbstractItemView
 from PyQt5 import QtWidgets
 from sysManage.strengthDisturb.InquiryResult import Inquiry_Result
 from sysManage.strengthDisturb.addStrenthInfo import AddStrenthInfo
@@ -25,7 +25,6 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
     def __init__(self, parent=None):
         super(Stren_Inquiry, self).__init__(parent)
         self.setupUi(self)
-
         self.first_treeWidget_dict = {}
         self.second_treeWidget_dict = {}
         self.tb_input.setDisabled(True)
@@ -78,11 +77,8 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
 
         # 新增某个年份
         self.tb_add.clicked.connect(self.slotAddNewYear)
-
         self.tb_del.clicked.connect(self.slotDelYear)
-
         self.pb_firstSelect.clicked.connect(self.slotSelectUnit)
-
         self.pb_secondSelect.clicked.connect(self.slotSelectEquip)
 
 

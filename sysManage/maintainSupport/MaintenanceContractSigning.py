@@ -20,6 +20,7 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
         self.startInfo = None
         self.infoDict = {}
         self.init()
+        self.shutdown = True
 
     result = []
     contactNo = ''
@@ -586,12 +587,12 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
 
     def slotAlterAndSava(self):
         selectRow = self.tw_result.selectedItems()
-
         if len(selectRow) > 0:
             currentRow = selectRow[0].row()
         else:
             currentRow = self.tw_result.currentIndex().row()
-
+        if self.shutdown:
+            return
         if self.checkData(currentRow):
             print('currentRow',currentRow)
             print('currentLastRow',self.currentLastRow)
@@ -618,18 +619,15 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
                 else:
                     item.setText('')
                     self.tw_result.itemChanged.connect(self.slotAlterAndSava)
-                    
                     return False
             else:
                 self.tw_result.itemChanged.connect(self.slotAlterAndSava)
-                
                 return False
         contractMoney = float(self.tw_result.item(row,checkColomns[-2]).text())
         paidMoney = float(self.tw_result.item(row,checkColomns[-1]).text())
         dueMonet = contractMoney - paidMoney
         self.tw_result.item(row, 25).setText(str(dueMonet))
         self.tw_result.itemChanged.connect(self.slotAlterAndSava)
-        
         return True
 
     def savaRowData(self, row):
@@ -741,9 +739,9 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
     def slotAdd(self):
         print('SlotAdd')
         self.tb_add.disconnect()
+        self.shutdown = True
+        self.tw_result.itemChanged.disconnect(self.slotAlterAndSava)
         if self.tw_result.rowCount() <= 3 + len(self.result):
-            self.tw_result.itemChanged.disconnect(self.slotAlterAndSava)
-            
             rowCount = self.tw_result.rowCount()
             self.currentLastRow = rowCount
             self.tw_result.insertRow(rowCount)
@@ -791,10 +789,10 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
             self.tw_result.setItem(rowCount, 3, item)
 
             item = QComboBox()
-            item.activated.connect(self.contactNoChange)
             item.setEditable(False)
             item.addItems(contractNos)
             self.tw_result.setCellWidget(rowCount, 4, item)
+            item.activated.connect(self.contactNoChange)
 
             allocationUnit = []
             if len(contractNos) > 0:
@@ -824,20 +822,19 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
 
             # 开具调拨单
             item = QPushButton()
-            item.clicked.connect(self.formDialOrder)
             item.setText('开具调拨单')
             self.tw_result.setCellWidget(rowCount, 28, item)
+            item.clicked.connect(self.formDialOrder)
 
             item = QComboBox()
             item.setEditable(False)
             item.addItems(['否', '是'])
             self.tw_result.setCellWidget(rowCount, 29, item)
-            self.tw_result.itemChanged.connect(self.slotAlterAndSava)
-
-
         else:
             QMessageBox.warning(self, "注意", "请先将数据补充完整！", QMessageBox.Yes)
         self.tb_add.clicked.connect(self.slotAdd)
+        self.shutdown = False
+        self.tw_result.itemChanged.connect(self.slotAlterAndSava)
 
 
 

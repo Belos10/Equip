@@ -23,6 +23,7 @@ class PositionEngineerMain(QMainWindow, Position_Engineer_Widget):
 
 
 
+
     def connectSignal(self):
         self.tb_installation.clicked.connect(self.slotInstallation)
         self.tb_equipmentStatistics.clicked.connect(self.slotEquipmentStatistics)
