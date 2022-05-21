@@ -111,12 +111,19 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
         保存新增结果
     '''
     def slotSaveNewAdd(self):
+        # 当前页面总数据行数
         currentRowNum = self.tw_result.rowCount() - 2
+        # originRowCount数据库中本年已有的行数  addRow
         addRow = 2 + self.orginRowCount
+        # addRow = currentRowNum + self.orginRowCount
+        # print("army orginRowCount==",self.orginRowCount,"addRow==",addRow)
         IDList = selectIDFromArmyByYear(self.currentYear)
         equipIDList = selectEquipIDFromArmyByYear(self.currentYear)
+        equipIndexSet = {()}
         #print("IDList :", IDList)
+        # 总数据行数-已有行数=新增行数
         for i in range(currentRowNum - self.orginRowCount):
+            # print("-----------当前行数 ",i+addRow)
             haveID = False
             if self.tw_result.item(i + addRow, 0):
                 pass
@@ -146,11 +153,18 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
             index = self.tw_result.cellWidget(i + addRow, 14).currentIndex()
             Equip_ID = self.currentEquipInfo[index][0]
             haveEquip = False
+            haveEquipIndex = False
             for equipID in equipIDList:
                 if Equip_ID == equipID:
                     haveEquip = True
+            if index in equipIndexSet:
+                haveEquipIndex = True
+            equipIndexSet.add(index)
             if haveEquip:
                 reply = QMessageBox.information(self, '新增', '第' + str(i + addRow - 1) + '添加失败，当前年份该装备已录入', QMessageBox.Yes)
+                continue
+            if haveEquipIndex:
+                reply = QMessageBox.information(self, '新增', '第' + str(i + addRow - 1) + '添加失败，不可重复添加相同装备', QMessageBox.Yes)
                 continue
             if self.tw_result.item(i + addRow, 1):
                 Trans_ID = self.tw_result.item(i + addRow, 1).text()
@@ -243,7 +257,7 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
                                    Port_Way, Effic_Date, Send_UintID, Send_UnitName, Send_Connect,
                                    Send_Tel, Receive_Name, Receive_Connect, Receive_Tel,
                                    Equip_ID, Equip_Name, Equip_Unit, Equip_Quity, Equip_Num, Equip_Other, self.currentYear)
-            self.slotSelectResult()
+        self.slotSelectResult()
 
     '''
        新增一个年份
