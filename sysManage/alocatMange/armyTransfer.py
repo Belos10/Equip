@@ -131,14 +131,14 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
                 ID = ""
             ID = self.tw_result.item(i + addRow, 0).text()
             if ID == "":
-                reply = QMessageBox.question(self, '新增', '第' + str(i + addRow - 1) + '添加失败，序号不能为空', QMessageBox.Yes)
+                reply = QMessageBox.question(self, '新增', '第' + str(i + addRow - 1) + '行添加失败，序号不能为空', QMessageBox.Yes)
                 continue
             for id in IDList:
                 if ID == id:
                     haveID = True
 
             if haveID:
-                reply = QMessageBox.question(self, '新增', '第' + str(i + addRow- 1) + '添加失败，当前年份当前序号已存在', QMessageBox.Yes)
+                reply = QMessageBox.question(self, '新增', '第' + str(i + addRow- 1) + '行添加失败，当前年份当前序号已存在', QMessageBox.Yes)
                 continue
             if self.tw_result.item(i + addRow, 17):
                 pass
@@ -148,7 +148,7 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
             if Equip_Num.isdigit():
                 pass
             else:
-                reply = QMessageBox.question(self, '新增', '第' + str(i + addRow-1) + '添加失败，数量必须为整数', QMessageBox.Yes)
+                reply = QMessageBox.question(self, '新增', '第' + str(i + addRow-1) + '行添加失败，数量必须为整数', QMessageBox.Yes)
                 continue
             index = self.tw_result.cellWidget(i + addRow, 14).currentIndex()
             Equip_ID = self.currentEquipInfo[index][0]
@@ -161,10 +161,10 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
                 haveEquipIndex = True
             equipIndexSet.add(index)
             if haveEquip:
-                reply = QMessageBox.information(self, '新增', '第' + str(i + addRow - 1) + '添加失败，当前年份该装备已录入', QMessageBox.Yes)
+                reply = QMessageBox.information(self, '新增', '第' + str(i + addRow - 1) + '行添加失败，当前年份该装备已录入', QMessageBox.Yes)
                 continue
             if haveEquipIndex:
-                reply = QMessageBox.information(self, '新增', '第' + str(i + addRow - 1) + '添加失败，不可重复添加相同装备', QMessageBox.Yes)
+                reply = QMessageBox.information(self, '新增', '第' + str(i + addRow - 1) + '行添加失败，不可重复添加相同装备', QMessageBox.Yes)
                 continue
             if self.tw_result.item(i + addRow, 1):
                 Trans_ID = self.tw_result.item(i + addRow, 1).text()
