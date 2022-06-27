@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class yearList_Form(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(1227, 748)
+        Form.resize(800, 800)
         self.horizontalLayout_6 = QtWidgets.QHBoxLayout(Form)
         self.horizontalLayout_6.setObjectName("horizontalLayout_6")
         self.groupBox = QtWidgets.QGroupBox(Form)
@@ -33,10 +33,10 @@ class yearList_Form(object):
         self.lw_yearChoose.setMaximumSize(QtCore.QSize(80, 16777215))
         self.lw_yearChoose.setObjectName("lw_yearChoose")
         self.verticalLayout.addWidget(self.lw_yearChoose)
-        self.tb_add = QtWidgets.QToolButton(self.groupBox)
+        self.tb_add = QtWidgets.QPushButton(self.groupBox)
         self.tb_add.setObjectName("tb_add")
         self.verticalLayout.addWidget(self.tb_add)
-        self.tb_del = QtWidgets.QToolButton(self.groupBox)
+        self.tb_del = QtWidgets.QPushButton(self.groupBox)
         self.tb_del.setObjectName("tb_del")
         self.verticalLayout.addWidget(self.tb_del)
         self.horizontalLayout_6.addWidget(self.groupBox)
@@ -185,6 +185,9 @@ class yearList_Form(object):
         self.horizontalLayout_6.addLayout(self.verticalLayout_4)
 
         self.retranslateUi(Form)
+        self.tw_first.setMinimumSize(300, 500)
+        self.tw_second.setMinimumSize(300, 500)
+
         QtCore.QMetaObject.connectSlotsByName(Form)
 
     def retranslateUi(self, Form):

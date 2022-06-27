@@ -5,6 +5,7 @@ from PyQt5.QtGui import QColor, QBrush,QFont
 
 
 from database.serviceSupportSql import *
+from sysManage.component import getMessageBox
 from widgets.serviceSupport.serviceSupportUI import Widget_ServiceSupport
 from sysManage.userInfo import get_value
 
@@ -26,6 +27,7 @@ class materialManagement(QWidget, materialManagementUI):
         self.signalConnect()
         self.datadict = {}
         self.bl = 0
+        self.currentLastRow = -1
         self.initAll()
 
     def initAll(self):
@@ -53,10 +55,10 @@ class materialManagement(QWidget, materialManagementUI):
         self.tw_result.itemChanged.disconnect(self.slotAlterAndSava)
         # self.tb_outputToExcel.clicked.disconnect(self.slotOutputToExcel)
 
-    def slotClickedInqury(self):
-        self.first_treeWidget_dict = {}
-        self.second_treeWidget_dict = {}
-        self.currentYear = self.lw_yearChoose.currentItem().text()
+    # def slotClickedInqury(self):
+    #     self.first_treeWidget_dict = {}
+    #     self.second_treeWidget_dict = {}
+    #     self.currentYear = self.lw_yearChoose.currentItem().text()
 
 
     '''
@@ -189,6 +191,7 @@ class materialManagement(QWidget, materialManagementUI):
                     datas = QTableWidgetItem(str(temp_data))
                     self.tw_result.setItem(i + 3, j, datas)
                     datas.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                    datas.setFlags(Qt.ItemIsEnabled)
                 else:
                     temp_data = data[i][j]
                     datas = QTableWidgetItem(str(temp_data))
@@ -202,9 +205,16 @@ class materialManagement(QWidget, materialManagementUI):
         功能：新增一行的数据
     '''
     def slotAlterAndSava(self):
+        print('修改保存')
         selectRow = self.tw_result.selectedItems()
         if len(selectRow) != 0:
             currentRow = selectRow[0].row()
+            if currentRow == self.currentLastRow:
+                self.savaRowData(currentRow)
+            else:
+                self.alterRowData(currentRow)
+        else:
+            currentRow = self.tw_result.currentIndex().row()
             if currentRow == self.currentLastRow:
                 self.savaRowData(currentRow)
             else:
@@ -222,8 +232,11 @@ class materialManagement(QWidget, materialManagementUI):
         if len(rowData) != self.tw_result.columnCount():
             return False
         else:
-            insertContentOfMaterialManagement(rowData)
-            QMessageBox.warning(self, "注意", "插入成功！", QMessageBox.Yes, QMessageBox.Yes)
+            if insertContentOfMaterialManagement(rowData):
+                getMessageBox("注意", "插入成功！", True, False)
+            else:
+                getMessageBox("警告", "插入失败！", True, False)
+            # QMessageBox.warning(self, "注意", "插入成功！", QMessageBox.Yes, QMessageBox.Yes)
             self.showContentOfMaterialManagement()
 
 
@@ -232,15 +245,17 @@ class materialManagement(QWidget, materialManagementUI):
         rowData = []
         for i in range(self.tw_result.columnCount()):       # tw_result.columnCount()=12
             item = self.tw_result.item(row, i)
+            if item is None:
+                break
             rowData.append(item.text())
-
-        if len(rowData) != self.tw_result.columnCount():
-            return False
-        else:
+        if len(rowData) == self.tw_result.columnCount():
             QMessageBox.warning(self, "注意", "修改成功！", QMessageBox.Yes, QMessageBox.Yes)
-            updateContentOfMaterialManagement(rowData)
+            if updateContentOfMaterialManagement(rowData):
+                getMessageBox("注意", "修改成功！", True, False)
+            else:
+                getMessageBox("警告", "修改失败！", True, False)
             self.showContentOfMaterialManagement()
-        pass
+
 
     # 组件
     def slotInput(self):
@@ -255,7 +270,10 @@ class materialManagement(QWidget, materialManagementUI):
         功能： “新增计划” 按钮槽函数
     '''
     def slotAdd(self):
+
+        self.tw_result.itemChanged.disconnect(self.slotAlterAndSava)
         rowCount = self.tw_result.rowCount()
+        self.currentLastRow = rowCount
         dataCount = len(self.datadict)
         numList = []
         for i in range(dataCount):
@@ -267,7 +285,7 @@ class materialManagement(QWidget, materialManagementUI):
         else:
             self.bl = int(max(numList)) + 1
 
-        if self.tw_result.rowCount() <= 3 + rowCount:
+        if self.tw_result.rowCount() <= 3 + dataCount:
             self.currentLastRow = rowCount
             self.tw_result.insertRow(rowCount)
 
@@ -276,16 +294,19 @@ class materialManagement(QWidget, materialManagementUI):
                 currentRowNum = 1
                 item = QTableWidgetItem(str(currentRowNum))
                 item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                item.setFlags(Qt.ItemIsEnabled)
                 self.tw_result.setItem(rowCount, 0, item)
             else:
                 LastRowNum = self.tw_result.item(rowCount - 1, 0).text()
                 currentRowNum = int(LastRowNum) + 1
                 item = QTableWidgetItem(str(currentRowNum))
                 item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+                item.setFlags(Qt.ItemIsEnabled)
                 self.tw_result.setItem(rowCount, 0, item)
         else:
-            QMessageBox.warning(self, "注意", "请先将数据补充完整！", QMessageBox.Yes, QMessageBox.Yes)
-            return
+            getMessageBox("注意", "请先将数据补充完整！", True, False)
+            # QMessageBox.warning(self, "注意", "请先将数据补充完整！", QMessageBox.Yes, QMessageBox.Yes)
+        self.tw_result.itemChanged.connect(self.slotAlterAndSava)
 
 
     '''
@@ -293,25 +314,30 @@ class materialManagement(QWidget, materialManagementUI):
     '''
     def slotDelete(self):
         rowCount = self.tw_result.currentRow()
-        # print("rowCount000:", rowCount)
+        resultCount = len(self.datadict)
         if rowCount < 3:
-            QMessageBox.warning(self, "注意", "请选中有效单元格！", QMessageBox.Yes, QMessageBox.Yes)
-            return
-        elif rowCount >= 3:
-            # item = self.serviceSupportResult.item(rowCount, 0)
-            #应该删除的是字典datadict中的 key = item.text()的值的第一个数据 对应的数据库中的值
-            if self.datadict == {}:
-                self.tw_result.removeRow(rowCount)
-            else:
+            getMessageBox("注意", "请选中中有效单元格！", True, False)
+            # QMessageBox.warning(self, "注意", "请选中有效单元格！", QMessageBox.Yes, QMessageBox.Yes)
+        elif rowCount >= 3 and rowCount < 3 + resultCount:
+            reply = getMessageBox("警告", "是否删除该行数据？", True, True)
+            # reply = QMessageBox.question(self, '警告', '是否删除该行数据？', QMessageBox.Cancel, QMessageBox.Yes)
+            if reply == QMessageBox.Ok:
                 currentRow = self.tw_result.currentRow()
                 # print("currentRow:", currentRow)
                 currentRowNum = currentRow - 2
                 # print("currentRowNum:", currentRowNum)
                 currentRowNumKeyValue = self.datadict[str(currentRowNum)][0]
                 # print("currentRowNumKeyValue:", currentRowNumKeyValue)
-                deleteDataByMaterialManagementNum(int(currentRowNumKeyValue))
-                self.tw_result.removeRow(rowCount)
+                if deleteDataByMaterialManagementNum(int(currentRowNumKeyValue)) == True:
+                    getMessageBox("提示", "删除成功!", True, False)
+                else:
+                    getMessageBox("警告", "删除删除失败!", True, False)
                 self.showContentOfMaterialManagement()
+            else:
+                return
+        else:
+            self.tw_result.removeRow(rowCount)
+
 
 
 

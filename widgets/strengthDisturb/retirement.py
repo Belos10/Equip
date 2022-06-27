@@ -176,6 +176,8 @@ class Widget_Retirement(object):
         self.gridLayout_3.addWidget(self.groupBox, 0, 0, 1, 1)
 
         self.retranslateUi(Form)
+        self.tw_first.setMinimumSize(300, 500)
+        self.tw_second.setMinimumSize(300, 500)
         QtCore.QMetaObject.connectSlotsByName(Form)
 
     def retranslateUi(self, Form):

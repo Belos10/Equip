@@ -88,7 +88,6 @@ def findAllContractOrderData(year):
 def insertOneDataInToContractOrder(rowData):
     print(rowData)
     #('2003', '2', '2', '2', '2', 2.0, 2, 4.0, '2000-01-01', '2')
-    #['2003', '2', '2', '2', '3', '3', '3', '3', '9.0', '2000-01-01', '3']
     sql = "insert into contract_order(year,no, name,part_A,part_B,unit_price,count,amount,delivery_time,note) values ('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')"\
           %(rowData[0],rowData[1],rowData[2],rowData[3],rowData[4],rowData[5],rowData[6],rowData[7],rowData[8],rowData[9])
     return executeCommit(sql)
@@ -167,10 +166,11 @@ def insertOneDataIntoContractOrder(lineInfo):
     #(1, '2003', '2', '2', '2', '2', 2.0, 2, 4.0, '2000-01-01', '2')
     sql = "select no from contract_maintenance where no = '%s' "%(lineInfo[2])
     result = executeSql(sql)
+    print("result: ", result)
     try:
         if result == None or len(result) == 0:
-            data = lineInfo[-1]
-            insertOneDataInToContractOrder(data)
+            print(lineInfo)
+            insertOneDataInToContractOrder(lineInfo[1:11])
         else:
             data = []
             data.append(result[0][0])

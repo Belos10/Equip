@@ -3,6 +3,7 @@ import pickle
 from PyQt5.QtWidgets import *
 # new
 from database.SD_EquipmentBanlanceSql import updateOneEquipmentBalanceData, deleteByYear
+from sysManage.component import getIntInputDialog, getMessageBox
 from widgets.alocatMange.yearListForm import yearList_Form
 from database.strengthDisturbSql import *
 from PyQt5.Qt import Qt, QRegExpValidator, QRegExp
@@ -125,7 +126,7 @@ class DisturbPlan(QWidget, yearList_Form):
     # 新增年份
     def slotAddNewYear(self):
         year = 0
-        year, ok = QInputDialog.getInt(self, "输入年份", "year:", 0, 0, 100000, 1)
+        ok, year = getIntInputDialog("新增年份", "年份:", 0, 100000, 1, True, True)
         if ok:
             haveYear = False
             allyear = selectYearListAboutDisturbPlan()
@@ -133,7 +134,7 @@ class DisturbPlan(QWidget, yearList_Form):
                 if str(year) == yearInfo:
                     haveYear = True
             if haveYear == True:
-                reply = QMessageBox.information(self, '添加', '添加失败，该年份已存在', QMessageBox.Yes)
+                reply = getMessageBox('添加', '添加失败，该年份已存在', True, False)
                 return
 
             insertIntoDisturbPlanYear(year)
@@ -144,8 +145,8 @@ class DisturbPlan(QWidget, yearList_Form):
 
     # 删除年份
     def slotDelYear(self):
-        reply = QMessageBox.question(self, "删除", "是否删除该年份及其数据？", QMessageBox.Yes, QMessageBox.Cancel)
-        if reply == QMessageBox.Yes:
+        reply = getMessageBox("删除", "是否删除该年份及其数据？", True, False)
+        if reply == QMessageBox.Ok:
             currentYear = self.lw_yearChoose.currentItem()
             # print("currentYear.text()",currentYear.text())
             deleteDisturbPlanYear(currentYear.text())
@@ -547,9 +548,9 @@ class DisturbPlan(QWidget, yearList_Form):
                                                   self.currentUnitChilddict[self.currentColumn - 5][0])
                     # self.initDisturbPlanSum()
                 else:
-                    QMessageBox.information(self, "提示", "未填写实力数", QMessageBox.Yes)
+                    getMessageBox("提示", "未填写实力数", True, False)
             except ValueError:
-                QMessageBox.information(self, "提示", "请输入数字", QMessageBox.Yes)
+                getMessageBox("提示", "请输入数字",True, False)
                 self.disturbResult.item(self.currentRow, self.currentColumn).setText("")
 
         # 备注
@@ -662,9 +663,9 @@ class DisturbPlan(QWidget, yearList_Form):
     def slotOutputToExcel(self):
         self.disturbPlanList = {}
         if self.disturbResult.rowCount() <= 0:
-            reply = QMessageBox.warning(self, '警告', '未选中任何数据，无法导出', QMessageBox.Yes)
+            getMessageBox('警告', '未选中任何数据，无法导出',True, False)
             return
-        reply = QMessageBox.question(self, '修改导出Excel', '是否保存修改并导出Excel？', QMessageBox.Cancel, QMessageBox.Yes)
+        reply = getMessageBox('修改导出Excel', '是否保存修改并导出Excel？',True, True)
         if reply == QMessageBox.Cancel:
             self._initDisturbPlanByUnitListAndEquipList()
             return
@@ -779,22 +780,22 @@ class DisturbPlan(QWidget, yearList_Form):
                 workBook.save(pathName)
                 import win32api
                 win32api.ShellExecute(0, 'open', pathName, '', '', 1)
-                QMessageBox.about(self, "导出成功", "导出成功！")
+                getMessageBox("导出成功", "导出成功！", True, False)
                 return
             except Exception as e:
-                QMessageBox.about(self, "导出失败", "导出表格被占用，请关闭正在使用的Execl！")
+                getMessageBox("导出失败", "导出表格被占用，请关闭正在使用的Execl！", True, False)
                 return
         else:
-            QMessageBox.about(self, "选取文件夹失败！", "请选择正确的文件夹！")
+            getMessageBox("选取文件夹失败！", "请选择正确的文件夹！", True, False)
 
 
     # 导出分配调整计划数据
     def slotOutputData(self):
         self.disturbPlanList = {}
         if self.disturbResult.rowCount() <= 0:
-            reply = QMessageBox.warning(self, '警告', '未选中任何数据，无法导出', QMessageBox.Yes)
+            getMessageBox('警告', '未选中任何数据，无法导出',True, False)
             return
-        reply = QMessageBox.question(self, '导出数据包', '是否导出数据包？', QMessageBox.Cancel, QMessageBox.Yes)
+        reply = getMessageBox('导出数据包', '是否导出数据包？', True, True)
         if reply == QMessageBox.Cancel:
             self._initDisturbPlanByUnitListAndEquipList()
             return
@@ -823,9 +824,9 @@ class DisturbPlan(QWidget, yearList_Form):
                 pathName = "%s/%s分配调整计划.nms" % (directoryPath, installData)
                 with open(pathName, "wb") as file:
                     pickle.dump(self.disturbPlanList, file)
-                QMessageBox.about(self, "导出成功", "导出成功！")
+                getMessageBox("导出成功", "导出成功！", True, False)
         else:
-            QMessageBox.warning(self, "导出数据失败！", "请选择正确的文件夹！", QMessageBox.Yes)
+            getMessageBox("导出数据失败！", "请选择正确的文件夹！", True, False)
 
 
 
@@ -843,7 +844,7 @@ class DisturbPlan(QWidget, yearList_Form):
                     raise Exception("数据格式错误！")
         except Exception as e:
             print(e)
-            QMessageBox.warning(self, "加载文件失败！", "请检查文件格式及内容格式！", QMessageBox.Yes)
+            getMessageBox("加载文件失败！", "请检查文件格式及内容格式！", True, False)
             return
         print("导入数据self.inputDict", self.inputDict)
         self.showInputResult = showInputResult(self)
@@ -907,6 +908,6 @@ class DisturbPlan(QWidget, yearList_Form):
                                                              self.inputDict["unitFlag"])
             except Exception as e:
                 print(e)
-                QMessageBox.warning(self, "导入失败", "导入第%d数据失败！" % (i), QMessageBox.Yes)
+                getMessageBox("导入失败", "导入第%d数据失败！" % (i), True, False)
         self.showInputResult.hide()
         self.setDisabled(False)

@@ -21,6 +21,7 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
         self.infoDict = {}
         self.init()
         self.shutdown = True
+        self.deleteSilence = False
 
     result = []
     contactNo = ''
@@ -744,6 +745,9 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
         if self.tw_result.rowCount() <= 3 + len(self.result):
             rowCount = self.tw_result.rowCount()
             self.currentLastRow = rowCount
+            print("rowCount: ", rowCount)
+            print("3 + result: ", 3 + len(self.result))
+            print(self.result)
             self.tw_result.insertRow(rowCount)
 
             if (rowCount + 1 == 4):
@@ -757,9 +761,7 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
                 item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
                 item.setFlags(Qt.ItemIsEnabled)
                 self.tw_result.setItem(rowCount, 0, item)
-
             bureauNames = getBureauNamesFromAgentRoom()
-
             item = QComboBox()
             item.setEditable(False)
             itemElement = []
@@ -793,7 +795,6 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
             item.addItems(contractNos)
             self.tw_result.setCellWidget(rowCount, 4, item)
             item.activated.connect(self.contactNoChange)
-
             allocationUnit = []
             if len(contractNos) > 0:
                 allocationUnit = getAllocationByContractNo(contractNos[0])
@@ -804,28 +805,23 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
             item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             item.setFlags(Qt.ItemIsEnabled)
             self.tw_result.setItem(rowCount, 13, item)
-
             contractInfo = []
             if len(contractNos) > 0:
                 contractInfo = getContractMaintenanceInfoByNo(contractNos[0])
             self.setContractInfo(contractInfo, rowCount)
-
             item = QTableWidgetItem('')
             item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             item.setFlags(Qt.ItemIsEnabled)
             self.tw_result.setItem(rowCount, 25, item)
-
             item = QComboBox()
             item.setEditable(False)
             item.addItems(['否', '是'])
             self.tw_result.setCellWidget(rowCount, 27, item)
-
             # 开具调拨单
             item = QPushButton()
             item.setText('开具调拨单')
             self.tw_result.setCellWidget(rowCount, 28, item)
             item.clicked.connect(self.formDialOrder)
-
             item = QComboBox()
             item.setEditable(False)
             item.addItems(['否', '是'])
@@ -866,6 +862,9 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
     @pyqtSlot()
     def slotDelete(self):
         self.tb_del.disconnect()
+        if self.deleteSilence == True:
+            return
+        self.deleteSilence = True
         rowCount = self.tw_result.currentRow()
         if self.result == None:
             resultCount = 0
@@ -879,10 +878,14 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
             if reply == QMessageBox.Yes:
                 deleteDataByContractSignId(self.result[rowCount - 3][0])
                 self.tw_result.removeRow(rowCount)
+                self.displayData()
             else:
+                self.deleteSilence = False
+                self.tb_del.clicked.connect(self.slotDelete)
                 return
         else:
             self.tw_result.removeRow(rowCount)
+        self.deleteSilence = False
         self.tb_del.clicked.connect(self.slotDelete)
 
 

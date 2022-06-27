@@ -1,4 +1,5 @@
 from database.SD_EquipmentBanlanceSql import deleteByYear
+from sysManage.component import getMessageBox, getIntInputDialog
 from widgets.strengthDisturb.stren_inquiry import Widget_Stren_Inquiry
 from PyQt5.QtWidgets import QWidget, QTreeWidgetItemIterator, QTreeWidgetItem, QMessageBox, \
     QCheckBox, QListWidgetItem, QInputDialog, QHeaderView, QAbstractItemView
@@ -210,13 +211,13 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
             return
         else:
             currentYear = self.lw_chooseYear.currentItem().text()
-            reply = QMessageBox.question(self, '删除', '是否删除当前年份以及当前年份下所有数据？', QMessageBox.Yes, QMessageBox.Cancel)
-            if reply == QMessageBox.Yes:
+            reply = getMessageBox('删除', '是否删除当前年份以及当前年份下所有数据？', True, True )
+            if reply == QMessageBox.Ok:
                 delSuccess = delStrengthYearByYear(currentYear)
                 if delSuccess != True:
-                    reply = QMessageBox.information(self, '删除', str(delSuccess) + ',删除失败', QMessageBox.Yes)
+                    getMessageBox(self, '删除', str(delSuccess) + ',删除失败', True, False)
                     return
-                QMessageBox.information(self, '删除', '删除成功', QMessageBox.Yes)
+                getMessageBox('删除', '删除成功', True, False)
                 self.initSelectYear()
             else:
                 return
@@ -224,18 +225,18 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
 
     def slotAddNewYear(self):
         year = 0
-        year, ok = QInputDialog.getInt(self, "Get year", "year:", 0, 0, 100000, 1)
+        ok, year = getIntInputDialog("新增年份", "年份:", 0, 100000, 1, True, True)
         if ok:
             allyearInfo = selectAllStrengthYear()
             if isHaveStrengthYear(str(year)):
-                QMessageBox.information(self, "新增", "该年份已经存在，拒绝添加！", QMessageBox.Yes)
+                getMessageBox("新增", "该年份已经存在，拒绝添加！", True, False)
                 return
             else:
                 insertSuccess = insertIntoStrengthYear(year)
                 if insertSuccess == True:
-                    QMessageBox.information(self, "新增", "新增成功！", QMessageBox.Yes)
+                    getMessageBox( "新增", "新增成功！", True, False)
                 else:
-                    QMessageBox.information(self, "新增", str(insertSuccess) + ",新增失败！", QMessageBox.Yes)
+                    getMessageBox("新增", str(insertSuccess) + ",新增失败！", True, False)
                 self.initSelectYear()
 
     # 信号与槽连接的断开
@@ -278,14 +279,14 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
                 ID = self.add_strenth_info.tableWidget.item(i + orginRowNum, 0).text()
                 haveID = selectIDWhetherExitFromInputInfo(Equip_ID, Unit_ID, self.currentYear, ID)
                 if ID == "":
-                    QMessageBox.information(self, "增加", "第 " + str(currentRowNum) + " 添加失败，批次号不能为空", QMessageBox.Yes)
+                    getMessageBox("增加", "第 " + str(currentRowNum) + " 添加失败，批次号不能为空", True, False)
                     continue
                 if haveID:
-                    QMessageBox.information(self, "增加", "第 " + str(currentRowNum) + " 添加失败，批次号重复", QMessageBox.Yes)
+                    getMessageBox("增加", "第 " + str(currentRowNum) + " 添加失败，批次号重复", True, False)
 
                     continue
                 if num == "":
-                    QMessageBox.information(self, "增加", "第 " + str(currentRowNum) + " 添加失败，数量不能为空", QMessageBox.Yes)
+                    getMessageBox("增加", "第 " + str(currentRowNum) + " 添加失败，数量不能为空", True, False)
 
                     continue
                 factory = self.add_strenth_info.tableWidget.cellWidget(i + orginRowNum, 3).currentText()
@@ -304,7 +305,7 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
                                         other,
                                         self.currentYear)
                 if addSuccess != True:
-                    QMessageBox.information(self, "增加", "第 " + currentRowNum + " 添加失败，由于:" + addSuccess, QMessageBox.Yes)
+                    getMessageBox("增加", "第 " + currentRowNum + " 添加失败，由于:" + addSuccess, True)
 
                     continue
             self.sw_strenSelectMan.setCurrentIndex(0)
@@ -317,11 +318,11 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
                 ID = self.add_strenth_info.tableWidget.item(i + orginRowNum, 0).text()
                 haveID = selectIDWhetherExitFromInputInfo(Equip_ID, Unit_ID, self.currentYear, ID)
                 if ID == "":
-                    QMessageBox.information(self, "增加", "第 " + str(i + orginRowNum) + " 添加失败，批次号不能为空", QMessageBox.Yes)
+                    getMessageBox("增加", "第 " + str(i + orginRowNum) + " 添加失败，批次号不能为空", True, False)
 
                     continue
                 if haveID:
-                    QMessageBox.information(self, "增加", "第 " + str(i + orginRowNum) + " 添加失败，批次号重复", QMessageBox.Yes)
+                    getMessageBox("增加", "第 " + str(i + orginRowNum) + " 添加失败，批次号重复", True, False)
 
                     continue
                 factory = self.add_strenth_info.tableWidget.cellWidget(i + orginRowNum, 2).currentText()
@@ -340,8 +341,8 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
                                                   other,
                                                   self.currentYear)
                 if addSuccess != True:
-                    QMessageBox.information(self, "增加", "第 " + currentRowNum + " 添加失败，由于:" + addSuccess,
-                                            QMessageBox.Yes)
+
+                    getMessageBox("增加", "第 " + currentRowNum + " 添加失败，由于:" + addSuccess, True, False)
                     haveError = True
                     continue
             self.sw_strenSelectMan.setCurrentIndex(0)
@@ -354,9 +355,9 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
             录入界面的返回按钮
     '''
     def slotAddWidgetReturn(self):
-        reply = QMessageBox.question(self, '返回', '是否不保存直接返回？', QMessageBox.Yes,
-                                     QMessageBox.Cancel)
-        if reply == QMessageBox.Yes:
+        reply = getMessageBox('返回', '是否不保存直接返回?', True, True)
+
+        if reply == QMessageBox.Ok:
             self.sw_strenSelectMan.setCurrentIndex(0)
             self.groupBox.setDisabled(False)
             self.groupBox_2.setDisabled(False)
@@ -380,12 +381,12 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
                     equipHaveChild = selectEquipIsHaveChild(resultRowInfo[0])
                     equipInfo = selectEquipInfoByEquipID(resultRowInfo[0])
                     if unitHaveChild or equipHaveChild:
-                        reply = QMessageBox.information(self, '录入', '该单位或装备不是末级，无法录入', QMessageBox.Yes)
+                        getMessageBox('录入', '该单位或装备不是末级，无法录入', True, False)
                         return
                     if equipInfo:
                         print("--------", equipInfo)
                         if equipInfo[0][3] == "空":
-                            reply = QMessageBox.information(self, '录入', '请设置该装备录入类型，无法录入', QMessageBox.Yes)
+                            getMessageBox('录入', '请设置该装备录入类型，无法录入', True, False)
                             return
                         elif equipInfo[0][3] == "逐批录入信息":
                             self.add_strenth_info.isMutilInput = True
@@ -399,7 +400,7 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
                         self.groupBox_2.setDisabled(True)
                         break
                     else:
-                        reply = QMessageBox.information(self, '录入', '请将查看出厂年份修改为全部')
+                        getMessageBox('录入', '请将查看出厂年份修改为全部', True, False)
                         return
 
         else:

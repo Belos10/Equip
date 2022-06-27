@@ -4,6 +4,7 @@ from PyQt5.QtCore import QVariant, QDateTime
 from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, QAbstractItemView, \
     QMessageBox, QListWidgetItem, QInputDialog, QHeaderView, QFileDialog
 
+from sysManage.component import getMessageBox
 from sysManage.showInputResult import showInputResult
 from utills.utillsComponent import CheckableComboBox
 from widgets.strengthDisturb.retirement import Widget_Retirement
@@ -96,20 +97,12 @@ class retirement(QWidget, Widget_Retirement):
 
     def slotDelYear(self):
         currentRow = self.lw_year.currentRow()
-        # if currentRow == 0:
-        #     reply = QMessageBox.question(self, '删除', '是否删除所有年份以及年份下所有数据？', QMessageBox.Yes, QMessageBox.Cancel)
-        #     if reply == QMessageBox.Cancel:
-        #         return
-        #     else:
-        #         delRetireYearALLYear()
-        #         self._initAll_()
-        #         return
         if currentRow < 0:
-            reply = QMessageBox.question(self, '删除', '请选中某年进行删除', QMessageBox.Yes)
+            reply = getMessageBox('删除', '请选中某年进行删除', True, False)
         else:
             currentYear = self.lw_year.currentItem().text()
-            reply = QMessageBox.question(self, '删除', '是否删除当前年份以及当前年份下所有数据？', QMessageBox.Yes, QMessageBox.Cancel)
-            if reply == QMessageBox.Yes:
+            reply = getMessageBox('删除', '是否删除当前年份以及当前年份下所有数据？', True, False)
+            if reply == QMessageBox.Ok:
                 delRetireYearByYear(currentYear)
                 # self._initSelectYear_()
                 self._initAll_()
@@ -127,7 +120,7 @@ class retirement(QWidget, Widget_Retirement):
                     haveYear = True
                     break
             if haveYear:
-                reply = QMessageBox.information(self, "新增", "年份已存在，新增失败", QMessageBox.Yes)
+                getMessageBox("新增", "年份已存在，新增失败", True, False)
                 return
             insertIntoRetireYear(year)
             self._initSelectYear_()
@@ -540,7 +533,7 @@ class retirement(QWidget, Widget_Retirement):
 
     def slotSaveRetire(self):
         item = self.tw_result.currentItem()
-        reply = QMessageBox.question(self, '修改', '是否保存修改？', QMessageBox.Cancel, QMessageBox.Yes)
+        reply = getMessageBox('修改', '是否保存修改？', True, True)
         if reply == QMessageBox.Cancel:
             self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList,
                                                         self.currentYear)
@@ -552,7 +545,7 @@ class retirement(QWidget, Widget_Retirement):
                 apply = self.tw_result.item(i + 2, 8).text()
                 other = self.tw_result.item(i + 2, 9).text()
                 updateRetireAboutRetire(num, apply, other, result)
-        reply = QMessageBox.question(self, '修改', '修改成功', QMessageBox.Yes)
+        reply = getMessageBox('修改', '修改成功', True, False)
         self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList,
                                                    self.currentYear)
         return
@@ -567,7 +560,7 @@ class retirement(QWidget, Widget_Retirement):
                 if input.isdigit() == True:
                     return
                 else:
-                    reply = QMessageBox.question(self, '警告', '请输入正确的数字！', QMessageBox.Yes)
+                    getMessageBox('警告', '请输入正确的数字！', True, False)
                     self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList,
                                                                 self.currentCheckedEquipList,
                                                                 self.currentYear)
@@ -609,9 +602,9 @@ class retirement(QWidget, Widget_Retirement):
     #导出到Excel表格
     def slotOutputToExcel(self):
         if len(self.resultList) < 1:
-            reply = QMessageBox.warning(self, '警告', '未选中任何数据，无法导出', QMessageBox.Yes)
+            getMessageBox('警告', '未选中任何数据，无法导出',True, False)
             return
-        reply = QMessageBox.question(self, '修改导出Excel', '是否保存修改并导出Excel？', QMessageBox.Cancel, QMessageBox.Yes)
+        reply = getMessageBox(self, '修改导出Excel', '是否保存修改并导出Excel？', True, True)
         if reply == QMessageBox.Cancel:
             self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList,
                                                         self.currentYear)
@@ -731,20 +724,20 @@ class retirement(QWidget, Widget_Retirement):
                 workBook.save(pathName)
                 import win32api
                 win32api.ShellExecute(0, 'open', pathName, '', '', 1)
-                QMessageBox.about(self, "导出成功", "导出成功！")
+                getMessageBox("导出成功", "导出成功！", True, False)
                 return
             except Exception as e:
-                QMessageBox.about(self, "导出失败", "导出表格被占用，请关闭正在使用的Execl！")
+                getMessageBox("导出失败", "导出表格被占用，请关闭正在使用的Execl！", True, False)
                 return
         else:
-            QMessageBox.about(self, "选取文件夹失败！", "请选择正确的文件夹！")
+            getMessageBox("选取文件夹失败！", "请选择正确的文件夹！", True, False)
 
     #导出数据包
     def slotOutputData(self):
         if len(self.resultList) < 1:
-            reply = QMessageBox.warning(self, '警告', '未选中任何数据，无法导出', QMessageBox.Yes)
+            reply = getMessageBox('警告', '未选中任何数据，无法导出', True, False)
             return
-        reply = QMessageBox.question(self, '导出数据包', '是否保存修改并导出数据包？', QMessageBox.Cancel, QMessageBox.Yes)
+        reply = getMessageBox('导出数据包', '是否保存修改并导出数据包？', True, True)
         if reply == QMessageBox.Cancel:
             self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList,
                                                         self.currentYear)
@@ -773,10 +766,10 @@ class retirement(QWidget, Widget_Retirement):
                 pathName = "%s/%s%s年%s装备补充及退役需求表.nms" % (directoryPath,installData,self.year, selectUnitNameByUnitID(self.currentCheckedUnitList[0]))
                 with open(pathName, "wb") as file:
                     pickle.dump(dataList, file)
-                QMessageBox.warning(self, "导出数据成功！", "导出成功！", QMessageBox.Yes)
+                getMessageBox("导出数据成功！", "导出成功！",True, False)
             pass
         else:
-            QMessageBox.warning(self, "导出数据失败！", "请选择正确的文件夹！", QMessageBox.Yes)
+            getMessageBox("导出数据失败！", "请选择正确的文件夹！", True, False)
         pass
 
     #导入数据包
@@ -792,7 +785,7 @@ class retirement(QWidget, Widget_Retirement):
                     raise Exception("数据格式错误！")
         except Exception as e:
             print(e)
-            QMessageBox.warning(self, "加载文件失败！", "请检查文件格式及内容格式！", QMessageBox.Yes)
+            getMessageBox("加载文件失败！", "请检查文件格式及内容格式！", True, False)
             return
         headerlist = ['装备名称', '实力数', '编制数', '拟退役数', '现有数', '超缺编数', '申请需求', '提前退役', '备注']
         self.showInputResult.setWindowTitle("导入数据")
@@ -851,7 +844,7 @@ class retirement(QWidget, Widget_Retirement):
                    pass
             except Exception as e:
                 print(e)
-                QMessageBox.warning(self, "导入失败", "导入第%d数据失败！" % (i), QMessageBox.Yes)
+                getMessageBox("导入失败", "导入第%d数据失败！" % (i), True, False)
 
         self.showInputResult.hide()
         self.setDisabled(False)

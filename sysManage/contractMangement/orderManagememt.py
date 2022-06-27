@@ -3,12 +3,13 @@ import pickle
 from PyQt5.QtCore import Qt, QStringListModel, QDate, QDateTime
 
 from database.contractManagementSql import *
+from sysManage.component import getMessageBox, getIntInputDialog
 from sysManage.showInputResult import showInputResult
 from sysManage.userInfo import get_value
 from widgets.contractMangement.OrderManagementUI import OrderManagementUI
 import sys
 from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QTableWidget, QHeaderView, QTableWidgetItem, QComboBox, \
-    QMessageBox, QFileDialog, QListWidgetItem, QListView, QInputDialog, QDateEdit, QAbstractItemView
+    QMessageBox, QFileDialog, QListWidgetItem, QListView, QInputDialog, QDateEdit, QAbstractItemView, QPushButton
 
 
 class OrderManagement(QWidget, OrderManagementUI):
@@ -84,17 +85,21 @@ class OrderManagement(QWidget, OrderManagementUI):
     '''
     def soltAddContractYear(self):
         year = 0
-        year, ok = QInputDialog.getInt(self, "Get year", "year:", 0, 0, 100000, 1)
+        ok, year = getIntInputDialog("新增年份", "年份:", 0, 100000, 1, True, True)
+        # year, ok = QInputDialog.getInt(self, "新增年份", "年份:", 0, 0, 100000, 1)
         if ok:
             if isHaveContractOrderYear(str(year)):
-                QMessageBox.information(self, "新增", "该年份已经存在，拒绝添加！", QMessageBox.Yes)
+                getMessageBox("新增", "该年份已经存在，拒绝添加！", True, False)
+                # QMessageBox.information(self, "新增", "该年份已经存在，拒绝添加！", QMessageBox.Yes)
                 return
             else:
                 insertSuccess = addContractOrderYear(year)
                 if insertSuccess == True:
-                    QMessageBox.information(self, "新增", "新增成功！", QMessageBox.Yes)
+                    getMessageBox("新增", "新增成功", True, False)
+                    # QMessageBox.information(self, "新增", "新增成功！", QMessageBox.Yes)
                 else:
-                    QMessageBox.information(self, "新增", "新增失败！", QMessageBox.Yes)
+                    getMessageBox("新增", "新增失败", True, False)
+                    # QMessageBox.information(self, "新增", "新增失败！", QMessageBox.Yes)
                 self.init()
 
 
@@ -297,12 +302,14 @@ class OrderManagement(QWidget, OrderManagementUI):
                         try:
                              count = int(item1.text())
                         except ValueError:
-                            QMessageBox.warning(self, "注意", "请输入整数！", QMessageBox.Yes, QMessageBox.Yes)
+                            getMessageBox("注意", "请输入整数！", True, False)
+                            # QMessageBox.warning(self, "注意", "请输入整数！", QMessageBox.Yes, QMessageBox.Yes)
                             item1.setText('')
                         try:
                             unit = float(item0.text())
                         except:
-                            QMessageBox.warning(self, "注意", "请输入正确的数字！", QMessageBox.Yes, QMessageBox.Yes)
+                            getMessageBox("注意", "请输入正确的数字！", True, False)
+                            # QMessageBox.warning(self, "注意", "请输入正确的数字！", QMessageBox.Yes, QMessageBox.Yes)
                             item0.setText('')
                         amount = round(count * unit, 4)
                         item = self.tw_result.item(currentRow,8)
@@ -345,9 +352,11 @@ class OrderManagement(QWidget, OrderManagementUI):
                     break
         if len(rowData) == self.tw_result.columnCount() - 1:
             if(insertOneDataInToContractOrder(rowData) == True):
-                QMessageBox.warning(self, "注意", "插入成功！", QMessageBox.Yes, QMessageBox.Yes)
+                getMessageBox("注意", "插入成功！", True, False)
+                # QMessageBox.warning(self, "注意", "插入成功！", QMessageBox.Yes, QMessageBox.Yes)
             else:
-                QMessageBox.warning(self, "警告", "插入失败！", QMessageBox.Yes, QMessageBox.Yes)
+                getMessageBox("警告", "插入失败！", True, False)
+                # QMessageBox.warning(self, "警告", "插入失败！", QMessageBox.Yes, QMessageBox.Yes)
             self.displayData()
 
     def alterRowData(self, row):
@@ -373,9 +382,11 @@ class OrderManagement(QWidget, OrderManagementUI):
                     break
         if len(rowData) == self.tw_result.columnCount() - 1:
             if (updataOneDataToContractOrder(rowData) == True):
-                QMessageBox.warning(self, "注意", "修改成功！", QMessageBox.Yes, QMessageBox.Yes)
+                getMessageBox("注意", "修改成功！", True, False)
+                # QMessageBox.warning(self, "注意", "修改成功！", QMessageBox.Yes, QMessageBox.Yes)
             else:
-                QMessageBox.warning(self, "警告", "修改失败！", QMessageBox.Yes, QMessageBox.Yes)
+                getMessageBox("警告", "插入成功！", True, False)
+                # QMessageBox.warning(self, "警告", "修改失败！", QMessageBox.Yes, QMessageBox.Yes)
             self.displayData()
 
 
@@ -417,17 +428,20 @@ class OrderManagement(QWidget, OrderManagementUI):
             self.tw_result.itemChanged.connect(self.slotAlterAndSava)
 
         else:
-            QMessageBox.warning(self, "注意", "请先将数据补充完整！", QMessageBox.Yes, QMessageBox.Yes)
+            messageBox = getMessageBox("注意", "请先将数据补充完整！", True, False)
+            # QMessageBox.warning(self, "注意", "请先将数据补充完整！", QMessageBox.Yes, QMessageBox.Yes)
 
     def slotDelete(self):
 
         rowCount = self.tw_result.currentRow()
         resultCount = len(self.result)
         if rowCount < 2:
-            QMessageBox.warning(self, "注意", "请选中有效单元格！", QMessageBox.Yes, QMessageBox.Yes)
+            messageBox = getMessageBox("注意", "请选中有效单元格！", True, False)
+            # QMessageBox.warning(self, "注意", "请选中有效单元格！", QMessageBox.Yes, QMessageBox.Yes)
         elif rowCount >= 2 and rowCount < 2 + resultCount:
-            reply = QMessageBox.question(self, '警告', '是否删除该行数据？', QMessageBox.Cancel, QMessageBox.Yes)
-            if reply == QMessageBox.Yes:
+            # reply = QMessageBox.question(self, '警告', '是否删除该行数据？', QMessageBox.Cancel, QMessageBox.Yes)
+            reply  = getMessageBox("警告", "是否删除该行数据？", True, True)
+            if reply == QMessageBox.Ok:
                 deleteDataByContractOrderIdAndYear(self.result[rowCount - 2][0],self.selectedYear)
                 self.tw_result.removeRow(rowCount)
             else:
@@ -439,9 +453,12 @@ class OrderManagement(QWidget, OrderManagementUI):
     #导出至Excel
     def slotOutputToExcel(self):
         if len(self.result) < 1:
-            reply = QMessageBox.warning(self, '警告', '未选中任何数据，无法导出', QMessageBox.Yes)
+            getMessageBox("警告", "未选中任何数据，无法导出！", True, False)
+            # QMessageBox.warning(self, '警告', '未选中任何数据，无法导出', QMessageBox.Yes)
             return
-        reply = QMessageBox.question(self, '修改导出Excel', '是否保存修改并导出Excel？', QMessageBox.Cancel, QMessageBox.Yes)
+
+        # reply = QMessageBox.question(self, '修改导出Excel', '是否保存修改并导出Excel？', QMessageBox.Cancel, QMessageBox.Yes)
+        reply = getMessageBox("修改导出Excel", "是否保存修改并导出Excel？", True, True)
         if reply == QMessageBox.Cancel:
             self.displayData()
             return
@@ -521,10 +538,12 @@ class OrderManagement(QWidget, OrderManagementUI):
                 workBook.save(pathName)
                 import win32api
                 win32api.ShellExecute(0, 'open', pathName, '', '', 1)
-                QMessageBox.about(self, "导出成功", "导出成功！")
+                getMessageBox("导出成功", "导出成功！", True, False)
+                # QMessageBox.about(self, "导出成功", "导出成功！")
                 return
             except Exception as e:
-                QMessageBox.about(self, "导出失败", "导出表格被占用，请关闭正在使用的Execl！")
+                getMessageBox("导出失败", "导出表格被占用，请关闭正在使用的Execl！", True, False)
+                # QMessageBox.about(self, "导出失败", "导出表格被占用，请关闭正在使用的Execl！")
                 return
 
         pass
@@ -533,9 +552,11 @@ class OrderManagement(QWidget, OrderManagementUI):
 
     def slotOutputData(self):
         if len(self.result) < 1:
-            reply = QMessageBox.warning(self, '警告', '未选中任何数据，无法导出', QMessageBox.Yes)
+            reply = getMessageBox("警告", "未选中任何数据！", True, False)
+            # reply = QMessageBox.warning(self, '警告', '未选中任何数据，无法导出', QMessageBox.Yes)
             return
-        reply = QMessageBox.question(self, '导出数据包', '是否保存修改并导出数据包？', QMessageBox.Cancel, QMessageBox.Yes)
+        reply = getMessageBox("导出数据包", "是否保存修改并导出数据包？", True, True)
+        # reply = QMessageBox.question(self, '导出数据包', '是否保存修改并导出数据包？', QMessageBox.Cancel, QMessageBox.Yes)
         if reply == QMessageBox.Cancel:
             self.displayData()
             return
@@ -555,10 +576,11 @@ class OrderManagement(QWidget, OrderManagementUI):
                 directoryPath, installData, self.selectedYear)
                 with open(pathName, "wb") as file:
                     pickle.dump(dataList, file)
-                QMessageBox.warning(self, "导出数据成功！", "导出成功！", QMessageBox.Yes)
+                getMessageBox("导出成功", "导出数据成功！", True, False)
+                # QMessageBox.warning(self, "导出数据成功！", "导出成功！", QMessageBox.Yes)
             pass
         else:
-            QMessageBox.warning(self, "导出数据失败！", "请选择正确的文件夹！", QMessageBox.Yes)
+            getMessageBox("导出数据失败！", "请选择正确的文件夹！", True, False)
         pass
 
         # 导入数据包
@@ -574,7 +596,7 @@ class OrderManagement(QWidget, OrderManagementUI):
                     raise Exception("数据格式错误！")
         except Exception as e:
             print(e)
-            QMessageBox.warning(self, "加载文件失败！", "请检查文件格式及内容格式！", QMessageBox.Yes)
+            getMessageBox("加载文件失败！", "请检查文件格式及内容格式！", True, False)
             return
         headerlist = ['年度', '序号', '合同编号', '合同名称', '甲方', '乙方', '单价（万元）', '数量/单位', '金额（万元）', '交付时间', '备注']
         self.showInputResult.setWindowTitle("导入数据")
@@ -583,8 +605,6 @@ class OrderManagement(QWidget, OrderManagementUI):
         self.showInputResult.tw_result.setColumnCount(len(headerlist))
         self.showInputResult.tw_result.setHorizontalHeaderLabels(headerlist)
         self.showInputResult.tw_result.setRowCount(len(self.inputList) - 1)
-
-
         for i, LineInfo in enumerate(self.inputList):
             if i == 0:
                 continue
@@ -620,6 +640,9 @@ class OrderManagement(QWidget, OrderManagementUI):
             item = QTableWidgetItem(LineInfo[10])
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.showInputResult.tw_result.setItem(i, 9, item)
+            item = QTableWidgetItem(LineInfo[-1])
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.showInputResult.tw_result.setItem(i, 10, item)
 
     def slotCancelInputIntoDatabase(self):
         self.showInputResult.hide()
@@ -634,7 +657,7 @@ class OrderManagement(QWidget, OrderManagementUI):
                     pass
             except Exception as e:
                 print(e)
-                QMessageBox.warning(self, "导入失败", "导入第%d数据失败！" % (i), QMessageBox.Yes)
+                getMessageBox("导入失败", "导入第%d数据失败！" % (i), True, False)
 
         self.showInputResult.hide()
         self.setDisabled(False)

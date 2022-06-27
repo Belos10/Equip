@@ -216,14 +216,13 @@ def insertContentOfMaterialManagement(data):
           "', '" + data[4] + "', '" + data[5] + "', '" + data[6] + "', '" + data[7] + "', '" \
           + data[8] + "', '" + data[9] + "', '" + data[10] + "', '" + data[11] + "')"
     # print(sql)
-    executeCommit(sql)
+    return executeCommit(sql)
 
 def updateContentOfMaterialManagement(data):
     sql = "update materialManagement set VoucherNumber = '" + data[1] + "', AssetName = '" + data[2] + "', ContractNumber = '" + data[3] + "', SettlementTime = '" + data[4] + "', NumberOfContracts = '" + data[5] + "', ContractUnitPrice = '" + data[6] + "', ContractAmount = '" + data[7] + "', FinancialValuationAccountingQuantity = '" + data[8] + "', FinancialValuationAccountingPrice = '" + data[9] + "', other = '" + data[10] + "',  AllocationSituation = '" + data[11] + "' where Number = '" + data[0] + "'"
     # print(sql)
-    cur.execute(sql)
-    conn.commit()
+    return executeCommit(sql)
 
 def deleteDataByMaterialManagementNum(MaterialManagementNum):
     sql = "delete from MaterialManagement where Number ='%s'" % MaterialManagementNum
-    executeCommit(sql)
+    return executeCommit(sql)

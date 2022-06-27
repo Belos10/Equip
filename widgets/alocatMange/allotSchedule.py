@@ -162,6 +162,8 @@ class widget_AllotSchedule(object):
         self.horizontalLayout_8.addLayout(self.verticalLayout_4)
 
         self.retranslateUi(Form)
+        self.tw_first.setMinimumSize(300, 500)
+        self.tw_second.setMinimumSize(300, 500)
         QtCore.QMetaObject.connectSlotsByName(Form)
 
     def retranslateUi(self, Form):

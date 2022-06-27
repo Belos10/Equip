@@ -2,6 +2,7 @@ import sys
 from PyQt5.QtWidgets import *
 #new
 from database.SD_EquipmentBanlanceSql import updateOneEquipmentBalanceData
+from sysManage.component import getMessageBox
 from widgets.alocatMange.allotSchedule import widget_AllotSchedule
 from database.strengthDisturbSql import *
 from PyQt5.Qt import Qt
@@ -666,10 +667,10 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         if currentColumn - 1 < 0:
             return
         if self.disturbResult.cellWidget(currentRow, currentColumn - 1).text() == "设置进度":
-            QMessageBox.information(self, "设置接装条件", "上一级未完成", QMessageBox.Yes)
+            getMessageBox("设置接装条件", "上一级未完成", True, False)
             return
-        reply = QMessageBox.question(self,"设置接装条件","是否具备接装条件？",QMessageBox.Yes,QMessageBox.Cancel)
-        if reply==QMessageBox.Yes:
+        reply = getMessageBox("设置接装条件","是否具备接装条件？", True, True)
+        if reply==QMessageBox.Ok:
             item = QPushButton("已完成")
             self.disturbResult.setCellWidget(currentRow, 6 + self.lenCurrentUnitChilddict, item)
             if self.unitFlag == 1:
@@ -687,7 +688,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
             return
         if self.unitFlag == 1:
             if self.disturbResult.cellWidget(row, column - 1).text() != "已完成":
-                QMessageBox.information(self, "设置接装条件", "上一级未完成", QMessageBox.Yes)
+                getMessageBox("设置接装条件", "上一级未完成", True, False)
                 return
         currentUnit=[]
         for i in self.currentUnitChilddict.values():
@@ -733,7 +734,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
             return
         if self.unitFlag == 1:
             if self.disturbResult.cellWidget(row, currentColumn - 1).text() != "已完成":
-                QMessageBox.information(self, "设置接装条件", "上一级未完成", QMessageBox.Yes)
+                getMessageBox("设置接装条件", "上一级未完成", True, False)
                 return
         currentUnit = []
         for i in self.currentUnitChilddict.values():
@@ -772,7 +773,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         if currentColumn - 1 < 0:
             return
         if self.disturbResult.cellWidget(currentRow, currentColumn - 1).text() != "已完成":
-            QMessageBox.information(self, "设置接装条件", "上一级未完成", QMessageBox.Yes)
+            getMessageBox("设置接装条件", "上一级未完成",True, False)
             return
         # self.scheduleFinish.setWindowFlags(Qt.Dialog|Qt.WindowCloseButtonHint)
         self.scheduleFinish.fileName = ""

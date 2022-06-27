@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets, Qt
 class Widget_Strength_Disturb_Set(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(982, 659)
+        MainWindow.resize(800, 800)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)

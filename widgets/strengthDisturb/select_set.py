@@ -50,6 +50,7 @@ class Widget_Select_Set(object):
         self.verticalLayout_3.addLayout(self.horizontalLayout_2)
 
         self.retranslateUi(Form)
+
         QtCore.QMetaObject.connectSlotsByName(Form)
 
     def retranslateUi(self, Form):

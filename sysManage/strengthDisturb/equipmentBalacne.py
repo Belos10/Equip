@@ -3,6 +3,7 @@ from PyQt5.QtCore import QVariant
 from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, QAbstractItemView, \
     QMessageBox, QListWidgetItem, QInputDialog, QHeaderView, QFileDialog
 from database.SD_EquipmentBanlanceSql import findYear, getResultByYearAndEquipAndUnit, saveEquipmentBalanceByRow
+from sysManage.component import getMessageBox
 from widgets.strengthDisturb.retirement import Widget_Retirement
 from database.strengthDisturbSql import *
 from PyQt5.Qt import Qt
@@ -512,7 +513,8 @@ class equipmentBalance(QWidget, Widget_Retirement):
 
     def slotSaveEquipmentBalance(self):
         item = self.tw_result.currentItem()
-        reply = QMessageBox.question(self, '修改', '是否保存修改？', QMessageBox.Yes,QMessageBox.Cancel)
+        reply = getMessageBox("修改", "是否保存修改？", True, True)
+        # reply = QMessageBox.question(self, '修改', '是否保存修改？', QMessageBox.Yes,QMessageBox.Cancel)
         if reply == QMessageBox.Cancel:
             self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList,
                                                         self.currentYear)
@@ -924,9 +926,13 @@ class equipmentBalance(QWidget, Widget_Retirement):
     '''
     def slotOutputToExcel(self):
         if len(self.resultList) < 1:
-            reply = QMessageBox.warning(self, '警告', '未选中任何数据，无法导出!', QMessageBox.Yes)
+            getMessageBox("警告", "未选中任何数据，无法导出!", True, False)
+            # reply = QMessageBox.warning(self, '警告', '未选中任何数据，无法导出!', QMessageBox.Yes)
             return
-        reply = QMessageBox.question(self, '修改导出Excel', '是否保存修改并导出Excel？', QMessageBox.Cancel, QMessageBox.Yes)
+        reply = getMessageBox("修改导出Excel", "是否保存修改并导出Excel？", True, True)
+        # print("reply", reply)
+        # reply = QMessageBox.question(self, '修改导出Excel', '是否保存修改并导出Excel？', QMessageBox.Cancel, QMessageBox.Yes)
+        # print("QMessageBox.Cancel", QMessageBox.Cancel)
         if reply == QMessageBox.Cancel:
             self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList,
                                                         self.currentYear)
@@ -946,7 +952,7 @@ class equipmentBalance(QWidget, Widget_Retirement):
                             itemList.append('')
                         else:
                             itemList.append(item.text())
-            saveEquipmentBalanceByRow(itemList, self.currentCheckedUnitList[0], self.currentYear)
+            saveEquipmentBalanceByRow(itemList, self.resultList[row - 4]['equip_balance_id'])
             itemList.clear()
 
         self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList,
@@ -1164,11 +1170,14 @@ class equipmentBalance(QWidget, Widget_Retirement):
                 workBook.save(pathName)
                 import win32api
                 win32api.ShellExecute(0, 'open', pathName, '', '', 1)
-                QMessageBox.about(self, "导出成功", "导出成功！")
+                getMessageBox("导出成功", "导出成功!", True, False)
+                # QMessageBox.about(self, "导出成功", "导出成功！")
                 return
             except Exception as e:
-                QMessageBox.about(self, "导出失败", "导出表格被占用，请关闭正在使用的Execl！")
+                getMessageBox("导出失败！", "导出表格被占用，请关闭正在使用的Execl！", True, False)
+                # QMessageBox.about(self, "导出失败", "导出表格被占用，请关闭正在使用的Execl！")
                 return
         else:
-            QMessageBox.about(self, "选取文件夹失败！", "请选择正确的文件夹！")
+            getMessageBox("选择文件夹失败！", "请选择正确的文件夹！", True, False)
+            # QMessageBox.about(self, "选取文件夹失败！", "请选择正确的文件夹！")
 

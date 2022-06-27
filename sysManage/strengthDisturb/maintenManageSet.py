@@ -1,4 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, QAbstractItemView, QMessageBox,QHeaderView
+
+from sysManage.component import getMessageBox
 from widgets.strengthDisturb.maintenManageSet import Widget_Mainten_Manage_Set
 from database.strengthDisturbSql import *
 from PyQt5.Qt import Qt
@@ -176,7 +178,7 @@ class maintenManageSet(QWidget, Widget_Mainten_Manage_Set):
         if self.tw_unit.item(self.currentRow, 2).text() != self.cb_isGroup.currentText():
             updateSuccess = updateUnitIsGroupFromUnit(self.lb_unitID.text(), self.cb_isGroup.currentText())
             if updateSuccess != True:
-                QMessageBox.information(self, "更新", str(updateSuccess) + '，更新失败', QMessageBox.Yes)
+                getMessageBox("更新", str(updateSuccess) + '，更新失败', True, False)
                 return
             self.first_treeWidget_dict = {}
             self.tw_first.clear()

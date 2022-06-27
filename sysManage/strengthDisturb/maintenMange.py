@@ -1,6 +1,8 @@
 from PyQt5.QtCore import QVariant
 from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, QAbstractItemView, \
     QMessageBox, QListWidgetItem,QInputDialog,QHeaderView,QLineEdit
+
+from sysManage.component import getMessageBox
 from widgets.strengthDisturb.maintenMange import Widget_Mainten_Manage
 from database.strengthDisturbSql import *
 from PyQt5.Qt import Qt
@@ -115,21 +117,21 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
                     unitHaveChild = selectUnitIsHaveChild(resultRowInfo[0])
                     equipHaveChild = selectEquipIsHaveChild(resultRowInfo[1])
                     if isHavePulicEquip(resultRowInfo[0]):
-                        reply = QMessageBox.question(self, '录入', '该单位或装备不是末级，无法修改', QMessageBox.Yes)
+                        getMessageBox('录入', '该单位或装备不是末级，无法修改', True, False)
                         self.tw_result.cellWidget(self.currentRow, 3).setText(str(resultRowInfo[5]))
                         return
                     if unitHaveChild or equipHaveChild:
-                        reply = QMessageBox.question(self, '录入', '该单位或装备不是末级，无法修改', QMessageBox.Yes)
+                        getMessageBox('录入', '该单位或装备不是末级，无法修改', True, False)
                         self.tw_result.cellWidget(self.currentRow, 3).setText(str(resultRowInfo[5]))
                         return
                     else:
                         try:
                             weave = self.tw_result.cellWidget(self.currentRow, 3).text()
-                            reply = QMessageBox.question(self, '修改', '是否修改当前装备、单位的编制数?', QMessageBox.Yes, QMessageBox.Cancel)
-                            if reply == QMessageBox.Yes:
+                            reply = getMessageBox('修改', '是否修改当前装备、单位的编制数?', True, True)
+                            if reply == QMessageBox.Ok:
                                 updataSuccess = updateWeaveNum(resultRowInfo[0], resultRowInfo[1], self.tw_result.cellWidget(self.currentRow, 3).text(), str(resultRowInfo[5]), self.year)
                                 if updataSuccess != True:
-                                    QMessageBox.information(self, "修改", str(updataSuccess) + "修改失败", QMessageBox.Yes)
+                                    getMessageBox(self, "修改", str(updataSuccess) + "修改失败", True, False)
                                     return
 
                                 #updateOneEquipmentBalanceData(self.year, resultRowInfo[0],resultRowInfo[1])
@@ -139,7 +141,7 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
                                 self.tw_result.cellWidget(self.currentRow, 3).setText(str(resultRowInfo[5]))
                                 return
                         except ValueError:
-                            reply = QMessageBox.question(self, '修改', '编制数只能修改为整数?', QMessageBox.Yes)
+                            getMessageBox('修改', '编制数只能修改为整数?', True, False)
                             self.tw_result.cellWidget(self.currentRow, 3).setText(str(resultRowInfo[5]))
                             return
         else:
@@ -149,9 +151,9 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
     #清除当前页面的所有编制数
     def slotClearAllRow(self):
         if self.year == '全部':
-            reply = QMessageBox.question(self, '清除', '只能某一年，清除失败', QMessageBox.Yes)
+            getMessageBox('清除', '只能某一年，清除失败', True, False)
             return
-        reply = QMessageBox.question(self, '清除', '是否清除当前页面所有行的编制数？', QMessageBox.Yes, QMessageBox.Cancel)
+        reply = getMessageBox('清除', '是否清除当前页面所有行的编制数？', True, True)
         if reply == QMessageBox.Cancel:
             return
 
@@ -164,15 +166,15 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
             equipHaveChild = selectEquipIsHaveChild(Equip_ID)
 
             if unitHaveChild or equipHaveChild:
-                reply = QMessageBox.question(self, '清除', '第' + str(i) + "行清除失败，只能清除末级单位和装备编制数", QMessageBox.Yes)
+                getMessageBox('清除', '第' + str(i) + "行清除失败，只能清除末级单位和装备编制数",True, False)
                 continue
             else:
                 updateSuccess = updateWeaveNum(Unit_ID, Equip_ID, year, "0", orginNum)
                 if updateSuccess != True:
-                    QMessageBox.information(self, '清除', '第' + str(i) + "行清除失败, " + str(updateSuccess), QMessageBox.Yes)
+                    getMessageBox('清除', '第' + str(i) + "行清除失败, " + str(updateSuccess), True, False)
                     return
                 updateOneEquipmentBalanceData(year, Equip_ID, Unit_ID)
-                QMessageBox.information(self, '成功', '第' + str(i) + "行清除成功", QMessageBox.Yes)
+                getMessageBox('成功', '第' + str(i) + "行清除成功", True, False)
                 self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
 
     #清除当前行的编制数
@@ -190,13 +192,13 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
                     unitHaveChild = selectUnitIsHaveChild(Unit_ID)
                     equipHaveChild = selectEquipIsHaveChild(Equip_ID)
                     if unitHaveChild or equipHaveChild:
-                        reply = QMessageBox.question(self, '清除', '只能清除末级单位和装备的编制数', QMessageBox.Yes)
+                        getMessageBox('清除', '只能清除末级单位和装备的编制数', True, False)
                         return
                     elif self.year == '全部':
-                        reply = QMessageBox.question(self, '清除', '只能某一年，清除失败', QMessageBox.Yes)
+                        getMessageBox( '清除', '只能某一年，清除失败', True, False)
                         return
                     else:
-                        reply = QMessageBox.question(self, '清除', '是否清除当前行的编制数？', QMessageBox.Yes, QMessageBox.Cancel)
+                        getMessageBox('清除', '是否清除当前行的编制数？', True, True)
                         updateWeaveNum(Unit_ID, Equip_ID, "0", orginNum, year)
                         self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
 

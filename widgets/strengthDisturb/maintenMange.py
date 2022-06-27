@@ -143,6 +143,10 @@ class Widget_Mainten_Manage(object):
         self.gridLayout_2.addWidget(self.tw_result, 1, 0, 1, 1)
         self.gridLayout_3.addWidget(self.groupBox_3, 0, 2, 1, 1)
 
+
+        self.tw_first.setMinimumSize(300, 500)
+        self.tw_second.setMinimumSize(300, 500)
+
         self.retranslateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)
 

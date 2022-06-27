@@ -130,6 +130,7 @@ class widget_adjustOrder(object):
         self.horizontalLayout_2.addLayout(self.verticalLayout_4)
 
         self.retranslateUi(Form)
+        self.tw_equip.setMaximumSize(300, 500)
         QtCore.QMetaObject.connectSlotsByName(Form)
 
     def retranslateUi(self, Form):
