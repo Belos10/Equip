@@ -1,9 +1,10 @@
-from widgets.alocatMange.inputProof import widget_inputProof
-from PyQt5.QtWidgets import QWidget,QDialog
 from PyQt5 import QtCore
 from PyQt5.Qt import Qt
-from PyQt5.QtWidgets import QMessageBox,QPushButton
+from PyQt5.QtWidgets import QDialog
+from PyQt5.QtWidgets import QMessageBox, QPushButton
+
 from database.OrderManageSql import updateOrderPlanProof
+from widgets.alocatMange.inputProof import widget_inputProof
 
 
 class InputProof(QDialog,widget_inputProof):

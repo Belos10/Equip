@@ -10,6 +10,7 @@ from widgets.contractMangement.OrderManagementUI import OrderManagementUI
 import sys
 from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QTableWidget, QHeaderView, QTableWidgetItem, QComboBox, \
     QMessageBox, QFileDialog, QListWidgetItem, QListView, QInputDialog, QPushButton, QDateEdit, QAbstractItemView
+from sysManage.component import getMessageBox
 
 
 class MaintenanceManagement(QWidget, OrderManagementUI):
@@ -90,14 +91,14 @@ class MaintenanceManagement(QWidget, OrderManagementUI):
         year, ok = QInputDialog.getInt(self, "Get year", "year:", 0, 0, 100000, 1)
         if ok:
             if isHaveContractMaintenanceYear(str(year)):
-                QMessageBox.information(self, "新增", "该年份已经存在，拒绝添加！", QMessageBox.Yes)
+                getMessageBox("新增", "该年份已经存在，拒绝添加！", True, False)
                 return
             else:
                 insertSuccess = addContractMaintanceYear(year)
                 if insertSuccess == True:
-                    QMessageBox.information(self, "新增", "新增成功！", QMessageBox.Yes)
+                    getMessageBox("新增", "新增成功！", True, False)
                 else:
-                    QMessageBox.information(self, "新增", "新增失败！", QMessageBox.Yes)
+                    getMessageBox("新增", "新增失败！", True, False)
                 self.init()
 
 
@@ -342,12 +343,12 @@ class MaintenanceManagement(QWidget, OrderManagementUI):
                         try:
                              count = int(item1.text())
                         except ValueError:
-                            QMessageBox.warning(self, "注意", "请输入整数！", QMessageBox.Yes, QMessageBox.Yes)
+                            getMessageBox("注意", "请输入整数！", True, False)
                             item1.setText('')
                         try:
                             unit = float(item0.text())
                         except:
-                            QMessageBox.warning(self, "注意", "请输入正确的数字！", QMessageBox.Yes, QMessageBox.Yes)
+                            getMessageBox("注意", "请输入正确的数字！", True, False)
                             item0.setText('')
                         amount = round(count * unit, 4)
                         if (amount != 0):
@@ -396,7 +397,7 @@ class MaintenanceManagement(QWidget, OrderManagementUI):
                         if checkedNo(item.text()):
                             rowData.append(item.text())
                         else:
-                            QMessageBox.warning(self, "注意", "合同编号重复，请检查合同是否重复！", QMessageBox.Yes, QMessageBox.Yes)
+                            getMessageBox("注意", "合同编号重复，请检查合同是否重复！", True, False)
                             return
                 else:
                     break
@@ -412,9 +413,9 @@ class MaintenanceManagement(QWidget, OrderManagementUI):
 
         if len(rowData) == self.tw_result.columnCount() - 2:
             if(insertOneDataInToContractMaintenance(rowData) == True):
-                QMessageBox.warning(self, "注意", "插入成功！", QMessageBox.Yes, QMessageBox.Yes)
+                getMessageBox("注意", "插入成功！", True, False)
             else:
-                QMessageBox.warning(self, "警告", "插入失败！", QMessageBox.Yes, QMessageBox.Yes)
+                getMessageBox("警告", "插入失败！", True, False)
             self.displayData()
 
     def alterRowData(self, row):
@@ -439,9 +440,9 @@ class MaintenanceManagement(QWidget, OrderManagementUI):
                     break
         if len(rowData) == self.tw_result.columnCount() - 1:
             if (updataOneDataToContractMaintenance(rowData) == True):
-                QMessageBox.warning(self, "注意", "修改成功！", QMessageBox.Yes, QMessageBox.Yes)
+                getMessageBox("注意", "修改成功！", True, False)
             else:
-                QMessageBox.warning(self, "警告", "修改失败！", QMessageBox.Yes, QMessageBox.Yes)
+                getMessageBox("警告", "修改失败！", True, False)
             self.displayData()
 
 
@@ -496,16 +497,16 @@ class MaintenanceManagement(QWidget, OrderManagementUI):
             self.tw_result.setCellWidget(rowCount, 12, pushButton)
 
         else:
-            QMessageBox.warning(self, "注意", "请先将数据补充完整！", QMessageBox.Yes, QMessageBox.Yes)
+            getMessageBox("注意", "请先将数据补充完整！", True, False)
 
     def slotDelete(self):
         rowCount = self.tw_result.currentRow()
         resultCount = len(self.result)
         if rowCount < 2:
-            QMessageBox.warning(self, "注意", "请选中有效单元格！", QMessageBox.Yes, QMessageBox.Yes)
+            getMessageBox("注意", "请选中有效单元格！", True, False)
         elif rowCount >= 2 and rowCount < 2 + resultCount:
-            reply = QMessageBox.question(self, '警告', '是否删除该行数据？', QMessageBox.Cancel, QMessageBox.Yes)
-            if reply == QMessageBox.Yes:
+            reply = getMessageBox('警告', '是否删除该行数据？', True, True)
+            if reply == QMessageBox.Ok:
                 deleteDataByContractMaintenance(self.result[rowCount - 2][0],self.selectedYear)
                 self.tw_result.removeRow(rowCount)
             self.displayData()
@@ -516,9 +517,9 @@ class MaintenanceManagement(QWidget, OrderManagementUI):
     #导出至Excel
     def slotOutputToExcel(self):
         if len(self.result) < 1:
-            reply = QMessageBox.warning(self, '警告', '未选中任何数据，无法导出', QMessageBox.Yes)
+            reply = getMessageBox('警告', '未选中任何数据，无法导出', True, False)
             return
-        reply = QMessageBox.question(self, '修改导出Excel', '是否保存修改并导出Excel？', QMessageBox.Cancel, QMessageBox.Yes)
+        reply = getMessageBox('修改导出Excel', '是否保存修改并导出Excel？', True, True)
         if reply == QMessageBox.Cancel:
             self.displayData()
             return
@@ -600,19 +601,19 @@ class MaintenanceManagement(QWidget, OrderManagementUI):
                 workBook.save(pathName)
                 import win32api
                 win32api.ShellExecute(0, 'open', pathName, '', '', 1)
-                QMessageBox.about(self, "导出成功", "导出成功！")
+                getMessageBox("导出成功", "导出成功！", True, False)
                 return
             except Exception as e:
-                QMessageBox.about(self, "导出失败", "导出表格被占用，请关闭正在使用的Execl！")
+                getMessageBox("导出失败", "导出表格被占用，请关闭正在使用的Execl！", True, False)
                 return
 
         pass
 
     def slotOutputData(self):
         if len(self.result) < 1:
-            reply = QMessageBox.warning(self, '警告', '未选中任何数据，无法导出', QMessageBox.Yes)
+            getMessageBox('警告', '未选中任何数据，无法导出', True, False)
             return
-        reply = QMessageBox.question(self, '导出数据包', '是否保存修改并导出数据包？', QMessageBox.Cancel, QMessageBox.Yes)
+        reply = getMessageBox('导出数据包', '是否保存修改并导出数据包？', True, True)
         if reply == QMessageBox.Cancel:
             self.displayData()
             return
@@ -651,10 +652,10 @@ class MaintenanceManagement(QWidget, OrderManagementUI):
                     directoryPath, installData, self.selectedYear)
                 with open(pathName, "wb") as file:
                     pickle.dump(dataList, file)
-                QMessageBox.warning(self, "导出数据成功！", "导出成功！", QMessageBox.Yes)
+                getMessageBox("导出数据成功！", "导出成功！", True, False)
             pass
         else:
-            QMessageBox.warning(self, "导出数据失败！", "请选择正确的文件夹！", QMessageBox.Yes)
+            getMessageBox("导出数据失败！", "请选择正确的文件夹！", True, False)
         pass
 
         # 导入数据包
@@ -671,7 +672,7 @@ class MaintenanceManagement(QWidget, OrderManagementUI):
                     raise Exception("数据格式错误！")
         except Exception as e:
             print(e)
-            QMessageBox.warning(self, "加载文件失败！", "请检查文件格式及内容格式！", QMessageBox.Yes)
+            getMessageBox("加载文件失败！", "请检查文件格式及内容格式！", True, False)
             return
         headerlist = ['年度', '合同编号', '合同名称', '甲方', '乙方', '单价（万元）', '数量/单位', '金额（万元）', '签订时间', '交付时间', '备注']
         self.showInputResult.setWindowTitle("导入数据")
@@ -733,7 +734,7 @@ class MaintenanceManagement(QWidget, OrderManagementUI):
                     pass
             except Exception as e:
                 print(e)
-                QMessageBox.warning(self, "导入失败", "导入第%d数据失败！" % (i), QMessageBox.Yes)
+                getMessageBox("导入失败", "导入第%d数据失败！" % (i), True, False)
 
         self.showInputResult.hide()
         self.setDisabled(False)

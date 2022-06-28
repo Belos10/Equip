@@ -1,11 +1,12 @@
-from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, QAbstractItemView, QMessageBox,QHeaderView
-
-from sysManage.component import getMessageBox
-from widgets.strengthDisturb.maintenManageSet import Widget_Mainten_Manage_Set
-from database.strengthDisturbSql import *
-from PyQt5.Qt import Qt
 import sys
+
+from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, QAbstractItemView, QHeaderView
+
+from database.strengthDisturbSql import *
+from sysManage.component import getMessageBox
 from sysManage.userInfo import get_value
+from widgets.strengthDisturb.maintenManageSet import Widget_Mainten_Manage_Set
+
 sys.setrecursionlimit(100000)
 '''
    编制数维护目录设置

@@ -1,14 +1,13 @@
-import sys
-from PyQt5.QtWidgets import *
 from PyQt5.Qt import Qt
-from PyQt5.QtGui import QColor, QBrush, QFont
-# new
-from widgets.orderManage.Widget_OrderRetirePlan import retirePlan_Form
+from PyQt5.QtGui import QFont
+from PyQt5.QtWidgets import *
+
 from database.OrderManageSql import *
-from sysManage.userInfo import get_value
-from sysManage.orderManage.InputProof_Retire import InputProof
-from database.SD_EquipmentBanlanceSql import updateOneEquipmentBalanceData, deleteByYear
 from database.alocatMangeSql import *
+from sysManage.orderManage.InputProof_Retire import InputProof
+from sysManage.userInfo import get_value
+from widgets.orderManage.Widget_OrderRetirePlan import retirePlan_Form
+from sysManage.component import getMessageBox
 
 '''
     退役报废计划
@@ -109,7 +108,7 @@ class OrderRetirePlan(QWidget, retirePlan_Form):
                 if str(year) == yearInfo:
                     haveYear = True
             if haveYear == True:
-                reply = QMessageBox.information(self, '添加', '添加失败，该年份已存在', QMessageBox.Yes)
+                getMessageBox('添加', '添加失败，该年份已存在', True, False)
                 return
             insertIntoOrderRetirePlanYear(year)
             self._initYearWidget_()
@@ -117,8 +116,8 @@ class OrderRetirePlan(QWidget, retirePlan_Form):
 
     # 删除年份
     def slotDelYear(self):
-        reply = QMessageBox.question(self, "删除", "是否删除所选？", QMessageBox.Yes, QMessageBox.Cancel)
-        if reply == QMessageBox.Yes:
+        reply = getMessageBox("删除", "是否删除所选？", True, True)
+        if reply == QMessageBox.Ok:
             currentYear = self.lw_yearChoose.currentItem()
             deleteOrderRetirePlanYear(currentYear.text())
             deleteByYear(currentYear.text())
@@ -476,9 +475,9 @@ class OrderRetirePlan(QWidget, retirePlan_Form):
                     updateOneEquipmentBalanceData(self.currentYear, self.currentEquipdict[self.currentRow][0],
                                                   self.currentUnitChilddict[self.currentColumn - 3][0])
                 else:
-                    QMessageBox.information(self, "提示", "未填写实力数", QMessageBox.Yes)
+                    getMessageBox("提示", "未填写实力数", True, False)
             except ValueError:
-                QMessageBox.information(self, "提示", "请输入数字", QMessageBox.Yes)
+                getMessageBox("提示", "请输入数字", True, False)
                 self.retirePlanResult.item(self.currentRow, self.currentColumn).setText("")
         if self.currentColumn == self.lenHeaderList - 1:
             updateOrderRetirePlanNote(self.currentEquipdict[self.currentRow][0], self.currentYear,
@@ -516,9 +515,9 @@ class OrderRetirePlan(QWidget, retirePlan_Form):
     def slotOutputToExcel(self):
         self.retirePlanList = {}
         if self.retirePlanResult.rowCount() <= 0:
-            reply = QMessageBox.warning(self, '警告', '未选中任何数据，无法导出', QMessageBox.Yes)
+            getMessageBox('警告', '未选中任何数据，无法导出', True, False)
             return
-        reply = QMessageBox.question(self, '导出Excel', '是否保存修改并导出Excel？', QMessageBox.Cancel, QMessageBox.Yes)
+        reply = getMessageBox('导出Excel', '是否保存修改并导出Excel？', True, True)
         if reply == QMessageBox.Cancel:
             self._initRetirePlanByUnitListAndEquipList()
             return
@@ -630,10 +629,10 @@ class OrderRetirePlan(QWidget, retirePlan_Form):
                 workBook.save(pathName)
                 import win32api
                 win32api.ShellExecute(0, 'open', pathName, '', '', 1)
-                QMessageBox.about(self, "导出成功", "导出成功！")
+                getMessageBox("导出成功", "导出成功！", True, False)
                 return
             except Exception as e:
-                QMessageBox.about(self, "导出失败", "导出表格被占用，请关闭正在使用的Execl！")
+                getMessageBox("导出失败", "导出表格被占用，请关闭正在使用的Execl！", True, False)
                 return
         else:
-            QMessageBox.about(self, "选取文件夹失败！", "请选择正确的文件夹！")
+            getMessageBox("选取文件夹失败！", "请选择正确的文件夹！", True, False)

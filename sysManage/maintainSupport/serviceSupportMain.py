@@ -1,12 +1,11 @@
 import sys
-from PyQt5.QtWidgets import *
+
 from PyQt5.Qt import Qt
-from PyQt5.QtGui import QColor, QBrush,QFont
-from conda_verify import const
+from PyQt5.QtWidgets import *
 
 from database.serviceSupportSql import *
 from widgets.serviceSupport.serviceSupportUI import Widget_ServiceSupport
-from sysManage.userInfo import get_value
+from sysManage.component import getMessageBox
 
 '''
     维修保障计划
@@ -449,12 +448,12 @@ class serviceSupport(QDialog, Widget_ServiceSupport):
                         try:
                             count = int(item1.text())
                         except ValueError:
-                            QMessageBox.warning(self, "注意", "请输入整数！", QMessageBox.Yes, QMessageBox.Yes)
+                            getMessageBox("注意", "请输入整数！", True, False)
                             item1.setText('')
                         try:
                             unit = float(item0.text())
                         except:
-                            QMessageBox.warning(self, "注意", "请输入正确的数字！", QMessageBox.Yes, QMessageBox.Yes)
+                            getMessageBox("注意", "请输入正确的数字！", True, False)
                             item0.setText('')
                         amount = round(count * unit, 4)
                         if (amount != 0):
@@ -499,7 +498,7 @@ class serviceSupport(QDialog, Widget_ServiceSupport):
             return False
         else:
             insertContentOfServiceSupport(rowData)
-            QMessageBox.warning(self, "注意", "插入成功！", QMessageBox.Yes, QMessageBox.Yes)
+            getMessageBox("注意", "插入成功！", True, False)
             self.showContentOfServiceSupport()
             self._initYearWidget_()
 
@@ -528,7 +527,7 @@ class serviceSupport(QDialog, Widget_ServiceSupport):
         if len(rowData) != self.serviceSupportResult.columnCount():
             return False
         else:
-            QMessageBox.warning(self, "注意", "修改成功！", QMessageBox.Yes, QMessageBox.Yes)
+            getMessageBox("注意", "修改成功！", True, False)
             updateContentOfServiceSupport(rowData)
             self._initYearWidget_()
         pass
@@ -611,7 +610,7 @@ class serviceSupport(QDialog, Widget_ServiceSupport):
             self.serviceSupportResult.setItem(rowCount, 13, item)
 
         else:
-            QMessageBox.warning(self, "注意", "请先将数据补充完整！", QMessageBox.Yes, QMessageBox.Yes)
+            getMessageBox("注意", "请先将数据补充完整！", True, False)
 
 
 
@@ -621,7 +620,7 @@ class serviceSupport(QDialog, Widget_ServiceSupport):
     def slotDelete(self):
         rowCount = self.serviceSupportResult.currentRow()
         if rowCount < 2:
-            QMessageBox.warning(self, "注意", "请选中有效单元格！", QMessageBox.Yes, QMessageBox.Yes)
+            getMessageBox("注意", "请选中有效单元格！", True, False)
             return
         elif rowCount >= 2:
             # item = self.serviceSupportResult.item(rowCount, 0)
@@ -727,9 +726,9 @@ class serviceSupport(QDialog, Widget_ServiceSupport):
         # print("dataExcelList:", dataExcelList)
 
         if len(dataExcelList) < 1:
-            reply = QMessageBox.warning(self, '警告', '没有任何数据，无法导出', QMessageBox.Yes)
+            getMessageBox('警告', '没有任何数据，无法导出', True, False)
             return
-        reply = QMessageBox.question(self, '将内容导出Excel', '是否保存数据并导出至Excel？', QMessageBox.Cancel, QMessageBox.Yes)
+        reply = getMessageBox('将内容导出Excel', '是否保存数据并导出至Excel？', True, True)
 
         if reply == QMessageBox.Cancel:
             return
@@ -817,10 +816,10 @@ class serviceSupport(QDialog, Widget_ServiceSupport):
                 workBook.save(pathName)
                 import win32api
                 win32api.ShellExecute(0, 'open', pathName, '', '', 1)
-                QMessageBox.about(self, "导出成功", "导出成功！")
+                getMessageBox("导出成功", "导出成功！", True, False)
                 return
             except Exception as e:
-                QMessageBox.about(self, "导出失败", "导出表格被占用，请关闭正在使用的Execl！")
+                getMessageBox("导出失败", "导出表格被占用，请关闭正在使用的Execl！", True, False)
                 return
 
 

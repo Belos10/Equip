@@ -1,11 +1,10 @@
-import sys
-from PyQt5.QtWidgets import *
-from database.OrderManageSql import selectDataFromContractOrder
-from widgets.orderManage.Widget_SelectQua import Widget_SelectQua
-from database.strengthDisturbSql import *
-from PyQt5.Qt import Qt
-from database.alocatMangeSql import *
 from PyQt5 import QtCore
+from PyQt5.Qt import Qt
+from PyQt5.QtWidgets import *
+
+from widgets.orderManage.Widget_SelectQua import Widget_SelectQua
+from sysManage.component import getMessageBox
+
 
 class SelectQua(QDialog, Widget_SelectQua):
     signal=QtCore.pyqtSignal(str)
@@ -24,7 +23,7 @@ class SelectQua(QDialog, Widget_SelectQua):
             self.signal.emit('1')
             self.close()
         else:
-            QMessageBox.information(self,"提示","未选择装备质量",QMessageBox.Yes)
+            getMessageBox("提示","未选择装备质量", True, False)
             return
 
 

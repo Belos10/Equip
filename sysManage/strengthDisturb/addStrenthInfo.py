@@ -5,6 +5,7 @@ from database.strengthDisturbSql import *
 from database.dictSelect.factorySetSql import *
 from sysManage.strengthDisturb.chooseFactoryYear import chooseFactoryYear
 from database.alocatMangeSql import *
+from sysManage.component import getMessageBox
 
 regx = QRegExp("[0-9]*")
 allFactoryYearInt = list(range(1970, 2022))
@@ -71,7 +72,7 @@ class AddStrenthInfo(QWidget, Add_Strenth_Info):
             self.endFactoryYear = self.chooseFactoryYear.endFactoryYear
             #print("===============0", self.startFactoryYear, self.endFactoryYear)
             if int(self.startFactoryYear) > int(self.endFactoryYear):
-                reply = QMessageBox.information(self,"查询", "请重新选择，开始年份必须小于等于结束年份", QMessageBox.Yes)
+                getMessageBox("查询", "请重新选择，开始年份必须小于等于结束年份", True, False)
                 return
             else:
                 self.lb_factorYear.setText("当前查询出厂年份为：" + self.startFactoryYear + "年 至 " + self.endFactoryYear + "年")
@@ -257,15 +258,15 @@ class AddStrenthInfo(QWidget, Add_Strenth_Info):
         if currentRow < 0:
             return
         else:
-            reply = QMessageBox.question(self, '删除', '是否删除当前行？', QMessageBox.Yes, QMessageBox.Cancel)
-            if reply == QMessageBox.Yes:
+            reply = getMessageBox('删除', '是否删除当前行？', True, True)
+            if reply == QMessageBox.Ok:
                 for i, resultInfo in enumerate(self.currentResult):
                     if i == currentRow:
                         year = resultInfo[4]
                         delSuccess = delFromInputInfo(resultInfo[0], resultInfo[1], resultInfo[2], resultInfo[3], resultInfo[4], self.yearList)
                         if delSuccess != True:
-                            reply = QMessageBox.question(self, '删除', str(delSuccess) + '删除失败！', QMessageBox.Yes)
+                            getMessageBox('删除', str(delSuccess) + '删除失败！', True, False)
                             return
-                        reply = QMessageBox.question(self, '删除', '删除成功！', QMessageBox.Yes)
+                        getMessageBox('删除', '删除成功！', True, False)
                         self._initTableWidget_(self.RowData, self.yearList)
                         return

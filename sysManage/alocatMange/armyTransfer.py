@@ -7,6 +7,7 @@ from database.strengthDisturbSql import *
 from sysManage.alocatMange.config import ArmyTransferReceiveUnit, ArmyTransferSendUnit
 from PyQt5.Qt import Qt
 from database.dictSelect.factorySetSql import *
+from sysManage.component import getMessageBox
 
 #new
 '''
@@ -95,11 +96,11 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
             return
         #print(currentRow)
         if currentRow < 2:
-            reply = QMessageBox.question(self, '删除', '当前未选中某行，请选中某行删除', QMessageBox.Yes)
+            getMessageBox('删除', '当前未选中某行，请选中某行删除', True, False)
             return
         else:
-            reply = QMessageBox.question(self, '删除', '是否删除当前行？', QMessageBox.Yes, QMessageBox.Cancel)
-            if reply == QMessageBox.Yes:
+            reply = getMessageBox('删除', '是否删除当前行？', True, True)
+            if reply == QMessageBox.Ok:
                 #根据陆军调拨单的序号以及年份删除当前行
                 delArmyTransferByIDAndYear(self.tw_result.item(currentRow, 0).text(), self.currentYear)
                 #删除后重新显示结果界面
@@ -131,14 +132,14 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
                 ID = ""
             ID = self.tw_result.item(i + addRow, 0).text()
             if ID == "":
-                reply = QMessageBox.question(self, '新增', '第' + str(i + addRow - 1) + '行添加失败，序号不能为空', QMessageBox.Yes)
+                getMessageBox('新增', '第' + str(i + addRow - 1) + '行添加失败，序号不能为空', True, False)
                 continue
             for id in IDList:
                 if ID == id:
                     haveID = True
 
             if haveID:
-                reply = QMessageBox.question(self, '新增', '第' + str(i + addRow- 1) + '行添加失败，当前年份当前序号已存在', QMessageBox.Yes)
+                getMessageBox('新增', '第' + str(i + addRow- 1) + '行添加失败，当前年份当前序号已存在', True, False)
                 continue
             if self.tw_result.item(i + addRow, 17):
                 pass
@@ -148,7 +149,7 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
             if Equip_Num.isdigit():
                 pass
             else:
-                reply = QMessageBox.question(self, '新增', '第' + str(i + addRow-1) + '行添加失败，数量必须为整数', QMessageBox.Yes)
+                getMessageBox('新增', '第' + str(i + addRow-1) + '行添加失败，数量必须为整数', True, False)
                 continue
             index = self.tw_result.cellWidget(i + addRow, 14).currentIndex()
             Equip_ID = self.currentEquipInfo[index][0]
@@ -161,10 +162,10 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
                 haveEquipIndex = True
             equipIndexSet.add(index)
             if haveEquip:
-                reply = QMessageBox.information(self, '新增', '第' + str(i + addRow - 1) + '行添加失败，当前年份该装备已录入', QMessageBox.Yes)
+                getMessageBox('新增', '第' + str(i + addRow - 1) + '行添加失败，当前年份该装备已录入', True, False)
                 continue
             if haveEquipIndex:
-                reply = QMessageBox.information(self, '新增', '第' + str(i + addRow - 1) + '行添加失败，不可重复添加相同装备', QMessageBox.Yes)
+                getMessageBox('新增', '第' + str(i + addRow - 1) + '行添加失败，不可重复添加相同装备', True, False)
                 continue
             if self.tw_result.item(i + addRow, 1):
                 Trans_ID = self.tw_result.item(i + addRow, 1).text()
@@ -275,15 +276,15 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
     def slotDelCurrentYear(self):
         currentRow = self.lw_yearChoose.currentRow()
         if currentRow == 0:
-            reply = QMessageBox.question(self, '删除', '是否删除所有年份以及年份下所有数据？', QMessageBox.Yes, QMessageBox.Cancel)
+            getMessageBox('删除', '是否删除所有年份以及年份下所有数据？', True, True)
             if QMessageBox.Cancel:
                 return
         if currentRow < 0:
-            reply = QMessageBox.question(self, '删除', '请选中某年进行删除', QMessageBox.Yes)
+            getMessageBox('删除', '请选中某年进行删除', True, False)
         else:
             currentYear = self.lw_yearChoose.currentItem().text()
-            reply = QMessageBox.question(self, '删除', '是否删除当前年份以及当前年份下所有数据？', QMessageBox.Yes, QMessageBox.Cancel)
-            if reply == QMessageBox.Yes:
+            reply = getMessageBox('删除', '是否删除当前年份以及当前年份下所有数据？', True, True)
+            if reply == QMessageBox.Ok:
                 delArmyTransferYearByYear(currentYear)
                 self._initSelf_()
             else:
@@ -538,7 +539,7 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
             break
         print(self.equipInfoList)
         if self.currentYear == '全部' or self.currentYear == None:
-            reply = QMessageBox.question(self, '新增', '只能对某年的数据进行新增，请重新选择', QMessageBox.Yes)
+            getMessageBox('新增', '只能对某年的数据进行新增，请重新选择', True, False)
             return
         currentRow = self.tw_result.rowCount()
         self.tw_result.setRowCount(currentRow + 1)
@@ -633,9 +634,9 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
     #导出至Excel
     def slotOutputToExcel(self):
         if len(self.currentResult) < 1:
-            reply = QMessageBox.warning(self, '警告', '未选中任何数据，无法导出', QMessageBox.Yes)
+            getMessageBox('警告', '未选中任何数据，无法导出', True, False)
             return
-        reply = QMessageBox.question(self, '修改导出Excel', '是否保存修改并导出Excel？', QMessageBox.Cancel, QMessageBox.Yes)
+        reply =  getMessageBox('修改导出Excel', '是否保存修改并导出Excel？', True, True)
         if reply == QMessageBox.Cancel:
             return
 
@@ -764,11 +765,11 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
                 workBook.save(pathName)
                 import win32api
                 win32api.ShellExecute(0, 'open', pathName, '', '', 1)
-                QMessageBox.about(self, "导出成功", "导出成功！")
+                getMessageBox("导出成功", "导出成功！", True, False)
                 return
             except Exception as e:
-                QMessageBox.about(self, "导出失败", "导出表格被占用，请关闭正在使用的Execl！")
+                getMessageBox("导出失败", "导出表格被占用，请关闭正在使用的Execl！", True, False)
                 return
         else:
-            QMessageBox.about(self, "选取文件夹失败！", "请选择正确的文件夹！")
+            getMessageBox("选取文件夹失败！", "请选择正确的文件夹！", True, False)
         pass

@@ -1,15 +1,12 @@
-from database.SD_EquipmentBanlanceSql import deleteByYear
+from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QMessageBox, \
+    QListWidgetItem
+
+from database.strengthDisturbSql import *
 from sysManage.component import getMessageBox, getIntInputDialog
-from widgets.strengthDisturb.stren_inquiry import Widget_Stren_Inquiry
-from PyQt5.QtWidgets import QWidget, QTreeWidgetItemIterator, QTreeWidgetItem, QMessageBox, \
-    QCheckBox, QListWidgetItem, QInputDialog, QHeaderView, QAbstractItemView
-from PyQt5 import QtWidgets
 from sysManage.strengthDisturb.InquiryResult import Inquiry_Result
 from sysManage.strengthDisturb.addStrenthInfo import AddStrenthInfo
-from database.strengthDisturbSql import *
-from database.strengthDisturbSql import *
-from PyQt5.Qt import Qt
 from sysManage.userInfo import get_value
+from widgets.strengthDisturb.stren_inquiry import Widget_Stren_Inquiry
 
 '''
     类功能：
@@ -211,11 +208,11 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
             return
         else:
             currentYear = self.lw_chooseYear.currentItem().text()
-            reply = getMessageBox('删除', '是否删除当前年份以及当前年份下所有数据？', True, True )
+            reply = getMessageBox('删除', '是否删除当前年份以及当前年份下所有数据？', True, True)
             if reply == QMessageBox.Ok:
                 delSuccess = delStrengthYearByYear(currentYear)
                 if delSuccess != True:
-                    getMessageBox(self, '删除', str(delSuccess) + ',删除失败', True, False)
+                    getMessageBox('删除', str(delSuccess) + ',删除失败', True, False)
                     return
                 getMessageBox('删除', '删除成功', True, False)
                 self.initSelectYear()

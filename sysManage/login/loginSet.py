@@ -3,6 +3,8 @@ from widgets.login.loginSet import Widget_LoginSet
 from database.strengthDisturbSql import selectAllDataAboutUnit
 from database.loginSql import selectAllDataAboutLogin,insertIntoLogin,delFromLogin,findAllLoginAccontList,updateUserInfo
 from PyQt5.Qt import Qt
+from sysManage.component import getMessageBox
+
 
 class loginSet(QDialog, Widget_LoginSet):
     def __init__(self, parent=None):
@@ -41,7 +43,7 @@ class loginSet(QDialog, Widget_LoginSet):
         self.unitResult = []
         selectSuccess = selectAllDataAboutUnit(self.unitResult)
         if selectSuccess != True:
-            QMessageBox.information(self, "初始化", "初始化登录界面失败")
+            getMessageBox("初始化", "初始化登录界面失败", True, False)
             return
         self.userInfo = selectAllDataAboutLogin()
 
@@ -92,12 +94,12 @@ class loginSet(QDialog, Widget_LoginSet):
             self.tw_unitResult.setItem(i, 4, item)
 
     def slotDelUserInfo(self):
-        reply = QMessageBox.question(self, '删除', '是否删除该用户？', QMessageBox.Yes, QMessageBox.Cancel)
+        reply = getMessageBox('删除', '是否删除该用户？', True, True)
         if reply == QMessageBox.Cancel:
             return
         else:
             delFromLogin(self.le_accont.text())
-            reply = QMessageBox.question(self, '删除', '删除成功', QMessageBox.Yes)
+            getMessageBox('删除', '删除成功', True, False)
             self.initWidgets()
 
     def slotAddUserInfo(self):
@@ -110,15 +112,15 @@ class loginSet(QDialog, Widget_LoginSet):
 
         for ID in accontList:
             if accont == ID:
-                reply = QMessageBox.question(self, '新增', '新增失败，账号存在，请重新输入', QMessageBox.Yes)
+                getMessageBox('新增', '新增失败，账号存在，请重新输入', True, False)
                 return
 
         if accont == "":
-            reply = QMessageBox.question(self, '新增', '新增失败，请输入账号', QMessageBox.Yes)
+            getMessageBox('新增', '新增失败，请输入账号', True, False)
             return
         else:
             insertIntoLogin(accont, name, password, role, unitID)
-            reply = QMessageBox.question(self, '新增', '新增成功', QMessageBox.Yes)
+            getMessageBox('新增', '新增成功', True, False)
             self.initWidgets()
             return
 
@@ -148,11 +150,11 @@ class loginSet(QDialog, Widget_LoginSet):
         accontList = findAllLoginAccontList()
 
         if accont != self.currentAccont:
-            reply = QMessageBox.question(self, '修改', '修改失败，账号无法修改', QMessageBox.Yes)
+            getMessageBox('修改', '修改失败，账号无法修改', True, False)
             self.le_accont.setText(self.currentAccont)
             return
 
         updateUserInfo(accont, name, password, role, unitID)
-        reply = QMessageBox.question(self, '修改', '修改成功', QMessageBox.Yes)
+        getMessageBox('修改', '修改成功', True, False)
         self.initWidgets()
         return

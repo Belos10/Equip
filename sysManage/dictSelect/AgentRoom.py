@@ -7,7 +7,7 @@ from PyQt5 import QtCore
 from PyQt5.QtCore import QStringListModel, Qt, QDateTime
 from PyQt5.QtWidgets import QWidget, QMessageBox, QFileDialog, QApplication, QHeaderView, QTableWidget, \
     QTableWidgetItem, QAbstractItemView, QCheckBox, QHBoxLayout
-
+from sysManage.component import getMessageBox
 from database.agentRoomSql import getResultFromAgentRoom, deleteDataById, updateOneData, \
     insertOneDataAgentRoom
 from sysManage.showInputResult import showInputResult
@@ -117,7 +117,7 @@ class AgentRoom(QWidget, AgentRoomUI):
                     raise Exception("数据格式错误！")
         except Exception as e:
             print(e)
-            QMessageBox.warning(self, "加载文件失败！", "请检查文件格式及内容格式！", QMessageBox.Yes)
+            getMessageBox("加载文件失败！", "请检查文件格式及内容格式！", True, False)
             return
 
         self.showInputResult.setWindowTitle("导入数据")
@@ -158,9 +158,9 @@ class AgentRoom(QWidget, AgentRoomUI):
 
     def soltOutput(self):
         if len(self.result) < 1:
-            reply = QMessageBox.warning(self, '警告', '未选中任何数据，无法导出', QMessageBox.Yes)
+            getMessageBox('警告', '未选中任何数据，无法导出', True, False)
             return
-        reply = QMessageBox.question(self, '导出数据包', '是否保存修改并导出数据包？', QMessageBox.Cancel, QMessageBox.Yes)
+        reply = getMessageBox('导出数据包', '是否保存修改并导出数据包？', True, True)
         if reply == QMessageBox.Cancel:
             self.displayData()
             return
@@ -179,7 +179,7 @@ class AgentRoom(QWidget, AgentRoomUI):
                 pathName = "%s/%s代表室目录.nms" % (directoryPath,installData)
                 with open(pathName, "wb") as file:
                     pickle.dump(dataList, file)
-                QMessageBox.about(self, "导出成功", "导出数据包成功！")
+                getMessageBox("导出成功", "导出数据包成功！", True, False)
         pass
 
     def slotCancelInputIntoDatabase(self):
@@ -196,7 +196,7 @@ class AgentRoom(QWidget, AgentRoomUI):
                     pass
             except Exception as e:
                 print(e)
-                QMessageBox.warning(self, "导入失败", "导入第%d数据失败！" % (i), QMessageBox.Yes)
+                getMessageBox("导入失败", "导入第%d数据失败！" % (i), True, False)
 
         self.showInputResult.hide()
         self.setDisabled(False)
@@ -221,9 +221,9 @@ class AgentRoom(QWidget, AgentRoomUI):
         else:
             if insertOneDataAgentRoom(rowData) == True:
                 self.currentLastRow = -1
-                QMessageBox.warning(self, "注意", "插入成功！", QMessageBox.Yes, QMessageBox.Yes)
+                getMessageBox("注意", "插入成功！", True, False)
             else:
-                QMessageBox.warning(self, "注意", "插入失败！", QMessageBox.Yes, QMessageBox.Yes)
+                getMessageBox("注意", "插入失败！", True, False)
             self.init()
 
     def alterRowData(self, row):
@@ -244,9 +244,9 @@ class AgentRoom(QWidget, AgentRoomUI):
             return False
         else:
             if (updateOneData(rowData) == True):
-                QMessageBox.warning(self, "修改成功", "修改成功！", QMessageBox.Yes, QMessageBox.Yes)
+                getMessageBox("修改成功", "修改成功！", True, False)
             else:
-                QMessageBox.warning(self, "警告", "修改失败！", QMessageBox.Yes, QMessageBox.Yes)
+                getMessageBox("警告", "修改失败！", True, False)
             self.init()
 
     def soltAdd(self):
@@ -269,7 +269,7 @@ class AgentRoom(QWidget, AgentRoomUI):
                 self.tw_result.setItem(rowCount, 0, item)
             self.tw_result.itemChanged.connect(self.slotAlterAndSava)
         else:
-            QMessageBox.warning(self, "注意", "请先将数据补充完整！", QMessageBox.Yes, QMessageBox.Yes)
+            getMessageBox("注意", "请先将数据补充完整！", True, False)
 
     def slotAlterAndSava(self):
         selectRow = self.tw_result.selectedItems()
@@ -288,10 +288,10 @@ class AgentRoom(QWidget, AgentRoomUI):
             resultCount = len(self.result)
 
         if rowCount < 0:
-            QMessageBox.warning(self, "注意", "请选中有效单元格！", QMessageBox.Yes, QMessageBox.Yes)
+            getMessageBox("注意", "请选中有效单元格！", True, False)
         elif rowCount >= 0 and rowCount < resultCount:
-            reply = QMessageBox.question(self, '警告', '是否删除该行数据？', QMessageBox.Cancel, QMessageBox.Yes)
-            if reply == QMessageBox.Yes:
+            reply = getMessageBox('警告', '是否删除该行数据？', True, True)
+            if reply == QMessageBox.Ok:
                 deleteDataById(self.result[rowCount][0])
                 self.tw_result.removeRow(rowCount)
             else:

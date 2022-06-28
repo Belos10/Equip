@@ -5,6 +5,7 @@ from PyQt5 import QtCore,QtGui
 from widgets.alocatMange.scheduleFinish import widget_ScheduleFinish
 from database.alocatMangeSql import selectIfUnitScheduleFinish, updateUnitScheduleFinish
 from PyQt5 import sip
+from sysManage.component import getMessageBox
 
 
 class ScheduleFinish(QWidget, widget_ScheduleFinish):
@@ -145,8 +146,8 @@ class ScheduleFinish(QWidget, widget_ScheduleFinish):
 
 
     def setUnitScheduleFinish(self):
-        reply = QMessageBox.question(self, "设置完成接装", "该单位是否完成接装？", QMessageBox.Yes, QMessageBox.Cancel)
-        if reply == QMessageBox.Yes:
+        reply = getMessageBox("设置完成接装", "该单位是否完成接装？", True, True)
+        if reply == QMessageBox.Ok:
             updateUnitScheduleFinish(self.UnitDict[self.key][0], self.equipID, self.year)
             self.layout1.itemAt(self.key).widget().setText("已完成")
             self.initUnitFinish()
@@ -168,7 +169,7 @@ class ScheduleFinish(QWidget, widget_ScheduleFinish):
     def onOpen(self):
         print(self.fileName)
         if self.fileName == "":
-            QMessageBox.information(self, "提示", "未存放文件")
+            getMessageBox("提示", "未存放文件", True, False)
             return
         os.startfile(self.fileName)
 

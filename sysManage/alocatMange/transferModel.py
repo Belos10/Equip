@@ -310,7 +310,7 @@ class transferModel(QDialog, Widget_Transfer_Model):
                     page.updateTableWidget(requireInfo)
 
     def slotClickedConfim(self):
-        reply = QMessageBox.question(self, '保存', '是否将调拨信息存入火箭军调拨单并已经导出调拨单？', QMessageBox.Yes, QMessageBox.Cancel)
+        reply = getMessageBox('保存', '是否将调拨信息存入火箭军调拨单并已经导出调拨单？', True, True)
         if reply == QMessageBox.Cancel:
             return
         else:
@@ -417,13 +417,13 @@ class transferModel(QDialog, Widget_Transfer_Model):
                 workBook.save(pathName)
                 import win32api
                 win32api.ShellExecute(0, 'open', pathName, '', '', 1)
-                QMessageBox.about(self, "导出成功", "导出成功！")
+                getMessageBox("导出成功", "导出成功！", True, False)
                 return
             except Exception as e:
-                QMessageBox.about(self, "导出失败", "导出表格被占用，请关闭正在使用的Execl！")
+                getMessageBox("导出失败", "导出表格被占用，请关闭正在使用的Execl！", True, False)
                 return
         else:
-            QMessageBox.about(self, "选取文件夹失败！", "请选择正确的文件夹！")
+            getMessageBox("选取文件夹失败！", "请选择正确的文件夹！", True, False)
         pass
 
     def initExcelTotalTable(self,workSheet,titileStyle,contentStyle, unitInfoList, equipInfo, year, requireInfo):

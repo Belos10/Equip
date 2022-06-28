@@ -1,16 +1,14 @@
 import sys
-from PyQt5.QtWidgets import *
-from PyQt5.Qt import Qt
-from PyQt5.QtGui import QColor, QBrush,QFont
 
+from PyQt5.Qt import Qt
+from PyQt5.QtGui import QFont
+from PyQt5.QtWidgets import *
 
 from database.serviceSupportSql import *
-from sysManage.component import getMessageBox
-from widgets.serviceSupport.serviceSupportUI import Widget_ServiceSupport
-from sysManage.userInfo import get_value
-
 from database.serviceSupportSql import selectContentOfMaterialManagement
+from sysManage.component import getMessageBox
 from widgets.serviceSupport.materialManagementUI import materialManagementUI
+
 
 '''
     维修保障计划
@@ -249,7 +247,7 @@ class materialManagement(QWidget, materialManagementUI):
                 break
             rowData.append(item.text())
         if len(rowData) == self.tw_result.columnCount():
-            QMessageBox.warning(self, "注意", "修改成功！", QMessageBox.Yes, QMessageBox.Yes)
+            getMessageBox("注意", "修改成功！", True, False)
             if updateContentOfMaterialManagement(rowData):
                 getMessageBox("注意", "修改成功！", True, False)
             else:

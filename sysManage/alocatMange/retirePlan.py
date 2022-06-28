@@ -120,7 +120,7 @@ class retirePlan(QWidget, retirePlan_Form):
 
     # 删除年份
     def slotDelYear(self):
-        reply = getMessageBox("删除", "是否删除所选？",True, False)
+        reply = getMessageBox("删除", "是否删除所选？",True, True)
         if reply == QMessageBox.Ok:
             currentYear = self.lw_yearChoose.currentItem()
             deleteRetirePlanYear(currentYear.text())

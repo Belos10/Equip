@@ -1,23 +1,22 @@
-from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import Qt, pyqtSignal, QPoint
+import ctypes
 
-from sysManage.component import getMessageBox
-from sysManage.contractMangement.contractMangementMain import ContractManagementMain
-from sysManage.maintainSupport.maintainSupportManage import MaintainSupportManage
-from sysManage.warStore.WarStoreMain import WarStoreMain
-from widgets.manage_widget import Widget_Manage_Widgets
-from PyQt5.QtWidgets import QMainWindow, QWidget, QApplication, QMessageBox, QDesktopWidget
-from sysManage.strengthDisturb.strengthDisturb import strengthDisturb
+from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QMainWindow, QDesktopWidget
+
 from sysManage.alocatMange.alocatMange import alocatMange
+from sysManage.contractMangement.contractMangementMain import ContractManagementMain
+from sysManage.dangerGoods.dangerGoods import DangerGoods
 from sysManage.dictSelect.dictSelect import dictSelect
 from sysManage.login.login import login
-from database.loginSql import selectUserInfoByAccont
 from sysManage.login.loginSet import loginSet
-from sysManage.dangerGoods.dangerGoods import DangerGoods
-from sysManage.positionEngineer.positionEngineerMain import PositionEngineerMain
-from sysManage.userInfo import get_value,set_value
+from sysManage.maintainSupport.maintainSupportManage import MaintainSupportManage
 from sysManage.orderManage.OrderManage import OrderManage
-import ctypes
+from sysManage.positionEngineer.positionEngineerMain import PositionEngineerMain
+from sysManage.strengthDisturb.strengthDisturb import strengthDisturb
+from sysManage.warStore.WarStoreMain import WarStoreMain
+from widgets.manage_widget import Widget_Manage_Widgets
+
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("myappid")
 
 #new

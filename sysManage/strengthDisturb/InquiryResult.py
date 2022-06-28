@@ -1,18 +1,19 @@
 import pickle
 import sys
 
+from PyQt5.Qt import QRegExp
+from PyQt5.Qt import Qt
 from PyQt5.QtCore import QDateTime
 from PyQt5.QtGui import QColor, QBrush
-from PyQt5.QtWidgets import QApplication, QWidget, QTextEdit, QTableWidgetItem, QAbstractItemView, QMessageBox, \
-    QLineEdit, QHeaderView, QFileDialog
-from PyQt5.Qt import QRegExp, QRegExpValidator,QKeyEvent
-from database.SD_EquipmentBanlanceSql import updateOneEquipmentBalanceData
-from sysManage.showInputResult import showInputResult
-from widgets.strengthDisturb.inquiry_result import Widget_Inquiry_Result
+from PyQt5.QtWidgets import QApplication, QWidget, QTableWidgetItem, QAbstractItemView, QMessageBox, \
+    QFileDialog
+
 from database.strengthDisturbSql import *
-from sysManage.strengthDisturb.chooseFactoryYear import chooseFactoryYear
+from sysManage.showInputResult import showInputResult
 from sysManage.strengthDisturb.FilterTitle import FilterTitle
-from PyQt5.Qt import Qt
+from sysManage.strengthDisturb.chooseFactoryYear import chooseFactoryYear
+from widgets.strengthDisturb.inquiry_result import Widget_Inquiry_Result
+from sysManage.component import getMessageBox
 
 regx = QRegExp("[0-9]*")
 #new
@@ -167,7 +168,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
             self.endFactoryYear = self.chooseFactoryYear.endFactoryYear
             #print("===============0", self.startFactoryYear, self.endFactoryYear)
             if int(self.startFactoryYear) > int(self.endFactoryYear):
-                reply = QMessageBox.information(self,"查询", "请重新选择，开始年份必须小于等于结束年份", QMessageBox.Yes)
+                getMessageBox("查询", "请重新选择，开始年份必须小于等于结束年份", True, False)
                 return
             else:
                 self.lb_factoryYear.setText("当前查询出厂年份为：" + self.startFactoryYear + "年 至 " + self.endFactoryYear + "年")
@@ -206,12 +207,12 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
     '''
     def slotClearCurrentPage(self):
         if self.currentFactoryYear != "":
-            reply = QMessageBox.question(self, '清除', '清除失败,请将出厂年份设置为全部', QMessageBox.Yes)
+            getMessageBox('清除', '清除失败,请将出厂年份设置为全部', True, False)
             return
         if self.year == '全部':
-            reply = QMessageBox.question(self, '清除', '只能某一年，清除失败', QMessageBox.Yes)
+            getMessageBox('清除', '只能某一年，清除失败', True, False)
             return
-        reply = QMessageBox.question(self, '清除', '是否清除当前页面所有行的实力数？', QMessageBox.Yes, QMessageBox.Cancel)
+        reply = getMessageBox('清除', '是否清除当前页面所有行的实力数？', True, True)
         if reply == QMessageBox.Cancel:
             return
 
@@ -223,7 +224,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
             unitHaveChild = selectUnitIsHaveChild(Unit_ID)
             equipHaveChild = selectEquipIsHaveChild(Equip_ID)
             if unitHaveChild or equipHaveChild:
-                reply = QMessageBox.question(self, '清除', '第' + str(i) + "行清除失败，只能清除末级单位和装备实力数", QMessageBox.Yes)
+                getMessageBox('清除', '第' + str(i) + "行清除失败，只能清除末级单位和装备实力数", True, False)
                 continue
             else:
                 updateStrengthAboutStrengrh(Unit_ID, Equip_ID, year, "0", orginNum)
@@ -264,13 +265,13 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                     unitHaveChild = selectUnitIsHaveChild(Unit_ID)
                     equipHaveChild = selectEquipIsHaveChild(Equip_ID)
                     if unitHaveChild or equipHaveChild:
-                        reply = QMessageBox.question(self, '清除', '只能清除末级单位和装备的实力数', QMessageBox.Yes)
+                        getMessageBox('清除', '只能清除末级单位和装备的实力数', True, False)
                         return
                     elif self.year == '全部':
-                        reply = QMessageBox.question(self, '清除', '只能某一年，清除失败', QMessageBox.Yes)
+                        getMessageBox('清除', '只能某一年，清除失败', True, False)
                         return
                     else:
-                        reply = QMessageBox.question(self, '清除', '是否清除当前行的实力数？', QMessageBox.Yes, QMessageBox.Cancel)
+                        getMessageBox('清除', '是否清除当前行的实力数？', True, True)
                         updateStrengthAboutStrengrh(Unit_ID, Equip_ID, year, "0", orginNum)
                         self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
 
@@ -296,7 +297,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                         if self.NewStrength == str(resultInfo[4]):
                             return
                         if self.currentFactoryYear != "":
-                            reply = QMessageBox.question(self, '清除', '清除失败,请将出厂年份设置为全部', QMessageBox.Yes)
+                            getMessageBox('清除', '清除失败,请将出厂年份设置为全部', True, False)
                             self.tw_inquiryResult.item(currentRow, currentColumn).setText(resultInfo[4])
                             return
                         # if unitHaveChild or equipHaveChild:
@@ -304,7 +305,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                         #     self.tw_inquiryResult.item(currentRow, currentColumn).setText(str(resultInfo[4]))
                         #     return
                         elif self.year == '全部':
-                            reply = QMessageBox.question(self, '修改', '只能某一年，修改失败', QMessageBox.Yes)
+                            getMessageBox('修改', '只能某一年，修改失败', True, False)
                             self.tw_inquiryResult.item(currentRow, currentColumn).setText(resultInfo[4])
                             return
                         else:
@@ -313,7 +314,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                                 updateSuccess = updateStrengthAboutStrengrh\
                                     (Unit_ID, Equip_ID, self.year,num,str(resultInfo[4]))
                                 if not updateSuccess:
-                                    QMessageBox.information(self, "修改", str(updateSuccess) + "修改失败", QMessageBox.Yes)
+                                    getMessageBox("修改", str(updateSuccess) + "修改失败", True, False)
                                     # QMessageBox.information(self, "修改", "修改成功！", QMessageBox.Yes)
                                 self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
                                 # except ValueError:
@@ -321,7 +322,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                                 #     self.tw_inquiryResult.item(currentRow, currentColumn).setText(str(resultInfo[4]))
                                 #     return
             except ValueError:
-                QMessageBox.information(self, "提示", "请输入正确的数字", QMessageBox.Yes)
+                getMessageBox("提示", "请输入正确的数字", True, False)
                 # self.disturbResult.item(self.currentRow, self.currentColumn).setText(0)
 
 
@@ -613,9 +614,9 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
     #导出至Excel
     def slotOutputToExcel(self):
         if len(self.resultList) < 1:
-            reply = QMessageBox.warning(self, '警告', '未选中任何数据，无法导出', QMessageBox.Yes)
+            getMessageBox('警告', '未选中任何数据，无法导出', True, False)
             return
-        reply = QMessageBox.question(self, '修改导出Excel', '是否保存修改并导出Excel？', QMessageBox.Cancel, QMessageBox.Yes)
+        reply = getMessageBox('修改导出Excel', '是否保存修改并导出Excel？', True, True)
         if reply == QMessageBox.Cancel:
             self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList,
                                                         self.year)
@@ -699,21 +700,21 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                 workBook.save(pathName)
                 import win32api
                 win32api.ShellExecute(0, 'open', pathName, '', '', 1)
-                QMessageBox.about(self, "导出成功", "导出成功！")
+                getMessageBox("导出成功", "导出成功！", True, False)
                 return
             except Exception as e:
-                QMessageBox.about(self, "导出失败", "导出表格被占用，请关闭正在使用的Execl！")
+                getMessageBox("导出失败", "导出表格被占用，请关闭正在使用的Execl！", True, False)
                 return
         else:
-            QMessageBox.about(self, "未选中导出目录", "导出失败！")
+            getMessageBox("未选中导出目录", "导出失败！", True, False)
             return
 
     # 导出数据包
     def slotOutputData(self):
         if len(self.resultList) < 1:
-            reply = QMessageBox.warning(self, '警告', '未选中任何数据，无法导出', QMessageBox.Yes)
+            getMessageBox('警告', '未选中任何数据，无法导出', True, False)
             return
-        reply = QMessageBox.question(self, '导出数据包', '是否导出数据包？', QMessageBox.Cancel, QMessageBox.Yes)
+        reply = getMessageBox('导出数据包', '是否导出数据包？', True, True)
         if reply == QMessageBox.Cancel:
             self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList,
                                                         self.year)
@@ -733,9 +734,9 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                 pathName = "%s/%s实力查询.nms" % (directoryPath, installData)
                 with open(pathName, "wb") as file:
                     pickle.dump(dataList, file)
-                QMessageBox.about(self, "导出成功", "导出成功！")
+                getMessageBox("导出成功", "导出成功！", True, False)
         else:
-            QMessageBox.warning(self, "导出数据失败！", "请选择正确的文件夹！", QMessageBox.Yes)
+            getMessageBox("导出数据失败！", "请选择正确的文件夹！", True, False)
 
     # 导入实力查询数据
     def slotInputData(self):
@@ -750,7 +751,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                     raise Exception("数据格式错误！")
         except Exception as e:
             print(e)
-            QMessageBox.warning(self, "加载文件失败！", "请检查文件格式及内容格式！", QMessageBox.Yes)
+            getMessageBox("加载文件失败！", "请检查文件格式及内容格式！", True, False)
             return
         headerlist = ['单位名称', '装备名称', '实力数', '编制数', '现有数', '偏差', '准备退役数', '未到位数', '提前退役', '待核查无实物', '待核查无实力', '单独建账',
                       '正常到位']
@@ -820,7 +821,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                     pass
             except Exception as e:
                 print(e)
-                QMessageBox.warning(self, "导入失败", "导入第%d数据失败！" % (i), QMessageBox.Yes)
+                getMessageBox("导入失败", "导入第%d数据失败！" % (i), True, False)
         self.showInputResult.hide()
         self.setDisabled(False)
 

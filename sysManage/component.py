@@ -1,14 +1,21 @@
-
-from PyQt5.QtWidgets import QMessageBox, QPushButton,QInputDialog
+from PyQt5.QtWidgets import QMessageBox, QPushButton, QInputDialog
 from PyQt5.QtCore import Qt
 
-def getMessageBox(title:str, context:str, confirm:bool, cancce:bool):
+
+# title: 标题
+# context: 提示信息
+# confirm: 是否添加 QMessage.Ok
+# cancel: 是否添加 QMessage.Cancel
+# // getMessageBox('添加', '添加失败，该年份已存在', True, False)
+# // from sysManage.component import getMessageBox
+
+def getMessageBox(title: str, context: str, confirm: bool, cancel: bool):
     messageBox = QMessageBox()
     messageBox.setWindowTitle(title)
     messageBox.setText(context)
     if confirm:
         messageBox.addButton(QPushButton('确定'), QMessageBox.YesRole)
-    if cancce:
+    if cancel:
         messageBox.addButton(QPushButton('取消'), QMessageBox.NoRole)
     execResult = messageBox.exec_()
     result = QMessageBox.Cancel
@@ -16,9 +23,10 @@ def getMessageBox(title:str, context:str, confirm:bool, cancce:bool):
         result = QMessageBox.Ok
     return result
 
-def getIntInputDialog(title:str, context:str,  floor:int, top: int, step: int, confirm:bool, cancce:bool):
+
+def getIntInputDialog(title: str, context: str, floor: int, top: int, step: int, confirm: bool, cancce: bool):
     inputDialog = QInputDialog()
-    inputDialog.setWindowFlags(Qt.CustomizeWindowHint  | Qt.WindowCloseButtonHint)
+    inputDialog.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowCloseButtonHint)
     inputDialog.setFixedSize(400, 400)
     inputDialog.setInputMode(QInputDialog.IntInput)
     inputDialog.setWindowTitle(title)
@@ -36,7 +44,8 @@ def getIntInputDialog(title:str, context:str,  floor:int, top: int, step: int, c
         ok = True
     return ok, value
 
-def getDoubleInputDialog(title:str, context:str,  floor:float, top: float, step: int, confirm:bool, cancce:bool):
+
+def getDoubleInputDialog(title: str, context: str, floor: float, top: float, step: int, confirm: bool, cancce: bool):
     inputDialog = QInputDialog()
     inputDialog.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowCloseButtonHint)
     inputDialog.setFixedSize(400, 400)
@@ -56,7 +65,8 @@ def getDoubleInputDialog(title:str, context:str,  floor:float, top: float, step:
         ok = True
     return ok, value
 
-def getTextInputDialog(title:str, context:str,  floor:float, top: float, step: int, confirm:bool, cancce:bool):
+
+def getTextInputDialog(title: str, context: str, floor: float, top: float, step: int, confirm: bool, cancce: bool):
     inputDialog = QInputDialog()
     inputDialog.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowCloseButtonHint)
     inputDialog.setFixedSize(400, 400)

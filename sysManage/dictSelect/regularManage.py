@@ -3,14 +3,12 @@ import sys
 import zipfile
 
 from PyQt5 import QtCore
-from PyQt5.QtCore import QStringListModel, Qt, QDateTime
-from PyQt5.QtWidgets import QWidget, QMessageBox, QFileDialog, QApplication, QHeaderView, QTableWidget, \
-    QTableWidgetItem, QAbstractItemView, QCheckBox, QHBoxLayout
-from PyQt5.uic.properties import QtWidgets
-
+from PyQt5.QtCore import Qt, QDateTime
+from PyQt5.QtWidgets import QWidget, QMessageBox, QFileDialog, QApplication, QHeaderView, QTableWidgetItem, \
+    QAbstractItemView, QCheckBox
+from sysManage.component import getMessageBox
 from database.regularManageSql import getResultFromRegularManage, savaFile, deleteFile
 from widgets.dictSelect.regularManage import Widget_Regular_Manage
-
 
 
 class regularManage(QWidget, Widget_Regular_Manage):
@@ -113,14 +111,14 @@ class regularManage(QWidget, Widget_Regular_Manage):
                                     # self.progerss.setValue(count)
                                     break
                     if savaFile(name,type,dirctorFilePath,stringDate) == False:
-                        QMessageBox.information(self, "警告", "导入失败！", QMessageBox.Yes)
+                        getMessageBox("警告", "导入失败！", True, False)
                         self.init()
                         return
-                QMessageBox.information(self, "提醒", "导入成功！", QMessageBox.Yes)
+                getMessageBox("提醒", "导入成功！", True, False)
                 self.init()
 
         else:
-            QMessageBox.information(self, "警告", "该文件导入不支持！", QMessageBox.Yes)
+            getMessageBox("警告", "该文件导入不支持！", True, False)
 
     def soltOpenFile(self,item):
         row = self.lw_file.row(item)
@@ -130,13 +128,13 @@ class regularManage(QWidget, Widget_Regular_Manage):
             try:
                 win32api.ShellExecute(0, 'open', fileInfo[3], '', '', 1)
             except:
-                QMessageBox.information(self, "警告", "找不到指定文件", QMessageBox.Yes)
+                getMessageBox("警告", "找不到指定文件", True, False)
 
 
 
     def soltOutputFiles(self):
-        reply = QMessageBox.question(self, '导出选中', '确定导出选中文件？', QMessageBox.Cancel, QMessageBox.Yes)
-        if reply == QMessageBox.Yes:
+        reply = getMessageBox('导出选中', '确定导出选中文件？', True, True)
+        if reply == QMessageBox.Ok:
             directoryPath = QFileDialog.getExistingDirectory(self, "请选择导出文件夹", "c:/")
             if len(directoryPath) > 0:
                 date = QDateTime.currentDateTime()
@@ -150,7 +148,7 @@ class regularManage(QWidget, Widget_Regular_Manage):
                         fileInfo = self.result[i]
                         createdZipFile.write(fileInfo[3],fileInfo[1] + '.' + fileInfo[2],zipfile.ZIP_DEFLATED)
                 createdZipFile.close()
-                QMessageBox.question(self, '成功', '成功导出！', QMessageBox.Yes)
+                getMessageBox('成功', '成功导出！', True, False)
             pass
 
     def soltSearchFile(self):
@@ -158,8 +156,8 @@ class regularManage(QWidget, Widget_Regular_Manage):
 
 
     def soltDeleteFile(self):
-        reply = QMessageBox.question(self, '删除', '确定删除选中导入的文件？', QMessageBox.Cancel, QMessageBox.Yes)
-        if reply == QMessageBox.Yes:
+        reply = getMessageBox('删除', '确定删除选中导入的文件？', True, True)
+        if reply == QMessageBox.Ok:
             for i in range(self.lw_file.rowCount()):
                 item = self.lw_file.cellWidget(i, 4)
                 if item != None and item.checkState() == 2:

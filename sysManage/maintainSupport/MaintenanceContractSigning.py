@@ -9,7 +9,7 @@ from sysManage.userInfo import get_value
 import sys
 from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QTableWidget, QHeaderView, QTableWidgetItem, QComboBox, \
     QMessageBox, QFileDialog, QDateEdit, QCheckBox, QPushButton
-
+from sysManage.component import getMessageBox
 from widgets.serviceSupport.maintenanceContractSigningUI import MaintenanceContractSigningUI
 
 
@@ -350,7 +350,7 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
                     item.setEnabled(False)
             except Exception as e:
                 print(e)
-                QMessageBox.about(self, "开具调拨单失败！", "请检查文件名是否正确、文件是否已存在、是否安装word或word正在被占用！")
+                getMessageBox("开具调拨单失败！", "请检查文件名是否正确、文件是否已存在、是否安装word或word正在被占用！", True, False)
                 return
     '''
         功能：
@@ -678,7 +678,7 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
         else:
             insertOneDataIntContactSign(rowData)
             self.currentLastRow = -1
-            QMessageBox.warning(self, "注意", "插入成功！", QMessageBox.Yes, QMessageBox.Yes)
+            getMessageBox("注意", "插入成功！", True, False)
             self.displayData()
 
     def alterRowData(self, row):
@@ -725,9 +725,9 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
             return
         else:
             if (updataOneDataIntoContractSign(rowData) == True):
-                QMessageBox.warning(self, "修改成功", "修改成功！", QMessageBox.Yes, QMessageBox.Yes)
+                getMessageBox("修改成功", "修改成功！", True, False)
             else:
-                QMessageBox.warning(self, "警告", "修改失败！", QMessageBox.Yes, QMessageBox.Yes)
+                getMessageBox("警告", "修改失败！", True, False)
             self.displayData()
 
 
@@ -827,7 +827,7 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
             item.addItems(['否', '是'])
             self.tw_result.setCellWidget(rowCount, 29, item)
         else:
-            QMessageBox.warning(self, "注意", "请先将数据补充完整！", QMessageBox.Yes)
+            getMessageBox("注意", "请先将数据补充完整！", True, False)
         self.tb_add.clicked.connect(self.slotAdd)
         self.shutdown = False
         self.tw_result.itemChanged.connect(self.slotAlterAndSava)
@@ -872,10 +872,10 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
             resultCount = len(self.result)
 
         if rowCount < 3:
-            QMessageBox.warning(self, "注意", "请选中有效单元格！", QMessageBox.Yes, QMessageBox.Yes)
+            getMessageBox("注意", "请选中有效单元格！", True, False)
         elif rowCount >= 3 and rowCount < 3 + resultCount:
-            reply = QMessageBox.question(self, '警告', '是否删除该行数据？', QMessageBox.Cancel, QMessageBox.Yes)
-            if reply == QMessageBox.Yes:
+            reply = getMessageBox('警告', '是否删除该行数据？', True, True)
+            if reply == QMessageBox.Ok:
                 deleteDataByContractSignId(self.result[rowCount - 3][0])
                 self.tw_result.removeRow(rowCount)
                 self.displayData()
@@ -894,9 +894,9 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
         self.tb_outputToExcel.disconnect()
 
         if len(self.result) < 1:
-            reply = QMessageBox.warning(self, '警告', '未选中任何数据，无法导出', QMessageBox.Yes)
+            getMessageBox('警告', '未选中任何数据，无法导出', True, False)
             return
-        reply = QMessageBox.question(self, '修改导出Excel', '是否保存修改并导出Excel？', QMessageBox.Cancel, QMessageBox.Yes)
+        reply = getMessageBox('修改导出Excel', '是否保存修改并导出Excel？', True, True)
         if reply == QMessageBox.Cancel:
             self.displayData()
             return
@@ -1041,10 +1041,10 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
                 workBook.save(pathName)
                 import win32api
                 win32api.ShellExecute(0, 'open', pathName, '', '', 1)
-                QMessageBox.about(self, "导出成功", "导出成功！")
+                getMessageBox("导出成功", "导出成功！", True, False)
                 return
             except Exception as e:
-                QMessageBox.about(self, "导出失败", "导出表格被占用，请关闭正在使用的Execl！")
+                getMessageBox("导出失败", "导出表格被占用，请关闭正在使用的Execl！", True, False)
                 return
         self.tb_outputToExcel.clicked.connect(self.slotOutputToExcel)
 

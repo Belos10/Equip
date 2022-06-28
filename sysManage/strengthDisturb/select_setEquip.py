@@ -7,6 +7,7 @@ from database.strengthDisturbSql import *
 from sysManage.showInputResult import showInputResult
 from widgets.strengthDisturb.select_setEquip import widget_Select_SetEquip
 from sysManage.userInfo import get_value
+from sysManage.component import getMessageBox
 
 class select_setEquip(QWidget,widget_Select_SetEquip):
     def __init__(self,parent=None):
@@ -266,13 +267,13 @@ class select_setEquip(QWidget,widget_Select_SetEquip):
 
     def slotAddDict(self):
         if self.le_equipID.text() == "" or self.le_equipName.text() == "":
-            reply = QMessageBox.information(self, '新增失败', '装备ID或装备名字为空，拒绝增加，请重新填写', QMessageBox.Yes)
+            getMessageBox('新增失败', '装备ID或装备名字为空，拒绝增加，请重新填写', True, False)
         else:
             Equip_ID = self.le_equipID.text()
             Equip_Name = self.le_equipName.text()
             haveEquipID = selectEquipInfoByEquipID(Equip_ID)
             if haveEquipID:
-                reply = QMessageBox.information(self, '新增失败', '装备ID已存在, 请重新填写', QMessageBox.Yes)
+                getMessageBox('新增失败', '装备ID已存在, 请重新填写', True, False)
                 return
             Equip_Uper = self.cb_equipUper.currentText()
             Input_Type = self.cb_inputType.currentText()
@@ -280,10 +281,10 @@ class select_setEquip(QWidget,widget_Select_SetEquip):
             Equip_Unit = self.le_equipUnit.text()
             addSuccess = addDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type, Equip_Unit)
             if addSuccess == True:
-                reply = QMessageBox.information(self, '新增', '新增成功', QMessageBox.Yes)
+                getMessageBox('新增', '新增成功', True, False)
                 self.slotEquipDictInit()
             else:
-                reply = QMessageBox.information(self, '新增', str(addSuccess) + ',新增失败', QMessageBox.Yes)
+                getMessageBox('新增', str(addSuccess) + ',新增失败', True, False)
                 return
 
     '''
@@ -293,13 +294,12 @@ class select_setEquip(QWidget,widget_Select_SetEquip):
 
     def slotUpdate(self):
         if self.tb_result.currentRow() < 0:
-            reply = QMessageBox.question(self, '修改失败', '请选中某行', QMessageBox.Yes)
+            getMessageBox('修改失败', '请选中某行', True, False)
             return
         # 装备目录
         if (self.tb_result.item(self.tb_result.currentRow(),
                                 0).text() != self.le_equipID.text()) or self.le_equipName.text() == "":
-            reply = QMessageBox.question(self, '修改失败', '装备ID不能修改或装备名字为空，拒绝修改，请重新填写', QMessageBox.Yes,
-                                         QMessageBox.Cancel)
+            getMessageBox('修改失败', '装备ID不能修改或装备名字为空，拒绝修改，请重新填写', True, False)
             self.le_equipID.setText(self.tb_result.item(self.tb_result.currentRow(), 0).text())
             return
         else:
@@ -312,10 +312,10 @@ class select_setEquip(QWidget,widget_Select_SetEquip):
             updateSuccess = updateDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type,
                                                 Equip_Unit)
             if updateSuccess == True:
-                reply = QMessageBox.question(self, '修改', '修改成功', QMessageBox.Yes)
+                getMessageBox('修改', '修改成功', True, False)
                 self.slotEquipDictInit()
             else:
-                reply = QMessageBox.question(self, '修改', str(updateSuccess) + '，修改失败', QMessageBox.Yes)
+                getMessageBox('修改', str(updateSuccess) + '，修改失败', True, False)
                 return
 
     '''
@@ -325,20 +325,19 @@ class select_setEquip(QWidget,widget_Select_SetEquip):
 
     def slotDelDict(self):
         if self.tb_result.currentRow() < 0:
-            reply = QMessageBox.question(self, '删除', '请选中某一行', QMessageBox.Yes)
+            getMessageBox('删除', '请选中某一行', True, False)
             return
-        reply = QMessageBox.question(self, '删除', '是否将下级装备以及所涉及的其他表关于该装备的信息一起删除？', QMessageBox.Yes,
-                                     QMessageBox.Cancel)
-        if reply == QMessageBox.Yes:
+        reply = getMessageBox('删除', '是否将下级装备以及所涉及的其他表关于该装备的信息一起删除？', True, True)
+        if reply == QMessageBox.Ok:
             delSuccess = delDataInEquip(self.le_equipID.text())
             if delSuccess == True:
-                reply = QMessageBox.question(self, '删除', '删除成功', QMessageBox.Yes)
+                getMessageBox('删除', '删除成功', True, False)
                 self.slotEquipDictInit()
             else:
-                reply = QMessageBox.question(self, '删除', str(delSuccess) + ',删除失败', QMessageBox.Yes)
+                getMessageBox('删除', str(delSuccess) + ',删除失败', True, False)
                 return
         else:
-            reply = QMessageBox.question(self, '删除', '删除失败', QMessageBox.Yes)
+            getMessageBox('删除', '删除失败', True, False)
 
 
     def slotCancelInputIntoMysql(self):
@@ -356,12 +355,12 @@ class select_setEquip(QWidget,widget_Select_SetEquip):
                                                   self.inputEquipInfoList[i][2], self.inputEquipInfoList[i][3],
                                                   self.inputEquipInfoList[i][4], self.inputEquipInfoList[i][5])
                 else:
-                    QMessageBox.information(self, "导入", "导入第%d数据失败,存在重复数据%d" % i, QMessageBox.Yes)
+                    getMessageBox("导入", "导入第%d数据失败,存在重复数据%d" % i, True, False)
             except Exception as e:
                 print(e)
-                QMessageBox.information(self, "导入", "导入第%d数据失败" % i, QMessageBox.Yes)
+                getMessageBox("导入", "导入第%d数据失败" % i, True, False)
                 continue
-        reply = QMessageBox.information(self, '新增', '新增成功', QMessageBox.Yes)
+        getMessageBox('新增', '新增成功', True, False)
         self.slotEquipDictInit()
         self.setDisabled(False)
         self.showInputResult.hide()
@@ -420,7 +419,7 @@ class select_setEquip(QWidget,widget_Select_SetEquip):
             return
         except BaseException as e:
             print(e)
-            QMessageBox.about(self, "打开失败", "打开文件失败，请检查文件")
+            getMessageBox("打开失败", "打开文件失败，请检查文件", True, False)
             self.setDisabled(False)
 
 
@@ -492,11 +491,11 @@ class select_setEquip(QWidget,widget_Select_SetEquip):
                     workBook.save("%s/装备目录表.xls"%directoryPath)
                     import win32api
                     win32api.ShellExecute(0, 'open', '%s/装备目录表.xls' % directoryPath, '', '', 1)
-                    QMessageBox.about(self, "导出成功", "导出成功！")
+                    getMessageBox("导出成功", "导出成功！", True, False)
                     return
                 except Exception as e:
-                    QMessageBox.about(self, "导出失败", "导出表格被占用，请关闭正在使用的Execl！")
+                    getMessageBox("导出失败", "导出表格被占用，请关闭正在使用的Execl！", True, False)
                     return
             else:
-                QMessageBox.about(self, "未选中任何数据", "导出失败！")
+                getMessageBox("未选中任何数据", "导出失败！", True, False)
                 return

@@ -1,10 +1,9 @@
-from PyQt5.QAxContainer import QAxWidget
-from PyQt5.QtCore import QVariant
-from PyQt5.QtGui import QColor
-from widgets.dictSelect.widget_manual import widget_manual
-from PyQt5.QtWidgets import QWidget, QFileDialog, QTreeWidgetItem, QMessageBox
-from docx import Document
 import os
+
+from PyQt5.QtWidgets import QWidget, QTreeWidgetItem
+from docx import Document
+
+from widgets.dictSelect.widget_manual import widget_manual
 
 
 class Manual(QWidget, widget_manual):

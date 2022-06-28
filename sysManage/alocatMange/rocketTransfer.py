@@ -8,6 +8,7 @@ from database.alocatMangeSql import selectYearListAboutArmy, selectArmyTransferB
 from database.alocatMangeSql import selectYearListAboutDisturbPlan
 from database.strengthDisturbSql import selectAllEndEquip
 from sysManage.alocatMange.config import ArmyTransferReceiveUnit, ArmyTransferSendUnit
+from sysManage.component import getMessageBox
 
 '''
    火箭军调拨单管理
@@ -227,9 +228,9 @@ class rocketTransfer(QWidget, Widget_Rocket_Transfer):
 
     def slotOutputToExcel(self):
         if len(self.currentResult) < 1:
-            reply = QMessageBox.warning(self, '警告', '未选中任何数据，无法导出', QMessageBox.Yes)
+            getMessageBox('警告', '未选中任何数据，无法导出', True, False)
             return
-        reply = QMessageBox.question(self, '修改导出Excel', '是否保存修改并导出Excel？', QMessageBox.Cancel, QMessageBox.Yes)
+        reply = getMessageBox('修改导出Excel', '是否保存修改并导出Excel？', True, True)
         if reply == QMessageBox.Cancel:
             return
 
@@ -357,13 +358,13 @@ class rocketTransfer(QWidget, Widget_Rocket_Transfer):
                 workBook.save(pathName)
                 import win32api
                 win32api.ShellExecute(0, 'open', pathName, '', '', 1)
-                QMessageBox.about(self, "导出成功", "导出成功！")
+                getMessageBox("导出成功", "导出成功！", True, False)
                 return
             except Exception as e:
-                QMessageBox.about(self, "导出失败", "导出表格被占用，请关闭正在使用的Execl！")
+                getMessageBox("导出失败", "导出表格被占用，请关闭正在使用的Execl！", True, False)
                 return
         else:
-            QMessageBox.about(self, "选取文件夹失败！", "请选择正确的文件夹！")
+            getMessageBox("选取文件夹失败！", "请选择正确的文件夹！", True, False)
         pass
 
 

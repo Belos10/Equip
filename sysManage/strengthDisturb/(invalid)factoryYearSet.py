@@ -1,9 +1,10 @@
-from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, QAbstractItemView, QMessageBox
-from widgets.strengthDisturb.factoryYearSet import Widget_Factory_Year_Set
-from database.strengthDisturbSql import selectAllStrengthYearInfo
-from PyQt5.Qt import Qt
+from PyQt5.QtWidgets import QWidget, QTableWidgetItem, QAbstractItemView
 
-#new
+from database.strengthDisturbSql import selectAllStrengthYearInfo
+from widgets.strengthDisturb.factoryYearSet import Widget_Factory_Year_Set
+
+
+
 class factoryYearSet(QWidget, Widget_Factory_Year_Set):
     def __init__(self, parent=None):
         super(factoryYearSet, self).__init__(parent)

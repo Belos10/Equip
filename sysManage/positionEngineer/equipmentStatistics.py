@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QTableWidget, QH
     QMessageBox, QTreeWidgetItem, QTreeWidgetItemIterator, QFileDialog
 from widgets.positionEngineer.posEngneerStatisticsUI import PosEngneerStatisticsUI
 from sysManage.userInfo import get_value
+from sysManage.component import getMessageBox
 
 
 class EquipmentStatistics(QWidget, PosEngneerStatisticsUI):
@@ -476,15 +477,15 @@ class EquipmentStatistics(QWidget, PosEngneerStatisticsUI):
                         try:
                             count = int(text1)
                         except:
-                            QMessageBox.warning(self, "注意", "请输入正确的数字！", QMessageBox.Yes)
+                            getMessageBox("注意", "请输入正确的数字！", True, False)
                             return
                         status = text2
                         if alterData(index,count,status) == True:
-                            QMessageBox.warning(self, "注意", "修改成功！", QMessageBox.Yes, QMessageBox.Yes)
+                            getMessageBox("注意", "修改成功！", True, False)
                             self.slotEquipmentStatisticsResult()
                     elif len(text1) == 0 and len(text2) == 0:
                        if deleteData(index) == True:
-                           QMessageBox.warning(self, "注意", "清除成功！", QMessageBox.Yes, QMessageBox.Yes)
+                           getMessageBox("注意", "清除成功！", True, False)
                            self.slotEquipmentStatisticsResult()
                 else:
                     itemData = self.tw_result.item(currentRow, currentColumn - 1)
@@ -502,15 +503,15 @@ class EquipmentStatistics(QWidget, PosEngneerStatisticsUI):
                         try:
                             count = int(text1)
                         except:
-                            QMessageBox.warning(self, "注意", "请输入正确的数字！", QMessageBox.Yes)
+                            getMessageBox("注意", "请输入正确的数字！", True, False)
                             return
                         status = text2
                         if alterData(index,count,status) == True:
-                            QMessageBox.warning(self, "注意", "修改成功！", QMessageBox.Yes, QMessageBox.Yes)
+                            getMessageBox("注意", "修改成功！", True, False)
                             self.slotEquipmentStatisticsResult()
                     elif len(text1) == 0 and len(text2) == 0:
                        if deleteData(index) == True:
-                           QMessageBox.warning(self, "注意", "清除成功！", QMessageBox.Yes, QMessageBox.Yes)
+                           getMessageBox("注意", "清除成功！", True, False)
                            self.slotEquipmentStatisticsResult()
             elif type(index) == list:
                 if currentColumn % 2 == 0:
@@ -528,11 +529,11 @@ class EquipmentStatistics(QWidget, PosEngneerStatisticsUI):
                         try:
                             count = int(text1)
                         except:
-                            QMessageBox.warning(self, "注意", "请输入正确的数字！", QMessageBox.Yes)
+                            getMessageBox("注意", "请输入正确的数字！", True, False)
                             return
                         status = text2
                         if insertData(index[0],index[1],count,status) == True:
-                            QMessageBox.warning(self, "注意", "增加成功！", QMessageBox.Yes, QMessageBox.Yes)
+                            getMessageBox("注意", "增加成功！", True, False)
                             self.slotEquipmentStatisticsResult()
                 else:
                     itemData = self.tw_result.item(currentRow, currentColumn - 1)
@@ -549,11 +550,11 @@ class EquipmentStatistics(QWidget, PosEngneerStatisticsUI):
                         try:
                             count = int(text1)
                         except:
-                            QMessageBox.warning(self, "注意", "请输入正确的数字！", QMessageBox.Yes)
+                            getMessageBox("注意", "请输入正确的数字！", True, False)
                             return
                         status = text2
                         if insertData(index[0], index[1], count, status) == True:
-                            QMessageBox.warning(self, "注意", "增加成功！", QMessageBox.Yes, QMessageBox.Yes)
+                            getMessageBox("注意", "增加成功！", True, False)
                             self.slotEquipmentStatisticsResult()
 
 
@@ -568,9 +569,9 @@ class EquipmentStatistics(QWidget, PosEngneerStatisticsUI):
     def slotOutputToExcel(self):
         if len(self.currentCheckedUnitList) == 1 and len(self.currentCheckedEquipList) > 0:
             if gradeInUnit(self.currentCheckedUnitList[0]) != 3:
-                reply = QMessageBox.warning(self, '警告', '未选中任何数据，无法导出', QMessageBox.Yes)
+                getMessageBox('警告', '未选中任何数据，无法导出', True, False)
                 return
-        reply = QMessageBox.question(self, '修改导出Excel', '是否保存修改并导出Excel？', QMessageBox.Cancel, QMessageBox.Yes)
+        reply = getMessageBox('修改导出Excel', '是否保存修改并导出Excel？', True, True)
         if reply == QMessageBox.Cancel:
             return
 
@@ -719,13 +720,13 @@ class EquipmentStatistics(QWidget, PosEngneerStatisticsUI):
                 workBook.save(pathName)
                 import win32api
                 win32api.ShellExecute(0, 'open', pathName, '', '', 1)
-                QMessageBox.about(self, "导出成功", "导出成功！")
+                getMessageBox("导出成功", "导出成功！", True, False)
                 return
             except Exception as e:
-                QMessageBox.about(self, "导出失败", "导出表格被占用，请关闭正在使用的Execl！")
+                getMessageBox("导出失败", "导出表格被占用，请关闭正在使用的Execl！", True, False)
                 return
         else:
-            QMessageBox.about(self, "选取文件夹失败！", "请选择正确的文件夹！")
+            getMessageBox("选取文件夹失败！", "请选择正确的文件夹！", True, False)
 
 
 

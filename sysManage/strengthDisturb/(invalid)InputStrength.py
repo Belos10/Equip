@@ -1,11 +1,9 @@
-from PyQt5.QtCore import QRegExp
-from PyQt5.QtGui import QRegExpValidator
-from widgets.strengthDisturb.inputStrength import widget_inputStrength
-from PyQt5.QtWidgets import QWidget,QDialog
-from PyQt5.Qt import QRegExp,QRegExpValidator,Qt
 from PyQt5 import QtCore
-from PyQt5.QtWidgets import QMessageBox,QPushButton
-from database.alocatMangeSql import updateDisturbPlanProof
+from PyQt5.Qt import QRegExp, QRegExpValidator, Qt
+from PyQt5.QtWidgets import QDialog
+from PyQt5.QtWidgets import QMessageBox, QPushButton
+
+from widgets.strengthDisturb.inputStrength import widget_inputStrength
 
 regx = QRegExp("[0-9]*")
 class InputStrength(QDialog,widget_inputStrength):

@@ -10,6 +10,7 @@ from database.alocatMangeSql import *
 from PyQt5.Qt import Qt
 from database.alocatMangeSql import *
 from sysManage.userInfo import *
+from sysManage.component import getMessageBox
 # new
 '''
     功能：
@@ -322,13 +323,13 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
         # 装备目录
         elif self.changeUnit == '2':
             if self.le_equipID.text() == "" or self.le_equipName.text() == "":
-                reply = QMessageBox.information(self, '新增失败', '装备ID或装备名字为空，拒绝增加，请重新填写', QMessageBox.Yes)
+                getMessageBox('新增失败', '装备ID或装备名字为空，拒绝增加，请重新填写', True, False)
             else:
                 Equip_ID = self.le_equipID.text()
                 Equip_Name = self.le_equipName.text()
                 haveEquipID = selectEquipInfoByEquipID(Equip_ID)
                 if haveEquipID:
-                    reply = QMessageBox.information(self, '新增失败', '装备ID已存在, 请重新填写', QMessageBox.Yes)
+                    getMessageBox( '新增失败', '装备ID已存在, 请重新填写', True, False)
                     return
                 Equip_Uper = self.cb_equipUper.currentText()
                 Input_Type = self.cb_inputType.currentText()
@@ -336,10 +337,10 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
                 Equip_Unit = self.le_equipUnit.text()
                 addSuccess = addDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type, Equip_Unit)
                 if addSuccess == True:
-                    reply = QMessageBox.information(self, '新增', '新增成功', QMessageBox.Yes)
+                    getMessageBox('新增', '新增成功', True, False)
                     self.slotEquipDictInit()
                 else:
-                    reply = QMessageBox.information(self, '新增', str(addSuccess) + ',新增失败', QMessageBox.Yes)
+                    getMessageBox('新增', str(addSuccess) + ',新增失败', True, False)
                     return
 
     def updateUnit(self):
@@ -354,7 +355,7 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
 
     def slotUpdate(self):
         if self.tb_result.currentRow() < 0:
-            reply = QMessageBox.question(self, '修改失败', '请选中某行', QMessageBox.Yes)
+            getMessageBox('修改失败', '请选中某行', True, False)
             return
         # 单位目录
         if self.changeUnit == '1':
@@ -363,8 +364,7 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
         elif self.changeUnit == '2':
             if (self.tb_result.item(self.tb_result.currentRow(),
                                     0).text() != self.le_equipID.text()) or self.le_equipName.text() == "":
-                reply = QMessageBox.question(self, '修改失败', '装备ID不能修改或装备名字为空，拒绝修改，请重新填写', QMessageBox.Yes,
-                                             QMessageBox.Cancel)
+                getMessageBox('修改失败', '装备ID不能修改或装备名字为空，拒绝修改，请重新填写', True, False)
                 self.le_equipID.setText(self.tb_result.item(self.tb_result.currentRow(), 0).text())
                 return
             else:
@@ -377,10 +377,10 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
                 updateSuccess = updateDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type,
                                                     Equip_Unit)
                 if updateSuccess == True:
-                    reply = QMessageBox.question(self, '修改', '修改成功', QMessageBox.Yes)
+                    getMessageBox('修改', '修改成功', True, False)
                     self.slotEquipDictInit()
                 else:
-                    reply = QMessageBox.question(self, '修改', str(updateSuccess) + '，修改失败', QMessageBox.Yes)
+                    getMessageBox('修改', str(updateSuccess) + '，修改失败', True, False)
                     return
 
     '''
@@ -389,33 +389,32 @@ class alocatDictSet(QWidget, Widget_Dict_Set):
     '''
     def slotDelDict(self):
         if self.tb_result.currentRow() < 0:
-            reply = QMessageBox.question(self, '删除', '请选中某一行', QMessageBox.Yes)
+            getMessageBox('删除', '请选中某一行', True, False)
             return
         # 单位目录
         if self.changeUnit == '1':
-            reply = QMessageBox.information(self, '删除', '是否将下级单位以及所涉及的其他表关于该单位的信息一起删除？', QMessageBox.Yes)
-            if reply == QMessageBox.Yes:
+            reply = getMessageBox('删除', '是否将下级单位以及所涉及的其他表关于该单位的信息一起删除？', True, False)
+            if reply == QMessageBox.Ok:
                 delDataInDisturbPlanUnit(self.le_unitID.text())
                 delDataInPosenginUnit(self.le_unitID.text())
-                reply = QMessageBox.question(self, '删除', '删除成功', QMessageBox.Yes)
+                getMessageBox('删除', '删除成功', True, False)
                 self.slotUnitDictInit()
 
             else:
-                reply = QMessageBox.question(self, '删除', '删除失败', QMessageBox.Yes)
+                getMessageBox('删除', '删除失败', True, False)
         # 装备目录
         elif self.changeUnit == '2':
-            reply = QMessageBox.question(self, '删除', '是否将下级装备以及所涉及的其他表关于该装备的信息一起删除？', QMessageBox.Yes,
-                                         QMessageBox.Cancel)
-            if reply == QMessageBox.Yes:
+            reply = getMessageBox('删除', '是否将下级装备以及所涉及的其他表关于该装备的信息一起删除？', True, True)
+            if reply == QMessageBox.Ok:
                 delSuccess = delDataInEquip(self.le_equipID.text())
                 if delSuccess == True:
-                    reply = QMessageBox.question(self, '删除', '删除成功', QMessageBox.Yes)
+                    getMessageBox('删除', '删除成功', True, False)
                     self.slotEquipDictInit()
                 else:
-                    reply = QMessageBox.question(self, '删除', str(delSuccess) + ',删除失败', QMessageBox.Yes)
+                    getMessageBox('删除', str(delSuccess) + ',删除失败', True, False)
                     return
             else:
-                reply = QMessageBox.question(self, '删除', '删除失败', QMessageBox.Yes)
+                getMessageBox('删除', '删除失败', True, False)
 
 
 '''

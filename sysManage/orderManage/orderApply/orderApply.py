@@ -1,13 +1,14 @@
+from PyQt5.Qt import Qt
 from PyQt5.QtCore import QVariant
-from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, QAbstractItemView, \
-    QMessageBox, QListWidgetItem, QInputDialog, QHeaderView, QFileDialog, QTreeWidgetItemIterator
+from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, QMessageBox, QListWidgetItem, QInputDialog, \
+    QHeaderView, QFileDialog
 
 from database.OrderApplySql import *
+from database.strengthDisturbSql import *
+from sysManage.userInfo import get_value
 from utills.utillsComponent import CheckableComboBox
 from widgets.strengthDisturb.retirement import Widget_Retirement
-from database.strengthDisturbSql import *
-from PyQt5.Qt import Qt
-from sysManage.userInfo import get_value
+from sysManage.component import getMessageBox
 
 '''
    订购申请
@@ -89,7 +90,7 @@ class OrderApply(QWidget, Widget_Retirement):
         currentRow = self.lw_year.currentRow()
 
         if currentRow == 0:
-            reply = QMessageBox.question(self, '删除', '是否删除所有年份以及年份下所有数据？', QMessageBox.Yes, QMessageBox.Cancel)
+            reply = getMessageBox('删除', '是否删除所有年份以及年份下所有数据？', True, True)
             if reply == QMessageBox.Cancel:
                 return
             else:
@@ -97,11 +98,11 @@ class OrderApply(QWidget, Widget_Retirement):
                 self.initAll()
                 return
         if currentRow < 0:
-            reply = QMessageBox.question(self, '删除', '请选中某年进行删除', QMessageBox.Yes)
+            getMessageBox('删除', '请选中某年进行删除', True, False)
         else:
             currentYear = self.lw_year.currentItem().text()
-            reply = QMessageBox.question(self, '删除', '是否删除当前年份以及当前年份下所有数据？', QMessageBox.Yes, QMessageBox.Cancel)
-            if reply == QMessageBox.Yes:
+            reply = getMessageBox('删除', '是否删除当前年份以及当前年份下所有数据？', True, True)
+            if reply == QMessageBox.Ok:
                 deleteOrderApplyYearByYear(currentYear)
                 self.initAll()
             else:
@@ -119,7 +120,7 @@ class OrderApply(QWidget, Widget_Retirement):
                     haveYear = True
                     break
             if haveYear:
-                reply = QMessageBox.information(self, "新增", "年份已存在，新增失败", QMessageBox.Yes)
+                getMessageBox("新增", "年份已存在，新增失败", True, False)
                 return
             insertIntoOrderApplyYear(year)
             self._initSelectYear_()
@@ -517,7 +518,7 @@ class OrderApply(QWidget, Widget_Retirement):
 
     def slotSaveRetire(self):
         item = self.tw_result.currentItem()
-        reply = QMessageBox.question(self, '修改', '是否保存修改？', QMessageBox.Cancel, QMessageBox.Yes)
+        reply = getMessageBox('修改', '是否保存修改？', True, True)
         if reply == QMessageBox.Cancel:
             self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList,
                                                         self.currentYear)
@@ -529,7 +530,7 @@ class OrderApply(QWidget, Widget_Retirement):
                 apply = self.tw_result.item(i + 2, 7).text()
                 other = self.tw_result.item(i + 2, 8).text()
                 updateOrderApply(num, apply, other, result)
-        QMessageBox.question(self, '修改', '修改成功', QMessageBox.Yes)
+        getMessageBox('修改', '修改成功', True, False)
         self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList,
                                                    self.currentYear)
         return
@@ -544,7 +545,7 @@ class OrderApply(QWidget, Widget_Retirement):
                 if input.isdigit() == True:
                     return
                 else:
-                    reply = QMessageBox.question(self, '警告', '请输入正确的数字！', QMessageBox.Yes)
+                    getMessageBox('警告', '请输入正确的数字！', True, False)
                     self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList,
                                                                 self.currentCheckedEquipList,
                                                                 self.currentYear)
@@ -584,9 +585,9 @@ class OrderApply(QWidget, Widget_Retirement):
     #导出到Excel表格
     def slotOutputToExcel(self):
         if len(self.resultList) < 1:
-            reply = QMessageBox.warning(self, '警告', '未选中任何数据，无法导出', QMessageBox.Yes)
+            getMessageBox('警告', '未选中任何数据，无法导出', True, False)
             return
-        reply = QMessageBox.question(self, '修改导出Excel', '是否保存修改并导出Excel？', QMessageBox.Cancel, QMessageBox.Yes)
+        reply = getMessageBox('修改导出Excel', '是否保存修改并导出Excel？', True, True)
         if reply == QMessageBox.Cancel:
             self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList,
                                                         self.currentYear)
@@ -701,13 +702,13 @@ class OrderApply(QWidget, Widget_Retirement):
                 workBook.save(pathName)
                 import win32api
                 win32api.ShellExecute(0, 'open', pathName, '', '', 1)
-                QMessageBox.about(self, "导出成功", "导出成功！")
+                getMessageBox("导出成功", "导出成功！", True, False)
                 return
             except Exception as e:
-                QMessageBox.about(self, "导出失败", "导出表格被占用，请关闭正在使用的Execl！")
+                getMessageBox("导出失败", "导出表格被占用，请关闭正在使用的Execl！", True, False)
                 return
         else:
-            QMessageBox.about(self, "选取文件夹失败！", "请选择正确的文件夹！")
+            getMessageBox("选取文件夹失败！", "请选择正确的文件夹！", True, False)
 
 
 

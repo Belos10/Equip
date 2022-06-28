@@ -1,6 +1,7 @@
 from PyQt5.QtCore import Qt, QDate
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QDialog, QHeaderView, QTableWidgetItem, QMessageBox, QDateEdit
+from sysManage.component import getMessageBox
 
 from database.contractManagementSql import *
 from widgets.contractMangement.attachmentDialogUI import AttachmentDialogUI
@@ -260,25 +261,25 @@ class AttachmentDialog(QDialog, AttachmentDialogUI):
                         try:
                             count = int(item1.text())
                         except ValueError:
-                            QMessageBox.warning(self, "注意", "请输入整数！")
+                            getMessageBox("注意", "请输入整数！", True, False)
                             item1.setText('')
                         try:
                             unit = float(item0.text())
                         except:
                             item0.setText('')
-                            QMessageBox.warning(self, "注意", "请输入正确的数字！")
+                            getMessageBox("注意", "请输入正确的数字！", True, False)
 
                         try:
                             float(item2.text())
                         except:
                             item2.setText('')
-                            QMessageBox.warning(self, "注意", "请输入正确的数字！")
+                            getMessageBox("注意", "请输入正确的数字！", True, False)
 
                         try:
                             float(item3.text())
                         except:
                             item3.setText('')
-                            QMessageBox.warning(self, "注意", "请输入正确的数字！")
+                            getMessageBox("注意", "请输入正确的数字！", True, False)
 
                         amount = round(count * unit, 6)
                         if (amount != 0):
@@ -322,10 +323,10 @@ class AttachmentDialog(QDialog, AttachmentDialogUI):
         rowData.append(self.year)
         if len(rowData) == self.tw_result.columnCount() + 2:
             if (insertOneDataInToContractAttachment(rowData) == True):
-                QMessageBox.warning(self, "注意", "插入成功！", QMessageBox.Yes, QMessageBox.Yes)
+                getMessageBox("注意", "插入成功！", True, False)
                 self.currentLastRow = -1
             else:
-                QMessageBox.warning(self, "警告", "插入失败！", QMessageBox.Yes, QMessageBox.Yes)
+                getMessageBox("警告", "插入失败！", True, False)
             self.displayData()
 
     def alterRowData(self, row):
@@ -349,9 +350,9 @@ class AttachmentDialog(QDialog, AttachmentDialogUI):
         rowData.append(self.year)
         if len(rowData) == self.tw_result.columnCount() + 2:
             if (updataOneDataToContractAttachment(rowData) == True):
-                QMessageBox.warning(self, "注意", "修改成功！", QMessageBox.Yes, QMessageBox.Yes)
+                getMessageBox("注意", "修改成功！", True, False)
             else:
-                QMessageBox.warning(self, "警告", "修改失败！", QMessageBox.Yes, QMessageBox.Yes)
+                getMessageBox("警告", "修改失败！", True, False)
             self.displayData()
 
     def soltAdd(self):
@@ -428,7 +429,7 @@ class AttachmentDialog(QDialog, AttachmentDialogUI):
 
             self.tw_result.itemChanged.connect(self.slotAlterAndSava)
         else:
-            QMessageBox.warning(self, "注意", "请先将数据补充完整！", QMessageBox.Yes, QMessageBox.Yes)
+            getMessageBox("注意", "请先将数据补充完整！", True, False)
 
 
 
@@ -439,10 +440,10 @@ class AttachmentDialog(QDialog, AttachmentDialogUI):
         rowCount = self.tw_result.currentRow()
         resultCount = len(self.resultList)
         if rowCount < 2:
-            QMessageBox.warning(self, "注意", "请选中有效单元格！", QMessageBox.Yes, QMessageBox.Yes)
+            getMessageBox("注意", "请选中有效单元格！", True, False)
         elif rowCount >= 2 and rowCount < 2 + resultCount:
-            reply = QMessageBox.question(self, '警告', '是否删除该行数据？', QMessageBox.Cancel, QMessageBox.Yes)
-            if reply == QMessageBox.Yes:
+            reply = getMessageBox('警告', '是否删除该行数据？', True, True)
+            if reply == QMessageBox.Ok:
                 print(self.resultList[rowCount - 2][0], self.resultList[rowCount - 2][1],self.year)
                 deleteDataByContractAttachmentId(self.resultList[rowCount - 2][0], self.resultList[rowCount - 2][1],self.year)
                 self.tw_result.removeRow(rowCount)

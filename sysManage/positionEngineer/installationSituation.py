@@ -1,14 +1,14 @@
-import base64
 import pickle
 
-from PyQt5.QtCore import Qt, QDate, QDateTime
+from PyQt5.QtCore import Qt, QDateTime
+from PyQt5.QtWidgets import QWidget, QHeaderView, QTableWidgetItem, QComboBox, \
+    QMessageBox, QFileDialog, QDateEdit
+
 from database.positionEngneerSql import *
 from sysManage.showInputResult import showInputResult
 from sysManage.userInfo import get_value
 from widgets.positionEngineer.posEngneerInstallationUI import PosEngneerInstallationUI
-import sys
-from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QTableWidget, QHeaderView, QTableWidgetItem, QComboBox, \
-    QMessageBox, QFileDialog, QDateEdit, QCheckBox
+from sysManage.component import getMessageBox
 
 
 class InstallationSituation(QWidget, PosEngneerInstallationUI):
@@ -374,7 +374,7 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
                         if getUnitIdbyName(item.text()) != None:
                             rowData.append(getUnitIdbyName(item.text()))
                         else:
-                            QMessageBox.warning(self, "注意", "该基地名称尚未加入基地目录！", QMessageBox.Yes, QMessageBox.Yes)
+                            getMessageBox("注意", "该基地名称尚未加入基地目录！", True, False)
                             break
                     else:
                         if len(item.text()) > 0:
@@ -388,7 +388,7 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
         else:
             insertOneDataIntInstallation(rowData)
             self.currentLastRow = -1
-            QMessageBox.warning(self, "注意", "插入成功！", QMessageBox.Yes, QMessageBox.Yes)
+            getMessageBox("注意", "插入成功！", True, False)
             self.displayData()
 
     def alterRowData(self, row):
@@ -428,9 +428,9 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
             return False
         else:
             if (updataOneDataIntInstallation(rowData) == True):
-                QMessageBox.warning(self, "修改成功", "修改成功！", QMessageBox.Yes, QMessageBox.Yes)
+                getMessageBox("修改成功", "修改成功！", True, False)
             else:
-                QMessageBox.warning(self, "警告", "插入失败！", QMessageBox.Yes, QMessageBox.Yes)
+                getMessageBox("警告", "插入失败！", True, False)
             self.displayData()
 
     def slotCancelInputIntoDatabase(self):
@@ -448,7 +448,7 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
                     pass
             except Exception as e:
                 print(e)
-                QMessageBox.warning(self, "导入失败", "导入第%d数据失败！" % (i), QMessageBox.Yes)
+                getMessageBox("导入失败", "导入第%d数据失败！" % (i), True, False)
 
         self.showInputResult.hide()
         self.setDisabled(False)
@@ -466,7 +466,7 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
                     raise Exception("数据格式错误！")
         except Exception as e:
             print(e)
-            QMessageBox.warning(self, "加载文件失败！", "请检查文件格式及内容格式！", QMessageBox.Yes)
+            getMessageBox("加载文件失败！", "请检查文件格式及内容格式！", True, False)
             return
 
         self.showInputResult.setWindowTitle("导入数据")
@@ -526,9 +526,9 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
 
     def slotOutput(self):
         if len(self.result) < 1:
-            reply = QMessageBox.warning(self, '警告', '未选中任何数据，无法导出', QMessageBox.Yes)
+            getMessageBox('警告', '未选中任何数据，无法导出', True, False)
             return
-        reply = QMessageBox.question(self, '导出数据包', '是否保存修改并导出数据包？', QMessageBox.Cancel, QMessageBox.Yes)
+        reply = getMessageBox('导出数据包', '是否保存修改并导出数据包？', True, True)
         if reply == QMessageBox.Cancel:
             self.displayData()
             return
@@ -547,7 +547,7 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
                 pathName = "%s/%s阵地工程x生化防护装备安装情况.nms" % (directoryPath,installData)
                 with open(pathName, "wb") as file:
                     pickle.dump(dataList, file)
-                QMessageBox.about(self, "导出成功", "导出数据包成功！")
+                getMessageBox("导出成功", "导出数据包成功！", True, False)
 
 
 
@@ -595,7 +595,7 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
             self.tw_result.setCellWidget(rowCount, 8, plenDate)
             self.tw_result.itemChanged.connect(self.slotAlterAndSava)
         else:
-            QMessageBox.warning(self, "注意", "请先将数据补充完整！", QMessageBox.Yes, QMessageBox.Yes)
+            getMessageBox("注意", "请先将数据补充完整！", True, False)
 
     def slotDelete(self):
         rowCount = self.tw_result.currentRow()
@@ -605,10 +605,10 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
             resultCount = len(self.result)
 
         if rowCount < 3:
-            QMessageBox.warning(self, "注意", "请选中有效单元格！", QMessageBox.Yes, QMessageBox.Yes)
+            getMessageBox("注意", "请选中有效单元格！", True, False)
         elif rowCount >= 3 and rowCount < 3 + resultCount:
-            reply = QMessageBox.question(self, '警告', '是否删除该行数据？', QMessageBox.Cancel, QMessageBox.Yes)
-            if reply == QMessageBox.Yes:
+            reply = getMessageBox('警告', '是否删除该行数据？', True, True)
+            if reply == QMessageBox.Ok:
                 deleteDataByInstallationId(self.result[rowCount - 3][0])
                 self.tw_result.removeRow(rowCount)
             else:
@@ -620,9 +620,9 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
     #导出至Excel
     def slotOutputToExcel(self):
         if len(self.result) < 1:
-            reply = QMessageBox.warning(self, '警告', '未选中任何数据，无法导出', QMessageBox.Yes)
+            getMessageBox('警告', '未选中任何数据，无法导出', True, False)
             return
-        reply = QMessageBox.question(self, '修改导出Excel', '是否保存修改并导出Excel？', QMessageBox.Cancel, QMessageBox.Yes)
+        reply = getMessageBox('修改导出Excel', '是否保存修改并导出Excel？', True, True)
         if reply == QMessageBox.Cancel:
             self.displayData()
             return
@@ -711,10 +711,10 @@ class InstallationSituation(QWidget, PosEngneerInstallationUI):
                 workBook.save(pathName)
                 import win32api
                 win32api.ShellExecute(0, 'open', pathName, '', '', 1)
-                QMessageBox.about(self, "导出成功", "导出成功！")
+                getMessageBox("导出成功", "导出成功！", True, False)
                 return
             except Exception as e:
-                QMessageBox.about(self, "导出失败", "导出表格被占用，请关闭正在使用的Execl！")
+                getMessageBox("导出失败", "导出表格被占用，请关闭正在使用的Execl！", True, False)
                 return
 
 if __name__ == "__main__":

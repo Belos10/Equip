@@ -2,6 +2,7 @@ import sys
 import os
 from PyQt5.QtWidgets import *
 from PyQt5 import QtCore
+from sysManage.component import getMessageBox
 
 class OrderScheduleFinish(QDialog):
     signal = QtCore.pyqtSignal(str)
@@ -92,7 +93,7 @@ class OrderScheduleFinish(QDialog):
     def onOpen(self):
         print(self.fileName)
         if self.fileName == "":
-            QMessageBox.information(self, "提示", "未存放文件")
+            getMessageBox("提示", "未存放文件", True, False)
             return
         os.startfile(self.fileName)
 

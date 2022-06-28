@@ -1,12 +1,13 @@
-import sys
+from PyQt5 import QtCore
+from PyQt5.Qt import Qt
 from PyQt5.QtWidgets import *
 
 from database.OrderManageSql import ifHaveContSource, selectOneOrderAdjustContData, udpateOrderAdjustContBid, \
     udpateOrderAdjustContSingle
-from widgets.orderManage.Widget_OrderAdjustCont import Widget_OrderAdjustCont
 from sysManage.orderManage.selectCont import SelectCont
-from PyQt5.Qt import Qt
-from PyQt5 import QtCore
+from widgets.orderManage.Widget_OrderAdjustCont import Widget_OrderAdjustCont
+from sysManage.component import getMessageBox
+
 
 class OrderAdjustCont(QDialog, Widget_OrderAdjustCont):
     signal=QtCore.pyqtSignal(str)
@@ -158,8 +159,8 @@ class OrderAdjustCont(QDialog, Widget_OrderAdjustCont):
             if column < 0:
                 return
             elif 5 >= column >= 2:
-                reply = QMessageBox.question(self, "设置条件", "是否已完成？", QMessageBox.Yes, QMessageBox.Cancel)
-                if reply == QMessageBox.Yes:
+                reply = getMessageBox("设置条件", "是否已完成？", True, True)
+                if reply == QMessageBox.Ok:
                     item = QPushButton("已完成")
                     self.contForm.setCellWidget(0, column, item)
             elif column == 7:
@@ -172,12 +173,12 @@ class OrderAdjustCont(QDialog, Widget_OrderAdjustCont):
                 if data[8] == '':
                     flag = False
                 if flag:
-                    reply = QMessageBox.question(self, "设置条件", "是否已完成？", QMessageBox.Yes, QMessageBox.Cancel)
-                    if reply == QMessageBox.Yes:
+                    reply = getMessageBox("设置条件", "是否已完成？", True, True)
+                    if reply == QMessageBox.Ok:
                         item = QPushButton("已完成")
                         self.contForm.setCellWidget(0, column, item)
                 else:
-                    QMessageBox.information(self,"设置条件","存在未完成前置状态，无法设置完成",QMessageBox.Yes)
+                    getMessageBox("设置条件","存在未完成前置状态，无法设置完成", True, False)
                     return
 
 
@@ -187,8 +188,8 @@ class OrderAdjustCont(QDialog, Widget_OrderAdjustCont):
             if column <0:
                 return
             elif column == 2:
-                reply = QMessageBox.question(self, "设置接装条件", "是否具备接装条件？", QMessageBox.Yes, QMessageBox.Cancel)
-                if reply == QMessageBox.Yes:
+                reply = getMessageBox("设置接装条件", "是否具备接装条件？", True, True)
+                if reply == QMessageBox.Ok:
                     item = QPushButton("已完成")
                     self.contForm.setCellWidget(0, column, item)
             elif column == 4:
@@ -198,12 +199,12 @@ class OrderAdjustCont(QDialog, Widget_OrderAdjustCont):
                 else:
                     flag = True
                 if flag:
-                    reply = QMessageBox.question(self, "设置条件", "是否已完成？", QMessageBox.Yes, QMessageBox.Cancel)
-                    if reply == QMessageBox.Yes:
+                    reply = getMessageBox("设置条件", "是否已完成？", True, True)
+                    if reply == QMessageBox.Ok:
                         item = QPushButton("已完成")
                         self.contForm.setCellWidget(0, column, item)
                 else:
-                    QMessageBox.information(self, "设置条件", "存在未完成前置状态，无法设置完成", QMessageBox.Yes)
+                    getMessageBox("设置条件", "存在未完成前置状态，无法设置完成", True, False)
                     return
 
     # 合同管理

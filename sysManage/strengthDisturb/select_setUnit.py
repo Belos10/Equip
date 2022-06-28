@@ -6,6 +6,7 @@ from database.strengthDisturbSql import *
 from widgets.strengthDisturb.select_setUnit import widget_Select_SetUnit
 from sysManage.showInputResult import showInputResult
 from sysManage.userInfo import get_value
+from sysManage.component import getMessageBox
 
 class select_setUnit(QWidget,widget_Select_SetUnit):
     def __init__(self,parent=None):
@@ -179,7 +180,7 @@ class select_setUnit(QWidget,widget_Select_SetUnit):
         self.resultList = []
         selectSuccess = selectAllDataAboutUnit(self.resultList)
         if selectSuccess != True:
-            QMessageBox.information(self, "初始化", "初始化单位表失败", QMessageBox.Yes)
+            getMessageBox("初始化", "初始化单位表失败", True, False)
             return
 
         self.tb_result.setRowCount(len(self.resultList))
@@ -227,7 +228,7 @@ class select_setUnit(QWidget,widget_Select_SetUnit):
     def slotAddDict(self):
         # 单位目录
         if self.le_unitID.text() == "" or self.le_unitName.text() == "":
-            reply = QMessageBox.question(self, '新增失败', '单位ID或单位名字为空，拒绝增加，请重新填写', QMessageBox.Yes)
+            getMessageBox('新增失败', '单位ID或单位名字为空，拒绝增加，请重新填写', True, False)
         else:
             Unit_ID = self.le_unitID.text()
             Unit_Name = self.le_unitName.text()
@@ -235,14 +236,14 @@ class select_setUnit(QWidget,widget_Select_SetUnit):
             Unit_Alias = self.le_unitAlias.text()
             haveUnitID = selectUnitInfoByUnitID(Unit_ID)
             if haveUnitID:
-                reply = QMessageBox.information(self, '新增失败', '单位ID已存在, 请重新填写', QMessageBox.Yes)
+                getMessageBox('新增失败', '单位ID已存在, 请重新填写', True, False)
                 return
 
             addSuccess = addDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper, Unit_Alias, "否")
             if addSuccess == True:
-                reply = QMessageBox.information(self, '新增', '新增成功', QMessageBox.Yes)
+                getMessageBox('新增', '新增成功', True, False)
             else:
-                reply = QMessageBox.information(self, '新增', str(addSuccess) + '，新增失败', QMessageBox.Yes)
+                getMessageBox('新增', str(addSuccess) + '，新增失败', True, False)
                 return
             self.slotUnitDictInit()
 
@@ -254,12 +255,12 @@ class select_setUnit(QWidget,widget_Select_SetUnit):
 
     def slotUpdate(self):
         if self.tb_result.currentRow() < 0:
-            reply = QMessageBox.question(self, '修改失败', '请选中某行', QMessageBox.Yes)
+            getMessageBox('修改失败', '请选中某行', True, False)
             return
         # 单位目录
         if (self.tb_result.item(self.tb_result.currentRow(),
                                 0).text() != self.le_unitID.text()) or self.le_unitName.text() == "":
-            reply = QMessageBox.question(self, '修改失败', '单位ID不能修改或单位名字为空，拒绝修改，请重新填写', QMessageBox.Yes)
+            getMessageBox('修改失败', '单位ID不能修改或单位名字为空，拒绝修改，请重新填写', True, False)
             self.le_unitID.setText(self.tb_result.item(self.tb_result.currentRow(), 0).text())
             return
         else:
@@ -270,10 +271,10 @@ class select_setUnit(QWidget,widget_Select_SetUnit):
 
             updateSuccess = updateDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper, Unit_Alias)
             if updateSuccess == True:
-                reply = QMessageBox.question(self, '修改', '修改成功', QMessageBox.Yes)
+                getMessageBox('修改', '修改成功', True, False)
                 self.slotUnitDictInit()
             else:
-                reply = QMessageBox.question(self, '修改', str(updateSuccess) + '，修改失败', QMessageBox.Yes)
+                getMessageBox('修改', str(updateSuccess) + '，修改失败', True, False)
                 return
 
 
@@ -284,21 +285,20 @@ class select_setUnit(QWidget,widget_Select_SetUnit):
 
     def slotDelDict(self):
         if self.tb_result.currentRow() < 0:
-            reply = QMessageBox.question(self, '删除', '请选中某一行', QMessageBox.Yes)
+            getMessageBox('删除', '请选中某一行', True, False)
             return
         # 单位目录
-        reply = QMessageBox.question(self, '删除', '是否将下级单位以及所涉及的其他表关于该单位的信息一起删除？', QMessageBox.Yes,
-                                     QMessageBox.Cancel)
-        if reply == QMessageBox.Yes:
+        reply = getMessageBox('删除', '是否将下级单位以及所涉及的其他表关于该单位的信息一起删除？', True, True)
+        if reply == QMessageBox.Ok:
             delSuccess = delDataInUnit(self.le_unitID.text())
             if delSuccess == True:
-                reply = QMessageBox.question(self, '删除', '删除成功', QMessageBox.Yes)
+                getMessageBox('删除', '删除成功', True, False)
                 self.slotUnitDictInit()
             else:
-                reply = QMessageBox.question(self, '删除', str(delSuccess) + ',删除失败', QMessageBox.Yes)
+                getMessageBox('删除', str(delSuccess) + ',删除失败', True, False)
                 return
         else:
-            reply = QMessageBox.question(self, '删除', '删除失败', QMessageBox.Yes)
+            getMessageBox('删除', '删除失败', True, False)
             return
 
     def slotInputDataByExcel(self):
@@ -343,7 +343,7 @@ class select_setUnit(QWidget,widget_Select_SetUnit):
 
         except BaseException as e:
             print(e)
-            QMessageBox.about(self, "打开失败", "打开文件失败，请检查文件")
+            getMessageBox("打开失败", "打开文件失败，请检查文件", True, False)
             self.setDisabled(False)
 
 
@@ -407,16 +407,16 @@ class select_setUnit(QWidget,widget_Select_SetUnit):
                     workSheet.write(i + 1, 3, item[3],contentStyle)
                 try:
                     workBook.save("%s/单位目录表.xls"%directoryPath)
-                    QMessageBox.about(self, "导出成功", "导出成功！")
+                    getMessageBox("导出成功", "导出成功！", True, False)
                     import win32api
                     win32api.ShellExecute(0, 'open', '%s/单位目录表.xls'%directoryPath, '', '', 1)
 
                     return
                 except Exception as e:
-                    QMessageBox.about(self, "导出失败", "导出表格被占用，请关闭正在使用的Execl！")
+                    getMessageBox("导出失败", "导出表格被占用，请关闭正在使用的Execl！", True, False)
                     return
             else:
-                QMessageBox.about(self, "未选中任何数据", "导出失败！")
+                getMessageBox("未选中任何数据", "导出失败！", True, False)
                 return
 
     def slotCancelInputIntoMysql(self):
@@ -429,7 +429,7 @@ class select_setUnit(QWidget,widget_Select_SetUnit):
         inputSuccess = inputIntoUnitFromExcel(self.inputUnitInfoList)
         if inputSuccess != True:
             for error in inputSuccess:
-                QMessageBox.information(self, "导入", error, QMessageBox.Yes)
+                getMessageBox("导入", error, True, False)
         self.slotUnitDictInit()
         self.setDisabled(False)
         self.showInputResult.hide()

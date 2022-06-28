@@ -1,18 +1,17 @@
-import sys
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import *
-from database.SD_EquipmentBanlanceSql import updateOneEquipmentBalanceData
-from widgets.orderManage.Widget_OrderAllotSchedule import widget_OrderAllotSchedule
-from database.strengthDisturbSql import *
-from PyQt5.Qt import Qt
-from PyQt5.QtGui import QColor, QBrush,QFont
+from PyQt5.QtGui import QFont
+from PyQt5.QtWidgets import *
+
 from database.OrderManageSql import *
-from sysManage.alocatMange.ArmySchedule import ArmySchedule
-from sysManage.orderManage.selectCont import SelectCont
-from sysManage.alocatMange.armyTransfer import armyTransfer
-from sysManage.orderManage.OrderScheduleFinish import OrderScheduleFinish
 from sysManage.alocatMange.transferModel import transferModel
+from sysManage.orderManage.OrderScheduleFinish import OrderScheduleFinish
+from sysManage.orderManage.selectCont import SelectCont
 from sysManage.orderManage.selectQua import SelectQua
 from sysManage.userInfo import get_value
+from widgets.orderManage.Widget_OrderAllotSchedule import widget_OrderAllotSchedule
+from sysManage.component import getMessageBox
+
 
 class OrderAllotSchedule(QWidget, widget_OrderAllotSchedule):
     def __init__(self,parent=None):
@@ -646,10 +645,10 @@ class OrderAllotSchedule(QWidget, widget_OrderAllotSchedule):
         if currentColumn - 1 < 0:
             return
         if self.disturbResult.cellWidget(currentRow, currentColumn - 1).text() == "设置进度":
-            QMessageBox.information(self, "设置接装条件", "上一级未完成", QMessageBox.Yes)
+            getMessageBox("设置接装条件", "上一级未完成", True, False)
             return
-        reply = QMessageBox.question(self,"设置接装条件","是否具备接装条件？",QMessageBox.Yes,QMessageBox.Cancel)
-        if reply==QMessageBox.Yes:
+        reply = getMessageBox("设置接装条件","是否具备接装条件？", True, True)
+        if reply==QMessageBox.Ok:
             item = QPushButton("已完成")
             self.disturbResult.setCellWidget(currentRow, 6 + self.lenCurrentUnitChilddict, item)
             if self.unitFlag == 1:
@@ -675,7 +674,7 @@ class OrderAllotSchedule(QWidget, widget_OrderAllotSchedule):
             return
         if self.unitFlag == 1:
             if self.disturbResult.cellWidget(row, column - 1).text() == "设置进度":
-                QMessageBox.information(self, "设置接装条件", "上一级未完成", QMessageBox.Yes)
+                getMessageBox("设置接装条件", "上一级未完成", True, False)
                 return
         currentUnit=[]
         for i in self.currentUnitChilddict.values():
@@ -761,7 +760,7 @@ class OrderAllotSchedule(QWidget, widget_OrderAllotSchedule):
         if currentColumn - 1 < 0:
             return
         if self.disturbResult.cellWidget(currentRow, currentColumn - 1).text() == "设置进度":
-            QMessageBox.information(self, "设置接装条件", "上一级未完成", QMessageBox.Yes)
+            getMessageBox("设置接装条件", "上一级未完成", True, False)
             return
         self.scheduleFinish.setWindowFlags(Qt.Dialog|Qt.WindowCloseButtonHint)
         self.scheduleFinish.show()

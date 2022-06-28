@@ -10,6 +10,8 @@ from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QTableWidgetItem
     QMessageBox, QFileDialog
 from PyQt5.Qt import QRegExp, QRegExpValidator
 from database.dictSelect.factorySetSql import *
+from sysManage.component import getMessageBox
+
 #new
 regx = QRegExp("[0-9]*")
 class factorySet(QWidget, Widget_Factory_Set):
@@ -90,20 +92,20 @@ class factorySet(QWidget, Widget_Factory_Set):
     # 新增厂家
     def slotAddFactoryInfo(self):
         if haveFactoryID(self.le_id.text()) == True:
-            QMessageBox.information(self,"新增", "新增失败，该厂家编号已存在", QMessageBox.Yes)
+            getMessageBox("新增", "新增失败，该厂家编号已存在", True, False)
             return
         else:
             ID = self.le_id.text()
             name = self.le_name.text()
             agentRoomId = self.cb_agentRoom.currentData()
             if name == "":
-                QMessageBox.information(self, "新增", "新增失败，厂家名字不能为空", QMessageBox.Yes)
+                getMessageBox("新增", "新增失败，厂家名字不能为空", True, False)
                 return
             if haveFactoryName(name) == True:
-                QMessageBox.information(self, "新增", "新增失败，厂家名字不能重复", QMessageBox.Yes)
+                getMessageBox("新增", "新增失败，厂家名字不能重复", True, False)
                 return
             if agentRoomId == -1:
-                QMessageBox.information(self, "新增", "新增失败，代表室不能为空！", QMessageBox.Yes)
+                getMessageBox("新增", "新增失败，代表室不能为空！", True, False)
                 return
             address = self.le_address.text()
             connect = self.le_connect.text()
@@ -111,11 +113,11 @@ class factorySet(QWidget, Widget_Factory_Set):
 
             addSuccess = addInfoIntoFactory(ID, name, address, connect, tel1,agentRoomId)
             if addSuccess == True:
-                QMessageBox.information(self, "新增", "新增成功", QMessageBox.Yes)
+                getMessageBox("新增", "新增成功", True, False)
                 self.initTableWidget()
                 return
             else:
-                QMessageBox.information(self, "新增", str(addSuccess) + ",新增失败", QMessageBox.Yes)
+                getMessageBox("新增", str(addSuccess) + ",新增失败", True, False)
                 return
 
     # 修改厂家
@@ -126,29 +128,29 @@ class factorySet(QWidget, Widget_Factory_Set):
             row = self.tw_result.currentRow()
             if self.tw_result.item(row, 0):
                 if self.tw_result.item(row, 0).text() != self.le_id.text():
-                    QMessageBox.information(self, "修改", "修改失败, 厂家编号不可修改", QMessageBox.Yes)
+                    getMessageBox("修改", "修改失败, 厂家编号不可修改", True, False)
                     return
             ID = self.le_id.text()
             name = self.le_name.text()
             if name != self.tw_result.item(row, 1).text():
-                QMessageBox.information(self, "修改", "修改失败，厂家名字不能修改", QMessageBox.Yes)
+                getMessageBox("修改", "修改失败，厂家名字不能修改", True, False)
                 return
             address = self.le_address.text()
             connect = self.le_connect.text()
             tel1 = self.le_tel1.text()
             agentRoomId = self.cb_agentRoom.currentData()
             if agentRoomId == -1:
-                QMessageBox.information(self, "修改", "修改失败，代表室不能为空", QMessageBox.Yes)
+                getMessageBox("修改", "修改失败，代表室不能为空", True, False)
                 return
 
 
             addSuccess = updateInfoIntoFactory(ID, name, address, connect, tel1, agentRoomId)
             if addSuccess == True:
-                QMessageBox.information(self, "修改", "修改成功", QMessageBox.Yes)
+                getMessageBox("修改", "修改成功", True, False)
                 self.initTableWidget()
                 return
             else:
-                QMessageBox.information(self, "修改", str(addSuccess) + ",修改失败", QMessageBox.Yes)
+                getMessageBox("修改", str(addSuccess) + ",修改失败", True, False)
                 return
     # 删除厂家
     def slotDelFactoryInfo(self):
@@ -159,7 +161,7 @@ class factorySet(QWidget, Widget_Factory_Set):
             ID = self.le_id.text()
             addSuccess = delInfoFromFactory(ID)
             if addSuccess == True:
-                QMessageBox.information(self, "删除", "删除成功", QMessageBox.Yes)
+                getMessageBox("删除", "删除成功", True, False)
                 self.initTableWidget()
                 self.le_id.clear()
                 self.le_represent.clear()
@@ -171,7 +173,7 @@ class factorySet(QWidget, Widget_Factory_Set):
                 self.le_name.clear()
                 return
             else:
-                QMessageBox.information(self, "删除", str(addSuccess) + ",删除失败", QMessageBox.Yes)
+                getMessageBox("删除", str(addSuccess) + ",删除失败", True, False)
                 return
 
     def slotClickedTableWidget(self):
@@ -220,7 +222,7 @@ class factorySet(QWidget, Widget_Factory_Set):
                     raise Exception("数据格式错误！")
         except Exception as e:
             print(e)
-            QMessageBox.warning(self, "加载文件失败！", "请检查文件格式及内容格式！", QMessageBox.Yes)
+            getMessageBox("加载文件失败！", "请检查文件格式及内容格式！", True, False)
             return
 
         self.showInputResult.setWindowTitle("导入数据")
@@ -266,9 +268,9 @@ class factorySet(QWidget, Widget_Factory_Set):
 
     def soltOutput(self):
         if len(self.result) < 1:
-            reply = QMessageBox.warning(self, '警告', '未选中任何数据，无法导出', QMessageBox.Yes)
+            getMessageBox('警告', '未选中任何数据，无法导出', True, False)
             return
-        reply = QMessageBox.question(self, '导出数据包', '是否保存修改并导出数据包？', QMessageBox.Cancel, QMessageBox.Yes)
+        reply = getMessageBox('导出数据包', '是否保存修改并导出数据包？', True, True)
         if reply == QMessageBox.Cancel:
             self.initTableWidget()
             return
@@ -295,7 +297,7 @@ class factorySet(QWidget, Widget_Factory_Set):
                 pathName = "%s/%s厂家目录.nms" % (directoryPath,installData)
                 with open(pathName, "wb") as file:
                     pickle.dump(dataList, file)
-                QMessageBox.about(self, "导出成功", "导出数据包成功！")
+                getMessageBox("导出成功", "导出数据包成功！", True, False)
         pass
 
     def slotCancelInputIntoDatabase(self):
@@ -312,7 +314,7 @@ class factorySet(QWidget, Widget_Factory_Set):
                     pass
             except Exception as e:
                 print(e)
-                QMessageBox.warning(self, "导入失败", "导入第%d数据失败！" % (i), QMessageBox.Yes)
+                getMessageBox("导入失败", "导入第%d数据失败！" % (i), True, False)
 
         self.showInputResult.hide()
         self.setDisabled(False)

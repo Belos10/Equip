@@ -2,7 +2,7 @@ from PyQt5.QtCore import Qt, QDate
 from database.danderGoodsSql import *
 from sysManage.userInfo import get_value
 from widgets.dangerGoods.dangerGoodsStatisticsUI import DangerGoodsStatisticsUI
-
+from sysManage.component import getMessageBox
 import sys
 from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QTableWidget, QHeaderView, QTableWidgetItem, QComboBox, \
     QMessageBox, QTreeWidgetItem, QDateEdit
@@ -358,7 +358,7 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
             insertOneDataIntDangerGoods(rowData)
             self.currentLastRow = -1
             self._initTableWidgetByUnit(self.unit)
-            QMessageBox.warning(self, "注意", "插入成功！", QMessageBox.Yes, QMessageBox.Yes)
+            getMessageBox("注意", "插入成功！", True, False)
 
     def alterRowData(self,row):
 
@@ -379,10 +379,10 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
         print(rowData)
         if len(rowData) == self.tw_result.columnCount() - 1:
             if (updataOneDataInDangerGood(rowData) == True):
-                QMessageBox.warning(self, "注意", "修改成功！", QMessageBox.Yes, QMessageBox.Yes)
+                getMessageBox("注意", "修改成功！", True, False)
                 self._initTableWidgetByUnit(self.unit)
             else:
-                QMessageBox.warning(self, "警告", "修改失败！", QMessageBox.Yes, QMessageBox.Yes)
+                getMessageBox("警告", "修改失败！", True, False)
 
 
 
@@ -432,16 +432,16 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
             self.tw_result.setCellWidget(rowCount, 9, storeDate)
             self.tw_result.itemChanged.connect(self.slotAlterAndSava)
         else:
-            QMessageBox.warning(self, "注意", "请先将数据添加完成！", QMessageBox.Yes, QMessageBox.Yes)
+            getMessageBox("注意", "请先将数据添加完成！", True, False)
             pass
 
     def slotDelete(self):
         selectedRow = self.tw_result.currentRow()
         if selectedRow < 2:
-            QMessageBox.warning(self, "注意", "请选中有效单元格！", QMessageBox.Yes, QMessageBox.Yes)
+            getMessageBox("注意", "请选中有效单元格！", True, False)
         elif selectedRow >= 2 and selectedRow < self.dataLen + 2:
-            reply = QMessageBox.question(self, '警告', '是否删除该行数据？', QMessageBox.Cancel, QMessageBox.Yes)
-            if reply == QMessageBox.Yes:
+            reply = getMessageBox('警告', '是否删除该行数据？', True, True)
+            if reply == QMessageBox.Ok:
                 goodsId = self.info[selectedRow]
                 if deleteByDangerGoodsId(goodsId) == True:
                     self.tw_result.removeRow(selectedRow)

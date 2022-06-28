@@ -1,14 +1,8 @@
-import xlwt
-from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, \
-    QAbstractItemView, QMessageBox, QInputDialog, QLineEdit, QFileDialog, QHeaderView
-from database.strengthDisturbSql import *
-from widgets.strengthDisturb.select_set import Widget_Select_Set
+from PyQt5.QtWidgets import QWidget
+
 from sysManage.strengthDisturb.select_setEquip import select_setEquip
 from sysManage.strengthDisturb.select_setUnit import select_setUnit
-from sysManage.showInputResult import showInputResult
-from PyQt5.Qt import Qt
-import xlrd
-from sysManage.userInfo import get_value
+from widgets.strengthDisturb.select_set import Widget_Select_Set
 
 '''
     装备/单位目录设置
