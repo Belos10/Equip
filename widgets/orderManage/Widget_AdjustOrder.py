@@ -111,14 +111,8 @@ class widget_adjustOrder(object):
         self.horizontalLayout_7.addWidget(self.pb_Save)
         spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_7.addItem(spacerItem1)
-        self.pb_Input = QtWidgets.QPushButton(Form)
-        self.pb_Input.setObjectName("pb_Input")
-        self.horizontalLayout_7.addWidget(self.pb_Input)
         spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_7.addItem(spacerItem2)
-        self.pb_Output = QtWidgets.QPushButton(Form)
-        self.pb_Output.setObjectName("pb_Output")
-        self.horizontalLayout_7.addWidget(self.pb_Output)
         spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_7.addItem(spacerItem3)
         self.pb_outputToExcel = QtWidgets.QPushButton(Form)
@@ -130,7 +124,6 @@ class widget_adjustOrder(object):
         self.horizontalLayout_2.addLayout(self.verticalLayout_4)
 
         self.retranslateUi(Form)
-        self.tw_equip.setMaximumSize(300, 500)
         QtCore.QMetaObject.connectSlotsByName(Form)
 
     def retranslateUi(self, Form):
@@ -144,9 +137,7 @@ class widget_adjustOrder(object):
         self.txt_adjustOrderYear.setHtml(_translate("Form", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'SimSun\'; font-size:7.2pt; font-weight:400; font-style:normal;\">\n"
-"<p align=\"center\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:9pt;\"><br /></p></body></html>"))
+"</style></head><body style=\" font-family:\'SimSun\'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
+"<p align=\"center\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>"))
         self.pb_Save.setText(_translate("Form", "保存"))
-        self.pb_Input.setText(_translate("Form", "导入"))
-        self.pb_Output.setText(_translate("Form", "导出至数据包"))
         self.pb_outputToExcel.setText(_translate("Form", "导出至Excel"))

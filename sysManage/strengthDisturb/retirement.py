@@ -604,7 +604,7 @@ class retirement(QWidget, Widget_Retirement):
         if len(self.resultList) < 1:
             getMessageBox('警告', '未选中任何数据，无法导出',True, False)
             return
-        reply = getMessageBox(self, '修改导出Excel', '是否保存修改并导出Excel？', True, True)
+        reply = getMessageBox('修改导出Excel', '是否保存修改并导出Excel？', True, True)
         if reply == QMessageBox.Cancel:
             self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList,
                                                         self.currentYear)

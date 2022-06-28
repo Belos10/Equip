@@ -51,6 +51,8 @@ class OrderApply(QWidget, Widget_Retirement):
         self.year = '全部'
         self.groupBox_2.setDisabled(True)
         self.groupBox_3.setDisabled(True)
+        self.pb_input.setVisible(False)
+        self.pb_output.setVisible(False)
 
         # 信号连接
     def signalConnect(self):

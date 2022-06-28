@@ -97,20 +97,6 @@
           </property>
          </widget>
         </item>
-        <item>
-         <widget class="QPushButton" name="pb_input">
-          <property name="text">
-           <string>导入</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pb_output">
-          <property name="text">
-           <string>导出</string>
-          </property>
-         </widget>
-        </item>
        </layout>
       </item>
      </layout>

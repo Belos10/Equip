@@ -352,13 +352,6 @@ p, li { white-space: pre-wrap; }
         </spacer>
        </item>
        <item>
-        <widget class="QPushButton" name="pb_input">
-         <property name="text">
-          <string>导入数据包</string>
-         </property>
-        </widget>
-       </item>
-       <item>
         <spacer name="horizontalSpacer_2">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -370,13 +363,6 @@ p, li { white-space: pre-wrap; }
           </size>
          </property>
         </spacer>
-       </item>
-       <item>
-        <widget class="QPushButton" name="pb_output">
-         <property name="text">
-          <string>导出数据包</string>
-         </property>
-        </widget>
        </item>
        <item>
         <spacer name="horizontalSpacer_3">
