@@ -7,7 +7,7 @@ from database.alocatMangeSql import *
 from sysManage.orderManage.InputProof_Allot import InputProof
 from sysManage.userInfo import get_value
 from widgets.orderManage.widget_OrderPlan import Widget_OrderPlan
-from sysManage.component import getMessageBox
+from sysManage.component import getMessageBox, getIntInputDialog
 
 '''
     分配调整计划
@@ -116,7 +116,7 @@ class OrderAllotPlan(QWidget, Widget_OrderPlan):
     # 新增年份
     def slotAddNewYear(self):
         year = 0
-        year, ok = QInputDialog.getInt(self, "Get year", "year:", 0, 0, 100000, 1)
+        ok, year = getIntInputDialog("新增年份", "年份:", 0, 100000, 1, True, True)
         if ok:
             haveYear = False
             allyear = selectYearListAboutOrderPlan()

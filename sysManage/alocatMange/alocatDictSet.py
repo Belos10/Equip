@@ -1,16 +1,13 @@
-from database.positionEngneerSql import delDataInPosenginUnit
-from widgets.alocatMange.select_set import Widget_Dict_Set
-import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QListWidgetItem, QComboBox, QTableWidgetItem, QDateEdit, \
-    QInputDialog, QMessageBox, QAbstractItemView, QTreeWidgetItem, QLineEdit
-from database.strengthDisturbSql import *
-from sysManage.alocatMange.config import ArmyTransferReceiveUnit, ArmyTransferSendUnit
-from sysManage.alocatMange.AddUnitChoose import *
-from database.alocatMangeSql import *
 from PyQt5.Qt import Qt
+from PyQt5.QtWidgets import QTableWidgetItem, QMessageBox, QAbstractItemView, QTreeWidgetItem
+
 from database.alocatMangeSql import *
-from sysManage.userInfo import *
+from database.positionEngneerSql import delDataInPosenginUnit
+from sysManage.alocatMange.AddUnitChoose import *
 from sysManage.component import getMessageBox
+from sysManage.userInfo import *
+from widgets.alocatMange.select_set import Widget_Dict_Set
+
 # new
 '''
     功能：

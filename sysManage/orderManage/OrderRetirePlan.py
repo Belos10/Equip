@@ -7,7 +7,7 @@ from database.alocatMangeSql import *
 from sysManage.orderManage.InputProof_Retire import InputProof
 from sysManage.userInfo import get_value
 from widgets.orderManage.Widget_OrderRetirePlan import retirePlan_Form
-from sysManage.component import getMessageBox
+from sysManage.component import getMessageBox, getIntInputDialog
 
 '''
     退役报废计划
@@ -100,7 +100,7 @@ class OrderRetirePlan(QWidget, retirePlan_Form):
     # 新增年份
     def slotAddNewYear(self):
         year = 0
-        year, ok = QInputDialog.getInt(self, "Get year", "year:", 0, 0, 100000, 1)
+        ok, year = getIntInputDialog("新增年份", "年份:", 0, 100000, 1, True, True)
         if ok:
             haveYear = False
             allyear = selectYearListAboutOrderRetirePlan()

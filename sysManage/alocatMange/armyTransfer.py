@@ -1,15 +1,14 @@
-from widgets.alocatMange.armyTransfer import Widget_Army_Transfer
-import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QListWidgetItem, QComboBox, QTableWidgetItem, QDateEdit, \
-    QInputDialog, QMessageBox, QPushButton, QFileDialog
-from database.alocatMangeSql import *
-from database.strengthDisturbSql import *
-from sysManage.alocatMange.config import ArmyTransferReceiveUnit, ArmyTransferSendUnit
-from PyQt5.Qt import Qt
-from database.dictSelect.factorySetSql import *
-from sysManage.component import getMessageBox
+from PyQt5.QtWidgets import QWidget, QListWidgetItem, QComboBox, QTableWidgetItem, QDateEdit, \
+    QFileDialog
 
-#new
+from database.alocatMangeSql import *
+from database.dictSelect.factorySetSql import *
+from database.strengthDisturbSql import *
+from sysManage.alocatMange.config import ArmyTransferReceiveUnit
+from sysManage.component import *
+from widgets.alocatMange.armyTransfer import Widget_Army_Transfer
+
+
 '''
     功能：
         陆军调拨单管理
@@ -265,7 +264,7 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
     '''
     def slotAddNewYear(self):
         year = 0
-        year, ok = QInputDialog.getInt(self, "Get year", "year:", 0, 0, 100000, 1)
+        ok, year = getIntInputDialog("新增年份", "年份:", 0, 100000, 1, True, True)
         if year:
             insertIntoArmyTransferYear(year)
             self._initYearWidget_()

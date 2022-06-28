@@ -134,7 +134,7 @@ class DisturbPlan(QWidget, yearList_Form):
                 if str(year) == yearInfo:
                     haveYear = True
             if haveYear == True:
-                reply = getMessageBox('添加', '添加失败，该年份已存在', True, False)
+                getMessageBox('添加', '添加失败，该年份已存在', True, False)
                 return
 
             insertIntoDisturbPlanYear(year)

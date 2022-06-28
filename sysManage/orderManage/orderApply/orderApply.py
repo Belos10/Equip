@@ -1,14 +1,14 @@
 from PyQt5.Qt import Qt
 from PyQt5.QtCore import QVariant
-from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, QMessageBox, QListWidgetItem, QInputDialog, \
-    QHeaderView, QFileDialog
+from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, QMessageBox, QListWidgetItem, QHeaderView, \
+    QFileDialog
 
 from database.OrderApplySql import *
 from database.strengthDisturbSql import *
+from sysManage.component import getMessageBox, getIntInputDialog
 from sysManage.userInfo import get_value
 from utills.utillsComponent import CheckableComboBox
 from widgets.strengthDisturb.retirement import Widget_Retirement
-from sysManage.component import getMessageBox
 
 '''
    订购申请
@@ -110,7 +110,7 @@ class OrderApply(QWidget, Widget_Retirement):
 
     def slotAddNewYear(self):
         year = 0
-        year, ok = QInputDialog.getInt(self, "Get year", "year:", 0, 0, 100000, 1)
+        ok, year = getIntInputDialog("新增年份", "年份:", 0, 100000, 1, True, True)
 
         if year:
             allyearInfo = selectAllOrderApplyYearInfo()

@@ -4,7 +4,7 @@ from PyQt5.QtCore import QVariant, QDateTime
 from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, QAbstractItemView, \
     QMessageBox, QListWidgetItem, QInputDialog, QHeaderView, QFileDialog
 
-from sysManage.component import getMessageBox
+from sysManage.component import getMessageBox, getIntInputDialog
 from sysManage.showInputResult import showInputResult
 from utills.utillsComponent import CheckableComboBox
 from widgets.strengthDisturb.retirement import Widget_Retirement
@@ -111,7 +111,7 @@ class retirement(QWidget, Widget_Retirement):
 
     def slotAddNewYear(self):
         year = 0
-        year, ok = QInputDialog.getInt(self, "年份", "年份:", 0, 0, 100000, 1)
+        ok, year = getIntInputDialog("新增年份", "年份:", 0, 100000, 1, True, True)
         if year:
             allyearInfo = selectAllRetirementYearInfo()
             haveYear = False

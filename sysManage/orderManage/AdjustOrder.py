@@ -6,7 +6,7 @@ from database.OrderManageSql import *
 from sysManage.orderManage.OrderAdjustCont import OrderAdjustCont
 from sysManage.userInfo import get_value
 from widgets.orderManage.Widget_AdjustOrder import widget_adjustOrder
-from sysManage.component import getMessageBox
+from sysManage.component import getMessageBox, getIntInputDialog
 
 
 class AdjustOrder(QWidget, widget_adjustOrder):
@@ -52,7 +52,7 @@ class AdjustOrder(QWidget, widget_adjustOrder):
 
     # 新增年份
     def slotAddNewYear(self):
-        year, ok = QInputDialog.getInt(self, "新增年份", "year:", 0, 0, 100000, 1)
+        ok, year = getIntInputDialog("新增年份", "年份:", 0, 100000, 1, True, True)
         if ok:
             haveYear = False
             allyear = selectYearListAboutOrderAdjust()

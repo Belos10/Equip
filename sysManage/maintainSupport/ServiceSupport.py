@@ -3,13 +3,13 @@ import sys
 
 from PyQt5.QtCore import Qt, QStringListModel, QDateTime
 from PyQt5.QtWidgets import QApplication, QWidget, QHeaderView, QTableWidgetItem, QComboBox, \
-    QMessageBox, QFileDialog, QInputDialog, QAbstractItemView
+    QMessageBox, QFileDialog, QAbstractItemView
 
 from database.serviceSupportSql import *
+from sysManage.component import getMessageBox, getIntInputDialog
 from sysManage.showInputResult import showInputResult
 from sysManage.userInfo import get_value
 from widgets.serviceSupport.ServiceSupportNewUI import ServiceSupportNewUI
-from sysManage.component import getMessageBox
 
 
 class ServiceSupport(QWidget, ServiceSupportNewUI):
@@ -130,7 +130,7 @@ class ServiceSupport(QWidget, ServiceSupportNewUI):
     '''
     def soltAddContractYear(self):
         year = 0
-        year, ok = QInputDialog.getInt(self, "年份", "年份:", 0, 0, 100000, 1)
+        ok, year = getIntInputDialog("新增年份", "年份:", 0, 100000, 1, True, True)
         if ok:
             if isHaveServiceSupportYear(str(year)):
                 getMessageBox("新增", "该年份已经存在，拒绝添加！", True, False)

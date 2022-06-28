@@ -1,14 +1,11 @@
-from widgets.alocatMange.rocketTransfer import Widget_Rocket_Transfer
 from PyQt5.Qt import Qt
-import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QListWidgetItem, QComboBox, QTableWidgetItem, QDateEdit, \
-    QInputDialog, QMessageBox, QFileDialog, QAbstractItemView
-from database.alocatMangeSql import selectYearListAboutArmy, selectArmyTransferByYear, insertIntoArmyTransferYear, \
-    insertIntoRocketTransferYear, selectYearListAboutRocket, selectRocketTransferByYear
+from PyQt5.QtWidgets import QWidget, QListWidgetItem, QTableWidgetItem, QMessageBox, QFileDialog, QAbstractItemView
+
+from database.alocatMangeSql import selectRocketTransferByYear
 from database.alocatMangeSql import selectYearListAboutDisturbPlan
 from database.strengthDisturbSql import selectAllEndEquip
-from sysManage.alocatMange.config import ArmyTransferReceiveUnit, ArmyTransferSendUnit
 from sysManage.component import getMessageBox
+from widgets.alocatMange.rocketTransfer import Widget_Rocket_Transfer
 
 '''
    火箭军调拨单管理

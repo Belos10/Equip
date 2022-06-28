@@ -6,7 +6,8 @@ from database.strengthDisturbSql import *
 from widgets.strengthDisturb.select_setUnit import widget_Select_SetUnit
 from sysManage.showInputResult import showInputResult
 from sysManage.userInfo import get_value
-from sysManage.component import getMessageBox
+from sysManage.component import getMessageBox, getTextInputDialog
+
 
 class select_setUnit(QWidget,widget_Select_SetUnit):
     def __init__(self,parent=None):
@@ -140,7 +141,8 @@ class select_setUnit(QWidget,widget_Select_SetUnit):
     def slotSetUnitAlias(self):
         if self.tb_result.currentRow() == -1:
             return
-        text, okPressed = QInputDialog.getText(self, "设置别名", "该单位代号为:", QLineEdit.Normal, "")
+        # text, okPressed = QInputDialog.getText(self, "设置别名", "该单位代号为:", QLineEdit.Normal, "")
+        okPressed, text = getTextInputDialog("设置别名", "该单位代号为:", True, True)
         if okPressed:
             print(text)
             updateUnitAlias(text, self.le_unitID.text())

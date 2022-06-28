@@ -1,16 +1,16 @@
 import pickle
+import sys
 
 from PyQt5.QtCore import Qt, QStringListModel, QDate, QDateTime
+from PyQt5.QtWidgets import QApplication, QWidget, QHeaderView, QTableWidgetItem, QMessageBox, QFileDialog, QPushButton, \
+    QDateEdit, QAbstractItemView
 
 from database.contractManagementSql import *
+from sysManage.component import getMessageBox, getIntInputDialog
 from sysManage.contractMangement.AttachmentDialog import AttachmentDialog
 from sysManage.showInputResult import showInputResult
 from sysManage.userInfo import get_value
 from widgets.contractMangement.OrderManagementUI import OrderManagementUI
-import sys
-from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QTableWidget, QHeaderView, QTableWidgetItem, QComboBox, \
-    QMessageBox, QFileDialog, QListWidgetItem, QListView, QInputDialog, QPushButton, QDateEdit, QAbstractItemView
-from sysManage.component import getMessageBox
 
 
 class MaintenanceManagement(QWidget, OrderManagementUI):
@@ -88,7 +88,7 @@ class MaintenanceManagement(QWidget, OrderManagementUI):
     '''
     def soltAddContractYear(self):
         year = 0
-        year, ok = QInputDialog.getInt(self, "Get year", "year:", 0, 0, 100000, 1)
+        ok, year = getIntInputDialog("新增年份", "年份:", 0, 100000, 1, True, True)
         if ok:
             if isHaveContractMaintenanceYear(str(year)):
                 getMessageBox("新增", "该年份已经存在，拒绝添加！", True, False)

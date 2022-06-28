@@ -24,7 +24,8 @@ def getMessageBox(title: str, context: str, confirm: bool, cancel: bool):
     return result
 
 
-def getIntInputDialog(title: str, context: str, floor: int, top: int, step: int, confirm: bool, cancce: bool):
+
+def getIntInputDialog(title: str, context: str, floor: int, top: int, step: int, confirm: bool, cancel: bool):
     inputDialog = QInputDialog()
     inputDialog.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowCloseButtonHint)
     inputDialog.setFixedSize(400, 400)
@@ -35,7 +36,7 @@ def getIntInputDialog(title: str, context: str, floor: int, top: int, step: int,
     inputDialog.setIntStep(step)
     if confirm:
         inputDialog.setOkButtonText("确定")
-    if cancce:
+    if cancel:
         inputDialog.setCancelButtonText("取消")
     value = -1
     ok = False
@@ -45,7 +46,7 @@ def getIntInputDialog(title: str, context: str, floor: int, top: int, step: int,
     return ok, value
 
 
-def getDoubleInputDialog(title: str, context: str, floor: float, top: float, step: int, confirm: bool, cancce: bool):
+def getDoubleInputDialog(title: str, context: str, floor: float, top: float, step: int, confirm: bool, cancel: bool):
     inputDialog = QInputDialog()
     inputDialog.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowCloseButtonHint)
     inputDialog.setFixedSize(400, 400)
@@ -56,7 +57,7 @@ def getDoubleInputDialog(title: str, context: str, floor: float, top: float, ste
     inputDialog.setDoubleRange(floor, top)
     if confirm:
         inputDialog.setOkButtonText("确定")
-    if cancce:
+    if cancel:
         inputDialog.setCancelButtonText("取消")
     value = -1
     ok = False
@@ -66,7 +67,7 @@ def getDoubleInputDialog(title: str, context: str, floor: float, top: float, ste
     return ok, value
 
 
-def getTextInputDialog(title: str, context: str, floor: float, top: float, step: int, confirm: bool, cancce: bool):
+def getTextInputDialog(title: str, context: str, confirm: bool, cancel: bool):
     inputDialog = QInputDialog()
     inputDialog.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowCloseButtonHint)
     inputDialog.setFixedSize(400, 400)
@@ -75,7 +76,7 @@ def getTextInputDialog(title: str, context: str, floor: float, top: float, step:
     inputDialog.setLabelText(context)
     if confirm:
         inputDialog.setOkButtonText("确定")
-    if cancce:
+    if cancel:
         inputDialog.setCancelButtonText("取消")
     text = ""
     ok = False
