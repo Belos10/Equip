@@ -39,6 +39,9 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
 
     #初始化编制数维护界面
     def _initAll_(self):
+        self.tw_first.clear()
+        self.tw_second.clear()
+        self.tw_result.clear()
         self.getUserInfo()
         self.first_treeWidget_dict = {}
         self.tw_first.clear()

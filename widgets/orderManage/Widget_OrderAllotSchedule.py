@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class widget_OrderAllotSchedule(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(1026, 659)
+        Form.resize(1032, 659)
         self.horizontalLayout_8 = QtWidgets.QHBoxLayout(Form)
         self.horizontalLayout_8.setObjectName("horizontalLayout_8")
         self.groupBox = QtWidgets.QGroupBox(Form)
@@ -35,12 +35,12 @@ class widget_OrderAllotSchedule(object):
         self.verticalLayout.addWidget(self.lw_yearChoose)
         self.horizontalLayout_8.addWidget(self.groupBox)
         self.groupBox_2 = QtWidgets.QGroupBox(Form)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.groupBox_2.sizePolicy().hasHeightForWidth())
         self.groupBox_2.setSizePolicy(sizePolicy)
-        self.groupBox_2.setMinimumSize(QtCore.QSize(300, 0))
+        self.groupBox_2.setMinimumSize(QtCore.QSize(600, 0))
         self.groupBox_2.setMaximumSize(QtCore.QSize(450, 16777215))
         self.groupBox_2.setObjectName("groupBox_2")
         self.gridLayout_2 = QtWidgets.QGridLayout(self.groupBox_2)
@@ -48,12 +48,12 @@ class widget_OrderAllotSchedule(object):
         self.gridLayout_2.setSpacing(0)
         self.gridLayout_2.setObjectName("gridLayout_2")
         self.wg_directory = QtWidgets.QWidget(self.groupBox_2)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.wg_directory.sizePolicy().hasHeightForWidth())
         self.wg_directory.setSizePolicy(sizePolicy)
-        self.wg_directory.setMinimumSize(QtCore.QSize(300, 0))
+        self.wg_directory.setMinimumSize(QtCore.QSize(600, 0))
         self.wg_directory.setMaximumSize(QtCore.QSize(450, 16777215))
         self.wg_directory.setObjectName("wg_directory")
         self.horizontalLayout_4 = QtWidgets.QHBoxLayout(self.wg_directory)
@@ -87,6 +87,7 @@ class widget_OrderAllotSchedule(object):
         self.horizontalLayout.addWidget(self.pb_firstSelect)
         self.verticalLayout_2.addLayout(self.horizontalLayout)
         self.tw_first = QtWidgets.QTreeWidget(self.wg_directory)
+        self.tw_first.setMinimumSize(QtCore.QSize(300, 0))
         self.tw_first.setObjectName("tw_first")
         self.verticalLayout_2.addWidget(self.tw_first)
         self.horizontalLayout_3.addLayout(self.verticalLayout_2)
@@ -114,6 +115,7 @@ class widget_OrderAllotSchedule(object):
         self.horizontalLayout_2.addWidget(self.pb_secondSelect)
         self.verticalLayout_3.addLayout(self.horizontalLayout_2)
         self.tw_second = QtWidgets.QTreeWidget(self.wg_directory)
+        self.tw_second.setMinimumSize(QtCore.QSize(300, 0))
         self.tw_second.setObjectName("tw_second")
         self.verticalLayout_3.addWidget(self.tw_second)
         self.horizontalLayout_3.addLayout(self.verticalLayout_3)
@@ -176,5 +178,5 @@ class widget_OrderAllotSchedule(object):
         self.txt_disturbPlanYear.setHtml(_translate("Form", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'SimSun\'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
-"<p align=\"center\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>"))
+"</style></head><body style=\" font-family:\'SimSun\'; font-size:9.07563pt; font-weight:400; font-style:normal;\">\n"
+"<p align=\"center\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:9pt;\"><br /></p></body></html>"))

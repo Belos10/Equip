@@ -168,6 +168,12 @@
           </item>
           <item>
            <widget class="QTreeWidget" name="tw_first">
+            <property name="minimumSize">
+             <size>
+              <width>300</width>
+              <height>0</height>
+             </size>
+            </property>
             <column>
              <property name="text">
               <string notr="true">1</string>
@@ -214,6 +220,12 @@
           </item>
           <item>
            <widget class="QTreeWidget" name="tw_second">
+            <property name="minimumSize">
+             <size>
+              <width>300</width>
+              <height>0</height>
+             </size>
+            </property>
             <column>
              <property name="text">
               <string notr="true">1</string>

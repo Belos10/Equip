@@ -33,7 +33,7 @@ class widget_adjustOrder(object):
         self.lw_yearChoose.setMaximumSize(QtCore.QSize(10000000, 16777215))
         self.lw_yearChoose.setObjectName("lw_yearChoose")
         self.verticalLayout.addWidget(self.lw_yearChoose)
-        self.tb_add = QtWidgets.QPushButton(self.groupBox)
+        self.tb_add = QtWidgets.QToolButton(self.groupBox)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -42,12 +42,13 @@ class widget_adjustOrder(object):
         self.tb_add.setMaximumSize(QtCore.QSize(80, 16777215))
         self.tb_add.setObjectName("tb_add")
         self.verticalLayout.addWidget(self.tb_add)
-        self.tb_del = QtWidgets.QPushButton(self.groupBox)
+        self.tb_del = QtWidgets.QToolButton(self.groupBox)
         self.tb_del.setMaximumSize(QtCore.QSize(80, 16777215))
         self.tb_del.setObjectName("tb_del")
         self.verticalLayout.addWidget(self.tb_del)
         self.horizontalLayout_2.addWidget(self.groupBox)
         self.groupBox_2 = QtWidgets.QGroupBox(Form)
+        self.groupBox_2.setMinimumSize(QtCore.QSize(300, 0))
         self.groupBox_2.setMaximumSize(QtCore.QSize(220, 16777215))
         self.groupBox_2.setObjectName("groupBox_2")
         self.gridLayout = QtWidgets.QGridLayout(self.groupBox_2)
@@ -78,6 +79,7 @@ class widget_adjustOrder(object):
         self.horizontalLayout.addWidget(self.pb_firstSelect)
         self.verticalLayout_2.addLayout(self.horizontalLayout)
         self.tw_equip = QtWidgets.QTreeWidget(self.groupBox_2)
+        self.tw_equip.setMinimumSize(QtCore.QSize(300, 0))
         self.tw_equip.setObjectName("tw_equip")
         self.verticalLayout_2.addWidget(self.tw_equip)
         self.gridLayout.addLayout(self.verticalLayout_2, 0, 0, 1, 1)
@@ -137,7 +139,7 @@ class widget_adjustOrder(object):
         self.txt_adjustOrderYear.setHtml(_translate("Form", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'SimSun\'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
-"<p align=\"center\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>"))
+"</style></head><body style=\" font-family:\'SimSun\'; font-size:9.07563pt; font-weight:400; font-style:normal;\">\n"
+"<p align=\"center\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:9pt;\"><br /></p></body></html>"))
         self.pb_Save.setText(_translate("Form", "保存"))
         self.pb_outputToExcel.setText(_translate("Form", "导出至Excel"))
