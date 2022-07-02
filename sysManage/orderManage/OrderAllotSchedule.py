@@ -63,8 +63,25 @@ class OrderAllotSchedule(QWidget, widget_OrderAllotSchedule):
         self.tw_second.itemClicked.connect(self.slotDisturbStrengthResult)
         self.tw_second.itemChanged.connect(self.slotCheckedChange)
         self.cb_schedule.activated.connect(self.selectSchedule)
+        self.pb_firstSelect.clicked.connect(self.slotSelectUnit)
+        self.pb_secondSelect.clicked.connect(self.slotSelectEquip)
 
 
+
+
+    def slotSelectUnit(self):
+        findText = self.le_first.text()
+        for i, item in self.first_treeWidget_dict.items():
+            if item.text(0) == findText:
+                self.tw_first.setCurrentItem(item)
+                break
+
+    def slotSelectEquip(self):
+        findText = self.le_second.text()
+        for i, item in self.second_treeWidget_dict.items():
+            if item.text(0) == findText:
+                self.tw_second.setCurrentItem(item)
+                break
 
     # 信号与槽连接的断开
     def signalDisconnectSlot(self):

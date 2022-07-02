@@ -2701,7 +2701,7 @@ def updateWeaveNum(Unit_ID, Equip_ID, weaveNum, orginWeave, year):
             return e
 
 def findBigOtherYear(year):
-    sql = "select year from strengthyear where year > '" + year + "'"
+    sql = "select year from strengthyear where year   > '" + year + "'"
     cur.execute(sql)
     result = cur.fetchall()
     yearList = []
@@ -3109,6 +3109,8 @@ def findEquipInfo(equipId):
 
 # 查询编制信息
 def selectWeaveInfo(UnitID, EquipID, year):
+    print("year", year)
+    print(type(year))
     sql = "select * from weave where Equip_ID = '" + \
           EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + year + "'"
     print(sql)

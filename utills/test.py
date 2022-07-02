@@ -14,6 +14,7 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout, QPushButton, QTextEdit
 # from LeftTabWidget import LeftTabWidget
 # 样式
 from sysManage.MainWindowManage import Manage_Widgets
+from sysManage.component import getTextInputDialog
 
 StyleSheet = """
 /*标题栏*/
@@ -108,7 +109,7 @@ class TitleBar(QWidget):
             self.buttonMaximum.setText('1')
             self.windowNormaled.emit()
 
-    def setHeight(self, height=38):
+    def setHeight(self, height=35):
         """设置标题栏高度"""
         self.setMinimumHeight(height)
         self.setMaximumHeight(height)
@@ -158,12 +159,9 @@ class TitleBar(QWidget):
 
 # 枚举左上右下以及四个定点
 Left, Top, Right, Bottom, LeftTop, RightTop, LeftBottom, RightBottom = range(8)
-
 class FramelessWindow(QWidget):
-
     # 四周边距
     Margins = 1
-
     def __init__(self, *args, **kwargs):
         super(FramelessWindow, self).__init__(*args, **kwargs)
 
@@ -194,7 +192,7 @@ class FramelessWindow(QWidget):
         self.windowTitleChanged.connect(self.titleBar.setTitle)
         self.windowIconChanged.connect(self.titleBar.setIcon)
 
-    def setTitleBarHeight(self, height=20):
+    def setTitleBarHeight(self, height=35):
         """设置标题栏高度"""
         self.titleBar.setHeight(height)
 
@@ -224,7 +222,7 @@ class FramelessWindow(QWidget):
     def showMaximized(self):
         """最大化,要去除上下左右边界,如果不去除则边框地方会有空隙"""
         super(FramelessWindow, self).showMaximized()
-        self.layout().setContentsMargins(0, 0, 0, 0)
+        self.layout().setContentsMargins(self.Margins, self.Margins, self.Margins, self.Margins)
 
     def showNormal(self):
         """还原,要保留上下左右边界,否则没有边框无法调整"""

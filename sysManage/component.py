@@ -1,15 +1,8 @@
-from PyQt5.QtWidgets import QMessageBox, QPushButton, QInputDialog
+
+from PyQt5.QtWidgets import QMessageBox, QPushButton,QInputDialog
 from PyQt5.QtCore import Qt
 
-
-# title: 标题
-# context: 提示信息
-# confirm: 是否添加 QMessage.Ok
-# cancel: 是否添加 QMessage.Cancel
-# // getMessageBox('添加', '添加失败，该年份已存在', True, False)
-# // from sysManage.component import getMessageBox
-
-def getMessageBox(title: str, context: str, confirm: bool, cancel: bool):
+def getMessageBox(title:str, context:str, confirm:bool, cancel:bool):
     messageBox = QMessageBox()
     messageBox.setWindowTitle(title)
     messageBox.setText(context)
@@ -81,6 +74,6 @@ def getTextInputDialog(title: str, context: str, confirm: bool, cancel: bool):
     text = ""
     ok = False
     if inputDialog.exec_() == QInputDialog.Accepted:
-        text = inputDialog.doubleValue()
+        text = inputDialog.textValue()
         ok = True
     return ok, text

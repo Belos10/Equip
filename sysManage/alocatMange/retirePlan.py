@@ -103,6 +103,7 @@ class retirePlan(QWidget, retirePlan_Form):
     # 新增年份
     def slotAddNewYear(self):
         year = 0
+
         ok, year = getIntInputDialog("新增年份", "年份:", 0, 100000, 1, True, True)
         if ok:
             haveYear = False

@@ -20,6 +20,7 @@ class AdjustOrder(QWidget, widget_adjustOrder):
         self.signalConnect()
 
 
+
     def initAll(self):
         self.tw_equip.header().setVisible(False)
         self.le_first.setDisabled(1)
@@ -45,7 +46,17 @@ class AdjustOrder(QWidget, widget_adjustOrder):
         self.pb_outputToExcel.clicked.connect(self.slotOutputToExcel)
         self.tb_add.clicked.connect(self.slotAddNewYear)
         self.tb_del.clicked.connect(self.slotDelYear)
+        self.pb_firstSelect.clicked.connect(self.slotSelectEquip)
 
+
+
+
+    def slotSelectEquip(self):
+        findText = self.le_first.text()
+        for i, item in self.equip_treeWidget_dict.items():
+            if item.text(0) == findText:
+                self.tw_equip.setCurrentItem(item)
+                break
     # 信号与槽连接的断开
     def signalDisconnectSlot(self):
         pass
@@ -98,7 +109,7 @@ class AdjustOrder(QWidget, widget_adjustOrder):
         self.tw_equip.header().setVisible(False)
         self.le_first.setDisabled(False)
         self.tw_equip.setDisabled(False)
-        self.first_treeWidget_dict = {}
+        # self.first_treeWile_firstdget_dict = {}
         self.equip_treeWidget_dict = {}
         self.initUserInfo()
         self.currentYear = self.lw_yearChoose.currentItem().text()

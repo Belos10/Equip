@@ -56,7 +56,7 @@ class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
         self.login = login()
         self.login.show()
         self.hide()
-        # self.center()
+        self.center()
         self.signalConnect()
 
     def center(self):

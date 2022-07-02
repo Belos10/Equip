@@ -33,10 +33,16 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
         self.tb_add.clicked.connect(self.slotAdd)
         self.tb_delete.clicked.connect(self.slotDelete)
         self.tw_result.itemChanged.connect(self.slotAlterAndSava)
-
+        self.pb_firstSelect.clicked.connect(self.slotSelectUnit)
         self.tw_first.itemClicked.connect(self.displayData)
 
 
+    def slotSelectUnit(self):
+        findText = self.le_first.text()
+        for i, item in self.first_treeWidget_dict.items():
+            if item.text(0) == findText:
+                self.tw_first.setCurrentItem(item)
+                break
     #信号和槽断开
     def slotDisconnect(self):
         pass

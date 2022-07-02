@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'Widget_OrderAllotSchedule.ui'
+# Form implementation generated from reading ui file 'allotSchedule.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.4
 #
@@ -14,7 +14,12 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class widget_AllotSchedule(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(1026, 659)
+        Form.resize(1747, 1157)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(Form.sizePolicy().hasHeightForWidth())
+        Form.setSizePolicy(sizePolicy)
         self.horizontalLayout_8 = QtWidgets.QHBoxLayout(Form)
         self.horizontalLayout_8.setObjectName("horizontalLayout_8")
         self.groupBox = QtWidgets.QGroupBox(Form)
@@ -35,26 +40,26 @@ class widget_AllotSchedule(object):
         self.verticalLayout.addWidget(self.lw_yearChoose)
         self.horizontalLayout_8.addWidget(self.groupBox)
         self.groupBox_2 = QtWidgets.QGroupBox(Form)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.groupBox_2.sizePolicy().hasHeightForWidth())
         self.groupBox_2.setSizePolicy(sizePolicy)
-        self.groupBox_2.setMinimumSize(QtCore.QSize(300, 0))
-        self.groupBox_2.setMaximumSize(QtCore.QSize(450, 16777215))
+        self.groupBox_2.setMinimumSize(QtCore.QSize(0, 0))
+        self.groupBox_2.setMaximumSize(QtCore.QSize(16777215, 16777215))
         self.groupBox_2.setObjectName("groupBox_2")
         self.gridLayout_2 = QtWidgets.QGridLayout(self.groupBox_2)
         self.gridLayout_2.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_2.setSpacing(0)
         self.gridLayout_2.setObjectName("gridLayout_2")
         self.wg_directory = QtWidgets.QWidget(self.groupBox_2)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.wg_directory.sizePolicy().hasHeightForWidth())
         self.wg_directory.setSizePolicy(sizePolicy)
-        self.wg_directory.setMinimumSize(QtCore.QSize(300, 0))
-        self.wg_directory.setMaximumSize(QtCore.QSize(450, 16777215))
+        self.wg_directory.setMinimumSize(QtCore.QSize(0, 0))
+        self.wg_directory.setMaximumSize(QtCore.QSize(16777215, 16777215))
         self.wg_directory.setObjectName("wg_directory")
         self.horizontalLayout_4 = QtWidgets.QHBoxLayout(self.wg_directory)
         self.horizontalLayout_4.setContentsMargins(0, 0, 0, 0)
@@ -87,6 +92,8 @@ class widget_AllotSchedule(object):
         self.horizontalLayout.addWidget(self.pb_firstSelect)
         self.verticalLayout_2.addLayout(self.horizontalLayout)
         self.tw_first = QtWidgets.QTreeWidget(self.wg_directory)
+        self.tw_first.setMinimumSize(QtCore.QSize(300, 800))
+        self.tw_first.setMaximumSize(QtCore.QSize(16777215, 16777215))
         self.tw_first.setObjectName("tw_first")
         self.verticalLayout_2.addWidget(self.tw_first)
         self.horizontalLayout_3.addLayout(self.verticalLayout_2)
@@ -114,6 +121,8 @@ class widget_AllotSchedule(object):
         self.horizontalLayout_2.addWidget(self.pb_secondSelect)
         self.verticalLayout_3.addLayout(self.horizontalLayout_2)
         self.tw_second = QtWidgets.QTreeWidget(self.wg_directory)
+        self.tw_second.setMinimumSize(QtCore.QSize(350, 800))
+        self.tw_second.setMaximumSize(QtCore.QSize(16777215, 16777215))
         self.tw_second.setObjectName("tw_second")
         self.verticalLayout_3.addWidget(self.tw_second)
         self.horizontalLayout_3.addLayout(self.verticalLayout_3)
@@ -160,10 +169,11 @@ class widget_AllotSchedule(object):
         self.disturbResult.setRowCount(0)
         self.verticalLayout_4.addWidget(self.disturbResult)
         self.horizontalLayout_8.addLayout(self.verticalLayout_4)
+        self.horizontalLayout_8.setStretch(0, 1)
+        self.horizontalLayout_8.setStretch(1, 4)
+        self.horizontalLayout_8.setStretch(2, 8)
 
         self.retranslateUi(Form)
-        self.tw_first.setMinimumSize(300, 500)
-        self.tw_second.setMinimumSize(300, 500)
         QtCore.QMetaObject.connectSlotsByName(Form)
 
     def retranslateUi(self, Form):
@@ -178,5 +188,5 @@ class widget_AllotSchedule(object):
         self.txt_disturbPlanYear.setHtml(_translate("Form", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'SimSun\'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
-"<p align=\"center\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>"))
+"</style></head><body style=\" font-family:\'SimSun\'; font-size:9.07563pt; font-weight:400; font-style:normal;\">\n"
+"<p align=\"center\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:9pt;\"><br /></p></body></html>"))

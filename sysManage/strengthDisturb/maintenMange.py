@@ -161,7 +161,8 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
             Unit_ID = resultInfo[0]
             Equip_ID = resultInfo[1]
             orginNum = resultInfo[5]
-            year = resultInfo[7]
+            print('resultInfo', resultInfo)
+            year = resultInfo[-1]
             unitHaveChild = selectUnitIsHaveChild(Unit_ID)
             equipHaveChild = selectEquipIsHaveChild(Equip_ID)
 
@@ -169,7 +170,7 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
                 getMessageBox('清除', '第' + str(i) + "行清除失败，只能清除末级单位和装备编制数",True, False)
                 continue
             else:
-                updateSuccess = updateWeaveNum(Unit_ID, Equip_ID, year, "0", orginNum)
+                updateSuccess = updateWeaveNum(Unit_ID, Equip_ID, "0", orginNum, year)
                 if updateSuccess != True:
                     getMessageBox('清除', '第' + str(i) + "行清除失败, " + str(updateSuccess), True, False)
                     return

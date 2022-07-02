@@ -540,7 +540,7 @@ class DisturbPlan(QWidget, yearList_Form):
                 originStrengthNum = selectStrengthNum(self.currentUnitChilddict[self.currentColumn - 5][0],
                                                       self.currentEquipdict[self.currentRow][0], self.currentYear)
                 print("originDisturbPlanNum", originDisturbPlanNum, "originStrengthNum", originStrengthNum)
-                if originStrengthNum[0] != '':
+                if len(originStrengthNum) > 0 and  originStrengthNum[0] != '':
                     updateDisturbPlanNum(self.currentEquipdict[self.currentRow][0],
                                          self.currentUnitChilddict[self.currentColumn - 5][0],
                                          self.currentYear, num, originDisturbPlanNum[0])

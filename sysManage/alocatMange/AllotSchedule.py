@@ -68,6 +68,23 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         self.tw_second.itemChanged.connect(self.slotCheckedChange)
         self.cb_schedule.activated.connect(self.selectSchedule)
 
+        self.pb_secondSelect.clicked.connect(self.slotSelectEquip)
+        self.pb_firstSelect.clicked.connect(self.slotSelectUnit)
+
+
+    def slotSelectUnit(self):
+        findText = self.le_first.text()
+        for i, item in self.first_treeWidget_dict.items():
+            if item.text(0) == findText:
+                self.tw_first.setCurrentItem(item)
+                break
+
+    def slotSelectEquip(self):
+        findText = self.le_second.text()
+        for i, item in self.second_treeWidget_dict.items():
+            if item.text(0) == findText:
+                self.tw_second.setCurrentItem(item)
+                break
 
 
     # 信号与槽连接的断开
@@ -180,12 +197,12 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
             self.cb_schedule.addItem("完成进度1",1)
             self.cb_schedule.addItem("完成进度2", 2)
             self.cb_schedule.addItem("完成进度3", 3)
-            self.cb_schedule.addItem("完成全部进度", 4)
+            self.cb_schedule.addItem("全部完成", 4)
         elif self.unitFlag == 2:
             self.cb_schedule.addItem("全部", 0)
             self.cb_schedule.addItem("完成进度1", 1)
             self.cb_schedule.addItem("完成进度2", 2)
-            self.cb_schedule.addItem("完成全部进度", 3)
+            self.cb_schedule.addItem("全部完成", 3)
 
 
 

@@ -66,22 +66,6 @@ class OrderAllotPlan(QWidget, Widget_OrderPlan):
         self.inputProof.signal.connect(self.initOrderPlanProof)
         self.pb_outputToExcel.clicked.connect(self.slotOutputToExcel)
 
-    # 查询单位
-    def slotSelectUnit(self):
-        findText = self.le_first.text()
-        for i, item in self.first_treeWidget_dict.items():
-            if item.text(0) == findText:
-                self.tw_first.setCurrentItem(item)
-                break
-
-    # 查询装备
-    def slotSelectEquip(self):
-        findText = self.le_second.text()
-        for i, item in self.second_treeWidget_dict.items():
-            if item.text(0) == findText:
-                self.tw_second.setCurrentItem(item)
-                break
-        print("self.second_treeWidget_dict",self.second_treeWidget_dict)
 
 
     # 信号与槽连接的断开
@@ -112,6 +96,22 @@ class OrderAllotPlan(QWidget, Widget_OrderPlan):
         self.pb_secondSelect.clicked.disconnect(self.slotSelectEquip)
 
         self.inputProof.signal.disconnect(self.initOrderPlanProof)
+
+
+
+    def slotSelectUnit(self):
+        findText = self.le_first.text()
+        for i, item in self.first_treeWidget_dict.items():
+            if item.text(0) == findText:
+                self.tw_first.setCurrentItem(item)
+                break
+
+    def slotSelectEquip(self):
+        findText = self.le_second.text()
+        for i, item in self.second_treeWidget_dict.items():
+            if item.text(0) == findText:
+                self.tw_second.setCurrentItem(item)
+                break
 
     # 新增年份
     def slotAddNewYear(self):

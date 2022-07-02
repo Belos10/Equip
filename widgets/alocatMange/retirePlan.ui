@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1214</width>
+    <width>1630</width>
     <height>796</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout_5">
+  <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,4,8">
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="maximumSize">
@@ -95,20 +95,20 @@
    <item>
     <widget class="QGroupBox" name="groupBox_2">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
      <property name="minimumSize">
       <size>
-       <width>300</width>
+       <width>700</width>
        <height>0</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
-       <width>450</width>
+       <width>16777215</width>
        <height>16777215</height>
       </size>
      </property>
@@ -141,13 +141,13 @@
         </property>
         <property name="minimumSize">
          <size>
-          <width>300</width>
+          <width>698</width>
           <height>0</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>450</width>
+          <width>16777215</width>
           <height>16777215</height>
          </size>
         </property>
@@ -209,6 +209,12 @@
              </item>
              <item>
               <widget class="QTreeWidget" name="tw_first">
+               <property name="minimumSize">
+                <size>
+                 <width>300</width>
+                 <height>0</height>
+                </size>
+               </property>
                <column>
                 <property name="text">
                  <string/>
@@ -255,6 +261,12 @@
              </item>
              <item>
               <widget class="QTreeWidget" name="tw_second">
+               <property name="minimumSize">
+                <size>
+                 <width>300</width>
+                 <height>0</height>
+                </size>
+               </property>
                <column>
                 <property name="text">
                  <string/>
@@ -304,7 +316,14 @@ p, li { white-space: pre-wrap; }
       </widget>
      </item>
      <item>
-      <widget class="QTableWidget" name="retirePlanResult"/>
+      <widget class="QTableWidget" name="retirePlanResult">
+       <property name="minimumSize">
+        <size>
+         <width>600</width>
+         <height>0</height>
+        </size>
+       </property>
+      </widget>
      </item>
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_7">
