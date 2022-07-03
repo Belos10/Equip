@@ -4,6 +4,7 @@ import threading
 
 from PyQt5.Qt import QObject
 from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication
 
 from database.loginSql import selectUserInfoByAccont
@@ -27,6 +28,7 @@ class mainManage(QObject):
         # self.login = login()
         # self.login.show()
         self.mainwnd = FramelessWindow()
+        # self.mainwnd.setWindowIcon(QIcon(":/pic/system.png"))
         self.widget = Manage_Widgets()
         self.mainwnd.setWidget(self.widget)
         self.mainwnd.show()

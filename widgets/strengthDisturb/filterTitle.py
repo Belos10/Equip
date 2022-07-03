@@ -9,12 +9,15 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtGui import QIcon
 
 
 class Widget_filterTitle(object):
     def setupUi(self, widget_FilterTitle):
         widget_FilterTitle.setObjectName("widget_FilterTitle")
         widget_FilterTitle.resize(383, 344)
+        self.setStyleSheet("background-color:rgb(100, 100, 100)")
+        self.setWindowIcon(QIcon(":/pic/system.png"))
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
