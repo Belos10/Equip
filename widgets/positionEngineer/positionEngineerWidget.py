@@ -50,7 +50,7 @@ class Position_Engineer_Widget(object):
         self.tb_equipmentStatistics.setToolButtonStyle(Qt.Qt.ToolButtonTextUnderIcon)
 
 
-        # self.tb_directoryMaintenance = QtWidgets.QToolButton(MainWindow)
+        # self.tb_directoryMaintenance = QtWidgets.QPushButton(MainWindow)
         # icon2 = QtGui.QIcon()
         # icon2.addPixmap(QtGui.QPixmap(":/pic/set.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         # self.tb_directoryMaintenance.setIcon(icon2)

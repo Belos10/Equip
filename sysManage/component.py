@@ -1,9 +1,10 @@
-
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMessageBox, QPushButton,QInputDialog
 from PyQt5.QtCore import Qt
 
 def getMessageBox(title:str, context:str, confirm:bool, cancel:bool):
     messageBox = QMessageBox()
+    messageBox.setIcon(QMessageBox.Question)
     messageBox.setWindowTitle(title)
     messageBox.setText(context)
     if confirm:

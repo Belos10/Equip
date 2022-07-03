@@ -22,6 +22,7 @@ class MaintenanceManagement(QWidget, OrderManagementUI):
         self.contractNo = ''
         self.attachmentDialog = None
         self.inputList = []
+        self.shutdown = True
         self.showInputResult = showInputResult(self)
         self.showInputResult.hide()
         self.signalConnection()
@@ -30,8 +31,6 @@ class MaintenanceManagement(QWidget, OrderManagementUI):
     # 信号和槽连接
     def signalConnection(self):
         self.pb_select.clicked.connect(self.slotSelect)
-        self.tb_input.clicked.connect(self.slotInput)
-        self.pb_output.clicked.connect(self.slotOutput)
         self.tb_add.clicked.connect(self.slotAdd)
         self.tb_del.clicked.connect(self.slotDelete)
         self.lv_year.clicked.connect(self.displayDataByYear)
@@ -329,6 +328,8 @@ class MaintenanceManagement(QWidget, OrderManagementUI):
 
     def slotAlterAndSava(self):
         selectRow = self.tw_result.selectedItems()
+        if self.shutdown:
+            return
         if len(selectRow) != 0:
             currentRow = selectRow[0].row()
             currentColumn = selectRow[0].column()
@@ -445,20 +446,13 @@ class MaintenanceManagement(QWidget, OrderManagementUI):
                 getMessageBox("警告", "修改失败！", True, False)
             self.displayData()
 
-
-    # 组件
-    def slotInput(self):
-        pass
-
-    def slotOutput(self):
-        pass
-
     '''
         功能：
             新增按钮槽函数
     '''
 
     def slotAdd(self):
+        self.shutdown = True
         if self.tw_result.rowCount() <= 2 + len(self.result):
             rowCount = self.tw_result.rowCount()
             self.currentLastRow = rowCount
@@ -498,6 +492,7 @@ class MaintenanceManagement(QWidget, OrderManagementUI):
 
         else:
             getMessageBox("注意", "请先将数据补充完整！", True, False)
+        self.shutdown = False
 
     def slotDelete(self):
         rowCount = self.tw_result.currentRow()

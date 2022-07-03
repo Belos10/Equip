@@ -42,7 +42,7 @@ class Danger_Goods_Widget(object):
         self.tb_strengthStatistics.setObjectName("tb_strengthStatistics")
         self.tb_strengthStatistics.setToolButtonStyle(Qt.Qt.ToolButtonTextUnderIcon)
 
-        # self.tb_directoryMaintenance = QtWidgets.QToolButton(MainWindow)
+        # self.tb_directoryMaintenance = QtWidgets.QPushButton(MainWindow)
         # icon = QtGui.QIcon()
         # icon.addPixmap(QtGui.QPixmap(":/pic/set.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         # self.tb_directoryMaintenance.setIcon(icon)
