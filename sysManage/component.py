@@ -4,7 +4,7 @@ from PyQt5.QtCore import Qt
 
 def getMessageBox(title:str, context:str, confirm:bool, cancel:bool):
     messageBox = QMessageBox()
-    messageBox.setIcon(QMessageBox.Question)
+    messageBox.setWindowIcon(QIcon(":/pic/system.png"))
     messageBox.setWindowTitle(title)
     messageBox.setText(context)
     if confirm:
@@ -21,6 +21,7 @@ def getMessageBox(title:str, context:str, confirm:bool, cancel:bool):
 
 def getIntInputDialog(title: str, context: str, floor: int, top: int, step: int, confirm: bool, cancel: bool):
     inputDialog = QInputDialog()
+    inputDialog.setWindowIcon(QIcon(":/pic/system.png"))
     inputDialog.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowCloseButtonHint)
     inputDialog.setFixedSize(400, 400)
     inputDialog.setInputMode(QInputDialog.IntInput)
@@ -42,6 +43,7 @@ def getIntInputDialog(title: str, context: str, floor: int, top: int, step: int,
 
 def getDoubleInputDialog(title: str, context: str, floor: float, top: float, step: int, confirm: bool, cancel: bool):
     inputDialog = QInputDialog()
+    inputDialog.setWindowIcon(QIcon(":/pic/system.png"))
     inputDialog.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowCloseButtonHint)
     inputDialog.setFixedSize(400, 400)
     inputDialog.setInputMode(QInputDialog.DoubleInput)
@@ -63,6 +65,7 @@ def getDoubleInputDialog(title: str, context: str, floor: float, top: float, ste
 
 def getTextInputDialog(title: str, context: str, confirm: bool, cancel: bool):
     inputDialog = QInputDialog()
+    inputDialog.setWindowIcon(QIcon(":/pic/system.png"))
     inputDialog.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowCloseButtonHint)
     inputDialog.setFixedSize(400, 400)
     inputDialog.setInputMode(QInputDialog.TextInput)
