@@ -1,6 +1,7 @@
 import pickle
 import sys
-
+import xlrd
+import xlwt
 from PyQt5.Qt import QRegExp
 from PyQt5.Qt import Qt
 from PyQt5.QtCore import QDateTime
@@ -99,6 +100,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         self.pb_output.clicked.connect(self.slotOutputData)
         # 导入数据包
         self.pb_input.clicked.connect(self.slotInputData)
+        self.pb_inputFromExcel.clicked.connect(self.slotInputDataFromExcel)
         # 导入数据到数据库
         self.showInputResult.pb_confirm.clicked.connect(self.slotInputIntoDatabase)
         self.showInputResult.pb_cancel.clicked.connect(self.slotCancelInputIntoDatabase)
@@ -117,6 +119,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         self.rb_equipShow.setChecked(False)
         self.rb_unitShow.setChecked(False)
         self.pb_input.setDisabled(True)
+        self.pb_inputFromExcel.setDisabled(True)
         self.pb_output.setDisabled(True)
         self.pb_outputToExcel.setDisabled(True)
         self.cb_showLast.setDisabled(True)
@@ -143,6 +146,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         self.rb_equipShow.setChecked(False)
         self.rb_unitShow.setChecked(False)
         self.pb_input.setDisabled(False)
+        self.pb_inputFromExcel.setDisabled(False)
         self.pb_output.setDisabled(False)
         self.pb_outputToExcel.setDisabled(False)
         self.cb_showLast.setDisabled(False)
@@ -613,6 +617,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
 
     #导出至Excel
     def slotOutputToExcel(self):
+
         if len(self.resultList) < 1:
             getMessageBox('警告', '未选中任何数据，无法导出', True, False)
             return
@@ -621,8 +626,6 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
             self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList,
                                                         self.year)
             return
-
-
         for i, result in self.currentInquiryResult.items():
             if result[13] == True:
                 checkbox = self.tw_result.cellWidget(i + 2, 5)
@@ -630,7 +633,6 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                 apply = self.tw_result.item(i + 2, 8).text()
                 other = self.tw_result.item(i + 2, 9).text()
                 updateRetireAboutRetire(num, apply, other, result)
-
 
         self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList,self.year)
         directoryPath = QFileDialog.getExistingDirectory(self, "请选择导出文件夹", "c:/")
@@ -673,28 +675,33 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
             contentStyle.borders = borders
 
             #画表头
-            headerlist = ['单位名称', '装备名称', '实力数', '编制数', '现有数', '偏差', '准备退役数', '未到位数', '提前退役', '待核查无实物', '待核查无实力',
+            headerlist = [ '单位编号','单位名称', '装备编号', '装备名称', '实力数', '编制数', '现有数', '偏差', '准备退役数', '未到位数', '提前退役', '待核查无实物', '待核查无实力',
                           '单独建账',
                           '正常到位']
             for i in range(len(headerlist)):
                 workSheet.col(i).width = 4000
-                workSheet.write(0,i,headerlist[i],titileStyle)
+                workSheet.write(0, i, headerlist[i], titileStyle)
 
             #填表
             for index,LineInfo in enumerate(self.resultList):
-                workSheet.write(index + 1, 0, LineInfo[3], contentStyle)
-                workSheet.write(index + 1, 1, LineInfo[2], contentStyle)
-                workSheet.write(index + 1, 2, str(LineInfo[4]), contentStyle)
-                workSheet.write(index + 1, 3, str(LineInfo[5]), contentStyle)
-                workSheet.write(index + 1, 4, str(LineInfo[6]), contentStyle)
-                workSheet.write(index + 1, 5, str(LineInfo[7]), contentStyle)
-                workSheet.write(index + 1, 6, str(LineInfo[8]), contentStyle)
-                workSheet.write(index + 1, 7, str(LineInfo[9]), contentStyle)
-                workSheet.write(index + 1, 8, str(LineInfo[10]), contentStyle)
-                workSheet.write(index + 1, 9, str(LineInfo[11]), contentStyle)
-                workSheet.write(index + 1, 10, str(LineInfo[12]), contentStyle)
-                workSheet.write(index + 1, 11, str(LineInfo[13]), contentStyle)
-                workSheet.write(index + 1, 12, str(LineInfo[14]), contentStyle)
+                #  装备号 单位号
+                # ['5', '6', 'A车', '六十一旅团', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '2001']
+                workSheet.write(index + 1, 0, str(LineInfo[1]), contentStyle)
+                workSheet.write(index + 1, 1, str(LineInfo[3]), contentStyle)
+                workSheet.write(index + 1, 2, str(LineInfo[0]), contentStyle)
+                workSheet.write(index + 1, 3, str(LineInfo[2]), contentStyle)
+
+                workSheet.write(index + 1, 4, str(LineInfo[4]), contentStyle)
+                workSheet.write(index + 1, 5, str(LineInfo[5]), contentStyle)
+                workSheet.write(index + 1, 6, str(LineInfo[6]), contentStyle)
+                workSheet.write(index + 1, 7, str(LineInfo[7]), contentStyle)
+                workSheet.write(index + 1, 8, str(LineInfo[8]), contentStyle)
+                workSheet.write(index + 1, 9, str(LineInfo[9]), contentStyle)
+                workSheet.write(index + 1, 10, str(LineInfo[10]), contentStyle)
+                workSheet.write(index + 1, 11, str(LineInfo[11]), contentStyle)
+                workSheet.write(index + 1, 12, str(LineInfo[12]), contentStyle)
+                workSheet.write(index + 1, 13, str(LineInfo[13]), contentStyle)
+                workSheet.write(index + 1, 14, str(LineInfo[14]), contentStyle)
             try:
                 pathName = "%s/%s年%s实力对比表.xls" % (directoryPath,self.year, selectUnitNameByUnitID(self.unitList[0]))
                 workBook.save(pathName)
@@ -808,22 +815,108 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
             self.showInputResult.tw_result.setItem(i, 12, item)
         pass
 
+    '''
+        从Excel导入实力数
+    '''
+    def slotInputDataFromExcel(self):
+        self.inputList = []
+        self.setDisabled(True)
+        self.showInputResult.setDisabled(False)
+        filename, _ = QFileDialog.getOpenFileName(self, "选中文件", '', "Excel Files (*.xls);;Excel Files (*.xlsx)")
+        try:
+            workBook = xlrd.open_workbook(filename)
+            self.workSheet = workBook.sheet_by_index(0)
+
+            if self.workSheet.ncols != 15:
+                getMessageBox("打开失败", "打开文件失败，请检查文件是否正确", True, False)
+                self.setDisabled(False)
+                return
+            year = ((filename.split('/'))[-1])[0:4]
+            print('year')
+            print(year)
+            try:
+                year = str(int(year))
+            except:
+                getMessageBox("读取失败", "读取年份失败，年份是否正确！", True, False)
+                self.setDisabled(False)
+                return
+            print("year: " + year)
+            title = ['单位编号', '单位名称', '装备编号', '装备名称', '实力数']
+            for r in range(1, self.workSheet.nrows):
+                unitId = (self.workSheet.cell(r, 0).value)
+                unitName = self.workSheet.cell(r, 1).value
+                equipId = (self.workSheet.cell(r, 2).value)
+                equipName = self.workSheet.cell(r, 3).value
+                strength = (self.workSheet.cell(r, 4).value)
+                try:
+                    unitId = str(int(unitId))
+                    equipId = str(int(equipId))
+                    strength = str(int(strength))
+                except:
+                    getMessageBox("读取失败", "读取第%d行数据失败，请检测数据是否正确！" % (r), True, False)
+                    continue
+                inputInfo = []
+                inputInfo.append(unitId)
+                inputInfo.append(unitName)
+                inputInfo.append(equipId)
+                inputInfo.append(equipName)
+                inputInfo.append(strength)
+                inputInfo.append(year)
+                self.inputList.append(inputInfo)
+            self.showInputResult.setWindowTitle("从Excel导入%s实力数"%year)
+            self.showInputResult.tw_result.setColumnCount(len(title))
+            self.showInputResult.tw_result.setHorizontalHeaderLabels(title)
+            self.showInputResult.tw_result.setEditTriggers(QAbstractItemView.NoEditTriggers)
+            self.showInputResult.tw_result.setRowCount(len(self.inputList))
+            self.showInputResult.tw_result.verticalHeader().setVisible(False)
+            for r, list_item in enumerate(self.inputList):
+                item = QTableWidgetItem(list_item[0])
+                self.showInputResult.tw_result.setItem(r, 0, item)
+                item = QTableWidgetItem(list_item[1])
+                self.showInputResult.tw_result.setItem(r, 1, item)
+                item = QTableWidgetItem(list_item[2])
+                self.showInputResult.tw_result.setItem(r, 2, item)
+                item = QTableWidgetItem(list_item[3])
+                self.showInputResult.tw_result.setItem(r, 3, item)
+                item = QTableWidgetItem(list_item[4])
+                self.showInputResult.tw_result.setItem(r, 4, item)
+            self.showInputResult.show()
+
+        except BaseException as e:
+            print(e)
+            getMessageBox("打开失败", "打开文件失败，请检查文件", True, False)
+            self.setDisabled(False)
+
+
+
+
     def slotCancelInputIntoDatabase(self):
         self.showInputResult.hide()
         self.setDisabled(False)
 
     def slotInputIntoDatabase(self):
-        for i, lineInfo in enumerate(self.inputList):
-            if i == 0:
-                continue
-            try:
-                if insertOneDataIntoStrenth(lineInfo):
-                    pass
-            except Exception as e:
-                print(e)
-                getMessageBox("导入失败", "导入第%d数据失败！" % (i), True, False)
+        print(self.inputList)
+        if len(self.inputList[0]) == 6:
+            for i, lineInfo in enumerate(self.inputList):
+                try:
+                    if inputOneDataIntoStrenth(lineInfo):
+                        pass
+                except Exception as e:
+                    print(e)
+                    getMessageBox("导入失败", "导入第%d数据失败！" % (i), True, False)
+        else:
+            for i, lineInfo in enumerate(self.inputList):
+                if i == 0:
+                    continue
+                try:
+                    if insertOneDataIntoStrenth(lineInfo):
+                        pass
+                except Exception as e:
+                    print(e)
+                    getMessageBox("导入失败", "导入第%d数据失败！" % (i), True, False)
         self.showInputResult.hide()
         self.setDisabled(False)
+        self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

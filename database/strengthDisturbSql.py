@@ -3594,8 +3594,8 @@ def insertOneDataIntoStrenth(lineInfo):
             conn.rollback()
     else:
         sql = "update strength set  Strength = '%d', Work = '%d', Now = '%d', Error = '%d', Retire = '%d', Delay = '%d', Pre = '%d', NonObject = '%d', NonStrength =" \
-              " '%d', Single = '%d', Arrive = '%d' where Equip_ID = '%s' and Unit_ID = '%s' " %(lineInfo[4],lineInfo[5], lineInfo[6], lineInfo[7], lineInfo[8], lineInfo[9], lineInfo[10], lineInfo[11], lineInfo[12], lineInfo[13],
-        lineInfo[14], lineInfo[0], lineInfo[1])
+              " '%d', Single = '%d', Arrive = '%d' where Equip_ID = '%s' and Unit_ID = '%s'and year = '%s' " %(lineInfo[4],lineInfo[5], lineInfo[6], lineInfo[7], lineInfo[8], lineInfo[9], lineInfo[10], lineInfo[11], lineInfo[12], lineInfo[13],
+        lineInfo[14], lineInfo[0], lineInfo[1], lineInfo[-1])
         try:
             cur.execute(sql)
         except Exception as e:
@@ -3607,7 +3607,46 @@ def insertOneDataIntoStrenth(lineInfo):
     except Exception as e:
         print(e)
         return False
+def inputOneDataIntoStrenth(lineInfo):
+    #['单位编号', '单位名称', '装备编号', '装备名称', '实力数'， ’年份‘]
+    #['8', '六十一阵地', '5', 'A车', '1', '2001']
+    if selectIfExistsStrengthYear(lineInfo[-1]) == False:
+        year = str(lineInfo[-1])
+        sql = "insert into strengthyear(ID, year) values ('" + year + "', '" + year + "')"
+        # print(sql)
+        try:
+            cur.execute(sql)
+        except Exception as e:
+            conn.rollback()
 
+    result = selectStrengthInfo(lineInfo[0], lineInfo[2], lineInfo[-1])
+    if result == None or len(result) == 0:
+        # ['5', '10', 'A车', '六十一旅团一阵地', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '2000']
+        #['单位编号', '单位名称', '装备编号', '装备名称', '实力数'， ’年份‘]
+        #['8', '六十一阵地', '5', 'A车', '1', '2001']
+        sql = "insert into strength values('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (
+        lineInfo[2], lineInfo[0], (lineInfo[3]).strip(),
+        (lineInfo[1]).strip(), lineInfo[4], '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', lineInfo[-1])
+        # print(sql)
+        try:
+            cur.execute(sql)
+        except Exception as e:
+            print(e)
+            conn.rollback()
+    else:
+        sql = "update strength set  Strength = '%s' where Equip_ID = '%s' and Unit_ID = '%s'  and year = '%s'" % (lineInfo[4], lineInfo[2], lineInfo[0], lineInfo[-1])
+        # print(sql)
+        try:
+            cur.execute(sql)
+        except Exception as e:
+            print(e)
+            conn.rollback()
+    try:
+        conn.commit()
+        return True
+    except Exception as e:
+        print(e)
+        return False
 def insertOneDataIntoRetire(lineInfo):
     # ['1022000', '10', '2', '        通用装备', '', 0, '0', '0', '0', '0', '', '', '2000', False]
     if selectIfExistsRetireYear(lineInfo[-2]) == False:

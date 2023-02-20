@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Widget_Inquiry_Result(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(954, 769)
+        Form.resize(1241, 939)
         self.verticalLayout = QtWidgets.QVBoxLayout(Form)
         self.verticalLayout.setObjectName("verticalLayout")
         self.widget = QtWidgets.QWidget(Form)
@@ -96,6 +96,11 @@ class Widget_Inquiry_Result(object):
         self.horizontalLayout.addWidget(self.pb_outputToExcel)
         spacerItem5 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem5)
+        self.pb_inputFromExcel = QtWidgets.QPushButton(Form)
+        self.pb_inputFromExcel.setObjectName("pb_inputFromExcel")
+        self.horizontalLayout.addWidget(self.pb_inputFromExcel)
+        spacerItem6 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout.addItem(spacerItem6)
         self.verticalLayout.addLayout(self.horizontalLayout)
 
         self.retranslateUi(Form)
@@ -117,3 +122,4 @@ class Widget_Inquiry_Result(object):
         self.pb_input.setText(_translate("Form", "导入数据包"))
         self.pb_output.setText(_translate("Form", "导出数据包"))
         self.pb_outputToExcel.setText(_translate("Form", "导出至Excel"))
+        self.pb_inputFromExcel.setText(_translate("Form", "从Excel导入"))
