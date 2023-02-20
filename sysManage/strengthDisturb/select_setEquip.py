@@ -154,8 +154,8 @@ class select_setEquip(QWidget,widget_Select_SetEquip):
         self.second_treeWidget_dict = {}
         self.cb_equipUper.clear()
         # self.cb_unitUper.clear()
+        self.inputEquipInfoList = []
         self.equipIDList = []
-
         self.equipIDList = selectAllIDFromEquip()
         self.equipIDList.append("")
         self.cb_equipUper.addItems(self.equipIDList)
@@ -347,6 +347,7 @@ class select_setEquip(QWidget,widget_Select_SetEquip):
 
     def slotInputIntoMysql(self):
         print(self.inputEquipInfoList)
+        self.inputEquipInfoList.insert(0, ['1', '装备', '', '空', '空', ''])
         for i in range(len(self.inputEquipInfoList)):
             try:
                 isHaveEquipId = isHaveEquipment(self.inputEquipInfoList[i][0])
@@ -355,12 +356,14 @@ class select_setEquip(QWidget,widget_Select_SetEquip):
                                                   self.inputEquipInfoList[i][2], self.inputEquipInfoList[i][3],
                                                   self.inputEquipInfoList[i][4], self.inputEquipInfoList[i][5])
                 else:
-                    getMessageBox("导入", "导入第%d数据失败,存在重复数据%d" % i, True, False)
+                    if i > 1:
+                        getMessageBox("导入", "导入第%d数据失败,存在重复数据%d" % i, True, False)
             except Exception as e:
                 print(e)
                 getMessageBox("导入", "导入第%d数据失败" % i, True, False)
                 continue
         getMessageBox('新增', '新增成功', True, False)
+
         self.slotEquipDictInit()
         self.setDisabled(False)
         self.showInputResult.hide()
@@ -380,6 +383,10 @@ class select_setEquip(QWidget,widget_Select_SetEquip):
                     equipId = str(int(self.workSheet.cell(r, 0).value))
                     equipUper = str(int(self.workSheet.cell(r, 2).value))
                 except:
+                    if equipId == '1' and equipName == '装备':
+                        pass
+                    else:
+                        getMessageBox("读取失败", "读取第%d行数据失败，请检查装备编号或上级装备号是否正确！" % (r), True, False)
                     continue
                 inputType = self.workSheet.cell(r, 3).value.strip()
                 equipType = self.workSheet.cell(r, 4).value.strip()

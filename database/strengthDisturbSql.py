@@ -3498,6 +3498,7 @@ def inputIntoUnitFromExcel(unitInfoList):
     equipInfoTuple = selectAllDataAboutEquip()
     strengthYearInfoTuple = selectAllDataAboutStrengthYear()
     disturbplanYearInfoTuple = selectYearListAboutDisturbPlan()
+    unitInfoList.insert(0, ['1', '火箭军', '', ''])
     for i, unitInfo in enumerate(unitInfoList):
         unitID = unitInfo[0]
         unitName = unitInfo[1]

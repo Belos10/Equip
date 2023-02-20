@@ -314,12 +314,17 @@ class select_setUnit(QWidget,widget_Select_SetUnit):
             title = ['单位编号', '单位名称', '上级单位编号', '单位代号']
             for r in range(1, self.workSheet.nrows):
                 Unit_Name = (self.workSheet.cell(r, 1).value).strip()
-                try:
-                    Unit_Uper = str(int(self.workSheet.cell(r, 2).value))
-                    Unit_ID = str(int(self.workSheet.cell(r, 0).value))
-                except:
-                    continue;
                 Unit_Alias = self.workSheet.cell(r, 3).value
+                Unit_ID = ''
+                try:
+                    Unit_ID = str(int(self.workSheet.cell(r, 0).value))
+                    Unit_Uper = str(int(self.workSheet.cell(r, 2).value))
+                except:
+                    if Unit_Name == '火箭军' and Unit_ID == '1':
+                        pass
+                    else:
+                        getMessageBox("读取失败", "读取第%d行数据失败，请检查单位或上级单位编号是否正确！"%(r), True, False)
+                    continue
                 unitInfo = []
                 unitInfo.append(Unit_ID)
                 unitInfo.append(Unit_Name)

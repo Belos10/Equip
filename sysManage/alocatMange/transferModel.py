@@ -8,6 +8,7 @@ from sysManage.alocatMange.armyTransfer import armyTransfer
 from sysManage.alocatMange.totalModel import totalModel
 from sysManage.alocatMange.singleModel import singleModel
 from database.alocatMangeSql import *
+from sysManage.component import getMessageBox
 from PyQt5 import QtCore
 '''
    调拨单管理界面
