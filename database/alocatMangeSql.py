@@ -511,9 +511,9 @@ def updateArmySchedule(Equip_Id,Year,txt):
     # disconnectMySql(conn, cur)
 
 # 更新是否具备条件进度
-def updateAllotConditionBase(Equip_Id, Year):
+def updateAllotConditionBase(Equip_Id, Year, txt):
     # conn, cur = connectMySql()
-    sql = "update allotschedule set allotconditionBase = '1' where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
+    sql = "update allotschedule set allotconditionBase = " + txt + "  where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
     print(sql)
     cur.execute(sql)
     conn.commit()
@@ -521,26 +521,26 @@ def updateAllotConditionBase(Equip_Id, Year):
 
 
 # 更新是否具备条件进度
-def updateAllotConditionUper(Equip_Id, Year):
+def updateAllotConditionUper(Equip_Id, Year, txt):
     # conn, cur = connectMySql()
-    sql = "update allotschedule set allotconditionUper = '1' where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
+    sql = "update allotschedule set allotconditionUper = " + txt + " where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
     print(sql)
     cur.execute(sql)
     conn.commit()
     # disconnectMySql(conn, cur)
 
 # 更新火箭军调拨单进度(机关)
-def updateRocketScheduleBase(Equip_Id, Year):
+def updateRocketScheduleBase(Equip_Id, Year, txt):
     # conn, cur = connectMySql()
-    sql = "update allotschedule set rocketBase = '1' where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
+    sql = "update allotschedule set rocketBase = " + txt + " where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
     cur.execute(sql)
     conn.commit()
     # disconnectMySql(conn, cur)
 
 # 更新火箭军调拨单进度(基地)
-def updateRocketScheduleUper(Equip_Id, Year):
+def updateRocketScheduleUper(Equip_Id, Year, txt):
     # conn, cur = connectMySql()
-    sql = "update allotschedule set rocketUper = '1' where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
+    sql = "update allotschedule set rocketUper = " + txt + " where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
     cur.execute(sql)
     conn.commit()
     # disconnectMySql(conn, cur)

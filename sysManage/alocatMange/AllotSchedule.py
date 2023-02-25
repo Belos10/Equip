@@ -68,7 +68,6 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         self.tw_second.itemClicked.connect(self.slotDisturbStrengthResult)
         self.tw_second.itemChanged.connect(self.slotCheckedChange)
         # self.cb_schedule.activated.connect(self.selectSchedule)
-        # self.cb_schedule.stateChanged.connect(self.selectSchedule)
         self.cb_schedule.signal.connect(self.preSelectSchedule)
         self.pb_secondSelect.clicked.connect(self.slotSelectEquip)
         self.pb_firstSelect.clicked.connect(self.slotSelectUnit)
@@ -422,6 +421,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                     item.clicked.connect(self.setArmySchedule)
                     if flag1[0][0] != '0':
                         item = QPushButton(flag1[0][0])
+                        item.clicked.connect(self.setButtonBack)
                     self.disturbResult.setCellWidget(i, 5 + self.lenCurrentUnitChilddict, item)
 
                     # 是否具备接装条件
@@ -430,6 +430,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                     item.clicked.connect(self.setCondition)
                     if int(flag2[0][0]):
                         item = QPushButton("已完成")
+                        item.clicked.connect(self.setButtonBack)
                     self.disturbResult.setCellWidget(i, 6 + self.lenCurrentUnitChilddict, item)
 
                     # 火箭军调拨单进度
@@ -439,6 +440,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                     if int(flag3[0][0]):
                         item = QPushButton("已完成")
                         item.clicked.connect(self.showRocket)
+                        item.clicked.connect(self.setButtonBack)
                     self.disturbResult.setCellWidget(i, 7 + self.lenCurrentUnitChilddict, item)
 
                     # 是否完成接装
@@ -447,6 +449,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                     item.clicked.connect(self.setScheduleFinish)
                     if flag4[0][0] != '0':
                         item = QPushButton("已完成")
+                        item.clicked.connect(self.setButtonBack)
                     self.disturbResult.setCellWidget(i, 8 + self.lenCurrentUnitChilddict, item)
         # 选择基地
         elif self.unitFlag == 2:
@@ -467,6 +470,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                     if int(flag2[0][0]):
                         item = QPushButton("已完成")
                         item.clicked.connect(self.showRocket)
+                        item.clicked.connect(self.setButtonBack)
                     self.disturbResult.setCellWidget(i, 5 + self.lenCurrentUnitChilddict, item)
 
                     # 是否具备接装条件
@@ -475,6 +479,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                     item.clicked.connect(self.setCondition)
                     if int(flag3[0][0]):
                         item = QPushButton("已完成")
+                        item.clicked.connect(self.setButtonBack)
                     self.disturbResult.setCellWidget(i, 6 + self.lenCurrentUnitChilddict, item)
 
                     # 是否完成接装
@@ -483,6 +488,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                     item.clicked.connect(self.setScheduleFinish)
                     if flag4[0][0] != '0':
                         item = QPushButton("已完成")
+                        item.clicked.connect(self.setButtonBack)
                     self.disturbResult.setCellWidget(i, 7 + self.lenCurrentUnitChilddict, item)
 
     # 初始化调拨依据
@@ -667,6 +673,32 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                             self.disturbResult.item(row, 2).setText(str(sum))
 
 
+    def setButtonBack(self):
+        reply = getMessageBox("修改", "是否修改进度？", True, True)
+        if reply == QMessageBox.Ok:
+            currentRow = self.disturbResult.currentRow()
+            currentColumn = self.disturbResult.currentColumn()
+            if self.unitFlag == 1:
+                if currentColumn == 5 + self.lenCurrentUnitChilddict:
+                    updateArmySchedule(self.currentEquipdict[currentRow][0], self.currentYear, '0')
+                if currentColumn == 6 + self.lenCurrentUnitChilddict:
+                    updateAllotConditionUper(self.currentEquipdict[currentRow][0], self.currentYear, '0')
+                if currentColumn == 7 + self.lenCurrentUnitChilddict:
+                    updateRocketScheduleUper(self.currentEquipdict[currentRow][0], self.currentYear, '0')
+                if currentColumn == 8 + self.lenCurrentUnitChilddict:
+                    updateScheduleFinishUper(self.currentEquipdict[currentRow][0], self.currentYear, '0')
+                item = QPushButton("设置进度")
+                self.disturbResult.setCellWidget(currentRow, currentColumn, item)
+            elif self.unitFlag == 2:
+                if currentColumn == 5 + self.lenCurrentUnitChilddict:
+                    updateRocketScheduleBase(self.currentEquipdict[currentRow][0], self.currentYear, '0')
+                if currentColumn == 6 + self.lenCurrentUnitChilddict:
+                    updateAllotConditionBase(self.currentEquipdict[currentRow][0], self.currentYear, '0')
+                if currentColumn == 7 + self.lenCurrentUnitChilddict:
+                    updateScheduleFinishBase(self.currentEquipdict[currentRow][0], self.currentYear, '0')
+                item = QPushButton("设置进度")
+                self.disturbResult.setCellWidget(currentRow, currentColumn, item)
+
     # 进度1 陆军调拨
     def setArmySchedule(self):
         self.armySchedule._initSelf_()
@@ -675,6 +707,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         self.armySchedule.setWindowFlags(Qt.Dialog|Qt.WindowCloseButtonHint)
         self.armySchedule.show()
         self.armySchedule.signal.connect(self.updateArmy)
+
 
     # 更新进度1 陆军调拨
     def updateArmy(self):
@@ -695,14 +728,14 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         if self.disturbResult.cellWidget(currentRow, currentColumn - 1).text() == "设置进度":
             getMessageBox("设置接装条件", "上一级未完成", True, False)
             return
-        reply = getMessageBox("设置接装条件","是否具备接装条件？", True, True)
+        reply = getMessageBox("设置接装条件","是否具备接装条件？", True, False)
         if reply==QMessageBox.Ok:
             item = QPushButton("已完成")
             self.disturbResult.setCellWidget(currentRow, 6 + self.lenCurrentUnitChilddict, item)
             if self.unitFlag == 1:
-                updateAllotConditionUper(self.currentEquipdict[currentRow][0], self.currentYear)
+                updateAllotConditionUper(self.currentEquipdict[currentRow][0], self.currentYear, '1')
             elif self.unitFlag == 2:
-                updateAllotConditionBase(self.currentEquipdict[currentRow][0], self.currentYear)
+                updateAllotConditionBase(self.currentEquipdict[currentRow][0], self.currentYear, '1')
 
     # 进度3 火箭军调拨
     def setRocketSchedule(self):
@@ -743,11 +776,11 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         item = QPushButton("已完成")
         if self.unitFlag == 1:
             self.disturbResult.setCellWidget(currentRow, 7 + self.lenCurrentUnitChilddict, item)
-            updateRocketScheduleUper(self.currentEquipdict[currentRow][0], self.currentYear)
+            updateRocketScheduleUper(self.currentEquipdict[currentRow][0], self.currentYear, '1')
             item.clicked.connect(self.showRocket)
         elif self.unitFlag == 2:
             self.disturbResult.setCellWidget(currentRow, 5 + self.lenCurrentUnitChilddict, item)
-            updateRocketScheduleBase(self.currentEquipdict[currentRow][0], self.currentYear)
+            updateRocketScheduleBase(self.currentEquipdict[currentRow][0], self.currentYear, '1')
             item.clicked.connect(self.showRocket)
 
     def showRocket(self):
