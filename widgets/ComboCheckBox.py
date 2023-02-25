@@ -47,7 +47,6 @@ class ComboCheckBox(QComboBox):
         return Outputlist
 
     def showMessage(self):
-        print("show1")
         Outputlist = self.Selectlist()
         self.qLineEdit.setReadOnly(False)
         self.qLineEdit.clear()
@@ -61,11 +60,9 @@ class ComboCheckBox(QComboBox):
             self.qCheckBox[0].setCheckState(1)
         self.qLineEdit.setText(show)
         self.qLineEdit.setReadOnly(True)
-        print("show2")
         self.signal.emit('1')
 
     def All(self, zhuangtai):
-        print("zhuangtai=",zhuangtai)
         if zhuangtai == 2:
             for i in range(1, self.row_num):
                 self.qCheckBox[i].setChecked(True)
