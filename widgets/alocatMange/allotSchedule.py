@@ -10,6 +10,10 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+import widgets.ComboCheckBox
+from widgets.ComboCheckBox import ComboCheckBox
+# from widgets.q import ComboCheckBox
+
 
 class widget_AllotSchedule(object):
     def setupUi(self, Form):
@@ -140,10 +144,12 @@ class widget_AllotSchedule(object):
         self.label.setMinimumSize(QtCore.QSize(0, 0))
         self.label.setObjectName("label")
         self.horizontalLayout_5.addWidget(self.label)
-        self.cb_schedule = QtWidgets.QComboBox(Form)
-        self.cb_schedule.setMinimumSize(QtCore.QSize(80, 0))
+        # self.cb_schedule1 = QtWidgets.QComboBox(Form)
+        self.cb_schedule = ComboCheckBox(Form)
+        self.cb_schedule.setMinimumSize(QtCore.QSize(200, 0))
         self.cb_schedule.setObjectName("cb_schedule")
-        self.cb_schedule.addItem("")
+        # self.cb_schedule.addItem("")
+
         self.horizontalLayout_5.addWidget(self.cb_schedule)
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_5.addItem(spacerItem)
