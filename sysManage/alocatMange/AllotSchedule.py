@@ -421,6 +421,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                     item.clicked.connect(self.setArmySchedule)
                     if flag1[0][0] != '0':
                         item = QPushButton(flag1[0][0])
+                        item.setStyleSheet("background-color : rgba(154,200,226,255)")
                         item.clicked.connect(self.setButtonBack)
                     self.disturbResult.setCellWidget(i, 5 + self.lenCurrentUnitChilddict, item)
 
@@ -430,6 +431,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                     item.clicked.connect(self.setCondition)
                     if int(flag2[0][0]):
                         item = QPushButton("已完成")
+                        item.setStyleSheet("background-color : rgba(154,200,226,255)")
                         item.clicked.connect(self.setButtonBack)
                     self.disturbResult.setCellWidget(i, 6 + self.lenCurrentUnitChilddict, item)
 
@@ -439,6 +441,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                     item.clicked.connect(self.setRocketSchedule)
                     if int(flag3[0][0]):
                         item = QPushButton("已完成")
+                        item.setStyleSheet("background-color : rgba(154,200,226,255)")
                         item.clicked.connect(self.showRocket)
                         item.clicked.connect(self.setButtonBack)
                     self.disturbResult.setCellWidget(i, 7 + self.lenCurrentUnitChilddict, item)
@@ -449,6 +452,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                     item.clicked.connect(self.setScheduleFinish)
                     if flag4[0][0] != '0':
                         item = QPushButton("已完成")
+                        item.setStyleSheet("background-color : rgba(154,200,226,255)")
                         item.clicked.connect(self.setButtonBack)
                     self.disturbResult.setCellWidget(i, 8 + self.lenCurrentUnitChilddict, item)
         # 选择基地
@@ -469,6 +473,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                     item.clicked.connect(self.setRocketSchedule)
                     if int(flag2[0][0]):
                         item = QPushButton("已完成")
+                        item.setStyleSheet("background-color : rgba(154,200,226,255)")
                         item.clicked.connect(self.showRocket)
                         item.clicked.connect(self.setButtonBack)
                     self.disturbResult.setCellWidget(i, 5 + self.lenCurrentUnitChilddict, item)
@@ -479,6 +484,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                     item.clicked.connect(self.setCondition)
                     if int(flag3[0][0]):
                         item = QPushButton("已完成")
+                        item.setStyleSheet("background-color : rgba(154,200,226,255)")
                         item.clicked.connect(self.setButtonBack)
                     self.disturbResult.setCellWidget(i, 6 + self.lenCurrentUnitChilddict, item)
 
@@ -488,6 +494,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                     item.clicked.connect(self.setScheduleFinish)
                     if flag4[0][0] != '0':
                         item = QPushButton("已完成")
+                        item.setStyleSheet("background-color : rgba(154,200,226,255)")
                         item.clicked.connect(self.setButtonBack)
                     self.disturbResult.setCellWidget(i, 7 + self.lenCurrentUnitChilddict, item)
 
@@ -714,6 +721,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         txt = self.armySchedule.returnID()
         currentRow = self.disturbResult.currentRow()
         item = QPushButton(txt)
+        item.setStyleSheet("background-color : rgba(154,200,226,255)")
         self.disturbResult.setCellWidget(currentRow, 5 + self.lenCurrentUnitChilddict, item)
         updateArmySchedule(self.currentEquipdict[currentRow][0], self.currentYear,txt)
 
@@ -731,6 +739,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         reply = getMessageBox("设置接装条件","是否具备接装条件？", True, False)
         if reply==QMessageBox.Ok:
             item = QPushButton("已完成")
+            item.setStyleSheet("background-color : rgba(154,200,226,255)")
             self.disturbResult.setCellWidget(currentRow, 6 + self.lenCurrentUnitChilddict, item)
             if self.unitFlag == 1:
                 updateAllotConditionUper(self.currentEquipdict[currentRow][0], self.currentYear, '1')
@@ -774,6 +783,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
     def updateRocket(self):
         currentRow = self.disturbResult.currentRow()
         item = QPushButton("已完成")
+        item.setStyleSheet("background-color : rgba(154,200,226,255)")
         if self.unitFlag == 1:
             self.disturbResult.setCellWidget(currentRow, 7 + self.lenCurrentUnitChilddict, item)
             updateRocketScheduleUper(self.currentEquipdict[currentRow][0], self.currentYear, '1')
@@ -858,6 +868,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
 
         if (fileName != "") & flag1:
             item = QPushButton("已完成")
+            item.setStyleSheet("background-color : rgba(154,200,226,255)")
             if self.unitFlag == 1:
                 self.disturbResult.setCellWidget(currentRow, 8 + self.lenCurrentUnitChilddict, item)
                 updateScheduleFinishUper(self.currentEquipdict[currentRow][0], self.currentYear, fileName)
