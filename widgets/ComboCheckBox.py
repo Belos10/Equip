@@ -14,6 +14,7 @@ class ComboCheckBox(QComboBox):
         self.qLineEdit = QLineEdit()
         self.qLineEdit.setReadOnly(True)
         self.qListWidget = QListWidget()
+        self.qListWidget.setStyleSheet("background-color : black")
         self.addQCheckBox(0)
         self.qCheckBox[0].stateChanged.connect(self.All)
         for i in range(0, self.row_num):
