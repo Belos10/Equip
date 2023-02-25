@@ -963,12 +963,16 @@ def delDataInDisturbPlanUnit(Unit_ID):
 
     conn.commit()
 
-def selectStrength(EquipID, UnitID, year, conn, cur):
-    sql = "select * from strength where Equip_ID = '" + EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + year + "'"
+def selectStrength(UnitID, EquipID, year):
+    sql = "select Strength from strength where Equip_ID = '" + EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + year + "'"
     print("--------------------", sql)
     cur.execute(sql)
     result = cur.fetchall()
-    return result
+    # print('result: [(0,)]')
+    if result == None or len(result) < 1:
+        return -1
+    else:
+        return result[0][0]
 
 def selectAllChildEquipInfo(equipInfoList):
     sql = "select * from equip"
@@ -3498,6 +3502,7 @@ def inputIntoUnitFromExcel(unitInfoList):
     equipInfoTuple = selectAllDataAboutEquip()
     strengthYearInfoTuple = selectAllDataAboutStrengthYear()
     disturbplanYearInfoTuple = selectYearListAboutDisturbPlan()
+
     unitInfoList.insert(0, ['1', '火箭军', '', ''])
     for i, unitInfo in enumerate(unitInfoList):
         unitID = unitInfo[0]
@@ -3517,50 +3522,52 @@ def inputIntoUnitFromExcel(unitInfoList):
             error = "第 " + str(i) + " 行导入失败，单位名字不能为空"
             errorInfo.append(error)
             continue
-        sql = "INSERT INTO unit (Unit_ID, Unit_Name, Unit_Uper,Unit_Alias, Is_Group) VALUES" \
-          + "('" + unitID + "','" + unitName + "','" + unitUper + "', '" + unitAlias + "', '" + isGroup + "')"
-        try:
-            cur.execute(sql)
-        except Exception as e:
-            error = "第 " + str(i) + " 行导入失败, " + str(e)
-            errorInfo.append(error)
-            continue
-        for equipInfo in equipInfoTuple:
-            for strengthYearInfo in strengthYearInfoTuple:
-                sql = "INSERT INTO strength (Equip_ID, Unit_ID, Equip_Name, Unit_Name, Strength, Work, Now, Error, Retire, Delay, Pre, NonObject," \
-                      "NonStrength, Single, Arrive, year) VALUES" \
-                      + "('" + equipInfo[0] + "','" + unitID + "','" + equipInfo[1] + "','" + unitName + "', 0," \
-                                                                                                           " 0, 0, 0,0, 0, 0, 0, 0, 0, 0," + "'" + \
-                      strengthYearInfo[1] + "')"
-                try:
-                    cur.execute(sql)
-                except Exception as e:
-                    error = "第 " + str(i) + " 行导入失败, " + str(e)
-                    conn.rollback()
-                    errorInfo.append(error)
-                    continue
-
-                sql = "INSERT INTO weave (Unit_ID, Equip_ID, Unit_Name, Equip_Name, Strength, Work, Now, year) VALUES" \
-                      + "('" + unitID + "','" + equipInfo[0] + "','" + unitName + "','" + equipInfo[
-                          1] + "', 0, 0, 0, '" + strengthYearInfo[1] + "')"
-                try:
-                    cur.execute(sql)
-                except Exception as e:
-                    error = "第 " + str(i) + " 行导入失败, " + str(e)
-                    conn.rollback()
-                    errorInfo.append(error)
-                    continue
-    try:
-        conn.commit()
-        if errorInfo != []:
-            return errorInfo
-        else:
-            return True
-    except Exception as e:
-        error = "commit 失败"
-        conn.rollback()
-        errorInfo.append(error)
-        return errorInfo
+        addDataIntoUnit(unitID, unitName, unitUper, unitAlias, isGroup)
+    return True
+    #     sql = "INSERT INTO unit (Unit_ID, Unit_Name, Unit_Uper,Unit_Alias, Is_Group) VALUES" \
+    #       + "('" + unitID + "','" + unitName + "','" + unitUper + "', '" + unitAlias + "', '" + isGroup + "')"
+    #     try:
+    #         cur.execute(sql)
+    #     except Exception as e:
+    #         error = "第 " + str(i) + " 行导入失败, " + str(e)
+    #         errorInfo.append(error)
+    #         continue
+    #     for equipInfo in equipInfoTuple:
+    #         for strengthYearInfo in strengthYearInfoTuple:
+    #             sql = "INSERT INTO strength (Equip_ID, Unit_ID, Equip_Name, Unit_Name, Strength, Work, Now, Error, Retire, Delay, Pre, NonObject," \
+    #                   "NonStrength, Single, Arrive, year) VALUES" \
+    #                   + "('" + equipInfo[0] + "','" + unitID + "','" + equipInfo[1] + "','" + unitName + "', 0," \
+    #                                                                                                        " 0, 0, 0,0, 0, 0, 0, 0, 0, 0," + "'" + \
+    #                   strengthYearInfo[1] + "')"
+    #             try:
+    #                 cur.execute(sql)
+    #             except Exception as e:
+    #                 error = "第 " + str(i) + " 行导入失败, " + str(e)
+    #                 conn.rollback()
+    #                 errorInfo.append(error)
+    #                 continue
+    #
+    #             sql = "INSERT INTO weave (Unit_ID, Equip_ID, Unit_Name, Equip_Name, Strength, Work, Now, year) VALUES" \
+    #                   + "('" + unitID + "','" + equipInfo[0] + "','" + unitName + "','" + equipInfo[
+    #                       1] + "', 0, 0, 0, '" + strengthYearInfo[1] + "')"
+    #             try:
+    #                 cur.execute(sql)
+    #             except Exception as e:
+    #                 error = "第 " + str(i) + " 行导入失败, " + str(e)
+    #                 conn.rollback()
+    #                 errorInfo.append(error)
+    #                 continue
+    # try:
+    #     conn.commit()
+    #     if errorInfo != []:
+    #         return errorInfo
+    #     else:
+    #         return True
+    # except Exception as e:
+    #     error = "commit 失败"
+    #     conn.rollback()
+    #     errorInfo.append(error)
+    #     return errorInfo
 
 def isHaveStrengthYear(year):
     sql = "select * from strengthYear where year ='" + year + "'"

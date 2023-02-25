@@ -21,7 +21,7 @@ class alocatMange(QMainWindow, Widget_Alocat_Mange):
         self.allotSchedule = AllotSchedule()        #调拨进度
         self.transferManage = transferManage(self)  #调拨单管理
         self.retirePlan = retirePlan(self)              #退役报废计划
-        self.alocatSet = alocatManageSet(self)  # 调配管理设置
+        # self.alocatSet = alocatManageSet(self)  # 调配管理设置
         self.userInfo = None
 
         #添加页面
@@ -29,14 +29,14 @@ class alocatMange(QMainWindow, Widget_Alocat_Mange):
         self.stackedWidget.addWidget(self.allotSchedule)
         self.stackedWidget.addWidget(self.transferManage)
         self.stackedWidget.addWidget(self.retirePlan)
-        self.stackedWidget.addWidget(self.alocatSet)
+        # self.stackedWidget.addWidget(self.alocatSet)
 
         #初始化显示分配调整计划页面
         self.stackedWidget.setCurrentIndex(0)
         self.tb_disturbPlan.setDisabled(True)
         self.tb_disturbSchedule.setDisabled(False)
         self.tb_disturbManage.setDisabled(False)
-        self.tb_alocatSet.setDisabled(False)
+        # self.tb_alocatSet.setDisabled(False)
         self.tb_retirePlan.setDisabled(False)
         self.connectSignal()
 
@@ -51,7 +51,7 @@ class alocatMange(QMainWindow, Widget_Alocat_Mange):
         self.tb_disturbPlan.clicked.connect(self.slotDisturbPlan)
         self.tb_disturbSchedule.clicked.connect(self.slotDisturbSchedule)
         self.tb_disturbManage.clicked.connect(self.slotDisturbManage)
-        self.tb_alocatSet.clicked.connect(self.slotAlocatSet)
+        # self.tb_alocatSet.clicked.connect(self.slotAlocatSet)
         self.tb_retirePlan.clicked.connect(self.slotRetirePlan)
         self.transferManage.armyTransfer.pb_equipSet.clicked.connect(self.slotSetEquip)
 
@@ -63,7 +63,7 @@ class alocatMange(QMainWindow, Widget_Alocat_Mange):
         self.tb_disturbPlan.clicked.disconnect(self.slotDisturbPlan)
         self.tb_disturbSchedule.clicked.disconnect(self.slotDisturbSchedule)
         self.tb_disturbManage.clicked.disconnect(self.slotDisturbManage)
-        self.tb_alocatSet.clicked.disconnect(self.slotAlocatSet)
+        # self.tb_alocatSet.clicked.disconnect(self.slotAlocatSet)
         self.tb_retirePlan.clicked.disconnect(self.slotRetirePlan)
 
     '''
@@ -75,7 +75,7 @@ class alocatMange(QMainWindow, Widget_Alocat_Mange):
         self.tb_disturbPlan.setDisabled(1)
         self.tb_disturbSchedule.setDisabled(False)
         self.tb_disturbManage.setDisabled(0)
-        self.tb_alocatSet.setDisabled(False)
+        # self.tb_alocatSet.setDisabled(False)
         self.tb_retirePlan.setDisabled(False)
         self.disturbPlan.initAll()
 
@@ -88,7 +88,7 @@ class alocatMange(QMainWindow, Widget_Alocat_Mange):
         self.tb_disturbPlan.setDisabled(0)
         self.tb_disturbSchedule.setDisabled(1)
         self.tb_disturbManage.setDisabled(0)
-        self.tb_alocatSet.setDisabled(False)
+        # self.tb_alocatSet.setDisabled(False)
         self.tb_retirePlan.setDisabled(False)
         self.allotSchedule.initAll()
 
@@ -101,7 +101,7 @@ class alocatMange(QMainWindow, Widget_Alocat_Mange):
         self.tb_disturbPlan.setDisabled(False)
         self.tb_disturbSchedule.setDisabled(False)
         self.tb_disturbManage.setDisabled(True)
-        self.tb_alocatSet.setDisabled(False)
+        # self.tb_alocatSet.setDisabled(False)
         self.tb_retirePlan.setDisabled(False)
         self.transferManage.slotArmyTransfer()
 
@@ -110,7 +110,7 @@ class alocatMange(QMainWindow, Widget_Alocat_Mange):
         self.tb_disturbPlan.setDisabled(False)
         self.tb_disturbSchedule.setDisabled(False)
         self.tb_disturbManage.setDisabled(False)
-        self.tb_alocatSet.setDisabled(True)
+        # self.tb_alocatSet.setDisabled(True)
         self.tb_retirePlan.setDisabled(False)
 
     def slotSetEquip(self):
@@ -118,7 +118,7 @@ class alocatMange(QMainWindow, Widget_Alocat_Mange):
         self.tb_disturbPlan.setDisabled(False)
         self.tb_disturbSchedule.setDisabled(False)
         self.tb_disturbManage.setDisabled(False)
-        self.tb_alocatSet.setDisabled(True)
+        # self.tb_alocatSet.setDisabled(True)
         self.tb_retirePlan.setDisabled(False)
         self.alocatSet.dictSet.slotEquipDictInit()
 
@@ -131,6 +131,6 @@ class alocatMange(QMainWindow, Widget_Alocat_Mange):
         self.tb_disturbPlan.setDisabled(False)
         self.tb_disturbSchedule.setDisabled(False)
         self.tb_disturbManage.setDisabled(False)
-        self.tb_alocatSet.setDisabled(False)
+        # self.tb_alocatSet.setDisabled(False)
         self.tb_retirePlan.setDisabled(True)
         self.disturbPlan.initAll()

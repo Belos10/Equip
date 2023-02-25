@@ -131,6 +131,8 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         self.tw_second.setDisabled(False)
         self.inquiry_result.setDisabled(True)
         self.inquiry_result.allButtonDisabled()
+        self.inquiry_result.pb_input.setDisabled(False)
+        self.inquiry_result.pb_inputFromExcel.setDisabled(False)
 
         self.currentYear = self.lw_chooseYear.currentItem().text()
         print("currentYear :", self.currentYear)
