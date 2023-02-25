@@ -83,5 +83,5 @@ class widget_orderManage(object):
         self.tb_orderPlan.setText(_translate("MainWindow", "订购申请"))
         self.tb_adjustOrder.setText(_translate("MainWindow", "计划调整"))
         self.tb_orderAllotPlan.setText(_translate("MainWindow", "分配计划"))
-        self.tb_orderSchedule.setText(_translate("MainWindow", "分配进度"))
+        self.tb_orderSchedule.setText(_translate("MainWindow", "调拨进度"))
         self.tb_retirePlan.setText(_translate("MainWindow", "退役计划"))

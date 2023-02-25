@@ -118,8 +118,12 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         # self.pb_filterTitle.setCheckable(False)
         self.rb_equipShow.setChecked(False)
         self.rb_unitShow.setChecked(False)
-        self.pb_input.setDisabled(True)
-        self.pb_inputFromExcel.setDisabled(True)
+
+
+        # self.pb_input.setDisabled(True)
+        # self.pb_inputFromExcel.setDisabled(True)
+
+
         self.pb_output.setDisabled(True)
         self.pb_outputToExcel.setDisabled(True)
         self.cb_showLast.setDisabled(True)
@@ -145,8 +149,12 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         # self.pb_filterTitle.setCheckable(False)
         self.rb_equipShow.setChecked(False)
         self.rb_unitShow.setChecked(False)
-        self.pb_input.setDisabled(False)
-        self.pb_inputFromExcel.setDisabled(False)
+
+
+        # self.pb_input.setDisabled(False)
+        # self.pb_inputFromExcel.setDisabled(False)
+
+
         self.pb_output.setDisabled(False)
         self.pb_outputToExcel.setDisabled(False)
         self.cb_showLast.setDisabled(False)
@@ -607,6 +615,9 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                 if selectEquipIsHaveChild(j):
                     row1+=1
                 else:
+                    print("/////////////////////////////")
+                    print('row1: ', row1)
+                    print('index: ', index)
                     item = self.tw_inquiryResult.item(row1, index)
                     item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable)
                     item.setBackground(QBrush(QColor(154, 200, 226)))
@@ -863,7 +874,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                 inputInfo.append(strength)
                 inputInfo.append(year)
                 self.inputList.append(inputInfo)
-            self.showInputResult.setWindowTitle("从Excel导入%s实力数"%year)
+            self.showInputResult.setWindowTitle("从Excel导入%s年实力数"%year)
             self.showInputResult.tw_result.setColumnCount(len(title))
             self.showInputResult.tw_result.setHorizontalHeaderLabels(title)
             self.showInputResult.tw_result.setEditTriggers(QAbstractItemView.NoEditTriggers)
@@ -896,24 +907,42 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
 
     def slotInputIntoDatabase(self):
         print(self.inputList)
-        if len(self.inputList[0]) == 6:
+        if self.inputList[0] != '实力查询数据':
             for i, lineInfo in enumerate(self.inputList):
                 try:
-                    if inputOneDataIntoStrenth(lineInfo):
-                        pass
+                    # ['单位编号', '单位名称', '装备编号', '装备名称', '实力数'， ’年份‘]
+                    # ['8', '六十一阵地', '5', 'A车', '1', '2001']
+                    # updateStrengthAboutStrengrh(Unit_ID, Equip_ID, year, strengthNum, orginStrengthNum)
+                    orginStrengthNum = selectStrength(lineInfo[0], lineInfo[2],lineInfo[-1])
+                    if orginStrengthNum == -1:
+                        raise Exception
+                    else:
+                        if orginStrengthNum != int(lineInfo[4]):
+                            if updateStrengthAboutStrengrh(lineInfo[0], lineInfo[2], lineInfo[-1], int(lineInfo[4]), orginStrengthNum) == False:
+                                raise Exception
                 except Exception as e:
                     print(e)
                     getMessageBox("导入失败", "导入第%d数据失败！" % (i), True, False)
         else:
             for i, lineInfo in enumerate(self.inputList):
                 if i == 0:
-                    continue
-                try:
-                    if insertOneDataIntoStrenth(lineInfo):
-                        pass
-                except Exception as e:
-                    print(e)
-                    getMessageBox("导入失败", "导入第%d数据失败！" % (i), True, False)
+                    pass
+                else:
+                    try:
+                        # print('lineInfo: ')
+                        # print(lineInfo)
+                        # updateStrengthAboutStrengrh(Unit_ID, Equip_ID, year, strengthNum, orginStrengthNum)
+                        orginStrengthNum = selectStrength(lineInfo[1], lineInfo[0], lineInfo[-1])
+                        if orginStrengthNum == -1:
+                            raise BaseException
+                        else:
+                            # updateStrengthAboutStrengrh(Unit_ID, Equip_ID, year, strengthNum, orginStrengthNum)
+                            if updateStrengthAboutStrengrh(lineInfo[1], lineInfo[0], lineInfo[-1], lineInfo[4],
+                                                           orginStrengthNum) == False:
+                                raise BaseException
+                    except Exception as e:
+                        print(e)
+                        getMessageBox("导入失败", "导入第%d数据失败！" % (i), True, False)
         self.showInputResult.hide()
         self.setDisabled(False)
         self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
