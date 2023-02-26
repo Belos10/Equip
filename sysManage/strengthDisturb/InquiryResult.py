@@ -46,7 +46,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         self.signalConnect()
         self.startFactoryYear = None
         self.endFactoryYear = None
-        headerlist = ['单位名称', '装备名称', '实力数', '编制数', '现有数', '偏差', '准备退役数', '未到位数', '提前退役', '待核查无实物', '待核查无实力', '单独建账',
+        headerlist = ['单位名称', '装备名称', '实力数', '编制数', '现有数', '偏差(实力-现有)', '准备退役数', '未到位数', '提前退役', '待核查无实物', '待核查无实力', '单独建账',
                       '正常到位']
         self.tw_inquiryResult.setHorizontalHeaderLabels(headerlist)
         self.tw_inquiryResult.setColumnCount(len(headerlist))
@@ -359,7 +359,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         if self.titleList:
             headerlist = self.titleList
         else:
-            headerlist = ['单位名称', '装备名称', '实力数', '编制数', '现有数', '偏差', '准备退役数', '未到位数', '提前退役', '待核查无实物', '待核查无实力', '单独建账',
+            headerlist = ['单位名称', '装备名称', '实力数', '编制数', '现有数', '偏差(实力-现有)', '准备退役数', '未到位数', '提前退役', '待核查无实物', '待核查无实力', '单独建账',
                       '正常到位']
         print("headerlist=",headerlist)
         self.tw_inquiryResult.setHorizontalHeaderLabels(headerlist)
@@ -544,7 +544,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                 item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                 # self.tw_inquiryResult.setItem(i, 5, item)
                 try:
-                    self.tw_inquiryResult.setItem(i, headerlist.index('偏差'), item)
+                    self.tw_inquiryResult.setItem(i, headerlist.index('偏差(实力-现有)'), item)
                 except ValueError:
                     pass
                 item = QTableWidgetItem(str(LineInfo[8]))
@@ -686,7 +686,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
             contentStyle.borders = borders
 
             #画表头
-            headerlist = [ '单位编号','单位名称', '装备编号', '装备名称', '实力数', '编制数', '现有数', '偏差', '准备退役数', '未到位数', '提前退役', '待核查无实物', '待核查无实力',
+            headerlist = [ '单位编号','单位名称', '装备编号', '装备名称', '实力数', '编制数', '现有数', '偏差(实力-现有)', '准备退役数', '未到位数', '提前退役', '待核查无实物', '待核查无实力',
                           '单独建账',
                           '正常到位']
             for i in range(len(headerlist)):
@@ -771,7 +771,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
             print(e)
             getMessageBox("加载文件失败！", "请检查文件格式及内容格式！", True, False)
             return
-        headerlist = ['单位名称', '装备名称', '实力数', '编制数', '现有数', '偏差', '准备退役数', '未到位数', '提前退役', '待核查无实物', '待核查无实力', '单独建账',
+        headerlist = ['单位名称', '装备名称', '实力数', '编制数', '现有数', '偏差(实力-现有)', '准备退役数', '未到位数', '提前退役', '待核查无实物', '待核查无实力', '单独建账',
                       '正常到位']
         self.showInputResult.setWindowTitle("导入数据")
         self.showInputResult.show()

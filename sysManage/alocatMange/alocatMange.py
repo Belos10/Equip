@@ -53,7 +53,7 @@ class alocatMange(QMainWindow, Widget_Alocat_Mange):
         self.tb_disturbManage.clicked.connect(self.slotDisturbManage)
         # self.tb_alocatSet.clicked.connect(self.slotAlocatSet)
         self.tb_retirePlan.clicked.connect(self.slotRetirePlan)
-        self.transferManage.armyTransfer.pb_equipSet.clicked.connect(self.slotSetEquip)
+        # self.transferManage.armyTransfer.pb_equipSet.clicked.connect(self.slotSetEquip)
 
     '''
         功能：

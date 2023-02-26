@@ -1,4 +1,5 @@
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QBrush, QColor
 from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QMessageBox, \
     QListWidgetItem
 
@@ -8,11 +9,20 @@ from sysManage.strengthDisturb.InquiryResult import Inquiry_Result
 from sysManage.strengthDisturb.addStrenthInfo import AddStrenthInfo
 from sysManage.userInfo import get_value
 from widgets.strengthDisturb.stren_inquiry import Widget_Stren_Inquiry
-
+from utills.Search import selectUnit
+import re
 '''
     类功能：
         管理查询结果界面，包含查询结果相关逻辑代码
         实力查询 左边部分 年份、单位、装备xxx
+'''
+STYLESHEET='''QTreeWidget {border:None} 
+    QTreeWidget::Item {
+                       color: rgba(255,255,255,255);}  
+
+    QTreeView {
+        alternate-background-color: rgba(170,170,170,255);
+        background: rgba(211,211,211,255);}
 '''
 # 更新
 first_treeWidget_dict = {}
@@ -190,19 +200,36 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
 
 
 
+    # def slotSelectUnit(self):
+    #     findText = self.le_first.text()
+    #     pattern = '.*' + findText + '.*'
+    #     for i, item in self.first_treeWidget_dict.items():
+    #         obj = re.findall(pattern, item.text(0))
+    #         if (len(obj) > 0):
+    #             # self.tw_first.setAlternatingRowColors(True)
+    #             self.tw_first.setCurrentItem(item)
+    #             color = QColor()
+    #             color.setRgb(164, 176, 190, 80)
+    #             item.setBackground(0, QBrush(color))
+    #         else:
+    #             item.setBackground(0, QBrush(Qt.white))
+
     def slotSelectUnit(self):
-        findText = self.le_first.text()
-        for i, item in self.first_treeWidget_dict.items():
-            if item.text(0) == findText:
-                self.tw_first.setCurrentItem(item)
-                break
+        selectUnit(self, self.le_first, self.first_treeWidget_dict, self.tw_first)
+
+
+
 
     def slotSelectEquip(self):
-        findText = self.le_second.text()
-        for i, item in self.second_treeWidget_dict.items():
-            if item.text(0) == findText:
-                self.tw_second.setCurrentItem(item)
-                break
+        selectUnit(self, self.le_second, self.second_treeWidget_dict, self.tw_second)
+        # findText = self.le_second.text()
+        # pattern = '.*' + findText + '.*'
+        # for i, item in self.second_treeWidget_dict.items():
+        #     obj = re.findall(pattern, item.text(0))
+        #     if(len(obj) > 0):
+        #         self.tw_second.setCurrentItem(item)
+        #     # if item.text(0) == findText:
+        #     #     break
 
     # 删除年份
     def slotDelYear(self):
