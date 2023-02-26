@@ -8,6 +8,9 @@ from sysManage.strengthDisturb.maintenMange import maintenManage
 from sysManage.strengthDisturb.retirement import retirement
 from sysManage.userInfo import get_value
 #new
+'''
+    实力分布管理界面
+'''
 
 class strengthDisturb(QMainWindow, Strength_Disturb_Widget):
     def __init__(self, parent=None):

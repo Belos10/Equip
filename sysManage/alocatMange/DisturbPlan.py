@@ -13,6 +13,7 @@ from sysManage.userInfo import get_value
 from sysManage.alocatMange.InputProof_Disturb import InputProof
 from sysManage.showInputResult import showInputResult
 from PyQt5.QtCore import QDateTime
+from utills.Search import selectUnit
 
 '''
     分配调整计划
@@ -78,20 +79,13 @@ class DisturbPlan(QWidget, yearList_Form):
 
     # 查询单位
     def slotSelectUnit(self):
-        findText = self.le_first.text()
-        for i, item in self.first_treeWidget_dict.items():
-            if item.text(0) == findText:
-                self.tw_first.setCurrentItem(item)
-                break
+        selectUnit(self, self.le_first, self.first_treeWidget_dict, self.tw_first)
+
 
     # 查询装备
     def slotSelectEquip(self):
-        findText = self.le_second.text()
-        for i, item in self.second_treeWidget_dict.items():
-            if item.text(0) == findText:
-                self.tw_second.setCurrentItem(item)
-                break
-        print("self.second_treeWidget_dict",self.second_treeWidget_dict)
+        selectUnit(self, self.le_second, self.second_treeWidget_dict, self.tw_second)
+
 
 
     # 信号与槽连接的断开
@@ -540,7 +534,7 @@ class DisturbPlan(QWidget, yearList_Form):
                 originStrengthNum = selectStrengthNum(self.currentUnitChilddict[self.currentColumn - 5][0],
                                                       self.currentEquipdict[self.currentRow][0], self.currentYear)
                 print("originDisturbPlanNum", originDisturbPlanNum, "originStrengthNum", originStrengthNum)
-                if len(originStrengthNum) > 0 and  originStrengthNum[0] != '':
+                if len(originStrengthNum) > 0 and originStrengthNum[0] != '':
                     updateDisturbPlanNum(self.currentEquipdict[self.currentRow][0],
                                          self.currentUnitChilddict[self.currentColumn - 5][0],
                                          self.currentYear, num, originDisturbPlanNum[0])
@@ -550,7 +544,7 @@ class DisturbPlan(QWidget, yearList_Form):
                 else:
                     getMessageBox("提示", "未填写实力数", True, False)
             except ValueError:
-                getMessageBox("提示", "请输入数字",True, False)
+                getMessageBox("提示", "请输入数字", True, False)
                 self.disturbResult.item(self.currentRow, self.currentColumn).setText("")
 
         # 备注

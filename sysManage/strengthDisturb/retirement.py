@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, QAbstrac
 
 from sysManage.component import getMessageBox, getIntInputDialog
 from sysManage.showInputResult import showInputResult
+from utills.Search import selectUnit
 from utills.utillsComponent import CheckableComboBox
 from widgets.strengthDisturb.retirement import Widget_Retirement
 from database.strengthDisturbSql import *
@@ -82,18 +83,12 @@ class retirement(QWidget, Widget_Retirement):
         self.showInputResult.pb_cancel.clicked.connect(self.slotCancelInputIntoDatabase)
 
     def slotSelectUnit(self):
-        findText = self.le_first.text()
-        for i, item in self.first_treeWidget_dict.items():
-            if item.text(0) == findText:
-                self.tw_first.setCurrentItem(item)
-                break
+        selectUnit(self, self.le_first, self.first_treeWidget_dict, self.tw_first)
+
 
     def slotSelectEquip(self):
-        findText = self.le_second.text()
-        for i, item in self.second_treeWidget_dict.items():
-            if item.text(0) == findText:
-                self.tw_second.setCurrentItem(item)
-                break
+        selectUnit(self, self.le_second, self.second_treeWidget_dict, self.tw_second)
+
 
     def slotDelYear(self):
         currentRow = self.lw_year.currentRow()

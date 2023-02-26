@@ -3,7 +3,9 @@ import re
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QBrush, QColor
 
-
+'''
+    搜索框模糊查询
+'''
 def selectUnit(self, lineEdit, dict, widget):
     findText = lineEdit.text()
     pattern = '.*' + findText + '.*'

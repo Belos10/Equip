@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, QAbstrac
     QMessageBox, QListWidgetItem,QInputDialog,QHeaderView,QLineEdit
 
 from sysManage.component import getMessageBox
+from utills.Search import selectUnit
 from widgets.strengthDisturb.maintenMange import Widget_Mainten_Manage
 from database.strengthDisturbSql import *
 from PyQt5.Qt import Qt
@@ -96,18 +97,12 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
         # self.tw_first.itemChanged.connect(self.slotCheckedChange)
 
     def slotSelectUnit(self):
-        findText = self.le_first.text()
-        for i, item in self.first_treeWidget_dict.items():
-            if item.text(0) == findText:
-                self.tw_first.setCurrentItem(item)
-                break
+        selectUnit(self, self.le_first, self.first_treeWidget_dict, self.tw_first)
+
 
     def slotSelectEquip(self):
-        findText = self.le_second.text()
-        for i, item in self.second_treeWidget_dict.items():
-            if item.text(0) == findText:
-                self.tw_second.setCurrentItem(item)
-                break
+        selectUnit(self, self.le_second, self.second_treeWidget_dict, self.tw_second)
+
 
     #当前结果的值被修改
     def slotResultItemChange(self):
