@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, QAbstrac
     QMessageBox, QListWidgetItem, QInputDialog, QHeaderView, QFileDialog
 from database.SD_EquipmentBanlanceSql import findYear, getResultByYearAndEquipAndUnit, saveEquipmentBalanceByRow
 from sysManage.component import getMessageBox
+from utills.Search import selectUnit
 from widgets.strengthDisturb.retirement import Widget_Retirement
 from database.strengthDisturbSql import *
 from PyQt5.Qt import Qt
@@ -75,18 +76,11 @@ class equipmentBalance(QWidget, Widget_Retirement):
         self.pb_outputToExcel.clicked.connect(self.slotOutputToExcel)
 
     def slotSelectUnit(self):
-        findText = self.le_first.text()
-        for i, item in self.first_treeWidget_dict.items():
-            if item.text(0) == findText:
-                self.tw_first.setCurrentItem(item)
-                break
+        selectUnit(self, self.le_first, self.first_treeWidget_dict, self.tw_first)
 
     def slotSelectEquip(self):
-        findText = self.le_second.text()
-        for i, item in self.second_treeWidget_dict.items():
-            if item.text(0) == findText:
-                self.tw_second.setCurrentItem(item)
-                break
+        selectUnit(self, self.le_second, self.second_treeWidget_dict, self.tw_second)
+
 
     '''
            功能：
@@ -175,6 +169,7 @@ class equipmentBalance(QWidget, Widget_Retirement):
         # for equipID, equipItem in self.second_treeWidget_dict.items():
         #     if equipItem.checkState(0) == Qt.Checked or equipItem.checkState(0) == Qt.PartiallyChecked:
         self.currentCheckedEquipList = self.get_checked(self.tw_second.topLevelItem(0))
+        self.tw_second.expandAll()
         # print('-----------------------------')
         # print(self.currentCheckedEquipList)
 

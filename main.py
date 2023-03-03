@@ -75,9 +75,11 @@ class mainManage(QObject):
         # self.alocatMange.initUserInfo(self.userInfo)
         # self.PosEngin.slotInstallation()
         self.mainwnd._widget.login.close()
+
         self.mainwnd._widget.show()
-        self.mainwnd._widget.center()
         self.mainwnd.titleBar.show()
+        self.mainwnd.center()
+        # self.mainwnd.showMaximized()
 
 if __name__ == "__main__":
     # appctxt = ApplicationContext()

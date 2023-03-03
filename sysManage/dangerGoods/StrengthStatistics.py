@@ -1,6 +1,7 @@
 from PyQt5.QtCore import Qt, QDate
 from database.danderGoodsSql import *
 from sysManage.userInfo import get_value
+from utills.Search import selectUnit
 from widgets.dangerGoods.dangerGoodsStatisticsUI import DangerGoodsStatisticsUI
 from sysManage.component import getMessageBox
 import sys
@@ -38,11 +39,8 @@ class StrengthStatistics(QWidget, DangerGoodsStatisticsUI):
 
 
     def slotSelectUnit(self):
-        findText = self.le_first.text()
-        for i, item in self.first_treeWidget_dict.items():
-            if item.text(0) == findText:
-                self.tw_first.setCurrentItem(item)
-                break
+        selectUnit(self, self.le_first, self.first_treeWidget_dict, self.tw_first)
+
     #信号和槽断开
     def slotDisconnect(self):
         pass

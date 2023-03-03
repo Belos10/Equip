@@ -60,6 +60,7 @@ class select_setEquip(QWidget,widget_Select_SetEquip):
         self.le_equipID.clear()
         self.le_equipName.clear()
         self.le_equipUnit.clear()
+        self.le_equipUnitInfo.clear()
         self.cb_equipUper.clear()
         # self.le_unitAlias.clear()
 
@@ -171,7 +172,7 @@ class select_setEquip(QWidget,widget_Select_SetEquip):
             # self._initUnitTreeWidget("", self.tw_first)
             self._initEquipTableWidget()
         else:
-            header = ['装备编号', '装备名称', '上级装备编号', '录入类型', '装备类型', '装备单位']
+            header = ['装备编号', '装备名称', '单位','上级装备编号', '录入类型', '装备类型', '装备单位']
             self.tb_result.setColumnCount(len(header))
             self.tb_result.setRowCount(0)
             self.tb_result.setHorizontalHeaderLabels(header)
@@ -205,7 +206,7 @@ class select_setEquip(QWidget,widget_Select_SetEquip):
 
     def _initEquipTableWidget(self):
         self.result = []
-        header = ['装备编号', '装备名称', '上级装备编号', '录入类型', '装备类型', '装备单位']
+        header = ['装备编号', '装备名称', '单位', '上级装备编号', '录入类型', '装备类型', '装备单位']
         self.tb_result.setColumnCount(len(header))
         self.tb_result.setHorizontalHeaderLabels(header)
         self.equipResultList = []
@@ -213,18 +214,24 @@ class select_setEquip(QWidget,widget_Select_SetEquip):
         if self.equipResultList:
             self.tb_result.setRowCount(len(self.equipResultList))
             for i, data in enumerate(self.equipResultList):
+                equip_unit_info = selectEquipUnitInfo(data[0])
+                print('equip_unit_info')
+                print(equip_unit_info)
                 item = QTableWidgetItem(data[0])
                 self.tb_result.setItem(i, 0, item)
                 item = QTableWidgetItem(data[1])
                 self.tb_result.setItem(i, 1, item)
-                item = QTableWidgetItem(data[2])
+                item = QTableWidgetItem(equip_unit_info)
                 self.tb_result.setItem(i, 2, item)
-                item = QTableWidgetItem(data[3])
+                item = QTableWidgetItem(data[2])
                 self.tb_result.setItem(i, 3, item)
-                item = QTableWidgetItem(data[4])
+                item = QTableWidgetItem(data[3])
                 self.tb_result.setItem(i, 4, item)
-                item = QTableWidgetItem(data[5])
+                item = QTableWidgetItem(data[4])
                 self.tb_result.setItem(i, 5, item)
+                item = QTableWidgetItem(data[5])
+                self.tb_result.setItem(i, 6, item)
+                self.equipResultList[i].append(equip_unit_info)
         else:
             self.tb_result.setRowCount(0)
         # print(result)   #测试查找到的数据
@@ -244,21 +251,21 @@ class select_setEquip(QWidget,widget_Select_SetEquip):
         inputTypeList = ['空', '逐号录入信息', '逐批录入信息']
         equipTypeList = ['空', '通用装备', '专用装备']
         for i, equipID in enumerate(self.equipIDList):
-            if equipID == self.tb_result.item(currentRow, 2).text():
+            if equipID == self.tb_result.item(currentRow, 3).text():
                 self.cb_equipUper.setCurrentIndex(i)
                 break
 
         for i, inputType in enumerate(inputTypeList):
-            if inputType == self.tb_result.item(currentRow, 3).text():
+            if inputType == self.tb_result.item(currentRow, 4).text():
                 self.cb_inputType.setCurrentIndex(i)
                 break
 
         for i, equipType in enumerate(equipTypeList):
-            if equipType == self.tb_result.item(currentRow, 4).text():
+            if equipType == self.tb_result.item(currentRow, 5).text():
                 self.cb_equipType.setCurrentIndex(i)
                 break
-
-        self.le_equipUnit.setText((self.tb_result.item(currentRow, 5).text()))
+        self.le_equipUnitInfo.setText((self.tb_result.item(currentRow, 2).text()))
+        self.le_equipUnit.setText((self.tb_result.item(currentRow, 6).text()))
 
     '''
         功能：
@@ -279,12 +286,14 @@ class select_setEquip(QWidget,widget_Select_SetEquip):
             Input_Type = self.cb_inputType.currentText()
             Equip_Type = self.cb_equipType.currentText()
             Equip_Unit = self.le_equipUnit.text()
+            Equip_Unit_Info = self.le_equipUnitInfo.text()
             addSuccess = addDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type, Equip_Unit)
-            if addSuccess == True:
+            addEquipInfoSuccess = addDataIntoEquipUnitInfo(Equip_ID, Equip_Unit_Info)
+            if addSuccess == True and addEquipInfoSuccess == True:
                 getMessageBox('新增', '新增成功', True, False)
                 self.slotEquipDictInit()
             else:
-                getMessageBox('新增', str(addSuccess) + ',新增失败', True, False)
+                getMessageBox('新增', '新增失败!', True, False)
                 return
 
     '''
@@ -309,9 +318,11 @@ class select_setEquip(QWidget,widget_Select_SetEquip):
             Input_Type = self.cb_inputType.currentText()
             Equip_Type = self.cb_equipType.currentText()
             Equip_Unit = self.le_equipUnit.text()
+            Equip_Unit_Info = self.le_equipUnitInfo.text()
             updateSuccess = updateDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type,
                                                 Equip_Unit)
-            if updateSuccess == True:
+
+            if updateSuccess == True and updateDataIntoEquipUnitInfo(Equip_ID, Equip_Unit_Info):
                 getMessageBox('修改', '修改成功', True, False)
                 self.slotEquipDictInit()
             else:
@@ -347,7 +358,7 @@ class select_setEquip(QWidget,widget_Select_SetEquip):
 
     def slotInputIntoMysql(self):
         print(self.inputEquipInfoList)
-        self.inputEquipInfoList.insert(0, ['1', '装备', '', '空', '空', ''])
+        self.inputEquipInfoList.insert(0, ['1', '装备', '', '空', '空', '', ''])
         for i in range(len(self.inputEquipInfoList)):
             try:
                 isHaveEquipId = isHaveEquipment(self.inputEquipInfoList[i][0])
@@ -355,6 +366,8 @@ class select_setEquip(QWidget,widget_Select_SetEquip):
                     addSuccess = addDataIntoEquip(self.inputEquipInfoList[i][0], self.inputEquipInfoList[i][1],
                                                   self.inputEquipInfoList[i][2], self.inputEquipInfoList[i][3],
                                                   self.inputEquipInfoList[i][4], self.inputEquipInfoList[i][5])
+                    addEquipInfoSuccess = addDataIntoEquipUnitInfo(self.inputEquipInfoList[i][0], self.inputEquipInfoList[i][6])
+
                 else:
                     if i > 1:
                         getMessageBox("导入", "导入第%d数据失败,存在重复数据%d" % i, True, False)
@@ -381,18 +394,19 @@ class select_setEquip(QWidget,widget_Select_SetEquip):
                 equipName = self.workSheet.cell(r, 1).value.strip()
                 try:
                     equipId = str(int(self.workSheet.cell(r, 0).value))
-                    equipUper = str(int(self.workSheet.cell(r, 2).value))
+                    equipUper = str(int(self.workSheet.cell(r, 3).value))
                 except:
                     if equipId == '1' and equipName == '装备':
                         pass
                     else:
                         getMessageBox("读取失败", "读取第%d行数据失败，请检查装备编号或上级装备号是否正确！" % (r), True, False)
                     continue
-                inputType = self.workSheet.cell(r, 3).value.strip()
-                equipType = self.workSheet.cell(r, 4).value.strip()
+                inputType = self.workSheet.cell(r, 4).value.strip()
+                equipType = self.workSheet.cell(r, 5).value.strip()
                 if len(equipType) <= 1:
                     continue
-                equipUnit = self.workSheet.cell(r, 5).value.strip()
+                equipUnit = self.workSheet.cell(r, 6).value.strip()
+                equipUnitInfo = self.workSheet.cell(r, 2).value.strip()
                 euipmentInfo = []
                 euipmentInfo.append(equipId)
                 euipmentInfo.append(equipName)
@@ -400,10 +414,11 @@ class select_setEquip(QWidget,widget_Select_SetEquip):
                 euipmentInfo.append(inputType)
                 euipmentInfo.append(equipType)
                 euipmentInfo.append(equipUnit)
+                euipmentInfo.append(equipUnitInfo)
                 self.inputEquipInfoList.append(euipmentInfo)
 
             self.showInputResult.setWindowTitle("导入Excel数据到数据库装备表中")
-            title = ['装备编号', '装备名称', '上级装备号', '录入类型', '装备类型', '装备单位']
+            title = ['装备编号', '装备名称', '单位','上级装备号', '录入类型', '装备类型', '装备单位']
             self.showInputResult.tw_result.setColumnCount(len(title))
             self.showInputResult.tw_result.setHorizontalHeaderLabels(title)
             self.showInputResult.tw_result.verticalHeader().setVisible(False)
@@ -414,14 +429,16 @@ class select_setEquip(QWidget,widget_Select_SetEquip):
                 self.showInputResult.tw_result.setItem(r, 0, item)
                 item = QTableWidgetItem(list_item[1])
                 self.showInputResult.tw_result.setItem(r, 1, item)
-                item = QTableWidgetItem(list_item[2])
+                item = QTableWidgetItem(list_item[6])
                 self.showInputResult.tw_result.setItem(r, 2, item)
-                item = QTableWidgetItem(list_item[3])
+                item = QTableWidgetItem(list_item[2])
                 self.showInputResult.tw_result.setItem(r, 3, item)
-                item = QTableWidgetItem(list_item[4])
+                item = QTableWidgetItem(list_item[3])
                 self.showInputResult.tw_result.setItem(r, 4, item)
-                item = QTableWidgetItem(list_item[5])
+                item = QTableWidgetItem(list_item[4])
                 self.showInputResult.tw_result.setItem(r, 5, item)
+                item = QTableWidgetItem(list_item[5])
+                self.showInputResult.tw_result.setItem(r, 6, item)
             self.showInputResult.show()
             return
         except BaseException as e:
@@ -483,17 +500,19 @@ class select_setEquip(QWidget,widget_Select_SetEquip):
 
                 workSheet.write(0, 0, '装备编号', titileStyle)
                 workSheet.write(0, 1, '装备名称', titileStyle)
-                workSheet.write(0, 2, '上级装备号', titileStyle)
-                workSheet.write(0, 3, '录入类型', titileStyle)
-                workSheet.write(0, 4, '装备类型', titileStyle)
-                workSheet.write(0, 5, '装备单位', titileStyle)
+                workSheet.write(0, 2, '单位', titileStyle)
+                workSheet.write(0, 3, '上级装备号', titileStyle)
+                workSheet.write(0, 4, '录入类型', titileStyle)
+                workSheet.write(0, 5, '装备类型', titileStyle)
+                workSheet.write(0, 6, '装备单位', titileStyle)
                 for i, item in enumerate(self.equipResultList):
                     workSheet.write(i + 1, 0, item[0],contentStyle)
                     workSheet.write(i + 1, 1, item[1],contentStyle)
-                    workSheet.write(i + 1, 2, item[2],contentStyle)
-                    workSheet.write(i + 1, 3, item[3],contentStyle)
-                    workSheet.write(i + 1, 4, item[4],contentStyle)
-                    workSheet.write(i + 1, 5, item[5],contentStyle)
+                    workSheet.write(i + 1, 2, item[6],contentStyle)
+                    workSheet.write(i + 1, 3, item[2],contentStyle)
+                    workSheet.write(i + 1, 4, item[3],contentStyle)
+                    workSheet.write(i + 1, 5, item[4],contentStyle)
+                    workSheet.write(i + 1, 6, item[5],contentStyle)
                 try:
                     workBook.save("%s/装备目录表.xls"%directoryPath)
                     import win32api

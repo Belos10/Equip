@@ -5,7 +5,7 @@ import sys
 
 from PyQt5 import QtGui
 from PyQt5.QtCore import QSize
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication, QDesktopWidget
 from PyQt5.QtCore import Qt, pyqtSignal, QPoint
 from PyQt5.QtGui import QFont, QEnterEvent, QPainter, QColor, QPen
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel,QSpacerItem, QSizePolicy, QPushButton
@@ -164,7 +164,8 @@ class FramelessWindow(QWidget):
     Margins = 1
     def __init__(self, *args, **kwargs):
         super(FramelessWindow, self).__init__(*args, **kwargs)
-
+        self.setMaximumSize(1900, 1000)
+        self.setMinimumSize(1700, 1000)
         self._pressed = False
         self.Direction = None
         # 背景透明
@@ -363,6 +364,19 @@ class FramelessWindow(QWidget):
             else:
                 return
         self.setGeometry(x, y, w, h)
+    def center(self):
+        print("center")
+        #获获取屏幕的尺寸信息，也可以理解为屏幕的分辨率信息。获取到的屏幕信息有两个属性，一个是width对应屏幕的长度，一个是height对应屏幕的宽度。
+        screen = QDesktopWidget().screenGeometry()
+        #获取控件的尺寸信息
+        size = self.geometry()
+        # print(screen)
+        # print(size)
+        #
+        # print(size.width())
+        # print(size.height())
+        # self.move(QPoint((self.size.width() - self.resize.width()) /2, (self.size.height() - self.resize.height())/2 ))
+        self.move(QPoint(int((screen.width() - size.width()) / 2), int((screen.height() - size.height()) / 2)))
 
 class MainWindow(QWidget):
 

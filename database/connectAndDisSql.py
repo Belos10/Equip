@@ -132,6 +132,7 @@ def executeCommit(sql=''):
         return True
     except sqlite3.Error as error:
         conn.rollback()
+        print('SQL error')
         print(error)
         return False
 

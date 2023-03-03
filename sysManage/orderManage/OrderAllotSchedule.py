@@ -9,6 +9,7 @@ from sysManage.orderManage.OrderScheduleFinish import OrderScheduleFinish
 from sysManage.orderManage.selectCont import SelectCont
 from sysManage.orderManage.selectQua import SelectQua
 from sysManage.userInfo import get_value
+from utills.Search import selectUnit
 from widgets.orderManage.Widget_OrderAllotSchedule import widget_OrderAllotSchedule
 from sysManage.component import getMessageBox
 
@@ -70,18 +71,13 @@ class OrderAllotSchedule(QWidget, widget_OrderAllotSchedule):
 
 
     def slotSelectUnit(self):
-        findText = self.le_first.text()
-        for i, item in self.first_treeWidget_dict.items():
-            if item.text(0) == findText:
-                self.tw_first.setCurrentItem(item)
-                break
+        selectUnit(self, self.le_first, self.first_treeWidget_dict, self.tw_first)
+
 
     def slotSelectEquip(self):
-        findText = self.le_second.text()
-        for i, item in self.second_treeWidget_dict.items():
-            if item.text(0) == findText:
-                self.tw_second.setCurrentItem(item)
-                break
+        selectUnit(self, self.le_second, self.second_treeWidget_dict, self.tw_second)
+
+
 
     # 信号与槽连接的断开
     def signalDisconnectSlot(self):

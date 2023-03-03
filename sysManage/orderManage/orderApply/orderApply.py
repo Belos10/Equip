@@ -7,12 +7,16 @@ from database.OrderApplySql import *
 from database.strengthDisturbSql import *
 from sysManage.component import getMessageBox, getIntInputDialog
 from sysManage.userInfo import get_value
+from utills.Search import selectUnit
 from utills.utillsComponent import CheckableComboBox
 from widgets.strengthDisturb.retirement import Widget_Retirement
 
 '''
    订购申请
 '''
+
+
+
 class OrderApply(QWidget, Widget_Retirement):
     def __init__(self, parent=None):
         super(OrderApply, self).__init__(parent)
@@ -75,18 +79,11 @@ class OrderApply(QWidget, Widget_Retirement):
         self.pb_outputToExcel.clicked.connect(self.slotOutputToExcel)
 
     def slotSelectUnit(self):
-        findText = self.le_first.text()
-        for i, item in self.first_treeWidget_dict.items():
-            if item.text(0) == findText:
-                self.tw_first.setCurrentItem(item)
-                break
+        selectUnit(self, self.le_first, self.first_treeWidget_dict, self.tw_first)
+
 
     def slotSelectEquip(self):
-        findText = self.le_second.text()
-        for i, item in self.second_treeWidget_dict.items():
-            if item.text(0) == findText:
-                self.tw_second.setCurrentItem(item)
-                break
+        selectUnit(self, self.le_second, self.second_treeWidget_dict, self.tw_second)
 
     def slotDelYear(self):
         currentRow = self.lw_year.currentRow()
@@ -211,6 +208,7 @@ class OrderApply(QWidget, Widget_Retirement):
                 self.currentCheckedUnitList.append(unitID)
                 break
         self.currentCheckedEquipList = self.get_checked(self.tw_second.topLevelItem(0))
+        self.tw_second.expandAll()
         if self.currentCheckedEquipList == [] or self.currentCheckedUnitList == []:
             self.tw_result.setRowCount(2)
             self.tw_result.horizontalHeader().setVisible(False)
@@ -343,7 +341,7 @@ class OrderApply(QWidget, Widget_Retirement):
                 parent_item.setCheckState(num, 2)
             else:
                 parent_item.setCheckState(num, 1)
-        self.tw_second.expandAll()
+
 
     def _initTableWidgetByUnitListAndEquipList(self, currentCheckedUnitList, currentCheckedEquipList,currentYear):
         self.tw_result.itemChanged.disconnect(self.soltCheckData)

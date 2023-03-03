@@ -60,6 +60,7 @@ class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
         self.signalConnect()
 
     def center(self):
+        print("center")
         self.size = QDesktopWidget().screenGeometry()
         self.resize = self.geometry()
         self.move((self.size.width() - self.resize.width()) / 2, (self.size.height() - self.resize.height()) / 2)

@@ -240,6 +240,8 @@ def deleteByYear(year):
 
 #根据分配调整计划更新装备平衡表
 def updateOneEquipmentBalanceData(year,equipmentId,unitId):
+    print('updateOneEquipmentBalanceData')
+
     item = {}
     item['Equip_ID'] = equipmentId
     item['Unit_ID'] = unitId

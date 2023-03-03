@@ -355,7 +355,7 @@ def selectAllDataAboutEquip():
     cur.execute(sql)
     result = cur.fetchall()
     for resultInfo in result:
-        resultList.append(resultInfo)
+        resultList.append(list(resultInfo))
     return resultList
 
 
@@ -518,6 +518,11 @@ def addDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper, Unit_Alias, Is_Group):
     except Exception as e:
         conn.rollback()
         return e
+#往装备单位信息表插入一条数据
+def addDataIntoEquipUnitInfo(Equip_ID, Equip_Unit_Info):
+    sql = "INSERT INTO equip_unit_info (Equip_ID, Unit_Info) VALUES ('%s', '%s')"%(Equip_ID, Equip_Unit_Info)
+
+    return executeCommit(sql)
 
 # 往装备表equip中插入一条数据
 def addDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type, Equip_Unit):
@@ -775,8 +780,21 @@ def updateDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper, Unit_Alias):
         conn.rollback()
         return e
 
-
-
+#查询装备信息单位表中单位信息
+def selectEquipUnitInfo(Equip_ID):
+    sql = "Select Unit_Info from equip_unit_info where Equip_ID = '%s'"%Equip_ID
+    result =  executeSql(sql)
+    if(len(result) < 1):
+        return ''
+    else:
+        return result[0][0]
+# 先装备信息表中修改一条数据
+def updateDataIntoEquipUnitInfo(Equip_ID, Equip_Unit_Info):
+    if len(selectEquipUnitInfo(Equip_ID)) > 0:
+        sql = "Update equip_unit_info set Unit_Info = '%s' where Equip_ID = '%s'"%(Equip_ID, Equip_Unit_Info)
+    else:
+        sql = "Insert into equip_unit_info values ('%s', '%s')"%(Equip_ID, Equip_Unit_Info)
+    return executeCommit(sql)
 # 单位表equip中修改一条数据
 def updateDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type, unit):
     # 插入的sql语句
@@ -1296,6 +1314,14 @@ def delDataInEquip(Equip_ID):
                                 return e
     for EquipID in EquipIDList:
         sql = "Delete from equip where Equip_ID = '" + EquipID[0] + "'"
+        # print(sql)
+        # 执行sql语句，并发送给数据库
+        try:
+            cur.execute(sql)
+        except Exception as e:
+            conn.rollback()
+            return e
+        sql = "Delete from equip_unit_info where Equip_ID = '" + EquipID[0] + "'"
         # print(sql)
         # 执行sql语句，并发送给数据库
         try:
@@ -3124,11 +3150,11 @@ def selectWeaveInfo(UnitID, EquipID, year):
 
 
 # 插入退休表
-def insertIntoRetire(ID, Unit_ID, EquipID, Equip_Name,Equip_Unit,strength,Weave, Num, Now, Super, Apply, Other, year):
-    sql = "insert into retire (ID, Unit_ID, Equip_ID, Equip_Name, Equip_Unit, Strenth, Weave, Num, Now, Super, Apply, Other, year) " \
-          "VALUES('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')"%(ID, Unit_ID, EquipID, Equip_Name,Equip_Unit,strength,Weave, Num, Now, Super, Apply, Other, year)
-    #print(sql)
-    cur.execute(sql)
+def insertIntoRetire(ID, Unit_ID, EquipID, Equip_Name,Equip_Unit,strength,Weave, Num, Now, Super, Apply, Other, Unarrived, ProposedRetire, ProposedApply, year):
+    sql = "insert into retire (ID, Unit_ID, Equip_ID, Equip_Name, Equip_Unit, Strenth, Weave, Num, Now, Super, Apply, Other,Unarrived , Proposed_retire, Proposed_apply , year) " \
+          "VALUES('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s', '%s', '%s' , '%s')"%(ID, Unit_ID, EquipID, Equip_Name,Equip_Unit,strength,Weave, Num, Now, Super, Apply, Other, Unarrived, ProposedRetire, ProposedApply, year)
+    # print(sql)
+    executeCommit(sql)
 
 # 查询退休信息
 def selectInfoFromRetire(unitID, equipID, year):
@@ -3154,7 +3180,6 @@ def selectStrengthNum(unitID, EquipID, year):
 def selectStrengthInfo(unitID, EquipID, year):
     sql = "select * from strength where Equip_ID = '" + \
           EquipID + "' and Unit_ID = '" + unitID + "' and year = '" + year + "'"
-    cur.execute(sql)
     result = cur.fetchall()
     return result
 
@@ -3223,8 +3248,11 @@ def selectAboutRetireByEquipShow(UnitList, EquipList, year):
             apply = ''
             other = ''
             haveChild = selectEquipIsHaveChild(EquipID)
-            insertIntoRetire(ID, unitID, EquipID, equipName, equipUnit, strength,weave, num, now, super, apply, other, year)
-            currentResultInfo = [ID, unitID, EquipID, equipName, equipUnit, strength,weave, num, now, super, apply, other, year]
+            Unarrived = ''
+            ProposedRetire = ''
+            ProposedApply = ''
+            insertIntoRetire(ID, unitID, EquipID, equipName, equipUnit, strength,weave, num, now, super, apply, other, Unarrived, ProposedRetire, ProposedApply,year)
+            currentResultInfo = [ID, unitID, EquipID, equipName, equipUnit, strength,weave, num, now, super, apply, other, Unarrived, ProposedRetire, ProposedApply, year]
             result.append(currentResultInfo)
     return result
 
@@ -3268,16 +3296,24 @@ def isSecondDict(EquipID):
 
 
 # 更新退休表
-def updateRetireAboutRetire(num, apply, other, orginInfo):
+def updateRetireFromStrength(num, orginInfo):
     print("原来的数据：", orginInfo)
     if orginInfo:
-        sql = "update retire set Num = '" + num + "', Apply = '" + apply + "', Other = '" + other +\
-              "' where Equip_ID = '" + orginInfo[2] + "' and Unit_ID = '" + orginInfo[1] + "' and year = '" + orginInfo[12] + "'"
+        sql = "update retire set Num = '" + num +  "' where Equip_ID = '" + orginInfo[2] + "' and Unit_ID = '" + orginInfo[1] + "' and year = '" + orginInfo[12] + "'"
     else:
         return
     cur.execute(sql)
     conn.commit()
-
+#申请退役更新退休表
+def updateRetire(num, apply, other, Unarrived, ProposedRetire, ProposedApply, orginInfo):
+    print("原来的数据：", orginInfo)
+    if orginInfo:
+        sql = "update retire set Num = '" + num + "', Apply = '" + apply + "', Other = '" + other + "', Unarrived = '" + Unarrived + "', Proposed_retire = '" + ProposedRetire + "', Proposed_apply = '" + ProposedApply +  \
+              "' where Equip_ID = '" + orginInfo[2] + "' and Unit_ID = '" + orginInfo[1] + "' and year = '" + orginInfo[-2] + "'"
+    else:
+        return
+    cur.execute(sql)
+    conn.commit()
 # 退役年份表中添加年份
 def insertIntoRetireYear(year):
 
@@ -3655,7 +3691,9 @@ def inputOneDataIntoStrenth(lineInfo):
         print(e)
         return False
 def insertOneDataIntoRetire(lineInfo):
-    # ['1022000', '10', '2', '        通用装备', '', 0, '0', '0', '0', '0', '', '', '2000', False]
+    print("insertLine info")
+    print(lineInfo)
+    # ['8102001', '8', '10', '    C车', '辆', 0, '2', '0', '0', '-2', '2', '3', '3', '3', '3', '2001', True]
     if selectIfExistsRetireYear(lineInfo[-2]) == False:
         year = str(lineInfo[-1])
         sql = "insert into retireyear(year) values ('%s')"%year
@@ -3666,22 +3704,23 @@ def insertOneDataIntoRetire(lineInfo):
             conn.rollback()
     result = selectInfoFromRetire(lineInfo[1], lineInfo[2], lineInfo[-2])
     if result == None or len(result) == 0:
-        sql = "insert into retire values('%s','%s','%s','%s','%s','%d','%s','%s','%s','%s','%s','%s','%s')" % (
+        # ['8102001', '8', '10', '    C车', '辆', 0, '2', '0', '0', '-2', '2', '3', '3', '3', '3', '2001', True]
+        sql = "insert into retire values('%s','%s','%s','%s','%s','%d','%s','%s','%s','%s','%s','%s','%s', '%s','%s', '%s')" % (
         lineInfo[0], lineInfo[1], lineInfo[2],
         lineInfo[3], lineInfo[4], lineInfo[5], lineInfo[6], lineInfo[7], lineInfo[8], lineInfo[9], lineInfo[10],
-        lineInfo[11], lineInfo[12])
+        lineInfo[11], lineInfo[12], lineInfo[13], lineInfo[14], lineInfo[-2])
         try:
             cur.execute(sql)
         except Exception as e:
             print(e)
             conn.rollback()
     else:
-        # ['1022000', '10', '2', '        通用装备', '', 0, '0', '0', '0', '0', '', '', '2000', False]
+        # ['8102001', '8', '10', '    C车', '辆', 0, '2', '0', '0', '-2', '2', '3', '3', '3', '3', '2001', True]
         sql = "update retire set  Unit_ID = '%s', Equip_ID = '%s', Equip_Name = '%s', Equip_Unit = '%s', Strenth = '%d', Weave = '%s', Num = '%s', Now =" \
-              " '%s', Super = '%s',Apply = '%s', Other = '%s', year = '%s' where ID = '%s'" % (
+              " '%s', Super = '%s',Apply = '%s', Other = '%s', Unarrived = '%s', Proposed_retire = '%s', Proposed_apply = '%s', year = '%s' where ID = '%s'" % (
               lineInfo[1], lineInfo[2], lineInfo[3], lineInfo[4], lineInfo[5], lineInfo[6], lineInfo[7], lineInfo[8],
               lineInfo[9], lineInfo[10],
-              lineInfo[11], lineInfo[12], lineInfo[0])
+              lineInfo[11], lineInfo[12], lineInfo[13], lineInfo[14], lineInfo[15], lineInfo[0])
         try:
             cur.execute(sql)
         except Exception as e:
