@@ -3,6 +3,7 @@ import xlwt
 from PyQt5.QtWidgets import QWidget, QAbstractItemView, QInputDialog, QLineEdit, QMessageBox, QTableWidgetItem, \
     QTreeWidgetItem, QHeaderView, QFileDialog
 from database.strengthDisturbSql import *
+from utills.Search import selectUnit
 from widgets.strengthDisturb.select_setUnit import widget_Select_SetUnit
 from sysManage.showInputResult import showInputResult
 from sysManage.userInfo import get_value
@@ -199,11 +200,7 @@ class select_setUnit(QWidget,widget_Select_SetUnit):
         # print(result)   #测试查找到的数据
 
     def slotSelectUnit(self):
-        findText = self.le_first.text()
-        for i, item in self.first_treeWidget_dict.items():
-            if item.text(0) == findText:
-                self.tw_first.setCurrentItem(item)
-                break
+        selectUnit(self, self.le_first, self.first_treeWidget_dict, self.tw_first)
 
     '''
             功能：
@@ -306,12 +303,23 @@ class select_setUnit(QWidget,widget_Select_SetUnit):
     def slotInputDataByExcel(self):
         self.setDisabled(True)
         self.showInputResult.setDisabled(False)
+
         filename, _ = QFileDialog.getOpenFileName(self, "选中文件", '', "Excel Files (*.xls);;Excel Files (*.xlsx)")
+        if filename == '':
+            self.setDisabled(False)
+            return
         try:
             workBook = xlrd.open_workbook(filename)
             self.workSheet = workBook.sheet_by_index(0)
             self.inputUnitInfoList = []
             title = ['单位编号', '单位名称', '上级单位编号', '单位代号']
+            cols = self.workSheet.ncols
+            if cols != len(title):
+                raise Exception("文件内容不匹配！")
+            for i in range(0, cols):
+                context = self.workSheet.cell(0, i).value
+                if(title[i] != context):
+                    raise Exception("文件内容不匹配！")
             for r in range(1, self.workSheet.nrows):
                 Unit_Name = (self.workSheet.cell(r, 1).value).strip()
                 Unit_Alias = self.workSheet.cell(r, 3).value
@@ -350,7 +358,7 @@ class select_setUnit(QWidget,widget_Select_SetUnit):
 
         except BaseException as e:
             print(e)
-            getMessageBox("打开失败", "打开文件失败，请检查文件", True, False)
+            getMessageBox("导入失败", "请检查文件内容是否正确！", True, False)
             self.setDisabled(False)
 
 
@@ -437,6 +445,7 @@ class select_setUnit(QWidget,widget_Select_SetUnit):
         if inputSuccess != True:
             for error in inputSuccess:
                 getMessageBox("导入", error, True, False)
+                break
         self.slotUnitDictInit()
         self.setDisabled(False)
         self.showInputResult.hide()

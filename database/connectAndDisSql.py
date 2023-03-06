@@ -4,7 +4,7 @@ from database.config import ConnectMySqlDict
 
 
 #os.path.join(BASE_DIR ,'NuclearManageSystem.db')
-
+from utills.file import copyFile
 
 try:
     # basepath = os.path.abspath(os.path.dirname(__file__))
@@ -14,7 +14,9 @@ try:
     # curpath = os.path.realpath(__file__)
     # basepath = os.path.dirname(curpath)
     # path = basepath + '\\NuclearManageSystem.db'
+    # backPath = basepath + '\\backUp.db'
     # print('路径',path)
+    # print('备份路径',backPath)
     # # conn = sqlite3.connect(path)
     conn = sqlite3.connect('NuclearManageSystem.db')
     cur = conn.cursor()
@@ -135,6 +137,32 @@ def executeCommit(sql=''):
         print('SQL error')
         print(error)
         return False
+def progress(status, remaining, total):
+    print(f'Copied {total-remaining} of {total} pages...')
+def backUp(basePath):
+    # global conn, cur
+    # conn.close()
+    backDir = basePath + '\\' + 'backUp.db'
+    sourceDir = basePath + '\\' + 'NuclearManageSystem.db'
+    copyFile(sourceDir, backDir)
+    # bck = sqlite3.connect(basePath + '\\' + 'backUp.db')
+    # with bck:
+    #     conn.backup(bck, pages=1, progress=progress)
+    # conn = sqlite3.connect(sourceDir)
+    # cur = conn.cursor()
+
+def restore(basePath):
+    backDir = basePath + '\\' + 'backUp.db'
+    sourceDir =  basePath + '\\' + 'NuclearManageSystem.db'
+    # print('restore路径', backDir)
+    # print('restore备份路径', sourceDir)
+    copyFile(backDir, sourceDir)
+    # global conn, cur
+    # conn = sqlite3.connect(sourceDir)
+    # cur = conn.cursor()
+
+
+
 
 if __name__ == '__main__':
     # executeCommit("delete into equipment_balance(equip_balance_id) values('001')")

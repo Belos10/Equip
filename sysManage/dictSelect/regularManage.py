@@ -134,6 +134,9 @@ class regularManage(QWidget, Widget_Regular_Manage):
 
     def soltOutputFiles(self):
         reply = getMessageBox('导出选中', '确定导出选中文件？', True, True)
+        if self.lw_file.rowCount() < 1:
+            getMessageBox('导出选中', '请选中文件导出？', True, False)
+            return
         if reply == QMessageBox.Ok:
             directoryPath = QFileDialog.getExistingDirectory(self, "请选择导出文件夹", "c:/")
             if len(directoryPath) > 0:

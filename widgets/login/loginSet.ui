@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1068</width>
-    <height>800</height>
+    <width>1176</width>
+    <height>599</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -31,11 +31,16 @@
      <property name="title">
       <string>用户信息</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="0">
-       <widget class="QTableWidget" name="tw_userInfo"/>
-      </item>
-     </layout>
+     <widget class="QTableWidget" name="tw_userInfo">
+      <property name="geometry">
+       <rect>
+        <x>12</x>
+        <y>27</y>
+        <width>256</width>
+        <height>192</height>
+       </rect>
+      </property>
+     </widget>
     </widget>
    </item>
    <item row="2" column="0">
@@ -44,6 +49,83 @@
       <string>信息管理</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="le_accont"/>
+      </item>
+      <item row="0" column="3">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>单位名字：</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="4">
+       <widget class="QLineEdit" name="le_name"/>
+      </item>
+      <item row="0" column="5">
+       <spacer name="horizontalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="0" column="2">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>账号：</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="8">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>密码：</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>开始单位号：</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="4">
+       <widget class="QLineEdit" name="le_unitID"/>
+      </item>
+      <item row="1" column="8">
+       <widget class="QPushButton" name="pb_add">
+        <property name="text">
+         <string>增加</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>角色：</string>
+        </property>
+       </widget>
+      </item>
       <item row="1" column="1">
        <widget class="QComboBox" name="cb_role">
         <item>
@@ -68,46 +150,6 @@
         </item>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QLineEdit" name="le_accont"/>
-      </item>
-      <item row="0" column="5">
-       <spacer name="horizontalSpacer_3">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="1" column="3">
-       <widget class="QLabel" name="label_5">
-        <property name="text">
-         <string>开始单位号：</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="3">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>单位名字：</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_4">
-        <property name="text">
-         <string>角色：</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="4">
-       <widget class="QLineEdit" name="le_unitID"/>
-      </item>
       <item row="1" column="2">
        <spacer name="horizontalSpacer_2">
         <property name="orientation">
@@ -121,35 +163,8 @@
         </property>
        </spacer>
       </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>账号：</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2">
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="0" column="4">
-       <widget class="QLineEdit" name="le_name"/>
-      </item>
-      <item row="1" column="7">
-       <widget class="QPushButton" name="pb_del">
-        <property name="text">
-         <string>删除</string>
-        </property>
-       </widget>
+      <item row="0" column="9" colspan="3">
+       <widget class="QLineEdit" name="le_pswd"/>
       </item>
       <item row="1" column="5">
        <spacer name="horizontalSpacer_4">
@@ -164,27 +179,31 @@
         </property>
        </spacer>
       </item>
-      <item row="1" column="6">
-       <widget class="QPushButton" name="pb_add">
-        <property name="text">
-         <string>增加</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="6">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>密码：</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="7" colspan="3">
-       <widget class="QLineEdit" name="le_pswd"/>
-      </item>
-      <item row="1" column="8">
+      <item row="1" column="10">
        <widget class="QPushButton" name="pb_update">
         <property name="text">
          <string>修改</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="9">
+       <widget class="QPushButton" name="pb_del">
+        <property name="text">
+         <string>删除</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="12">
+       <widget class="QPushButton" name="pb_restore">
+        <property name="text">
+         <string>恢复</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="12">
+       <widget class="QPushButton" name="pb_backUp">
+        <property name="text">
+         <string>备份</string>
         </property>
        </widget>
       </item>

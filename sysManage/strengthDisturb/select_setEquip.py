@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QWidget, QAbstractItemView, QTreeWidgetItem, QHeader
 
 from database.strengthDisturbSql import *
 from sysManage.showInputResult import showInputResult
+from utills.Search import selectUnit
 from widgets.strengthDisturb.select_setEquip import widget_Select_SetEquip
 from sysManage.userInfo import get_value
 from sysManage.component import getMessageBox
@@ -108,11 +109,7 @@ class select_setEquip(QWidget,widget_Select_SetEquip):
 
 
     def slotSelectEquip(self):
-        findText = self.le_second.text()
-        for i, item in self.second_treeWidget_dict.items():
-            if item.text(0) == findText:
-                self.tw_second.setCurrentItem(item)
-                break
+        selectUnit(self, self.le_second, self.second_treeWidget_dict, self.tw_second)
 
 
     # def slotSetEquipUnit(self):
@@ -367,16 +364,24 @@ class select_setEquip(QWidget,widget_Select_SetEquip):
                                                   self.inputEquipInfoList[i][2], self.inputEquipInfoList[i][3],
                                                   self.inputEquipInfoList[i][4], self.inputEquipInfoList[i][5])
                     addEquipInfoSuccess = addDataIntoEquipUnitInfo(self.inputEquipInfoList[i][0], self.inputEquipInfoList[i][6])
-
                 else:
-                    if i > 1:
-                        getMessageBox("导入", "导入第%d数据失败,存在重复数据%d" % i, True, False)
+                    if isHaveEquipment(self.inputEquipInfoList[i][2]):
+                        updateDataIntoEquip(self.inputEquipInfoList[i][0], self.inputEquipInfoList[i][1],
+                                                  self.inputEquipInfoList[i][2], self.inputEquipInfoList[i][3],
+                                                  self.inputEquipInfoList[i][4], self.inputEquipInfoList[i][5])
+                        updateDataIntoEquipUnitInfo(self.inputEquipInfoList[i][0], self.inputEquipInfoList[i][6])
+                    # if i > 1:
+                    #     getMessageBox("导入", "导入第%d数据失败,存在重复数据%d" % i, True, False)
+
             except Exception as e:
                 print(e)
                 getMessageBox("导入", "导入第%d数据失败" % i, True, False)
-                continue
-        getMessageBox('新增', '新增成功', True, False)
+                self.slotEquipDictInit()
+                self.setDisabled(False)
+                self.showInputResult.hide()
+                return
 
+        getMessageBox('新增', '新增成功', True, False)
         self.slotEquipDictInit()
         self.setDisabled(False)
         self.showInputResult.hide()
@@ -386,10 +391,22 @@ class select_setEquip(QWidget,widget_Select_SetEquip):
         self.setDisabled(True)
         self.showInputResult.setDisabled(False)
         filename, _ = QFileDialog.getOpenFileName(self, "选中文件", '', "Excel Files (*.xls);;Excel Files (*.xlsx)")
+        if filename == '':
+            self.setDisabled(False)
+            return
         try:
             workBook = xlrd.open_workbook(filename)
             self.workSheet = workBook.sheet_by_index(0)
             self.inputEquipInfoList = []
+            title = ['装备编号', '装备名称', '单位','上级装备号', '录入类型', '装备类型', '装备单位']
+            cols = self.workSheet.ncols
+            if cols != len(title):
+                raise Exception("文件内容不匹配！")
+            for i in range(0, cols):
+                context = self.workSheet.cell(0, i).value
+                if (title[i] != context):
+                    raise Exception("文件内容不匹配！")
+
             for r in range(1, self.workSheet.nrows):
                 equipName = self.workSheet.cell(r, 1).value.strip()
                 try:
@@ -418,7 +435,6 @@ class select_setEquip(QWidget,widget_Select_SetEquip):
                 self.inputEquipInfoList.append(euipmentInfo)
 
             self.showInputResult.setWindowTitle("导入Excel数据到数据库装备表中")
-            title = ['装备编号', '装备名称', '单位','上级装备号', '录入类型', '装备类型', '装备单位']
             self.showInputResult.tw_result.setColumnCount(len(title))
             self.showInputResult.tw_result.setHorizontalHeaderLabels(title)
             self.showInputResult.tw_result.verticalHeader().setVisible(False)
