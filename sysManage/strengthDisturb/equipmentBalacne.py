@@ -79,6 +79,7 @@ class equipmentBalance(QWidget, Widget_Retirement):
         selectUnit(self, self.le_first, self.first_treeWidget_dict, self.tw_first)
 
 
+
     def slotSelectEquip(self):
         selectUnit(self, self.le_second, self.second_treeWidget_dict, self.tw_second)
 
@@ -170,6 +171,7 @@ class equipmentBalance(QWidget, Widget_Retirement):
         # for equipID, equipItem in self.second_treeWidget_dict.items():
         #     if equipItem.checkState(0) == Qt.Checked or equipItem.checkState(0) == Qt.PartiallyChecked:
         self.currentCheckedEquipList = self.get_checked(self.tw_second.topLevelItem(0))
+        self.tw_second.expandAll()
         # print('-----------------------------')
         # print(self.currentCheckedEquipList)
 

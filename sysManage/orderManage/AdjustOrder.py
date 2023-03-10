@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import *
 from database.OrderManageSql import *
 from sysManage.orderManage.OrderAdjustCont import OrderAdjustCont
 from sysManage.userInfo import get_value
+from utills.Search import selectUnit
 from widgets.orderManage.Widget_AdjustOrder import widget_adjustOrder
 from sysManage.component import getMessageBox, getIntInputDialog
 
@@ -52,11 +53,8 @@ class AdjustOrder(QWidget, widget_adjustOrder):
 
 
     def slotSelectEquip(self):
-        findText = self.le_first.text()
-        for i, item in self.equip_treeWidget_dict.items():
-            if item.text(0) == findText:
-                self.tw_equip.setCurrentItem(item)
-                break
+        selectUnit(self, self.le_first, self.equip_treeWidget_dict, self.tw_equip)
+
     # 信号与槽连接的断开
     def signalDisconnectSlot(self):
         pass

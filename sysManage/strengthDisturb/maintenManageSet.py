@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QWidget, QTreeWidgetItem, QTableWidgetItem, QAbstrac
 from database.strengthDisturbSql import *
 from sysManage.component import getMessageBox
 from sysManage.userInfo import get_value
+from utills.Search import selectUnit
 from widgets.strengthDisturb.maintenManageSet import Widget_Mainten_Manage_Set
 
 sys.setrecursionlimit(100000)
@@ -94,11 +95,8 @@ class maintenManageSet(QWidget, Widget_Mainten_Manage_Set):
 
 
     def slotSelectUnit(self):
-        findText = self.le_first.text()
-        for i, item in self.first_treeWidget_dict.items():
-            if item.text(0) == findText:
-                self.tw_first.setCurrentItem(item)
-                break
+        selectUnit(self, self.le_first, self.first_treeWidget_dict, self.tw_first)
+
 
     '''
        当前单位被选中

@@ -1,17 +1,21 @@
-from PyQt5.QtWidgets import QDialog,QLineEdit,QTableWidgetItem,QAbstractItemView,QMessageBox,QHeaderView
+from PyQt5.QtCore import QProcess
+from PyQt5.QtWidgets import QDialog, QLineEdit, QTableWidgetItem, QAbstractItemView, QMessageBox, QHeaderView, qApp
+
+from database.connectAndDisSql import backUp, restore
+# from main import restart
 from widgets.login.loginSet import Widget_LoginSet
 from database.strengthDisturbSql import selectAllDataAboutUnit
 from database.loginSql import selectAllDataAboutLogin,insertIntoLogin,delFromLogin,findAllLoginAccontList,updateUserInfo
 from PyQt5.Qt import Qt
 from sysManage.component import getMessageBox
-
+import os
 
 class loginSet(QDialog, Widget_LoginSet):
     def __init__(self, parent=None):
         super(loginSet,self).__init__(parent)
         self.setupUi(self)
         self.initWidgets()
-
+        self.basepath = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
         self.tw_unitResult.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tw_userInfo.setSelectionMode(QAbstractItemView.SingleSelection)
 
@@ -36,6 +40,9 @@ class loginSet(QDialog, Widget_LoginSet):
         self.pb_del.clicked.connect(self.slotDelUserInfo)
 
         self.pb_update.clicked.connect(self.slotUpdateUserInfo)
+        self.pb_backUp.clicked.connect(self.slotBackUp)
+        self.pb_restore.clicked.connect(self.slotRestore)
+
 
     def initWidgets(self):
         self.tw_unitResult.clear()
@@ -158,3 +165,19 @@ class loginSet(QDialog, Widget_LoginSet):
         getMessageBox('修改', '修改成功', True, False)
         self.initWidgets()
         return
+
+
+
+    def slotBackUp(self):
+        self.setDisabled(True)
+        backUp(self.basepath)
+        getMessageBox('备份', '备份成功！', True, False)
+        self.setDisabled(False)
+
+
+    def slotRestore(self):
+        self.setDisabled(True)
+        restore(self.basepath)
+        getMessageBox('恢复', '恢复备份成功！', True, False)
+        self.setDisabled(False)
+

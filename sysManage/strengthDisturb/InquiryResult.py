@@ -641,9 +641,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
             if result[13] == True:
                 checkbox = self.tw_result.cellWidget(i + 2, 5)
                 num = checkbox.itemText(0)
-                apply = self.tw_result.item(i + 2, 8).text()
-                other = self.tw_result.item(i + 2, 9).text()
-                updateRetireAboutRetire(num, apply, other, result)
+                updateRetireFromStrength(num, result)
 
         self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList,self.year)
         directoryPath = QFileDialog.getExistingDirectory(self, "请选择导出文件夹", "c:/")
@@ -917,9 +915,16 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                     if orginStrengthNum == -1:
                         raise Exception
                     else:
-                        if orginStrengthNum != int(lineInfo[4]):
-                            if updateStrengthAboutStrengrh(lineInfo[0], lineInfo[2], lineInfo[-1], int(lineInfo[4]), orginStrengthNum) == False:
-                                raise Exception
+                        unitHaveChild = selectUnitIsHaveChild(lineInfo[0])
+                        equipHaveChild = selectEquipIsHaveChild(lineInfo[2])
+                        if unitHaveChild or equipHaveChild:
+                            continue
+                        else:
+                            if orginStrengthNum != int(lineInfo[4]):
+                                if not updateStrengthAboutStrengrh(lineInfo[0], lineInfo[2], lineInfo[-1], int(lineInfo[4]),
+                                                               orginStrengthNum):
+                                    raise Exception
+
                 except Exception as e:
                     print(e)
                     getMessageBox("导入失败", "导入第%d数据失败！" % (i), True, False)
@@ -937,9 +942,14 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                             raise BaseException
                         else:
                             # updateStrengthAboutStrengrh(Unit_ID, Equip_ID, year, strengthNum, orginStrengthNum)
-                            if updateStrengthAboutStrengrh(lineInfo[1], lineInfo[0], lineInfo[-1], lineInfo[4],
-                                                           orginStrengthNum) == False:
-                                raise BaseException
+                            unitHaveChild = selectUnitIsHaveChild(lineInfo[1])
+                            equipHaveChild = selectEquipIsHaveChild(lineInfo[0])
+                            if unitHaveChild or equipHaveChild:
+                                continue
+                            else:
+                                if not updateStrengthAboutStrengrh(lineInfo[1], lineInfo[0], lineInfo[-1], lineInfo[4],
+                                                                   orginStrengthNum):
+                                    raise BaseException
                     except Exception as e:
                         print(e)
                         getMessageBox("导入失败", "导入第%d数据失败！" % (i), True, False)

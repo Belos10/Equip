@@ -6,6 +6,7 @@ from database.OrderManageSql import *
 from database.alocatMangeSql import *
 from sysManage.orderManage.InputProof_Allot import InputProof
 from sysManage.userInfo import get_value
+from utills.Search import selectUnit
 from widgets.orderManage.widget_OrderPlan import Widget_OrderPlan
 from sysManage.component import getMessageBox, getIntInputDialog
 
@@ -100,18 +101,12 @@ class OrderAllotPlan(QWidget, Widget_OrderPlan):
 
 
     def slotSelectUnit(self):
-        findText = self.le_first.text()
-        for i, item in self.first_treeWidget_dict.items():
-            if item.text(0) == findText:
-                self.tw_first.setCurrentItem(item)
-                break
+        selectUnit(self, self.le_first, self.first_treeWidget_dict, self.tw_first)
+
 
     def slotSelectEquip(self):
-        findText = self.le_second.text()
-        for i, item in self.second_treeWidget_dict.items():
-            if item.text(0) == findText:
-                self.tw_second.setCurrentItem(item)
-                break
+        selectUnit(self, self.le_second, self.second_treeWidget_dict, self.tw_second)
+
 
     # 新增年份
     def slotAddNewYear(self):

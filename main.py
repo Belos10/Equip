@@ -3,14 +3,14 @@ import sys
 import threading
 
 from PyQt5.Qt import QObject
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSignal, QProcess
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication, qApp
 
 from database.loginSql import selectUserInfoByAccont
-from sysManage.MainWindowManage import Manage_Widgets
 from PyQt5 import sip, Qt, QtGui
 
+from sysManage.MainWindowManage import Manage_Widgets
 from sysManage.component import getMessageBox
 from sysManage.login.login import login
 from icons.readQss import readQss
@@ -40,6 +40,7 @@ class mainManage(QObject):
         app = QApplication.instance()
         # 退出应用程序
         app.quit()
+
 
     def slotLoginSystem(self):
         self.mainwnd._widget.login.accont = self.mainwnd._widget.login.le_accont.text()
@@ -75,10 +76,17 @@ class mainManage(QObject):
         # self.alocatMange.initUserInfo(self.userInfo)
         # self.PosEngin.slotInstallation()
         self.mainwnd._widget.login.close()
-        self.mainwnd._widget.show()
-        self.mainwnd._widget.center()
-        self.mainwnd.titleBar.show()
 
+        self.mainwnd._widget.show()
+        self.mainwnd.titleBar.show()
+        self.mainwnd.center()
+        # self.mainwnd.showMaximized()
+def restart():
+    qApp.quit()
+    # QProcess 类的作用是启动一个外部的程序并与之交互，并且没有父子关系。
+    p = QProcess()
+    # applicationFilePath() 返回应用程序可执行文件的文件路径
+    p.startDetached(qApp.applicationFilePath())
 if __name__ == "__main__":
     # appctxt = ApplicationContext()
     os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
@@ -92,7 +100,8 @@ if __name__ == "__main__":
         qssStyle = f.read()
     app.setStyleSheet(qssStyle)
     # exit_code = appctxt.app.exec_()
-    sys.exit(app.exec_())
+    exitCode = sys.exit(app.exec_())
+
 
 
 python2: raw_input("please input any key to exit!")
