@@ -317,6 +317,15 @@ def selectDisturbPlanInputNumBase(EquipList, Year):
     # disconnectMySql(conn, cur)
     return resultList
 
+def selectDisturbPlanInputNumBase_single(EquipId, Year):
+    # conn, cur = connectMySql()
+    sql = "select InputNumBase from disturbplannote where Equip_Id = '" + EquipId + "' and Year = '" + Year + "'"
+    cur.execute(sql)
+    result = cur.fetchall()
+    #print("自定义输入数字",resultList)
+    # disconnectMySql(conn, cur)
+    return result
+
 
 def selectDisturbPlanInputNumUpmost(EquipList, Year):
     # conn, cur = connectMySql()
@@ -330,6 +339,12 @@ def selectDisturbPlanInputNumUpmost(EquipList, Year):
     #print("自定义输入数字",resultList)
     # disconnectMySql(conn, cur)
     return resultList
+
+def selectDisturbPlanInputNumUpmost_single(EquipID, Year):
+    sql = "select InputNumUpmost from disturbplannote where Equip_Id = '" + EquipID + "' and Year = '" + Year + "'"
+    cur.execute(sql)
+    result = cur.fetchall()
+    return result
 
 # 读取年份对应调拨依据
 def selectDisturbPlanProof(year):
@@ -387,6 +402,22 @@ def selectDisturbPlanOther(EquipList, YearList):
     # print("陆军调拨单resultList", resultList)
     return resultList
 
+# 读取分配计划军委计划数与装备单位
+def selectDisturbPlanOther_single(EquipId, YearList):
+    # conn, cur = connectMySql()
+    resultList = []
+    sql = "select Equip_Unit,Equip_Num from armytransfer where Equip_Id = '" + EquipId + "' and year = '" + YearList + "'"
+    cur.execute(sql)
+    result = cur.fetchall()
+    #print("other result",result)
+    if result:
+        resultList.append(result)
+    else:
+        resultList.append([])
+    # print("陆军调拨单resultList", resultList)
+    return resultList
+
+
 # # 读取火箭军计划数
 # def selectRocketOther(EquipList, YearList,UnitID):
 #     # conn, cur = connectMySql()
@@ -396,32 +427,55 @@ def selectDisturbPlanOther(EquipList, YearList):
 #               + "' and "
 #         cur.execute(sql)
 #         result = cur.fetchall()
-#         #print("火箭军 result",result)
 #         if result:
 #             resultList.append(result)
 #         else:
 #             resultList.append([])
-#         # for resultInfo in result:
-#         #     resultList.append(resultInfo)
 #     print("火箭军调拨resultList", resultList)
 #     # disconnectMySql(conn, cur)
 #     return resultList
 
 # 更新自定义分配数  机关
-def updateDisturbPlanInputNumUpmost(Equip_Id,Year,InputNum):
+def updateDisturbPlanInputNumUpmost(Equip_Id, Year, InputNum):
+    oriNumList = selectDisturbPlanInputNumUpmost_single(Equip_Id, Year)
+    if oriNumList[0][0] == None:
+        oriNum = 0
+    else:
+        oriNum = oriNumList[0][0]
+    EquipIDList = []
+    findEquipUperIDList(Equip_Id, EquipIDList)
+    for EquipID in EquipIDList:
+        originalNumList = selectDisturbPlanInputNumUpmost_single(EquipID, Year)
+        if originalNumList[0][0] == None:
+            originalNum = 0
+        else:
+            originalNum = originalNumList[0][0]
+        num = int(originalNum) - int(oriNum) + int(InputNum)
     # conn,cur=connectMySql()
-    sql= "update disturbplannote set InputNumUpmost ='" + InputNum + "'where Equip_Id='" + Equip_Id + "' and Year = '" + Year + "'"
-    cur.execute(sql)
-    conn.commit()
-    # disconnectMySql(conn,cur)
+        sql= "update disturbplannote set InputNumUpmost ='" + str(num) + "'where Equip_Id='" + EquipID + "' and Year = '" + Year + "'"
+        cur.execute(sql)
+        conn.commit()
+
 
 # 更新自定义分配数  基地
 def updateDisturbPlanInputNumBase(Equip_Id,Year,InputNum):
-    # conn,cur=connectMySql()
-    sql= "update disturbplannote set InputNumBase ='" + InputNum + "'where Equip_Id='" + Equip_Id + "' and Year = '" + Year + "'"
-    cur.execute(sql)
-    conn.commit()
-    # disconnectMySql(conn,cur)
+    oriNumList = selectDisturbPlanInputNumBase_single(Equip_Id, Year)
+    if oriNumList[0][0] == None:
+        oriNum = 0
+    else:
+        oriNum = oriNumList[0][0]
+    EquipIDList = []
+    findEquipUperIDList(Equip_Id, EquipIDList)
+    for EquipID in EquipIDList:
+        originalNumList = selectDisturbPlanInputNumBase_single(EquipID, Year)
+        if originalNumList[0][0] == None:
+            originalNum = 0
+        else:
+            originalNum = originalNumList[0][0]
+        num = int(originalNum) - int(oriNum) + int(InputNum)
+        sql= "update disturbplannote set InputNumBase ='" + num + "'where Equip_Id='" + EquipID + "' and Year = '" + Year + "'"
+        cur.execute(sql)
+        conn.commit()
 
 # 更新分配计划备注
 def updateDisturbPlanNote(Equip_Id,Year,Note):

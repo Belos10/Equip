@@ -1,20 +1,15 @@
-import sys
-from PyQt5.QtWidgets import *
-#new
-from database.SD_EquipmentBanlanceSql import updateOneEquipmentBalanceData
-from sysManage.component import getMessageBox
-from widgets.alocatMange.allotSchedule import widget_AllotSchedule
-from database.strengthDisturbSql import *
 from PyQt5.Qt import Qt
-from PyQt5.QtGui import QColor, QBrush,QFont
+from PyQt5.QtGui import QColor, QBrush, QFont
+from PyQt5.QtWidgets import *
 from database.alocatMangeSql import *
 from sysManage.alocatMange.ArmySchedule import ArmySchedule
-from sysManage.alocatMange.armyTransfer import armyTransfer
 from sysManage.alocatMange.ScheduleFinish import ScheduleFinish
 from sysManage.alocatMange.transferModel import transferModel
-from sysManage.orderManage.OrderScheduleFinish import OrderScheduleFinish
+from sysManage.alocatMange.MultiyearComparison import MultiyearComparison
+from sysManage.component import getMessageBox
 from sysManage.userInfo import get_value
 from utills.Search import selectUnit
+from widgets.alocatMange.allotSchedule import widget_AllotSchedule
 
 '''
     调拨进度
@@ -36,6 +31,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         self.fileName = ""
         self.unitFlag = 0
         self.rocketSchedule = transferModel(self)
+        self.multiyearComparisonDialog = MultiyearComparison()
         self.signalConnect()
 
 
@@ -50,6 +46,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         self.tw_second.clear()
         self.txt_disturbPlanYear.clear()
         self.cb_schedule.setDisabled(1)
+        self.pb_multiyearComparison.setDisabled(1)
         self.tb_proof.clear()
         self.disturbResult.clear()
         self.disturbResult.setRowCount(0)
@@ -68,10 +65,10 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         # 点击第二目录结果
         self.tw_second.itemClicked.connect(self.slotDisturbStrengthResult)
         self.tw_second.itemChanged.connect(self.slotCheckedChange)
-        # self.cb_schedule.activated.connect(self.selectSchedule)
         self.cb_schedule.signal.connect(self.preSelectSchedule)
         self.pb_secondSelect.clicked.connect(self.slotSelectEquip)
         self.pb_firstSelect.clicked.connect(self.slotSelectUnit)
+        self.pb_multiyearComparison.clicked.connect(self.multiyearComparison)
 
 
     def slotSelectUnit(self):
@@ -128,7 +125,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
             root.append(self.tw_first)
             self._initUnitTreeWidget(stack, root)
 
-        equipInfo =  findUperEquipIDByName("通用装备")
+        equipInfo = findUperEquipIDByName("通用装备")
         stack = []
         root = []
         if equipInfo:
@@ -186,6 +183,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         result[0] = tuple(result1)
         return result
 
+    # 筛选进度
     def initcbschedule(self):
         # self.cb_schedule.clear()
         # if self.unitFlag == 1:
@@ -251,7 +249,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                 equipInfo = self.addTab(equipInfo)
                 self.originalEquipDictTab[j] = equipInfo[0]
                 j = j + 1
-        #print("self.originalEquipDict",self.originalEquipDict)
+        print("self.originalEquipDict",self.originalEquipDict)
         self.initDisturbPlanByUnitListAndEquipList(self.originalEquipDict, self.originalEquipDictTab)
 
 
@@ -264,6 +262,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         self.currentEquipdict = equipDict
         self.lenCurrentUnitChilddict = len(self.currentUnitChilddict)
         self.lenCurrentEquipdict = len(self.currentEquipdict)
+        self.pb_multiyearComparison.setDisabled(0)
         # 选择机关或其他
         if self.unitFlag == 1:
             headerlist = ['装备名称及规格型号', '单位', '陆军调拨单开具数', '机关分配计划数', '此次分配合计数']
@@ -675,6 +674,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                             self.disturbResult.item(row, 2).setText(str(sum))
 
 
+    # 撤销进度
     def setButtonBack(self):
         reply = getMessageBox("修改", "是否修改进度？", True, True)
         if reply == QMessageBox.Ok:
@@ -700,6 +700,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                     updateScheduleFinishBase(self.currentEquipdict[currentRow][0], self.currentYear, '0')
                 item = QPushButton("设置进度")
                 self.disturbResult.setCellWidget(currentRow, currentColumn, item)
+            self.preSelectSchedule()
 
     # 进度1 陆军调拨
     def setArmySchedule(self):
@@ -1116,4 +1117,23 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
             equipDict[j] = equipInfo[0]
             equipInfo = self.addTab(equipInfo)
             equipDictTab[j] = equipInfo[0]
+
+
+    # 多年份数据对比
+    def multiyearComparison(self):
+        row = -1
+        # 读取当前选中行的装备  若无则显示错误信息
+        if self.disturbResult.currentRow() != -1:
+            row = self.disturbResult.currentRow()
+        else:
+            getMessageBox("错误", "未选中装备", True, False)
+            return
+        self.multiyearComparisonDialog.setUnitAndEquip(self.currentUnitChilddict,
+                                                       self.currentEquipdict, row, self.unitFlag)
+        self.multiyearComparisonDialog.initAll()
+        self.multiyearComparisonDialog.show()
+        # 选择年份
+
+        # 通过选中行的装备与选中的年份信息
+        pass
 

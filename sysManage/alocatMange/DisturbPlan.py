@@ -25,11 +25,11 @@ class DisturbPlan(QWidget, yearList_Form):
         super(DisturbPlan, self).__init__(parent)
         # Stren_Inquiry._initUnitTreeWidget()
         self.setupUi(self)
+        self.initAll()
         self.first_treeWidget_dict = {}
         self.second_treeWidget_dict = {}
         self.unitDisturbPlanList = {}
         self.unitFlag = 0
-        self.initAll()
         self.inputProof = InputProof()
         self.signalConnect()
 
@@ -48,6 +48,8 @@ class DisturbPlan(QWidget, yearList_Form):
         self.tb_proof.clear()
         self.txt_disturbPlanYear.clear()
         self.disturbResult.clear()
+        self.disturbResult.setRowCount(0)
+        self.disturbResult.setColumnCount(0)
         self._initYearWidget_()
 
     def signalConnect(self):
@@ -551,6 +553,7 @@ class DisturbPlan(QWidget, yearList_Form):
         if self.currentColumn == self.lenHeaderList - 1:
             updateDisturbPlanNote(self.currentEquipdict[self.currentRow][0], self.currentYear,
                                   self.disturbResult.item(self.currentRow, self.currentColumn).text())
+
         # 自定义计划数
         if self.currentColumn == 3:
             if self.disturbResult.item(self.currentRow, self.currentColumn).text() == '':

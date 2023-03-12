@@ -10,9 +10,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-import widgets.ComboCheckBox
 from widgets.ComboCheckBox import ComboCheckBox
-# from widgets.q import ComboCheckBox
 
 
 class widget_AllotSchedule(object):
@@ -151,6 +149,9 @@ class widget_AllotSchedule(object):
         # self.cb_schedule.addItem("")
 
         self.horizontalLayout_5.addWidget(self.cb_schedule)
+        self.pb_multiyearComparison = QtWidgets.QPushButton(Form)
+        self.pb_multiyearComparison.setObjectName("pb_multiyearComparison")
+        self.horizontalLayout_5.addWidget(self.pb_multiyearComparison)
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_5.addItem(spacerItem)
         self.verticalLayout_4.addLayout(self.horizontalLayout_5)
@@ -191,8 +192,9 @@ class widget_AllotSchedule(object):
         self.pb_secondSelect.setText(_translate("Form", "查询"))
         self.label.setText(_translate("Form", "调拨进度筛选："))
         self.cb_schedule.setItemText(0, _translate("Form", "全部"))
+        self.pb_multiyearComparison.setText(_translate("Form", "数据对比"))
         self.txt_disturbPlanYear.setHtml(_translate("Form", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'SimSun\'; font-size:9.07563pt; font-weight:400; font-style:normal;\">\n"
-"<p align=\"center\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:9pt;\"><br /></p></body></html>"))
+"</style></head><body style=\" font-family:\'SimSun\'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
+"<p align=\"center\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>"))

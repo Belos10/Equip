@@ -7,7 +7,6 @@ class showRocket(QDialog, widget_showRocket):
     def __init__(self, parent=None):
         super(showRocket, self).__init__(parent)
         self.setupUi(self)
-
         self.setWindowTitle("火箭军调拨单")
 
 

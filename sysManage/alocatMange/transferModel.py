@@ -310,6 +310,7 @@ class transferModel(QDialog, Widget_Transfer_Model):
                     self.requireInfoDict[str(i)] = requireInfo.copy()
                     page.updateTableWidget(requireInfo)
 
+    # 点击确定按钮完成前确认
     def slotClickedConfim(self):
         reply = getMessageBox('保存', '是否将调拨信息存入火箭军调拨单并已经导出调拨单？', True, True)
         if reply == QMessageBox.Cancel:
@@ -353,6 +354,7 @@ class transferModel(QDialog, Widget_Transfer_Model):
         self.totalModel = totalModel()
         self.totalModel.initTableWidget(self.unitInfoList, self.equipInfo, self.year, self.requireInfo)
         self.tw_transferModel.addTab(self.totalModel, "总单")
+        print("调配进度-火箭军调拨单unitInfoList", self.unitInfoList)
         for unitInfo, num in zip(unitInfoList, requireInfo[2: -2]):
             if num == "" or num == "0":
                 continue
@@ -457,7 +459,8 @@ class transferModel(QDialog, Widget_Transfer_Model):
         workSheet.write(15, 4, requireInfo[1], contentStyle)
 
         for i, unitInfo in enumerate(unitInfoList):
-            workSheet.write(14, 5 + i, unitInfo[3], contentStyle)
+            workSheet.write(14, 5 + i, unitInfo[1], contentStyle)
+            print("unitInfo[1]",unitInfo[1])
         workSheet.write(14, 0, '编号', contentStyle)
         workSheet.write(14, 1, '装备名称', contentStyle)
         workSheet.write(14, 2, '计量单位', contentStyle)
@@ -554,6 +557,7 @@ class transferModel(QDialog, Widget_Transfer_Model):
         workSheet.write_merge(14, 14 + crtRowCount - 24, crtColumnCount * 2 + 1,  crtColumnCount * 2 + 1, "第二联：发物单位留存",style)
         self.initSingleTable(pageIndex, workSheet, style,crtRowCount, crtColumnCount,unitInfo, equipInfo,requireInfo, crtColumnCount * 2 + 2)
         workSheet.write_merge(14, 14 + crtRowCount - 24, crtColumnCount * 3 + 2,  crtColumnCount * 3 + 3, "第三联：收物单位留存",style)
+
 
     def initExcelTotalTableLastFourRow(self, workSheet, stlye,crtColumnCount, first, second, third, fourth, row):
         half = int((crtColumnCount - 4) / 2)
