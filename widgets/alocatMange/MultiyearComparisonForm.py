@@ -9,12 +9,14 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtGui import QIcon
 
 
 class Widget_MultiyearComparison(object):
     def setupUi(self, Form):
-        Form.setObjectName("Form")
-        Form.resize(811, 592)
+        Form.setObjectName("数据对比")
+        Form.resize(900, 600)
+        Form.setWindowIcon(QIcon(":/pic/system.png"))
         self.horizontalLayout_7 = QtWidgets.QHBoxLayout(Form)
         self.horizontalLayout_7.setObjectName("horizontalLayout_7")
         self.groupBox = QtWidgets.QGroupBox(Form)
@@ -48,5 +50,6 @@ class Widget_MultiyearComparison(object):
 
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
-        Form.setWindowTitle(_translate("Form", "Form"))
+        Form.setWindowTitle(_translate("Form", "数据对比"))
         self.groupBox.setTitle(_translate("Form", "年份筛选"))
+        self.groupBox.setStyleSheet('color:black')

@@ -38,7 +38,8 @@ class Manage_Widgets(QMainWindow, Widget_Manage_Widgets):
         self.dictSelect = dictSelect()
         self.loginStatus = False
         # self.sysConfig = QWidget()s
-        self.setWindowTitle("核化装备管理系统")
+        # self.setWindowTitle("装备管理系统")
+        # self.setStyleSheet("color:black")
         self.setWindowIcon(QIcon(":/pic/system.png"))
         self.tb_ManageWidget.addTab(self.strengthDisturb, "实力分布")
         self.tb_ManageWidget.setCurrentIndex(0)

@@ -3,7 +3,7 @@
 # Author: jyroy
 import sys
 
-from PyQt5 import QtGui
+from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import QSize
 from PyQt5.QtWidgets import QApplication, QDesktopWidget
 from PyQt5.QtCore import Qt, pyqtSignal, QPoint
@@ -77,6 +77,12 @@ class TitleBar(QWidget):
         layout.addWidget(self.iconLabel)
         # 窗口标题
         self.titleLabel = QLabel(self)
+        self.titleLabel.setText(' 装备管理系统')
+        self.titleLabel.setStyleSheet('font-size:17px')
+        self.setIcon(QIcon(":/pic/system.png"))
+        # self.setIconSize(QtCore.QSize(5000, 255))
+
+
         self.titleLabel.setMargin(2)
         layout.addWidget(self.titleLabel)
         # 中间伸缩条
@@ -172,6 +178,8 @@ class FramelessWindow(QWidget):
         self.setAttribute(Qt.WA_TranslucentBackground, True)
         # 无边框
         self.setWindowFlags(Qt.FramelessWindowHint)  # 隐藏边框
+        # self.setWindowTitle("装备管理系统")
+        # self.setStyleSheet("color:black")
         # 鼠标跟踪
         self.setMouseTracking(True)
         # 布局

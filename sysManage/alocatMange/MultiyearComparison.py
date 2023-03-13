@@ -176,7 +176,7 @@ class MultiyearComparison(QWidget, Widget_MultiyearComparison):
                     item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
                     flag = selectIfUnitScheduleFinish(self.currentUnitChilddict[x][0],
                                                       self.currentEquipdict[0][0],
-                                                      self.currentYear)
+                                                      LineInfo)
                     if flag[0][0] == 'TRUE':
                         item.setForeground(QBrush(QColor(87, 102, 144)))
                     else:
@@ -326,10 +326,12 @@ class MultiyearComparison(QWidget, Widget_MultiyearComparison):
                     item1 = QTableWidgetItem("")
                     # 陆军调拨单进度
                     flag1 = selectArmySchedule(self.currentEquipdict[0][0], self.yearChooseList[i])
-                    if flag1[0][0] != '0':
+                    print("flag11111", flag1)
+                    if flag1[0][0] != '0' and flag1[0][0] is not None and flag1[0][0] != '':
                         item1.setText(str(flag1[0][0]))
                     else:
                         item1.setText("未完成")
+
                     self.disturbResult.setItem(i, 6 + self.lenCurrentUnitChilddict, item1)
 
                     item2 = QTableWidgetItem("")
@@ -353,7 +355,7 @@ class MultiyearComparison(QWidget, Widget_MultiyearComparison):
                     item4 = QTableWidgetItem("")
                     # 是否完成接装
                     flag4 = selectIfScheduleFinishUper(self.currentEquipdict[0][0], self.yearChooseList[i])
-                    if flag4[0][0] != '0':
+                    if flag4[0][0] != '0' and flag4[0][0] is not None and flag4[0][0] != "":
                         item4.setText("已完成")
                     else:
                         item4.setText("未完成")
@@ -384,7 +386,7 @@ class MultiyearComparison(QWidget, Widget_MultiyearComparison):
                     item4 = QTableWidgetItem("")
                     # 是否完成接装
                     flag4 = selectIfScheduleFinishBase(self.currentEquipdict[0][0], self.yearChooseList[i])
-                    if flag4[0][0] != '0':
+                    if flag4[0][0] != '0' and flag4[0][0] is not None and flag4[0][0] != '':
                         item4.setText("已完成")
                     else:
                         item4.setText("未完成")
