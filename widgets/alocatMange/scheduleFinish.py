@@ -13,7 +13,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 class widget_ScheduleFinish(object):
     def setupUi(self, Form):
-        Form.setObjectName("Form")
+        Form.setObjectName("完成接装")
         Form.resize(411, 309)
         self.verticalLayout = QtWidgets.QVBoxLayout(Form)
         self.verticalLayout.setObjectName("verticalLayout")

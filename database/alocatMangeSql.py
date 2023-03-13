@@ -171,6 +171,12 @@ def delArmyTransferYearByYear(year):
     conn.commit()
     #disconnectMySql(conn, cur)
 
+def delRocketTransferByIDAndYear(iD, year):
+    sql = "delete from rockettransfer where Equip_ID = '" + iD + "' and year = '" + year + "'"
+    # print(sql)
+    cur.execute(sql)
+    conn.commit()
+
 #向火箭军调拨单年份表中添加年份
 def insertIntoRocketTransferYear(year):
     #conn, cur = connectMySql()

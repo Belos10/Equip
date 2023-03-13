@@ -7,10 +7,9 @@ from database.alocatMangeSql import selectIfUnitScheduleFinish, updateUnitSchedu
 from PyQt5 import sip
 from sysManage.component import getMessageBox
 
-
+# 完成接装按钮 弹出界面
 class ScheduleFinish(QWidget, widget_ScheduleFinish):
     signal = QtCore.pyqtSignal(str)
-
     def __init__(self, parent=None):
         super(ScheduleFinish, self).__init__(parent)
         self.setupUi(self)
@@ -84,7 +83,7 @@ class ScheduleFinish(QWidget, widget_ScheduleFinish):
             #     self.layout1.removeWidget(btn)
             #     # btn.deleteLater()
             #     sip.delete(btn)
-            for idx in range(self.layout1.count()+1,1,-1):
+            for idx in range(self.layout1.count()+1, 1, -1):
                 # print("idx ===",idx)
                 wid = self.layout1.itemAt(idx-2).widget()
                 self.layout1.removeWidget(wid)
@@ -100,11 +99,12 @@ class ScheduleFinish(QWidget, widget_ScheduleFinish):
             # bbb = self.layout1.count()
             # print("bbb=",bbb)
 
-            print("Schedule::: self.UnitDict = ", self.UnitDict, "self.equipID = ", self.equipID)
+            # print("Schedule::: self.UnitDict = ", self.UnitDict, "self.equipID = ", self.equipID)
             for key,item in self.UnitDict.items():
                 flag = selectIfUnitScheduleFinish(self.UnitDict[key][0], self.equipID, self.year)
                 cb = QCheckBox()
                 cb.setText(item[1])
+                cb.setStyleSheet("color:black；background:white")
                 if flag[0][0] == 'TRUE':
                     cb.setChecked(True)
                 else:
@@ -133,14 +133,9 @@ class ScheduleFinish(QWidget, widget_ScheduleFinish):
 
 
     def ifUnitScheduleFinish(self):
-        aaa= self.layout1.count()
-        print("self.layout1.count()=", aaa)
         for i in range(self.layout1.count()):
             self.key = i
-            # print("i=====",i)
-            # flag = 'TRUE'
             flag = selectIfUnitScheduleFinish(self.UnitDict[i][0], self.equipID, self.year)
-            # print("flag = ",flag)
             if not flag[0][0] == 'TRUE':
                 self.layout1.itemAt(i).widget().clicked.connect(self.setUnitScheduleFinish)
 

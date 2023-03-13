@@ -687,6 +687,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                     updateAllotConditionUper(self.currentEquipdict[currentRow][0], self.currentYear, '0')
                 if currentColumn == 7 + self.lenCurrentUnitChilddict:
                     updateRocketScheduleUper(self.currentEquipdict[currentRow][0], self.currentYear, '0')
+                    delRocketTransferByIDAndYear(self.currentEquipdict[currentRow][0], self.currentYear)
                 if currentColumn == 8 + self.lenCurrentUnitChilddict:
                     updateScheduleFinishUper(self.currentEquipdict[currentRow][0], self.currentYear, '0')
                 item = QPushButton("设置进度")
@@ -732,7 +733,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         if self.disturbResult.cellWidget(currentRow, currentColumn - 1).text() == "设置进度":
             getMessageBox("设置接装条件", "上一级未完成", True, False)
             return
-        reply = getMessageBox("设置接装条件","是否具备接装条件？", True, False)
+        reply = getMessageBox("设置接装条件", "是否具备接装条件？", True, True)
         if reply==QMessageBox.Ok:
             item = QPushButton("已完成")
             item.setStyleSheet("background-color : rgba(154,200,226,255)")
