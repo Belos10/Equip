@@ -8,6 +8,7 @@ from sysManage.alocatMange.transferModel import transferModel
 from sysManage.alocatMange.MultiyearComparison import MultiyearComparison
 from sysManage.component import getMessageBox
 from sysManage.userInfo import get_value
+from sysManage.alocatMange.showRocket import showRocket
 from utills.Search import selectUnit
 from widgets.alocatMange.allotSchedule import widget_AllotSchedule
 
@@ -690,6 +691,8 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                     delRocketTransferByIDAndYear(self.currentEquipdict[currentRow][0], self.currentYear)
                 if currentColumn == 8 + self.lenCurrentUnitChilddict:
                     updateScheduleFinishUper(self.currentEquipdict[currentRow][0], self.currentYear, '0')
+                    for v in self.currentUnitChilddict.values():
+                        updateUnitScheduleFinish(v[0], self.currentEquipdict[currentRow][0], self.currentYear,False)
                 item = QPushButton("设置进度")
                 self.disturbResult.setCellWidget(currentRow, currentColumn, item)
             elif self.unitFlag == 2:
@@ -790,6 +793,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
             updateRocketScheduleBase(self.currentEquipdict[currentRow][0], self.currentYear, '1')
             item.clicked.connect(self.showRocket)
 
+    # 展示火箭军调拨单
     def showRocket(self):
         row = self.disturbResult.currentRow()
         currentColumn = self.disturbResult.currentColumn()

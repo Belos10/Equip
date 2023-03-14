@@ -19,7 +19,6 @@ class transferModel(QDialog, Widget_Transfer_Model):
     def __init__(self, parent=None):
         super(transferModel, self).__init__(parent)
         self.setupUi(self)
-
         self.unitNum = 0
         self.currentSingelUnitPage = {}
         self.currentUnitInfoList = []
@@ -354,7 +353,6 @@ class transferModel(QDialog, Widget_Transfer_Model):
         self.totalModel = totalModel()
         self.totalModel.initTableWidget(self.unitInfoList, self.equipInfo, self.year, self.requireInfo)
         self.tw_transferModel.addTab(self.totalModel, "总单")
-        print("调配进度-火箭军调拨单unitInfoList", self.unitInfoList)
         for unitInfo, num in zip(unitInfoList, requireInfo[2: -2]):
             if num == "" or num == "0":
                 continue

@@ -261,3 +261,35 @@ class showRocket(QDialog, widget_showRocket):
         item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
         self.tw_ditalModel.setItem(row, half + 4, item)
         self.tw_ditalModel.setSpan(row, half + 4, 1, self.crtColumnCount - half - 3)
+
+
+    def getUnitIDList(self, unitInfoList, equipInfo, year, requireInfo):
+        # if unitInfoList == "" and equipInfo =="" and  year =="" and  requireInfo == "":
+        #     self.pb_input.setDisabled(True)
+        #     self.pb_output.setDisabled(True)
+        #     self.pb_saveTotal.setDisabled(True)
+        #     self.pb_saveSingle.setDisabled(True)
+        #     self.pb_confirm.setDisabled(True)
+        #     return
+        # self.pb_input.setDisabled(False)
+        # self.pb_output.setDisabled(False)
+        # self.pb_saveTotal.setDisabled(False)
+        # self.pb_saveSingle.setDisabled(False)
+        # self.pb_confirm.setDisabled(False)
+        self.unitInfoList = unitInfoList
+        self.equipInfo = equipInfo
+        self.year = year
+        self.requireInfo = requireInfo
+        self.unitNum = len(unitInfoList)
+        self.currentUnitInfoList = unitInfoList
+        self.tw_ditalModel.clear()
+        self.totalModel = totalModel()
+        self.totalModel.initTableWidget(self.unitInfoList, self.equipInfo, self.year, self.requireInfo)
+        self.tw_transferModel.addTab(self.totalModel, "总单")
+        for unitInfo, num in zip(unitInfoList, requireInfo[2: -2]):
+            if num == "" or num == "0":
+                continue
+            page = singleModel()
+            self.tw_transferModel.addTab(page, unitInfo[0])
+            self.currentSingelUnitPage[unitInfo[0]] = page
+            page.initTableWidget(unitInfo, self.equipInfo,self.year)

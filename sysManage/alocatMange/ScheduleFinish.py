@@ -104,7 +104,7 @@ class ScheduleFinish(QWidget, widget_ScheduleFinish):
                 flag = selectIfUnitScheduleFinish(self.UnitDict[key][0], self.equipID, self.year)
                 cb = QCheckBox()
                 cb.setText(item[1])
-                cb.setStyleSheet("color:black；background:white")
+                # cb.setStyleSheet("color:black；background:white")
                 if flag[0][0] == 'TRUE':
                     cb.setChecked(True)
                 else:
@@ -133,6 +133,8 @@ class ScheduleFinish(QWidget, widget_ScheduleFinish):
 
 
     def ifUnitScheduleFinish(self):
+        aaa= self.layout1.count()
+        print("self.layout1.count()=", aaa)
         for i in range(self.layout1.count()):
             self.key = i
             flag = selectIfUnitScheduleFinish(self.UnitDict[i][0], self.equipID, self.year)
@@ -143,7 +145,7 @@ class ScheduleFinish(QWidget, widget_ScheduleFinish):
     def setUnitScheduleFinish(self):
         reply = getMessageBox("设置完成接装", "该单位是否完成接装？", True, True)
         if reply == QMessageBox.Ok:
-            updateUnitScheduleFinish(self.UnitDict[self.key][0], self.equipID, self.year)
+            updateUnitScheduleFinish(self.UnitDict[self.key][0], self.equipID, self.year, True)
             self.layout1.itemAt(self.key).widget().setText("已完成")
             self.initUnitFinish()
 
