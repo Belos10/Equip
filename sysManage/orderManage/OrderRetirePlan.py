@@ -462,7 +462,8 @@ class OrderRetirePlan(QWidget, retirePlan_Form):
                 originStrengthNum = selectStrengthNum(self.currentUnitChilddict[self.currentColumn - 3][0],
                                                       self.currentEquipdict[self.currentRow][0], self.currentYear)
                 # print("originRetirePlanNum", originRetirePlanNum, "originStrengthNum", originStrengthNum)
-                if originStrengthNum[0] != '':
+                print('originStrengthNum: ', originStrengthNum)
+                if originStrengthNum != None and originStrengthNum[0] != '':
                     updateOrderRetirePlanNum(self.currentEquipdict[self.currentRow][0],
                                              self.currentUnitChilddict[self.currentColumn - 3][0],
                                              self.currentYear, num, originRetirePlanNum[0])
