@@ -13,7 +13,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 class widget_ScheduleFinish(object):
     def setupUi(self, Form):
-        Form.setObjectName("完成接装")
+        Form.setObjectName("Form")
         Form.resize(411, 309)
         self.verticalLayout = QtWidgets.QVBoxLayout(Form)
         self.verticalLayout.setObjectName("verticalLayout")
@@ -44,6 +44,11 @@ class widget_ScheduleFinish(object):
         self.verticalLayout.addWidget(self.w1_vbox)
         self.w2_hbox = QtWidgets.QWidget(Form)
         self.w2_hbox.setObjectName("w2_hbox")
+        self.horizontalLayout_3 = QtWidgets.QHBoxLayout(self.w2_hbox)
+        self.horizontalLayout_3.setObjectName("horizontalLayout_3")
+        self.columnView = QtWidgets.QColumnView(self.w2_hbox)
+        self.columnView.setObjectName("columnView")
+        self.horizontalLayout_3.addWidget(self.columnView)
         self.verticalLayout.addWidget(self.w2_hbox)
         self.verticalLayout.setStretch(0, 5)
         self.verticalLayout.setStretch(1, 5)

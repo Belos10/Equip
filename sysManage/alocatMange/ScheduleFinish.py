@@ -110,6 +110,7 @@ class ScheduleFinish(QWidget, widget_ScheduleFinish):
                 else:
                     cb.setChecked(False)
                 self.layout1.addWidget(cb)
+
             self.w2_hbox.setLayout(self.layout1)
 
 
