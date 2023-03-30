@@ -162,12 +162,12 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
             if index in equipIndexSet:
                 haveEquipIndex = True
             equipIndexSet.add(index)
-            if haveEquip:
-                getMessageBox('新增', '第' + str(i + addRow - 1) + '行添加失败，当前年份该装备已录入', True, False)
-                continue
-            if haveEquipIndex:
-                getMessageBox('新增', '第' + str(i + addRow - 1) + '行添加失败，不可重复添加相同装备', True, False)
-                continue
+            # if haveEquip:
+            #     getMessageBox('新增', '第' + str(i + addRow - 1) + '行添加失败，当前年份该装备已录入', True, False)
+            #     continue
+            # if haveEquipIndex:
+            #     getMessageBox('新增', '第' + str(i + addRow - 1) + '行添加失败，不可重复添加相同装备', True, False)
+            #     continue
             if self.tw_result.item(i + addRow, 1):
                 Trans_ID = self.tw_result.item(i + addRow, 1).text()
             else:
