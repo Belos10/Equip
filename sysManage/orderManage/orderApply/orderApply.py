@@ -111,7 +111,7 @@ class OrderApply(QWidget, Widget_Retirement):
         year = 0
         ok, year = getIntInputDialog("新增年份", "年份:", 0, 100000, 1, True, True)
 
-        if year:
+        if ok:
             allyearInfo = selectAllOrderApplyYearInfo()
             haveYear = False
             for yearInfo in allyearInfo:

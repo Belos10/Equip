@@ -18,7 +18,7 @@ class rocketTransfer(QWidget, Widget_Rocket_Transfer):
         self.tw_result.horizontalHeader().setVisible(False)
         self.tw_result.verticalHeader().setVisible(False)
         #self.showRocket = showRocket()
-        self._initYearWidget_()
+        self._initSelf_()
         self._initResultHeader_()
 
         self.signalConnect()
@@ -30,6 +30,13 @@ class rocketTransfer(QWidget, Widget_Rocket_Transfer):
         self.lw_yearChoose.itemPressed.connect(self.slotSelectResult)
         self.pb_outputToExcel.clicked.connect(self.slotOutputToExcel)
 
+
+    def _initSelf_(self):
+        self.tw_result.clear()
+        self.tw_result.setRowCount(0)
+        self.tw_result.setColumnCount(0)
+        self.groupBox_2.setDisabled(1)
+        self._initYearWidget_()
 
     def _initYearWidget_(self):
         self.yearList = []

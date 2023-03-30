@@ -79,6 +79,8 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
     '''
     def _initSelf_(self):
         self.tw_result.clear()
+        self.tw_result.setColumnCount(0)
+        self.tw_result.setRowCount(0)
         self.groupBox_2.setDisabled(True)
         #初始化年份listwidget
         self._initYearWidget_()
@@ -265,7 +267,7 @@ class armyTransfer(QWidget, Widget_Army_Transfer):
     def slotAddNewYear(self):
         year = 0
         ok, year = getIntInputDialog("新增年份", "年份:", 0, 100000, 1, True, True)
-        if year:
+        if ok:
             insertIntoArmyTransferYear(year)
             self._initYearWidget_()
 

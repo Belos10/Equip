@@ -14,7 +14,7 @@ from PyQt5.Qt import Qt
 from sysManage.userInfo import get_value
 
 '''
-   编制数维护
+   申请退役
 '''
 class retirement(QWidget, Widget_Retirement):
     def __init__(self, parent=None):
@@ -34,9 +34,10 @@ class retirement(QWidget, Widget_Retirement):
         self._initAll_()
         self.signalConnect()
 
-        # 初始化编制数维护界面
+        # 初始化界面
     def getUserInfo(self):
         self.userInfo = get_value("totleUserInfo")
+
     def _initAll_(self):
         self.getUserInfo()
         self.tw_result.setRowCount(0)
@@ -108,7 +109,7 @@ class retirement(QWidget, Widget_Retirement):
     def slotAddNewYear(self):
         year = 0
         ok, year = getIntInputDialog("新增年份", "年份:", 0, 100000, 1, True, True)
-        if year:
+        if ok:
             allyearInfo = selectAllRetirementYearInfo()
             haveYear = False
             for yearInfo in allyearInfo:
