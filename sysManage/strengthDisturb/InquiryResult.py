@@ -308,10 +308,10 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                         # equipHaveChild = selectEquipIsHaveChild(Equip_ID)
                         if self.NewStrength == str(resultInfo[4]):
                             return
-                        if self.currentFactoryYear != "":
-                            getMessageBox('清除', '清除失败,请将出厂年份设置为全部', True, False)
-                            self.tw_inquiryResult.item(currentRow, currentColumn).setText(resultInfo[4])
-                            return
+                        # if self.currentFactoryYear != "":
+                        #     getMessageBox('修改', '修改失败,请将出厂年份设置为全部', True, False)
+                        #     self.tw_inquiryResult.item(currentRow, currentColumn).setText(str(resultInfo[4]))
+                        #     return
                         # if unitHaveChild or equipHaveChild:
                         #     reply = QMessageBox.question(self, '修改', '只能修改末级实力数，修改失败', QMessageBox.Yes)
                         #     self.tw_inquiryResult.item(currentRow, currentColumn).setText(str(resultInfo[4]))
@@ -385,6 +385,8 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
             self.rb_equipShow.setDisabled(False)
             self.rb_unitShow.setDisabled(False)
 
+        if self.resultList is None:
+            self.resultList = []
         self.tw_inquiryResult.setRowCount(len(self.resultList))
         isMinyear = selectIsMinStrengthYear(year)
         i = 0

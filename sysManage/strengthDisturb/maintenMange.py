@@ -53,6 +53,9 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
         #self.first_treeWidget_dict[self.userInfo[0][4]] = item
         self._initUnitTreeWidget("", self.tw_first)
         self._initStrenInquiry()
+        self.tw_result.clear()
+        self.tw_result.setRowCount(0)
+        self.tw_result.setColumnCount(0)
         self.currentYear = None
         self.currentInquiryResult = {}
         self.resultList = []
@@ -125,22 +128,31 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
                     else:
                         try:
                             weave = self.tw_result.cellWidget(self.currentRow, 3).text()
-                            reply = getMessageBox('修改', '是否修改当前装备、单位的编制数?', True, True)
-                            if reply == QMessageBox.Ok:
-                                updataSuccess = updateWeaveNum(resultRowInfo[0], resultRowInfo[1], self.tw_result.cellWidget(self.currentRow, 3).text(), str(resultRowInfo[5]), self.year)
-                                if updataSuccess != True:
-                                    getMessageBox(self, "修改", str(updataSuccess) + "修改失败", True, False)
-                                    return
+                            updataSuccess = updateWeaveNum(resultRowInfo[0], resultRowInfo[1],
+                                                           self.tw_result.cellWidget(self.currentRow, 3).text(),
+                                                           str(resultRowInfo[5]), self.year)
+                            self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
+                            return
 
-                                #updateOneEquipmentBalanceData(self.year, resultRowInfo[0],resultRowInfo[1])
-                                self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
-                                return
-                            else:
-                                self.tw_result.cellWidget(self.currentRow, 3).setText(str(resultRowInfo[5]))
-                                return
+                        # try:
+                        #     weave = self.tw_result.cellWidget(self.currentRow, 3).text()
+                        #     reply = getMessageBox('修改', '是否修改当前装备、单位的编制数?', True, True)
+                        #     if reply == QMessageBox.Ok:
+                        #         updataSuccess = updateWeaveNum(resultRowInfo[0], resultRowInfo[1], self.tw_result.cellWidget(self.currentRow, 3).text(), str(resultRowInfo[5]), self.year)
+                        #         if updataSuccess != True:
+                        #             getMessageBox(self, "修改", str(updataSuccess) + "修改失败", True, False)
+                        #             return
+                        #
+                        #         #updateOneEquipmentBalanceData(self.year, resultRowInfo[0],resultRowInfo[1])
+                        #         self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
+                        #         return
+                        #     else:
+                        #         self.tw_result.cellWidget(self.currentRow, 3).setText(str(resultRowInfo[5]))
+                        #         return
                         except ValueError:
                             getMessageBox('修改', '编制数只能修改为整数?', True, False)
                             self.tw_result.cellWidget(self.currentRow, 3).setText(str(resultRowInfo[5]))
+                            self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
                             return
         else:
             pass
@@ -360,17 +372,27 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
             if equipItem.checkState(0) == Qt.Checked:
                 self.currentCheckedEquipList.append(equipID)
 
-        print("----------装备单位列表---------")
-        print(self.currentCheckedUnitList)
-        print(self.currentCheckedEquipList)
-        if self.currentCheckedUnitList == [] or self.currentCheckedEquipList == []:
+        # print("----------装备单位列表---------")
+        # print(self.currentCheckedUnitList)
+        # print(self.currentCheckedEquipList)
+        # if self.currentCheckedUnitList == [] or self.currentCheckedEquipList == []:
+        #     headerlist = ['单位名称', '装备名称', '实力数', '编制数', '现有数']
+        #     self.tw_result.setHorizontalHeaderLabels(headerlist)
+        #     self.currentInquiryResult.clear()
+        #     self.tw_result.setColumnCount(len(headerlist))
+        #     self.tw_result.setRowCount(0)
+        #     return
+        if len(self.currentCheckedUnitList) > 0 and len(self.currentCheckedUnitList) > 0:
+            self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList, self.currentYear)
+        else:
             headerlist = ['单位名称', '装备名称', '实力数', '编制数', '现有数']
             self.tw_result.setHorizontalHeaderLabels(headerlist)
-            self.currentInquiryResult.clear()
             self.tw_result.setColumnCount(len(headerlist))
             self.tw_result.setRowCount(0)
-            return
-        self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList, self.currentYear)
+            # self.currentInquiryResult.clear()
+            pass
+
+
 
     # 初始化tableWidget
     def _initTableWidgetByUnitListAndEquipList(self, UnitList, EquipList, year):
@@ -419,13 +441,12 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
             self.tw_result.setItem(i, 2, item)
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
 
-            item = QLineEdit()
-            item.setText(str(LineInfo[5]))
-            item.textChanged.connect(self.slotResultItemChange)
-            item.setStyleSheet("background:white;border-width:0;color:black")
+            item = QTableWidgetItem(str(LineInfo[5]))
+            # item.textChanged.connect(self.slotResultItemChange)
+            # item.setStyleSheet("background:white;border-width:0;color:black")
             validator = QRegExpValidator(regx)
-            item.setValidator(validator)
-            self.tw_result.setCellWidget(i, 3, item)
+            # item.setValidator(validator)
+            self.tw_result.setItem(i, 3, item)
             item = QTableWidgetItem(str(LineInfo[6]))
 
             self.tw_result.setItem(i, 4, item)

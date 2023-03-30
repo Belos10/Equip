@@ -124,6 +124,7 @@ class OrderApply(QWidget, Widget_Retirement):
             insertIntoOrderApplyYear(year)
             self._initSelectYear_()
 
+
     '''
            功能：
                点击查询按钮时，设置当前可选项和不可选项，并初始化装备和单位目录
