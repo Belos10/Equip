@@ -528,26 +528,33 @@ class DisturbPlan(QWidget, yearList_Form):
         if 5 <= self.currentColumn <= self.lenHeaderList - 2:
             try:
                 num = self.disturbResult.item(self.currentRow, self.currentColumn).text()
-                self.initDisturbPlanSum()
-                self.updateDisturbPlanSumEachUnit()
+                # self.initDisturbPlanSum()
+                # self.updateDisturbPlanSumEachUnit()
                 originDisturbPlanNum = selectDisturbPlanNumByList({0: self.currentUnitChilddict[self.currentColumn - 5]},
                                                                   {0: self.currentEquipdict[self.currentRow]},
                                                                   self.currentYear)
                 originStrengthNum = selectStrengthNum(self.currentUnitChilddict[self.currentColumn - 5][0],
                                                       self.currentEquipdict[self.currentRow][0], self.currentYear)
                 print("originDisturbPlanNum", originDisturbPlanNum, "originStrengthNum", originStrengthNum)
-                if len(originStrengthNum) > 0 and originStrengthNum[0] != '':
+                if originDisturbPlanNum[0] != '' and len(originStrengthNum) > 0 and originStrengthNum[0] != '' and originStrengthNum[0] != 0:
                     updateDisturbPlanNum(self.currentEquipdict[self.currentRow][0],
                                          self.currentUnitChilddict[self.currentColumn - 5][0],
                                          self.currentYear, num, originDisturbPlanNum[0])
                     updateOneEquipmentBalanceData(self.currentYear, self.currentEquipdict[self.currentRow][0],
                                                   self.currentUnitChilddict[self.currentColumn - 5][0])
-                    # self.initDisturbPlanSum()
+                    self.initDisturbPlanSum()
+                    self.updateDisturbPlanSumEachUnit()
                 else:
                     getMessageBox("提示", "未填写实力数", True, False)
+                    self._initDisturbPlanByUnitListAndEquipList()
+                    # self.disturbResult.item(self.currentRow, self.currentColumn).setText("")
             except ValueError:
                 getMessageBox("提示", "请输入数字", True, False)
-                self.disturbResult.item(self.currentRow, self.currentColumn).setText("")
+                self._initDisturbPlanByUnitListAndEquipList()
+            except IndexError:
+                getMessageBox("提示", "操作有误", True, False)
+                self._initDisturbPlanByUnitListAndEquipList()
+
 
         # 备注
         if self.currentColumn == self.lenHeaderList - 1:
