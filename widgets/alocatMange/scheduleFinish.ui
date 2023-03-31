@@ -96,11 +96,7 @@
    </item>
    <item>
     <widget class="QWidget" name="w2_hbox" native="true">
-     <layout class="QHBoxLayout" name="horizontalLayout_3">
-      <item>
-       <widget class="QColumnView" name="columnView"/>
-      </item>
-     </layout>
+     <layout class="QHBoxLayout" name="horizontalLayout_3"/>
     </widget>
    </item>
   </layout>

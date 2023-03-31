@@ -104,7 +104,13 @@ class ScheduleFinish(QWidget, widget_ScheduleFinish):
                 flag = selectIfUnitScheduleFinish(self.UnitDict[key][0], self.equipID, self.year)
                 cb = QCheckBox()
                 cb.setText(item[1])
-                cb.setStyleSheet("color:black；background-color:white")
+
+                cb.setStyleSheet(
+                        '''
+                        QCheckBox{ color:black;
+    background-color:white;} 
+                        '''
+                )
                 if flag[0][0] == 'TRUE':
                     cb.setChecked(True)
                 else:
@@ -112,6 +118,7 @@ class ScheduleFinish(QWidget, widget_ScheduleFinish):
                 self.layout1.addWidget(cb)
 
             self.w2_hbox.setLayout(self.layout1)
+            # self.w2_hbox.setStyleSheet("color:black；background-color:white")
 
 
             # print("self.UnitDict = ", self.UnitDict, "self.equipID = ", self.equipID)
