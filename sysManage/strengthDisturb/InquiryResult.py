@@ -373,8 +373,10 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         else:
             self.resultList = selectAboutStrengthByUnitListAndEquipList(UnitList, EquipList, year, self.currentFactoryYear, self.startFactoryYear, self.endFactoryYear,flagValue0)
 
+        # 按末级展开
         if self.cb_showLast.isChecked():
             self.resultList = selectAboutStrengthByLast(UnitList, EquipList, year, self.currentFactoryYear, self.startFactoryYear, self.endFactoryYear,flagValue0)
+
             self.rb_unitShow.setCheckable(False)
             self.rb_equipShow.setCheckable(False)
             self.rb_equipShow.setDisabled(True)

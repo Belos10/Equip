@@ -9,6 +9,9 @@ from utills.Search import selectUnit
 from widgets.strengthDisturb.select_setEquip import widget_Select_SetEquip
 from sysManage.userInfo import get_value
 from sysManage.component import getMessageBox
+'''
+    目录设置-装备目录设置
+'''
 
 class select_setEquip(QWidget,widget_Select_SetEquip):
     def __init__(self,parent=None):

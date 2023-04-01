@@ -8,7 +8,9 @@ from widgets.strengthDisturb.select_setUnit import widget_Select_SetUnit
 from sysManage.showInputResult import showInputResult
 from sysManage.userInfo import get_value
 from sysManage.component import getMessageBox, getTextInputDialog
-
+'''
+    目录设置-设置单位目录
+'''
 
 class select_setUnit(QWidget,widget_Select_SetUnit):
     def __init__(self,parent=None):

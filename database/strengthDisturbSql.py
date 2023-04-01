@@ -1699,6 +1699,8 @@ def selectAboutStrengthByLast(UnitList, EquipList, year, equipYear, startFactory
     if findSuccess != True:
         return []
 
+    print('flagValue0')
+    print(flagValue0)
     if equipYear == "":
         if flagValue0:
             unitSpace = ""
@@ -3178,8 +3180,11 @@ def selectStrengthNum(unitID, EquipID, year):
 
 # 查询实力信息
 def selectStrengthInfo(unitID, EquipID, year):
+
     sql = "select * from strength where Equip_ID = '" + \
           EquipID + "' and Unit_ID = '" + unitID + "' and year = '" + year + "'"
+
+    cur.execute(sql)
     result = cur.fetchall()
     return result
 
