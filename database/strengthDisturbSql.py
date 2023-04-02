@@ -46,7 +46,6 @@ def selectPubilcEquipInfoByGroup(Unit_ID):
     sql = "select * from publicequip where Group_ID = '" + Unit_ID + "'"
     cur.execute(sql)
     result = cur.fetchall()
-    print("-----------------", result)
     return result
 
 '''
@@ -232,8 +231,6 @@ def add_UnitDictEquip(Equip_ID, Equip_Name, Equip_Uper):
     # 插入的sql语句
     sql = "INSERT INTO equip (Equip_ID, Equip_Name, Equip_Uper) VALUES" \
           + "('" + Equip_ID + "','" + Equip_Name + "','" + Equip_Uper + "')"
-    # print(sql)
-    # print(sql)
     # 执行sql语句，并发送给数据库
     cur.execute(sql)
     conn.commit()
@@ -244,7 +241,6 @@ def update_Equip_Dict(Equip_ID, Equip_Name, Equip_Uper):
     # 插入的sql语句
     sql = "Update equip set Equip_Name = '" + Equip_Name + "', Equip_Uper = '" + Equip_Uper \
           + "' where Equip_ID = '" + Equip_ID + "'"
-    # print(sql)
     # 执行sql语句，并发送给数据库
     cur.execute(sql)
     conn.commit()
@@ -254,7 +250,6 @@ def update_Equip_Dict(Equip_ID, Equip_Name, Equip_Uper):
 def del_Equip_And_Child(Equip_ID, Equip_Uper):
     # 插入的sql语句
     sql = "delete from equip where Equip_ID = '" + Equip_ID + "'" + "and Equip_Uper = '" + Equip_Uper + "'"
-    # print(sql)
     # 执行sql语句，并发送给数据库
     cur.execute(sql)
     conn.commit()
@@ -265,8 +260,6 @@ def selectUnitInfoByDeptUper(Unit_Uper):
     sql = "select * from unit where Unit_Uper = '" + Unit_Uper + "'"
     cur.execute(sql)
     result = cur.fetchall()
-    # 测试结果
-    # print(result)
     return result
 
 
@@ -275,8 +268,6 @@ def selectDisturbPlanUnitInfoByDeptUper(Unit_Uper):
     sql = "select * from disturbplanunit where Unit_Uper = '" + Unit_Uper + "'"
     cur.execute(sql)
     result = cur.fetchall()
-    # 测试结果
-    # print(result)
     return result
 
 
@@ -285,8 +276,6 @@ def selectAllDataAboutDisturbPlanUnit():
     sql = "select * from disturbplanunit order by Unit_ID"
     cur.execute(sql)
     result = cur.fetchall()
-    # 测试结果
-    # print(result)
     return result
 
 
@@ -295,8 +284,6 @@ def selectAllDataAboutDisturbPlanUnitExceptFirst():
     sql = "select * from disturbplanunit where Unit_Uper != ''"
     cur.execute(sql)
     result = cur.fetchall()
-    # 测试结果
-    # print(result)
     return result
 
 
@@ -310,9 +297,6 @@ def selectAllDataAboutUnit(resultList):
     result = cur.fetchall()
     for resultInfo in result:
         resultList.append(resultInfo)
-    # 测试结果
-    #print("单位表所有数据result",result)
-
     return True
 
 
@@ -429,7 +413,6 @@ def addDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper, Unit_Alias, Is_Group):
     # 插入的sql语句
     sql = "INSERT INTO unit (Unit_ID, Unit_Name, Unit_Uper,Unit_Alias, Is_Group) VALUES" \
           + "('" + Unit_ID + "','" + Unit_Name + "','" + Unit_Uper + "', '" + Unit_Alias + "', '" + Is_Group + "')"
-    # print(sql)
     # 执行sql语句，并发送给数据库
     try:
         cur.execute(sql)
@@ -449,7 +432,6 @@ def addDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper, Unit_Alias, Is_Group):
     orderallotplanYearInfoTuple = selectYearListAboutOrderPlan()
     retireplanYearInfoTuple = selectYearListAboutRetirePlan()
     orderretireplanYearInfoTuple = selectYearListAboutOrderRetirePlan()
-    print("test:     ", equipInfoTuple)
     for equipInfo in equipInfoTuple:
         for strengthYearInfo in strengthYearInfoTuple:
             sql = "INSERT INTO strength (Equip_ID, Unit_ID, Equip_Name, Unit_Name, Strength, Work, Now, Error, Retire, Delay, Pre, NonObject," \
@@ -530,7 +512,6 @@ def addDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type, E
     sql = "INSERT INTO equip (Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type, unit) VALUES" \
           + "('" + Equip_ID + "','" + Equip_Name + "','" + Equip_Uper + "','" + Input_Type + "','" + Equip_Type + "', '"\
           + Equip_Unit + "')"
-    # print(sql)
     # 执行sql语句，并发送给数据库
     try:
         cur.execute(sql)
@@ -549,7 +530,6 @@ def addDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type, E
     retireplanYearInfoTuple = selectYearListAboutRetirePlan()
     orderretireplanYearInfoTuple = selectYearListAboutOrderRetirePlan()
     orderadjustYearInfoTuple = selectYearListAboutOrderAdjust()
-    print(unitInfoTuple)
     for publicEquip in publicEquipInfoList:
         for strengthYearInfo in strengthYearInfoTuple:
 
@@ -709,7 +689,6 @@ def addDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type, E
 def updateDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper, Unit_Alias):
     # 插入的sql语句
     sql = "Update unit set Unit_Name = '" + Unit_Name + "', Unit_Uper = '" + Unit_Uper + "', Unit_Alias = '" + Unit_Alias + "' where Unit_ID = '" + Unit_ID + "'"
-    # print(sql)
     # 执行sql语句，并发送给数据库
     try:
         cur.execute(sql)
@@ -718,7 +697,6 @@ def updateDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper, Unit_Alias):
         return e
 
     sql = "Update strength set Unit_Name = '" + Unit_Name + "' where Unit_ID = '" + Unit_ID + "'"
-    # print(sql)
     try:
         cur.execute(sql)
     except Exception as e:
@@ -726,7 +704,6 @@ def updateDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper, Unit_Alias):
         return e
 
     sql = "Update weave set Unit_Name = '" + Unit_Name + "' where Unit_ID = '" + Unit_ID + "'"
-    # print(sql)
     try:
         cur.execute(sql)
     except Exception as e:
@@ -734,7 +711,6 @@ def updateDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper, Unit_Alias):
         return e
 
     sql = "Update disturbplan set Unit_Name = '" + Unit_Name + "' where Unit_ID = '" + Unit_ID + "'"
-    # print(sql)
     try:
         cur.execute(sql)
     except Exception as e:
@@ -742,7 +718,6 @@ def updateDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper, Unit_Alias):
         return e
 
     sql = "Update disturbplanunit set Unit_Name = '" + Unit_Name + "', Unit_Uper = '" + Unit_Uper + "', Unit_Alias = '" + Unit_Alias + "' where Unit_ID = '" + Unit_ID + "'"
-    # print(sql)
     try:
         cur.execute(sql)
     except Exception as e:
@@ -750,7 +725,6 @@ def updateDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper, Unit_Alias):
         return e
 
     sql = "Update retireplan set Unit_Name = '" + Unit_Name + "' where Unit_ID = '" + Unit_ID + "'"
-    # print(sql)
     try:
         cur.execute(sql)
     except Exception as e:
@@ -758,7 +732,6 @@ def updateDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper, Unit_Alias):
         return e
 
     sql = "Update orderallotplan set Unit_Name = '" + Unit_Name + "' where Unit_ID = '" + Unit_ID + "'"
-    # print(sql)
     try:
         cur.execute(sql)
     except Exception as e:
@@ -766,7 +739,6 @@ def updateDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper, Unit_Alias):
         return e
 
     sql = "Update orderretireplan set Unit_Name = '" + Unit_Name + "' where Unit_ID = '" + Unit_ID + "'"
-    # print(sql)
     try:
         cur.execute(sql)
     except Exception as e:
@@ -800,7 +772,6 @@ def updateDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type
     # 插入的sql语句
     sql = "Update equip set Equip_Name = '" + Equip_Name + "', Equip_Uper = '" + Equip_Uper + "', Input_Type = '" + Input_Type + \
           "', Equip_Type = '" + Equip_Type + "', unit ='" + unit + "' where Equip_ID = '" + Equip_ID + "'"
-    # print(sql)
     # 执行sql语句，并发送给数据库
     try:
         cur.execute(sql)
@@ -809,7 +780,6 @@ def updateDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type
         return e
 
     sql = "Update strength set Equip_Name = '" + Equip_Name + "' where Equip_ID = '" + Equip_ID + "'"
-    # print(sql)
     try:
         cur.execute(sql)
     except Exception as e:
@@ -817,7 +787,6 @@ def updateDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type
         return e
 
     sql = "Update weave set Equip_Name = '" + Equip_Name + "' where Equip_ID = '" + Equip_ID + "'"
-    # print(sql)
     try:
         cur.execute(sql)
     except Exception as e:
@@ -825,7 +794,6 @@ def updateDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type
         return e
 
     sql = "Update disturbplan set Equip_Name = '" + Equip_Name + "' where Equip_ID = '" + Equip_ID + "'"
-    # print(sql)
     try:
         cur.execute(sql)
     except Exception as e:
@@ -833,7 +801,6 @@ def updateDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type
         return e
 
     sql = "Update disturbplannote set Equip_Name = '" + Equip_Name + "' where Equip_ID = '" + Equip_ID + "'"
-    # print(sql)
     try:
         cur.execute(sql)
     except Exception as e:
@@ -841,7 +808,6 @@ def updateDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type
         return e
 
     sql = "Update allotschedule set Equip_Name = '" + Equip_Name + "' where Equip_ID = '" + Equip_ID + "'"
-    # print(sql)
     try:
         cur.execute(sql)
     except Exception as e:
@@ -849,14 +815,12 @@ def updateDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type
         return e
 
     sql = "Update armytransfer set Equip_Name = '" + Equip_Name  + "', Equip_Unit ='" + unit + "' where Equip_ID = '" + Equip_ID + "'"
-    # print(sql)
     try:
         cur.execute(sql)
     except Exception as e:
         conn.rollback()
         return e
     sql = "Update rockettransfer set Equip_Name = '" + Equip_Name + "', Equip_Unit ='" + unit + "' where Equip_ID = '" + Equip_ID + "'"
-    # print(sql)
     try:
         cur.execute(sql)
     except Exception as e:
@@ -864,7 +828,6 @@ def updateDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type
         return e
 
     sql = "Update retireplan set Equip_Name = '" + Equip_Name + "' where Equip_ID = '" + Equip_ID + "'"
-    # print(sql)
     try:
         cur.execute(sql)
     except Exception as e:
@@ -872,7 +835,6 @@ def updateDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type
         return e
 
     sql = "Update retireplannote set Equip_Name = '" + Equip_Name + "' where Equip_ID = '" + Equip_ID + "'"
-    # print(sql)
     try:
         cur.execute(sql)
     except Exception as e:
@@ -880,7 +842,6 @@ def updateDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type
         return e
 
     sql = "Update orderallotplan set Equip_Name = '" + Equip_Name + "' where Equip_ID = '" + Equip_ID + "'"
-    # print(sql)
     try:
         cur.execute(sql)
     except Exception as e:
@@ -888,7 +849,6 @@ def updateDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type
         return e
 
     sql = "Update orderallotplannote set Equip_Name = '" + Equip_Name + "' where Equip_ID = '" + Equip_ID + "'"
-    # print(sql)
     try:
         cur.execute(sql)
     except Exception as e:
@@ -896,7 +856,6 @@ def updateDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type
         return e
 
     sql = "Update orderretireplan set Equip_Name = '" + Equip_Name + "' where Equip_ID = '" + Equip_ID + "'"
-    # print(sql)
     try:
         cur.execute(sql)
     except Exception as e:
@@ -904,7 +863,6 @@ def updateDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type
         return e
 
     sql = "Update orderretireplannote set Equip_Name = '" + Equip_Name + "' where Equip_ID = '" + Equip_ID + "'"
-    # print(sql)
     try:
         cur.execute(sql)
     except Exception as e:
@@ -912,7 +870,6 @@ def updateDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type
         return e
 
     sql = "Update orderallotschedule set Equip_Name = '" + Equip_Name + "' where Equip_ID = '" + Equip_ID + "'"
-    # print(sql)
     try:
         cur.execute(sql)
     except Exception as e:
@@ -920,7 +877,6 @@ def updateDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type
         return e
 
     sql = "Update orderAdjust set equipName = '" + Equip_Name + "' where equip_ID = '" + Equip_ID + "'"
-    # print(sql)
     try:
         cur.execute(sql)
     except Exception as e:
@@ -928,7 +884,6 @@ def updateDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type
         return e
 
     sql = "Update orderAdjustCont set equip_Name = '" + Equip_Name + "' where equip_ID = '" + Equip_ID + "'"
-    # print(sql)
     try:
         cur.execute(sql)
     except Exception as e:
@@ -964,14 +919,12 @@ def delDataInDisturbPlanUnit(Unit_ID):
     # 插入的sql语句
     UnitIDList = []
     findChildDisturbPlanUnit(Unit_ID, UnitIDList, cur)
-    print(UnitIDList)
     for UnitID in UnitIDList:
         if UnitID != '':
             sql = "Delete from disturbplanunit where Unit_ID = '" + UnitID + "'"
             cur.execute(sql)
             sql = "Delete from disturbplan where Unit_ID = '" + UnitID + "'"
             cur.execute(sql)
-            # print(sql)
         else:
             sql = "Delete from disturbplanunit where Unit_ID is null"
             cur.execute(sql)
@@ -983,10 +936,8 @@ def delDataInDisturbPlanUnit(Unit_ID):
 
 def selectStrength(UnitID, EquipID, year):
     sql = "select Strength from strength where Equip_ID = '" + EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + year + "'"
-    print("--------------------", sql)
     cur.execute(sql)
     result = cur.fetchall()
-    # print('result: [(0,)]')
     if result == None or len(result) < 1:
         return -1
     else:
@@ -1129,7 +1080,6 @@ def delDataInUnit(Unit_ID):
                                 return e
     for UnitID in UnitIDList:
         sql = "Delete from unit where Unit_ID = '" + UnitID[0] + "'"
-        # print(sql)
         # 执行sql语句，并发送给数据库
         try:
             cur.execute(sql)
@@ -1145,7 +1095,6 @@ def delDataInUnit(Unit_ID):
             return False
 
         sql = "Delete from strength where Unit_ID = '" + UnitID[0] + "'"
-        # print(sql)
         try:
             cur.execute(sql)
         except Exception as e:
@@ -1155,7 +1104,6 @@ def delDataInUnit(Unit_ID):
         publicInfo = findChildUnitForPublic(UnitID[0])
         for public in publicInfo:
             sql = "Delete from publicequip where Equip_ID = '" + public[0] + "'"
-            # print(sql)
             try:
                 cur.execute(sql)
             except Exception as e:
@@ -1163,7 +1111,6 @@ def delDataInUnit(Unit_ID):
                 return False
 
             sql = "Delete from weave where Unit_ID = '" + public[0] + "'"
-            # print(sql)
             try:
                 cur.execute(sql)
             except Exception as e:
@@ -1171,7 +1118,6 @@ def delDataInUnit(Unit_ID):
                 return False
 
         sql = "Delete from weave where Unit_ID = '" + UnitID[0] + "'"
-        # print(sql)
         try:
             cur.execute(sql)
         except Exception as e:
@@ -1179,7 +1125,6 @@ def delDataInUnit(Unit_ID):
             return False
 
         sql = "Delete from disturbplan where Unit_ID = '" + UnitID[0] + "'"
-        # print(sql)
         try:
             cur.execute(sql)
         except Exception as e:
@@ -1187,7 +1132,6 @@ def delDataInUnit(Unit_ID):
             return False
 
         sql = "Delete from disturbplanunit where Unit_ID = '" + UnitID[0] + "'"
-        # print(sql)
         try:
             cur.execute(sql)
         except Exception as e:
@@ -1202,7 +1146,6 @@ def delDataInUnit(Unit_ID):
             return False
 
         sql = "Delete from retireplan where Unit_ID = '" + UnitID[0] + "'"
-        # print(sql)
         try:
             cur.execute(sql)
         except Exception as e:
@@ -1210,7 +1153,6 @@ def delDataInUnit(Unit_ID):
             return False
 
         sql = "Delete from orderallotplan where Unit_ID = '" + UnitID[0] + "'"
-        # print(sql)
         try:
             cur.execute(sql)
         except Exception as e:
@@ -1218,7 +1160,6 @@ def delDataInUnit(Unit_ID):
             return False
 
         sql = "Delete from orderretireplan where Unit_Id = '" + UnitID[0] + "'"
-        # print(sql)
         try:
             cur.execute(sql)
         except Exception as e:
@@ -1314,7 +1255,6 @@ def delDataInEquip(Equip_ID):
                                 return e
     for EquipID in EquipIDList:
         sql = "Delete from equip where Equip_ID = '" + EquipID[0] + "'"
-        # print(sql)
         # 执行sql语句，并发送给数据库
         try:
             cur.execute(sql)
@@ -1322,7 +1262,6 @@ def delDataInEquip(Equip_ID):
             conn.rollback()
             return e
         sql = "Delete from equip_unit_info where Equip_ID = '" + EquipID[0] + "'"
-        # print(sql)
         # 执行sql语句，并发送给数据库
         try:
             cur.execute(sql)
@@ -1331,7 +1270,6 @@ def delDataInEquip(Equip_ID):
             return e
 
         sql = "Delete from inputinfo where Equip_ID = '" + EquipID[0] + "'"
-        # print(sql)
         try:
             cur.execute(sql)
         except Exception as e:
@@ -1339,16 +1277,13 @@ def delDataInEquip(Equip_ID):
             return e
 
         sql = "Delete from strength where Equip_ID = '" + EquipID[0] + "'"
-        # print(sql)
         try:
             cur.execute(sql)
         except Exception as e:
             conn.rollback()
             return e
-        # print(sql)
 
         sql = "Delete from weave where Equip_ID = '" + EquipID[0] + "'"
-        # print(sql)
         try:
             cur.execute(sql)
         except Exception as e:
@@ -1356,7 +1291,6 @@ def delDataInEquip(Equip_ID):
             return e
 
         sql = "Delete from disturbplan where Equip_ID = '" + EquipID[0] + "'"
-        # print(sql)
         try:
             cur.execute(sql)
         except Exception as e:
@@ -1364,7 +1298,6 @@ def delDataInEquip(Equip_ID):
             return e
 
         sql = "Delete from disturbplannote where Equip_ID = '" + EquipID[0] + "'"
-        # print(sql)
         try:
             cur.execute(sql)
         except Exception as e:
@@ -1372,7 +1305,6 @@ def delDataInEquip(Equip_ID):
             return e
 
         sql = "Delete from retireplan where Equip_ID = '" + EquipID[0] + "'"
-        # print(sql)
         try:
             cur.execute(sql)
         except Exception as e:
@@ -1380,7 +1312,6 @@ def delDataInEquip(Equip_ID):
             return e
 
         sql = "Delete from retireplannote where Equip_ID = '" + EquipID[0] + "'"
-        # print(sql)
         try:
             cur.execute(sql)
         except Exception as e:
@@ -1388,7 +1319,6 @@ def delDataInEquip(Equip_ID):
             return e
 
         sql = "Delete from allotschedule where Equip_ID = '" + EquipID[0] + "'"
-        # print(sql)
         try:
             cur.execute(sql)
         except Exception as e:
@@ -1396,7 +1326,6 @@ def delDataInEquip(Equip_ID):
             return e
 
         sql = "Delete from retire where Equip_ID = '" + EquipID[0] + "'"
-        # print(sql)
         try:
             cur.execute(sql)
         except Exception as e:
@@ -1404,7 +1333,6 @@ def delDataInEquip(Equip_ID):
             return e
 
         sql = "Delete from rockettransfer where Equip_ID = '" + EquipID[0] + "'"
-        # print(sql)
         try:
             cur.execute(sql)
         except Exception as e:
@@ -1412,7 +1340,6 @@ def delDataInEquip(Equip_ID):
             return e
 
         sql = "Delete from armytransfer where Equip_ID = '" + EquipID[0] + "'"
-        # print(sql)
         try:
             cur.execute(sql)
         except Exception as e:
@@ -1420,7 +1347,6 @@ def delDataInEquip(Equip_ID):
             return e
 
         sql = "Delete from orderallotplan where Equip_ID = '" + EquipID[0] + "'"
-        # print(sql)
         try:
             cur.execute(sql)
         except Exception as e:
@@ -1428,7 +1354,6 @@ def delDataInEquip(Equip_ID):
             return e
 
         sql = "Delete from orderallotplannote where Equip_ID = '" + EquipID[0] + "'"
-        # print(sql)
         try:
             cur.execute(sql)
         except Exception as e:
@@ -1436,7 +1361,6 @@ def delDataInEquip(Equip_ID):
             return e
 
         sql = "Delete from orderallotschedule where Equip_ID = '" + EquipID[0] + "'"
-        # print(sql)
         try:
             cur.execute(sql)
         except Exception as e:
@@ -1444,7 +1368,6 @@ def delDataInEquip(Equip_ID):
             return e
 
         sql = "Delete from orderretireplan where Equip_ID = '" + EquipID[0] + "'"
-        # print(sql)
         try:
             cur.execute(sql)
         except Exception as e:
@@ -1452,7 +1375,6 @@ def delDataInEquip(Equip_ID):
             return e
 
         sql = "Delete from orderretireplannote where Equip_ID = '" + EquipID[0] + "'"
-        # print(sql)
         try:
             cur.execute(sql)
         except Exception as e:
@@ -1460,7 +1382,6 @@ def delDataInEquip(Equip_ID):
             return e
 
         sql = "Delete from orderAdjust where Equip_ID = '" + EquipID[0] + "'"
-        # print(sql)
         try:
             cur.execute(sql)
         except Exception as e:
@@ -1468,7 +1389,6 @@ def delDataInEquip(Equip_ID):
             return e
 
         sql = "Delete from orderAdjustCont where Equip_ID = '" + EquipID[0] + "'"
-        # print(sql)
         try:
             cur.execute(sql)
         except Exception as e:
@@ -1485,7 +1405,6 @@ def delDataInEquip(Equip_ID):
 
 def selectIfExistsStrengthYear(year):
     allYear = selectAllDataAboutStrengthYear()
-    #print("allYear",allYear)
     for i in allYear:
         if i[1] == str(year):
             return True
@@ -1501,14 +1420,11 @@ def selectAllDataAboutStrengthYear():
     result = cur.fetchall()
     for resultInfo in result:
         yearInfoList.append(resultInfo)
-    # 测试结果
-    # print(result)
     return yearInfoList
 
 
 #按照单位编号，装备编号以及录入年份查找录入信息
 def selectInfoAboutInput(Unit_ID, Equip_ID, inputYear, factoryYear, startFactoryYear, endFactorYear):
-    print(Unit_ID, Equip_ID, inputYear, factoryYear, startFactoryYear, endFactorYear)
     resultList = []
     if factoryYear == "":
         sql = "select * from inputinfo where Unit_ID = '" + Unit_ID + "' and Equip_ID = '" \
@@ -1516,20 +1432,16 @@ def selectInfoAboutInput(Unit_ID, Equip_ID, inputYear, factoryYear, startFactory
     else:
         sql = "select * from inputinfo where Unit_ID = '" + Unit_ID + "' and Equip_ID = '"\
           + Equip_ID + "' and inputYear = '" + inputYear + "' and (year between '" + startFactoryYear + "' and '" + endFactorYear + "')"
-        print("=============", sql)
     cur.execute(sql)
     result = cur.fetchall()
     for resultInfo in result:
         resultList.append(resultInfo)
-
     return resultList
 
 
 # 判断当前是否为公用装备
 def selectIsPublicEquip(Unit_ID):
-
     sql = "select * from publicequip where Equip_ID = '" + Unit_ID + "'"
-    # print(sql)
     cur.execute(sql)
     result = cur.fetchall()
     if result:
@@ -1546,7 +1458,6 @@ def selectAboutWeaveByEquipShow(UnitList, EquipList, yearList):
             # 查询当前装备ID的孩子序列
             EquipIDChildList = []
             findChildEquip(Equip_ID, EquipIDChildList, "")
-            #print("''''''''''''''", EquipIDChildList)
             for childEquipID in EquipIDChildList:
                 sql = "select * from weave where Unit_ID = '" + Unit_ID + \
                         "' and Equip_ID = '" + childEquipID[0] + "' and year = '" + yearList + "'"
@@ -1556,7 +1467,6 @@ def selectAboutWeaveByEquipShow(UnitList, EquipList, yearList):
                     weave = list(resultInfo)
                     weave[3] = childEquipID[1]
                     resultList.append(weave)
-    print("equip===================", resultList)
     return resultList
 
 def isEquipUper(Equip_ID, Equip_Uper):
@@ -1665,18 +1575,15 @@ def selectAboutWeaveByUnitShow(UnitList, EquipList, yearList):
             # 查询当前单位ID的孩子序列
             UnitIDChildList = []
             findChildUnitByWeave(Unit_ID, UnitIDChildList, "")
-            print("u1uu1it==================", UnitIDChildList)
             for childUnitID in UnitIDChildList:
                 sql = "select * from weave where Unit_ID = '" + childUnitID[0] + \
                             "' and Equip_ID = '" + Equip_ID + "' and year = '" + yearList + "'"
-                print("uiunit==================", sql)
                 cur.execute(sql)
                 result = cur.fetchall()
                 for resultInfo in result:
                     weave = list(resultInfo)
                     weave[2] = childUnitID[1]
                     resultList.append(weave)
-    print("unit===================",resultList)
     return resultList
 
 #实力查询展开到末级
@@ -1699,8 +1606,6 @@ def selectAboutStrengthByLast(UnitList, EquipList, year, equipYear, startFactory
     if findSuccess != True:
         return []
 
-    print('flagValue0')
-    print(flagValue0)
     if equipYear == "":
         if flagValue0:
             unitSpace = ""
@@ -1789,7 +1694,6 @@ def selectAboutStrengthByUnitShow(UnitList, EquipList, yearList, equipYear, star
                     sql = "select * from strength where Unit_ID = '" + childUnitID[0] + \
                             "' and Equip_ID = '" + Equip_ID + "' and year = '" + yearList + "'"
                     cur.execute(sql)
-                    print(sql)
                     result = cur.fetchall()
                     if flagValue0:
                         for resultInfo in result:
@@ -1936,7 +1840,6 @@ def selectFromInputInfo(EquipID, UnitID, strengthYear):
 def insertIntoStrengthYear(year):
     year = str(year)
     sql = "insert into strengthyear(ID, year) values ('" + year + "', '" + year + "')"
-    # print(sql)
     try:
         cur.execute(sql)
     except Exception as e:
@@ -1954,7 +1857,6 @@ def insertIntoStrengthYear(year):
         for equipInfo in equipList:
             for unitInfo in unitList:
                 strengthInfo = selectStrengthInfo(unitInfo[0], equipInfo[0], str(int(year) - 1))
-                # print("0000000000    ", strengthInfo)
                 if strengthInfo:
                     sql = "INSERT INTO strength (Equip_ID, Unit_ID, Equip_Name, Unit_Name, Strength, Work, Now, Error, Retire, Delay, Pre, NonObject," \
                           "NonStrength, Single, Arrive, year) VALUES" \
@@ -1975,7 +1877,6 @@ def insertIntoStrengthYear(year):
                         return e
 
                 else:
-                    # print("   ------------------------")
                     sql = "INSERT INTO strength (Equip_ID, Unit_ID, Equip_Name, Unit_Name, Strength, Work, Now, Error, Retire, Delay, Pre, NonObject," \
                           "NonStrength, Single, Arrive, year) VALUES" \
                           + "('" + equipInfo[0] + "', '" + unitInfo[0] + "', '" + equipInfo[1] + "', '" \
@@ -2111,7 +2012,6 @@ def selectAboutWeaveByUnitListAndEquipList(UnitList, EquipList, yearList):
         for Equip_ID in EquipList:
             sql = "select * from weave where Unit_ID = '" + Unit_ID + \
                       "' and Equip_ID = '" + Equip_ID + "' and year = '" + yearList + "'"
-            print(sql)
             cur.execute(sql)
             result = cur.fetchall()
             for resultInfo in result:
@@ -2130,7 +2030,6 @@ def selectAboutStrengthByUnitListAndEquipList(UnitList, EquipList, yearList, equ
             if equipYear == "":
                 sql = "select * from strength where Unit_ID = '" + Unit_ID + \
                           "' and Equip_ID = '" + Equip_ID + "' and year = '" + yearList + "'"
-                #print(sql)
                 cur.execute(sql)
                 result = cur.fetchall()
                 if flagValue0:
@@ -2334,7 +2233,6 @@ def delFromInputInfo(Unit_ID, Equip_ID, ID, num, year, inputYear):
 
             sql = "update weave set Now = " + str(changeAllNowNum) + " where Unit_ID = '" \
                    + UnitID + "' and Equip_ID = '" + EquipID + "' and year = '" + inputYear + "'"
-             # print(sql)
             try:
                 cur.execute(sql)
             except Exception as e:
@@ -2350,7 +2248,6 @@ def delFromInputInfo(Unit_ID, Equip_ID, ID, num, year, inputYear):
 
                     sql = "update weave set Now = Now - " + str(delNum) + " where Unit_ID = '" \
                       + UnitID + "' and Equip_ID = '" + EquipID + "' and year = '" + lastYear + "'"
-                # print(sql)
                     try:
                         cur.execute(sql)
                     except Exception as e:
@@ -2474,9 +2371,7 @@ def addDataIntoInputInfo(Unit_ID, Equip_ID, ID, num, year, shop, state, arrive, 
             cur.execute(sql)
         except Exception as e:
             return e
-    # print(sql)
     # 执行sql语句，并发送给数据库
-
     for UnitID in UnitIDList:
         for EquipID in EquipIDList:
             unitName = selectUnitNameByUnitID(UnitID)
@@ -2605,8 +2500,6 @@ def updateWeaveNum(Unit_ID, Equip_ID, weaveNum, orginWeave, year):
         EquipIDList = []
         findUnitUperIDList(Group_ID, UnitIDList)
         findEquipUperIDList(Equip_ID, EquipIDList)
-        print("UnitID :", UnitIDList)
-        print("equipID :", EquipIDList)
         for UnitID in UnitIDList:
             for EquipID in EquipIDList:
                 equipName = selectEquipNameByEquipID(EquipID)
@@ -2723,8 +2616,6 @@ def updateWeaveNum(Unit_ID, Equip_ID, weaveNum, orginWeave, year):
                     except Exception as e:
                         conn.rollback()
                         return e
-
-                   # print("******************")
         try:
             conn.commit()
             return True
@@ -2958,7 +2849,6 @@ def updateUnitIsGroupFromUnit(Unit_ID, Is_Group):
                         return e
 
         sql = "delete from publicequip where Group_ID = '" + Unit_ID + "'"
-        # print(sql)
 
         try:
             cur.execute(sql)
@@ -2987,7 +2877,6 @@ def updateUnitIsGroupFromUnit(Unit_ID, Is_Group):
         except Exception as e:
             conn.rollback()
             return e
-        # print(sql)
         equipInfoList = selectAllDataAboutEquip()
         weaveYearList = selectAllStrengthYearInfo()
         for equipInfo in equipInfoList:
@@ -3013,7 +2902,6 @@ def selectGroupIDByPublicEquip(Group_ID):
     sql = "select Equip_ID from publicequip where Group_ID = '" + Group_ID + "'"
     cur.execute(sql)
     result = cur.fetchall()
-    # print(result)
     if result:
         return result[0][0]
     else:
@@ -3042,7 +2930,6 @@ def updateInputInfo(Unit_ID, Equip_ID, ID, num, year, shop, state, arrive, confi
     sql = "update inputinfo set year = '" + year + "', shop = '" + shop + "', state = '" \
           + state + "', arrive = '" + arrive + "', confirm = '" + confirm + "', other = '" + other + \
           "' where Unit_ID = '" + Unit_ID + "' and Equip_ID = '" + Equip_ID + "' and ID = '" + ID + "'"
-    print(sql)
     cur.execute(sql)
     conn.commit()
     return
@@ -3082,7 +2969,6 @@ def findUnitChildInfo(unitId):
 #查询退休年份表
 def selectAllRetirementYearInfo():
     sql = "select * from retireyear order by year"
-    #print(sql)
     cur.execute(sql)
     result = cur.fetchall()
     return result
@@ -3100,7 +2986,6 @@ def selectLastYear():
 def isHaveRecord(UnitID, EquipID, year):
     sql = "select * from retire where Equip_ID = '" + \
           EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + year + "'"
-    #print(sql)
     cur.execute(sql)
     result = cur.fetchall()
     if result:
@@ -3112,7 +2997,6 @@ def isHaveRecord(UnitID, EquipID, year):
 def selectEquipInfoByEquipID(EquipID):
     sql = "select * from equip where Equip_ID = '" + \
           EquipID + "'"
-    print(sql)
     cur.execute(sql)
     result = cur.fetchall()
     return result
@@ -3120,10 +3004,8 @@ def selectEquipInfoByEquipID(EquipID):
 def isHaveEquipment(EquipID):
     sql = "select Equip_ID from equip where Equip_ID = '" + \
           EquipID + "'"
-    print(sql)
     cur.execute(sql)
     result = cur.fetchall()
-    print(result)
     if len(result) != 0:
         return True
     else:
@@ -3133,7 +3015,6 @@ def findEquipInfo(equipId):
     sql = "select * from equip where Equip_ID = '" + equipId + "'"
     cur.execute(sql)
     result = cur.fetchall()
-    #print("result",result)
     if result:
         return result
     else:
@@ -3141,11 +3022,8 @@ def findEquipInfo(equipId):
 
 # 查询编制信息
 def selectWeaveInfo(UnitID, EquipID, year):
-    print("year", year)
-    print(type(year))
     sql = "select * from weave where Equip_ID = '" + \
           EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + year + "'"
-    print(sql)
     cur.execute(sql)
     result = cur.fetchall()
     return result
@@ -3155,13 +3033,11 @@ def selectWeaveInfo(UnitID, EquipID, year):
 def insertIntoRetire(ID, Unit_ID, EquipID, Equip_Name,Equip_Unit,strength,Weave, Num, Now, Super, Apply, Other, Unarrived, ProposedRetire, ProposedApply, year):
     sql = "insert into retire (ID, Unit_ID, Equip_ID, Equip_Name, Equip_Unit, Strenth, Weave, Num, Now, Super, Apply, Other,Unarrived , Proposed_retire, Proposed_apply , year) " \
           "VALUES('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s', '%s', '%s' , '%s')"%(ID, Unit_ID, EquipID, Equip_Name,Equip_Unit,strength,Weave, Num, Now, Super, Apply, Other, Unarrived, ProposedRetire, ProposedApply, year)
-    # print(sql)
     executeCommit(sql)
 
 # 查询退休信息
 def selectInfoFromRetire(unitID, equipID, year):
     sql = "select * from retire where Unit_ID = '%s' and Equip_ID = '%s' and year = '%s'"%(unitID, equipID, year)
-    print(sql)
     cur.execute(sql)
     result = cur.fetchall()
     if result:
@@ -3183,7 +3059,6 @@ def selectStrengthInfo(unitID, EquipID, year):
 
     sql = "select * from strength where Equip_ID = '" + \
           EquipID + "' and Unit_ID = '" + unitID + "' and year = '" + year + "'"
-
     cur.execute(sql)
     result = cur.fetchall()
     return result
@@ -3280,7 +3155,6 @@ def findPlanToRetireItem(unitId,quipmentId,year):
 def selectChildEquip(Equip_ID):
     sql = "select * from equip where Equip_Uper = '" + \
           Equip_ID + "'"
-    print(sql)
     cur.execute(sql)
     result = cur.fetchall()
     return result
@@ -3302,16 +3176,16 @@ def isSecondDict(EquipID):
 
 # 更新退休表
 def updateRetireFromStrength(num, orginInfo):
-    print("原来的数据：", orginInfo)
     if orginInfo:
         sql = "update retire set Num = '" + num +  "' where Equip_ID = '" + orginInfo[2] + "' and Unit_ID = '" + orginInfo[1] + "' and year = '" + orginInfo[12] + "'"
     else:
         return
     cur.execute(sql)
     conn.commit()
+
+
 #申请退役更新退休表
 def updateRetire(num, apply, other, Unarrived, ProposedRetire, ProposedApply, orginInfo):
-    print("原来的数据：", orginInfo)
     if orginInfo:
         sql = "update retire set Num = '" + num + "', Apply = '" + apply + "', Other = '" + other + "', Unarrived = '" + Unarrived + "', Proposed_retire = '" + ProposedRetire + "', Proposed_apply = '" + ProposedApply +  \
               "' where Equip_ID = '" + orginInfo[2] + "' and Unit_ID = '" + orginInfo[1] + "' and year = '" + orginInfo[-2] + "'"
@@ -3319,35 +3193,31 @@ def updateRetire(num, apply, other, Unarrived, ProposedRetire, ProposedApply, or
         return
     cur.execute(sql)
     conn.commit()
+
+
 # 退役年份表中添加年份
 def insertIntoRetireYear(year):
-
     result = selectAllRetirementYearInfo()
     sql = "insert into retireyear (ID, year) VALUES" \
           + "('" + str(len(result) + 1) + "', '" + str(year) + "')"
-    # print(sql)
     cur.execute(sql)
     conn.commit()
 
 
 # 删除某个退休年份
 def delRetireYearByYear(year):
-
     sql = "delete from retireyear where year = '" + year + "'"
-    # print(sql)
     cur.execute(sql)
-
     sql = "delete from retire where year = '" + year + "'"
-    # print(sql)
     cur.execute(sql)
     conn.commit()
+
+
 # 删除退休表所有年份
 def delRetireYearALLYear():
     sql = "delete from retireyear "
-    # print(sql)
     cur.execute(sql)
     sql = "delete from retire "
-    # print(sql)
     cur.execute(sql)
     conn.commit()
 
@@ -3389,16 +3259,14 @@ def updateUnitAlias(Unit_Alias,Unit_ID):
 
 # 设置装备数量单位
 def updateEquipUnit(unit, Equip_ID):
-
     sql = "update equip set unit = '" \
           + unit + "' where Equip_ID = '" + Equip_ID + "'"
     cur.execute(sql)
-
     sql = "update retire set Equip_Unit = '" \
           + unit + "' where Equip_ID = '" + Equip_ID + "'"
     cur.execute(sql)
-
     conn.commit()
+
 
 #查找某个年份的所有inputinfo
 def selectInputInfoByYear(year):
@@ -3406,6 +3274,7 @@ def selectInputInfoByYear(year):
     cur.execute(sql)
     result = cur.fetchall()
     return result
+
 
 def delStrengthYearByYear(year):
     equipInfoList = selectAllDataAboutEquip()
@@ -3478,8 +3347,6 @@ def delStrengthYearByYear(year):
         return e
 
 
-
-
 def selectAllIDFromUnit():
     sql = "select Unit_ID from unit "
     cur.execute(sql)
@@ -3489,6 +3356,7 @@ def selectAllIDFromUnit():
         unitIDList.append(unitID[0])
     return unitIDList
 
+
 def selectAllIDFromEquip():
     sql = "select Equip_ID from equip "
     cur.execute(sql)
@@ -3497,6 +3365,8 @@ def selectAllIDFromEquip():
     for equipID in result:
         equipIDList.append(equipID[0])
     return equipIDList
+
+
 #根据装备ID查找某个装备的单位
 def findEquipUnitByEquipID(EquipID):
     sql = "select unit from equip where Equip_ID ='" + EquipID + "'"
@@ -3511,6 +3381,7 @@ def findUperEquipIDByName(Equip_Name):
     result = cur.fetchall()
     return result
 
+
 def selectUnitIfUppermost(Unit_Id):
     sql = "select Unit_Uper from unit where Unit_ID = '" + Unit_Id + "'"
     cur.execute(sql)
@@ -3519,6 +3390,7 @@ def selectUnitIfUppermost(Unit_Id):
         return True
     else:
         return False
+
 
 def findUperInfoList(EquipID, UperList):
     if EquipID == "":
@@ -3532,10 +3404,12 @@ def findUperInfoList(EquipID, UperList):
             if resultInfo:
                 findUperInfoList(resultInfo[0], UperList)
 
+
 def selectUperInfoByEquipID(EquipID):
     UperList = []
     findUperInfoList(EquipID, UperList)
     return UperList
+
 
 #从excel中将数据导入unit
 def inputIntoUnitFromExcel(unitInfoList):
@@ -3610,6 +3484,7 @@ def inputIntoUnitFromExcel(unitInfoList):
     #     errorInfo.append(error)
     #     return errorInfo
 
+
 def isHaveStrengthYear(year):
     sql = "select * from strengthYear where year ='" + year + "'"
     cur.execute(sql)
@@ -3619,12 +3494,12 @@ def isHaveStrengthYear(year):
     else:
         return False
 
+
 def insertOneDataIntoStrenth(lineInfo):
     #['5', '10', 'A车', '六十一旅团一阵地', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '2000']
     if selectIfExistsStrengthYear(lineInfo[-1]) == False:
         year = str(lineInfo[-1])
         sql = "insert into strengthyear(ID, year) values ('" + year + "', '" + year + "')"
-        # print(sql)
         try:
             cur.execute(sql)
         except Exception as e:
@@ -3655,13 +3530,14 @@ def insertOneDataIntoStrenth(lineInfo):
     except Exception as e:
         print(e)
         return False
+
+
 def inputOneDataIntoStrenth(lineInfo):
     #['单位编号', '单位名称', '装备编号', '装备名称', '实力数'， ’年份‘]
     #['8', '六十一阵地', '5', 'A车', '1', '2001']
     if selectIfExistsStrengthYear(lineInfo[-1]) == False:
         year = str(lineInfo[-1])
         sql = "insert into strengthyear(ID, year) values ('" + year + "', '" + year + "')"
-        # print(sql)
         try:
             cur.execute(sql)
         except Exception as e:
@@ -3675,7 +3551,6 @@ def inputOneDataIntoStrenth(lineInfo):
         sql = "insert into strength values('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (
         lineInfo[2], lineInfo[0], (lineInfo[3]).strip(),
         (lineInfo[1]).strip(), lineInfo[4], '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', lineInfo[-1])
-        # print(sql)
         try:
             cur.execute(sql)
         except Exception as e:
@@ -3683,7 +3558,6 @@ def inputOneDataIntoStrenth(lineInfo):
             conn.rollback()
     else:
         sql = "update strength set  Strength = '%s' where Equip_ID = '%s' and Unit_ID = '%s'  and year = '%s'" % (lineInfo[4], lineInfo[2], lineInfo[0], lineInfo[-1])
-        # print(sql)
         try:
             cur.execute(sql)
         except Exception as e:
@@ -3695,14 +3569,13 @@ def inputOneDataIntoStrenth(lineInfo):
     except Exception as e:
         print(e)
         return False
+
+
 def insertOneDataIntoRetire(lineInfo):
-    print("insertLine info")
-    print(lineInfo)
     # ['8102001', '8', '10', '    C车', '辆', 0, '2', '0', '0', '-2', '2', '3', '3', '3', '3', '2001', True]
     if selectIfExistsRetireYear(lineInfo[-2]) == False:
         year = str(lineInfo[-1])
         sql = "insert into retireyear(year) values ('%s')"%year
-        # print(sql)
         try:
             cur.execute(sql)
         except Exception as e:
@@ -3749,5 +3622,4 @@ def selectIfExistsRetireYear(year):
         return True
 
 if __name__ == '__main__':
-    print(len(findUnitNameFromID('10')))
     pass

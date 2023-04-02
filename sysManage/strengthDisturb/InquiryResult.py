@@ -376,7 +376,6 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         # 按末级展开
         if self.cb_showLast.isChecked():
             self.resultList = selectAboutStrengthByLast(UnitList, EquipList, year, self.currentFactoryYear, self.startFactoryYear, self.endFactoryYear,flagValue0)
-
             self.rb_unitShow.setCheckable(False)
             self.rb_equipShow.setCheckable(False)
             self.rb_equipShow.setDisabled(True)
@@ -619,9 +618,6 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                 if selectEquipIsHaveChild(j):
                     row1+=1
                 else:
-                    print("/////////////////////////////")
-                    print('row1: ', row1)
-                    print('index: ', index)
                     item = self.tw_inquiryResult.item(row1, index)
                     item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable)
                     item.setBackground(QBrush(QColor(154, 200, 226)))
