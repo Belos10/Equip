@@ -166,9 +166,6 @@ class ScheduleFinish(QWidget, widget_ScheduleFinish):
         fileName_choose, filetype = \
             QFileDialog.getOpenFileName(self, "选取文件", "C:/",  # 起始路径
                                         "All Files (*);;PDF Files (*.pdf);;Pictures (*.jpg;*.jpeg;*.bmp)")  # 设置文件扩展名过滤,用双分号间隔
-        # fileName_choose, filetype = \
-        #     QFileDialog.getOpenFileName(self, "选取文件", "C:/",  # 起始路径
-        #                                 "Pictures (*.jpg;*.jpeg;*.bmp;*.png)")  # 设置文件扩展名过滤,用双分号间隔
         if fileName_choose == "":
             return
         file = fileName_choose.split("/")
@@ -198,36 +195,15 @@ class ScheduleFinish(QWidget, widget_ScheduleFinish):
             return
         x = fileType.split("/")
         name = x[len(x)-1]
-        name1 = name.split(".")
-        type = name1[len(name1)-1]
-        if type == "pdf":
-            reader = PyPDF2.PdfReader(BytesIO(file))
-            print("")
+        str_path = QFileDialog.getExistingDirectory(None, "选取文件夹", "")
+        str_path += name
+        # if type == "pdf":
+        #     res = PyPDF2.PdfReader(BytesIO(file))
+        # else:
+        #     res = Image.open(BytesIO(file))
+        #     res.show()
+        self.writeTofile(file, str_path)
 
-        else:
-            img = Image.open(BytesIO(file))
-            img.show()
-
-        # with Image.open(BytesIO(file)).convert("RGB") as first_image:
-        #     output_buffer = BytesIO()
-        #     first_image.save(output_buffer, "png")
-        #     output_buffer.read()
-            # output_buffer.seek(0)
-
-
-        # with open(name, 'rb') as f:
-        #     json.dump(file, f)
-        # with open(name, "rb") as file:
-        #     file.read()
-
-        # shutil.rmtree("./mics")
-        # os.mkdir('./mics')
-        # self.writeTofile(file, "../mics")
-
-
-    # 下载
-    def download(self):
-        pass
 
 
     def returnFileName(self):
