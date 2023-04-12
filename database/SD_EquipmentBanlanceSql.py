@@ -443,7 +443,7 @@ def insertOneEquipmentBalanceData(tempItem):
 def getEquipmentIdByName(equipmentName):
 
     sql = "select Equip_ID from equip where Equip_Name='%s'"%equipmentName.strip()
-    print(sql)
+
     equipment = selectOne(sql)
     print('equipment',equipment)
     return equipment['Equip_ID']

@@ -157,7 +157,6 @@ class maintenManageSet(QWidget, Widget_Mainten_Manage_Set):
         self.tw_publicEquip.setHorizontalHeaderLabels(header)
 
         self.tw_publicEquip.setRowCount(len(self.currentPublicInfo))
-        #print("================== currentPublicInfo ======================", self.currentPublicInfo)
         for i, publicEquipInfo in enumerate(self.currentPublicInfo):
             item = QTableWidgetItem()
             item.setText(publicEquipInfo[0])

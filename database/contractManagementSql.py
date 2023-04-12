@@ -86,7 +86,6 @@ def findAllContractOrderData(year):
     return executeSql(sql)
 
 def insertOneDataInToContractOrder(rowData):
-    print(rowData)
     #('2003', '2', '2', '2', '2', 2.0, 2, 4.0, '2000-01-01', '2')
     sql = "insert into contract_order(year,no, name,part_A,part_B,unit_price,count,amount,delivery_time,note) values ('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')"\
           %(rowData[0],rowData[1],rowData[2],rowData[3],rowData[4],rowData[5],rowData[6],rowData[7],rowData[8],rowData[9])
@@ -98,12 +97,11 @@ def insertOneDataInToContractMaintenance(rowData):
     return executeCommit(sql)
 
 def updataOneDataToContractOrder(rowData):
-    print(rowData)
     #['1', '2', '2', '2', '2', '2.0', '2', '4.0', '2000-01-01', '2']
     #[3, 2, '2', '2', '2', '2', 2.0, 3, 6.0, '2000-01-01', '2']
     sql = "update  contract_order set no = '%s',name = '%s', part_A = '%s', part_B = '%s', unit_price = '%s', count = '%s', amount = '%s',delivery_time = '%s', note = '%s' where id = '%s'" \
           %(rowData[1], rowData[2],rowData[3],rowData[4],rowData[5],rowData[6],rowData[7],rowData[8],rowData[9],rowData[0])
-    print(sql)
+
     return executeCommit(sql)
 
 def updataOneDataToContractMaintenance(rowData):
@@ -166,7 +164,6 @@ def insertOneDataIntoContractOrder(lineInfo):
     #(1, '2003', '2', '2', '2', '2', 2.0, 2, 4.0, '2000-01-01', '2')
     sql = "select no from contract_maintenance where no = '%s' "%(lineInfo[2])
     result = executeSql(sql)
-    print("result: ", result)
     try:
         if result == None or len(result) == 0:
             print(lineInfo)
@@ -207,7 +204,6 @@ def inputOneDataIntoContractMaintenance(lineInfo):
 def getContractMaintenanceInfoByNo(contractNo):
     sql = "select * from contract_maintenance where no = '%s'"%contractNo
     result = list(executeSql(sql))
-    print('result',result)
     if len(result) > 0:
         return result[0]
     else:
@@ -216,7 +212,6 @@ def getContractMaintenanceInfoByNo(contractNo):
 def getContractMaintenanceInfoByMaintanceId(maintenceId):
     sql = "select * from contract_maintenance where id = '%d'"%maintenceId
     result = list(executeSql(sql))
-    print('result', result)
     if len(result) > 0:
         return result[0]
     else:

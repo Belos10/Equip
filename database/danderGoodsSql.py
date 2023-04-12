@@ -115,7 +115,7 @@ def updataOneDataInDangerGood(rowData):
     sql = "update dangergoods set name = '%s', unit='%s',count='%s',subtotal = '%s'," \
           "new_product='%s',waste_product='%s',delivery_time='%s',storage_time='%s',source='%s',radioactivity='%s'," \
           "notes='%s' where goods_Id='%d'"%(rowData[1],rowData[2],rowData[3],rowData[4],rowData[5],rowData[6],rowData[7],rowData[8],rowData[9],rowData[10],rowData[11],rowData[0])
-    print(sql)
+
     return executeCommit(sql)
 '''
     功能：
@@ -128,7 +128,7 @@ def insertOneDataIntDangerGoods(rowData):
           "values('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')"%(rowData[0],rowData[1],rowData[2],rowData[3],rowData[4],
                                                           rowData[5],rowData[6],rowData[7],rowData[8],rowData[9],
                                                           rowData[10],rowData[11],rowData[12])
-    print(sql)
+
     return  executeCommit(sql)
 '''
     功能：

@@ -380,7 +380,6 @@ class MaintenanceManagement(QWidget, OrderManagementUI):
 
 
     def savaRowData(self, row):
-        # print('保存一行')
         rowData = []
         rowData.append(self.selectedYear)
         for i in range(1, self.tw_result.columnCount() - 1):
@@ -420,7 +419,6 @@ class MaintenanceManagement(QWidget, OrderManagementUI):
             self.displayData()
 
     def alterRowData(self, row):
-        # print("修改一行数据")
         rowData = []
         rowData.append(self.result[row - 2][0])
         rowData.append(self.selectedYear)

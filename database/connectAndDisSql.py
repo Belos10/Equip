@@ -7,45 +7,16 @@ from database.config import ConnectMySqlDict
 from utills.file import copyFile
 
 try:
-    # basepath = os.path.abspath(os.path.dirname(__file__))
     basepath = os.path.split(os.path.realpath(__file__))[0]
-    # basepath = os.path.dirname(os.path.abspath(__file__))
-    # basepath = os.path.dirname(os.path.realpath(__file__))
-    # curpath = os.path.realpath(__file__)
-    # basepath = os.path.dirname(curpath)
-    # path = basepath + '\\NuclearManageSystem.db'
-    # backPath = basepath + '\\backUp.db'
-    # print('路径',path)
-    # print('备份路径',backPath)
-    # # conn = sqlite3.connect(path)
     conn = sqlite3.connect('NuclearManageSystem.db')
     cur = conn.cursor()
-except sqlite3.OperationalError:
-    # basepath = os.path.abspath(os.path.dirname(__file__))
-    # # basepath = os.path.split(os.path.realpath(__file__))[0]
-    # # basepath = os.path.dirname(os.path.abspath(__file__))
-    # # basepath = os.path.dirname(os.path.realpath(__file__))
-    # os.mkdir(basepath)
-    print("异常")
+except sqlite3.OperationalError as e:
+    print(e)
 finally:
-    # assert os.path.exists(basepath)
-    # path = basepath + 'database\\NuclearManageSystem.db'
-    # # print(path)
-    # conn = sqlite3.connect(path)
-    # cur = conn.cursor()
-
     pass
 
 
 
-# host = ConnectMySqlDic.get('host')
-# port = ConnectMySqlDict.get('port')
-# user = ConnectMySqlDict.get('user')
-# password = ConnectMySqlDict.get('password')
-# db = ConnectMySqlDict.get('db')
-#
-# conn = pymysql.connect(host=host, port=port, user=user, password=password, db=db)
-# cur = conn.cursor()
 
 '''
     功能：
@@ -124,8 +95,8 @@ def executeSql(sql):
         print(error)
 
 def executeCommit(sql=''):
-    """执行数据库sql语句，针对更新,删除,事务等操作失败时回滚
-
+    """
+    执行数据库sql语句，针对更新,删除,事务等操作失败时回滚
     """
     conn, cur = connectSqlite()
     try:
@@ -134,22 +105,19 @@ def executeCommit(sql=''):
         return True
     except sqlite3.Error as error:
         conn.rollback()
-        print('SQL error')
         print(error)
         return False
+
+
 def progress(status, remaining, total):
     print(f'Copied {total-remaining} of {total} pages...')
+
+
 def backUp(basePath):
-    # global conn, cur
-    # conn.close()
     backDir = basePath + '\\' + 'backUp.db'
     sourceDir = basePath + '\\' + 'NuclearManageSystem.db'
     copyFile(sourceDir, backDir)
-    # bck = sqlite3.connect(basePath + '\\' + 'backUp.db')
-    # with bck:
-    #     conn.backup(bck, pages=1, progress=progress)
-    # conn = sqlite3.connect(sourceDir)
-    # cur = conn.cursor()
+
 
 def restore(basePath):
     backDir = basePath + '\\' + 'backUp.db'

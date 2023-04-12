@@ -83,10 +83,7 @@ def insertIntoArmyTransfer(ID, Trans_ID, Trans_Date, Trans_Reason, Trans, Trans_
                            Send_Tel, Recive_Name, Recive_Connect, Recive_Tel, Equip_ID,
                            Equip_Name, Equip_Unit, Equip_Quity, Equip_Num, Equip_Other, year):
     # conn, cur = connectMySql()
-    sql = "INSERT INTO armytransfer(ID, Trans_ID, Trans_Date, Trans_Reason, Trans, Trans_Way," \
-          "Port_Way, Effic_Date, Send_UnitID, Send_UnitName, Send_Connect, Send_Tel, Recive_Name," \
-          "Recive_Connect, Recive_Tel, Equip_ID, Equip_Name, Equip_Unit, Equip_Quity, Equip_Num," \
-          "Equip_Other, year) VALUES ('" + ID + "', '"  + Trans_ID + "', '"  + Trans_Date + "', '"  + Trans_Reason + \
+    sql = 'Port_Way", Effic_Date, Send_UnitID, Send_UnitName, Send_Connect, Send_Tel, Recive_Name,' + ID + "', '"  + Trans_ID + "', '"  + Trans_Date + "', '"  + Trans_Reason + \
           "', '"  + Trans + "', '" + Trans_Way + "', '" + Port_Way + "', '" + Effic_Date + "', '" \
           + Send_UnitID + "', '" + Send_UnitName + "', '" + Send_Connect + "', '" + Send_Tel\
           + "', '" + Recive_Name + "', '" + Recive_Connect + "', '" + Recive_Tel + "', '" + Equip_ID + \
@@ -104,10 +101,7 @@ def insertIntoRocketTransfer(ID, Trans_ID, Trans_Date, Trans_Reason, Trans, Tran
                            Send_Tel, Recive_Name, Recive_Connect, Recive_Tel, Equip_ID,
                            Equip_Name, Equip_Unit, Equip_Quity, Equip_Num, Equip_Other, year):
     #conn, cur = connectMySql()
-    sql = "INSERT INTO rockettransfer(ID, Trans_ID, Trans_Date, Trans_Reason, Trans, Trans_Way," \
-          "Port_Way, Effic_Date, Send_UnitID, Send_UnitName, Send_Connect, Send_Tel, Recive_Name," \
-          "Recive_Connect, Recive_Tel, Equip_ID, Equip_Name, Equip_Unit, Equip_Quity, Equip_Num," \
-          "Equip_Other, year) VALUES ('" + ID + "', '"  + Trans_ID + "', '"  + Trans_Date + "', '"  + Trans_Reason + \
+    sql = 'Port_Way", Effic_Date, Send_UnitID, Send_UnitName, Send_Connect, Send_Tel, Recive_Name,' + ID + "', '"  + Trans_ID + "', '"  + Trans_Date + "', '"  + Trans_Reason + \
           "', '"  + Trans + "', '" + Trans_Way + "', '" + Port_Way + "', '" + Effic_Date + "', '" \
           + Send_UnitID + "', '" + Send_UnitName + "', '" + Send_Connect + "', '" + Send_Tel\
           + "', '" + Recive_Name + "', '" + Recive_Connect + "', '" + Recive_Tel + "', '" + Equip_ID + \
@@ -136,7 +130,6 @@ def selectIDFromArmyByYear(year):
     #conn, cur = connectMySql()
     result = selectYearListAboutArmy()
     sql = "select ID from armyTransfer where year = '" + year + "'"
-    print("year: ", sql)
     cur.execute(sql)
     result = cur.fetchall()
     yearList = []
@@ -283,8 +276,9 @@ def insertIntoDisturbPlanYear(year):
         sql = "insert into disturbplannote(Equip_id,Equip_Name,Year,Note) values " +\
                   "('" + EquipInfo[0] + "','" + EquipInfo[1] + "','" + str(year) +"', '' )"
         cur.execute(sql)
-        sql = "insert into allotschedule (Equip_Id,Equip_Name,army,allotconditionUper,rocketUper,finishUper,year) values " \
-              + "('" + EquipInfo[0] + "','" + EquipInfo[1] + "', '','0','0','0','" + str(year) + "' )"
+        sql = "insert into allotschedule (Equip_Id,Equip_Name,army,allotconditionUper,rocketUper,finishUperFile," \
+              "year, allotconditionBase, rocketBase, finishBaseFile, finishUperWay, finishBaseWay) values " \
+              + "('" + EquipInfo[0] + "','" + EquipInfo[1] + "', '','0','0','','" + str(year) + "', '0','0','','0','0' )"
         cur.execute(sql)
         for UnitInfo in UnitList:
             sql = "insert into disturbplan(Equip_id,Equip_Name,Unit_Id,Unit_Name,Year,DisturbNum) values " +\
@@ -544,7 +538,7 @@ def selectRocketScheduleUper(Equip_Id, Year):
 # 查询是否完成(基地)
 def selectIfScheduleFinishBase(Equip_Id, Year):
     # conn, cur = connectMySql()
-    sql = "select finishBase from allotschedule where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
+    sql = "select finishBaseFlag from allotschedule where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
     cur.execute(sql)
     result = cur.fetchall()
     conn.commit()
@@ -555,12 +549,27 @@ def selectIfScheduleFinishBase(Equip_Id, Year):
 # 查询是否完成(机关)
 def selectIfScheduleFinishUper(Equip_Id, Year):
     # conn, cur = connectMySql()
-    sql = "select finishUper from allotschedule where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
+    sql = "select finishUperFlag from allotschedule where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
     cur.execute(sql)
     result = cur.fetchall()
     conn.commit()
     # disconnectMySql(conn, cur)
     return result
+
+
+# 更新是否完成(机关)
+def updateIfScheduleFinishUper(Equip_Id, Year):
+    sql = "update allotschedule set finishUperFlag = TRUE where Equip_Id = '%s' and year = '%s'" % (Equip_Id, Year)
+    cur.execute(sql)
+    conn.commit()
+
+
+# 更新是否完成(基地)
+def updateIfScheduleFinishBase(Equip_Id, Year):
+    sql = "update allotschedule set finishBaseFlag = TRUE where Equip_Id = '%s' and year = '%s'" % (Equip_Id, Year)
+    cur.execute(sql)
+    conn.commit()
+
 
 # 更新陆军调拨单进度
 def updateArmySchedule(Equip_Id,Year,txt):
@@ -574,7 +583,6 @@ def updateArmySchedule(Equip_Id,Year,txt):
 def updateAllotConditionBase(Equip_Id, Year, txt):
     # conn, cur = connectMySql()
     sql = "update allotschedule set allotconditionBase = " + txt + "  where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
-    print(sql)
     cur.execute(sql)
     conn.commit()
     # disconnectMySql(conn, cur)
@@ -584,7 +592,6 @@ def updateAllotConditionBase(Equip_Id, Year, txt):
 def updateAllotConditionUper(Equip_Id, Year, txt):
     # conn, cur = connectMySql()
     sql = "update allotschedule set allotconditionUper = " + txt + " where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
-    print(sql)
     cur.execute(sql)
     conn.commit()
     # disconnectMySql(conn, cur)
@@ -606,27 +613,47 @@ def updateRocketScheduleUper(Equip_Id, Year, txt):
     # disconnectMySql(conn, cur)
 
 # 更新是否完成进度(基地)
-def updateScheduleFinishBase(Equip_Id, Year, fileName):
+def updateScheduleFinishBase(Equip_Id, Year, fileType, file):
     # conn, cur = connectMySql()
-    sql = "update allotschedule set finishBase = '" + fileName + "' where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
+    sql = "update allotschedule set finishBaseWay = '" + fileType + "' where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
+    cur.execute(sql)
+    conn.commit()
+    sql = "update allotschedule set finishBaseFile = '" + file + "' where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
     cur.execute(sql)
     conn.commit()
     #disconnectMySql(conn, cur)
 
 # 更新是否完成进度(机关)
-def updateScheduleFinishUper(Equip_Id, Year, fileName):
+def updateScheduleFinishUper(Equip_Id, Year, fileType, file):
     # conn, cur = connectMySql()
-    sql = "update allotschedule set finishUper = '" + fileName + "' where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
+    sql = "update allotschedule set finishUperWay = '" + fileType + "' where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
     cur.execute(sql)
     conn.commit()
+    sql = "update allotschedule set finishUperFile = ? where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
+    cur.execute(sql, (file,))
+    conn.commit()
     #disconnectMySql(conn, cur)
+
+
+def selectFileUper(Equip_Id, Year):
+    sql = "select finishUperFile, finishUperWay from allotschedule where Equip_Id = '%s' and year = '%s'" %(Equip_Id, Year)
+    cur.execute(sql)
+    result = cur.fetchall()
+    conn.commit()
+    return result
+
+def selectFileBase(Equip_Id, Year):
+    sql = "select finishBaseFile, finishBaseWay from allotschedule where Equip_Id = '%s' and year = '%s'" %(Equip_Id, Year)
+    cur.execute(sql)
+    result = cur.fetchall()
+    conn.commit()
+    return result
 
 # 陆军调拨号与装备质量
 def selectQuaAndID(Equip_ID, year):
     sql = "select Equip_Quity,Trans_ID from armytransfer where Equip_ID = '" + Equip_ID + "'and year = '" + year + "'"
     cur.execute(sql)
     result = cur.fetchall()
-    print("找质量和陆军单号result", result)
     conn.commit()
     return result
 
@@ -850,7 +877,7 @@ def findRetirePlanUnitChildInfo(unitId):
         return []
 
 
-def selectIfUnitScheduleFinish(unitID,equipID,year):
+def selectIfUnitScheduleFinish(unitID, equipID, year):
     # conn, cur = connectMySql()
     sql = "select Flag_ifFinish from disturbplan where Unit_Id = %s and " \
           "Equip_Id = %s and Year = %s" %(unitID, equipID, year)
@@ -861,7 +888,7 @@ def selectIfUnitScheduleFinish(unitID,equipID,year):
     return result
 
 
-def updateUnitScheduleFinish(unitID,equipID,year,flag):
+def updateUnitScheduleFinish(unitID, equipID, year, flag):
     # conn, cur = connectMySql()
     if flag:
         sql = "update disturbplan set Flag_ifFinish = 'TRUE' where Unit_Id = %s " \

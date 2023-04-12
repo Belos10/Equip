@@ -511,7 +511,6 @@ class serviceSupport(QDialog, Widget_ServiceSupport):
                 currentRowNum = currentRow - 1
                 currentRowNumKeyValue = self.datadict[str(currentRowNum)][0]
                 rowData.append(str(currentRowNumKeyValue))
-                # print("111111",rowData)
             elif i == 13:
                 item = self.serviceSupportResult.item(row, i)
                 if item != None:
@@ -558,7 +557,6 @@ class serviceSupport(QDialog, Widget_ServiceSupport):
             self.bl = 1
         else:
             self.bl = int(max(numList)) + 1
-        # print("self.bl:", self.bl)
 
         if self.serviceSupportResult.rowCount() <= 2 + rowCount:
             self.currentLastRow = rowCount
@@ -669,7 +667,6 @@ class serviceSupport(QDialog, Widget_ServiceSupport):
         功能：设置项目类型关联后面计价挂账进度值
     '''
     def projectTypeConnectProgress(self):
-        # print(111111111111111)判断有没有进入该函数
         currentRow = self.serviceSupportResult.currentRow()
         currentColumn = self.serviceSupportResult.currentColumn()
 

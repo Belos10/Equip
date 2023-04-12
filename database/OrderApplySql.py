@@ -53,7 +53,7 @@ def isHaveOrderApplyRecord(UnitID, EquipID, year):
 def selectWeaveInfo(UnitID, EquipID, year):
     sql = "select * from weave where Equip_ID = '" + \
           EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + year + "'"
-    print(sql)
+
     cur.execute(sql)
     result = cur.fetchall()
     return result
@@ -87,7 +87,7 @@ def selectUpdateIntoOrderApply(unitID, EquipID, year):
 def selectInfoFromOrderApply(unitID, equipID, year):
     sql = "select * from order_apply where Equip_ID = '" + \
           equipID + "' and Unit_ID = '" + unitID + "' and year = '" + year + "'"
-    print(sql)
+
     cur.execute(sql)
     result = cur.fetchall()
     if result:
@@ -97,7 +97,7 @@ def selectInfoFromOrderApply(unitID, equipID, year):
 def selectEquipInfoByEquipID(EquipID):
     sql = "select * from equip where Equip_ID = '" + \
           EquipID + "'"
-    print(sql)
+
     cur.execute(sql)
     result = cur.fetchall()
     return result

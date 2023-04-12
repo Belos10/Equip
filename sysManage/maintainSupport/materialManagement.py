@@ -203,7 +203,6 @@ class materialManagement(QWidget, materialManagementUI):
         功能：新增一行的数据
     '''
     def slotAlterAndSava(self):
-        print('修改保存')
         selectRow = self.tw_result.selectedItems()
         if len(selectRow) != 0:
             currentRow = selectRow[0].row()

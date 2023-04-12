@@ -302,7 +302,6 @@ class AttachmentDialog(QDialog, AttachmentDialogUI):
 
 
     def savaRowData(self,row):
-        # print('保存一行')
         rowData = []
         rowData.append(str(self.maintenanceId))
         for i in range(self.tw_result.columnCount()):
@@ -330,7 +329,6 @@ class AttachmentDialog(QDialog, AttachmentDialogUI):
             self.displayData()
 
     def alterRowData(self, row):
-        # print("修改一行数据")
         rowData = [str(self.maintenanceId)]
         for i in range(self.tw_result.columnCount()):
             if i == 9 or i == 16:

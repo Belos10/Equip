@@ -1,9 +1,15 @@
+import io
 import sys
 import os
+import shutil
+import json
+import PyPDF2
+from io import BytesIO
+from PIL import Image
 from PyQt5.QtWidgets import *
 from PyQt5 import QtCore,QtGui
 from widgets.alocatMange.scheduleFinish import widget_ScheduleFinish
-from database.alocatMangeSql import selectIfUnitScheduleFinish, updateUnitScheduleFinish
+from database.alocatMangeSql import *
 from PyQt5 import sip
 from sysManage.component import getMessageBox
 
@@ -18,9 +24,12 @@ class ScheduleFinish(QWidget, widget_ScheduleFinish):
         # self.resize(300,200)   # 设置窗体大小
         # self.signal = QtCore.pyqtSignal(str)
         self.fileName = ""
+        self.file = ""
+        self.fileWay = ""
         self.UnitDict = {}
         self.equipID = ''
         self.year = -1
+        self.unitFlag = -1
 
         # self.btn_chooseFile = QPushButton(self)
         # self.btn_chooseFile.setObjectName("btn_chooseFile")
@@ -39,14 +48,18 @@ class ScheduleFinish(QWidget, widget_ScheduleFinish):
         self.pb_openFile.clicked.connect(self.onOpen)
 
 
-    def initDict(self, unitDict, equipID, year):
+    def initDict(self, unitDict, equipID, year, unitFlag):
         self.UnitDict = unitDict
         self.equipID = equipID
         self.year = year
+        self.unitFlag = unitFlag
 
 
     def init1(self):
         self.initUnitFinish()
+        self.fileName = ""
+        self.file = ""
+        self.fileWay = ""
         # self.ifUnitScheduleFinish()
 
 
@@ -63,8 +76,6 @@ class ScheduleFinish(QWidget, widget_ScheduleFinish):
 
     def initUnitFinish(self):
         try:
-            # aaa = self.layout1.count()
-            # print("aaa====", aaa)
             # self.deleteItemsOfLayout(self.layout1)
             # self.layout1 = QHBoxLayout()
             # while self.layout1.takeAt(0):
@@ -84,7 +95,6 @@ class ScheduleFinish(QWidget, widget_ScheduleFinish):
             #     # btn.deleteLater()
             #     sip.delete(btn)
             for idx in range(self.layout1.count()+1, 1, -1):
-                # print("idx ===",idx)
                 wid = self.layout1.itemAt(idx-2).widget()
                 self.layout1.removeWidget(wid)
                 sip.delete(wid)
@@ -93,12 +103,8 @@ class ScheduleFinish(QWidget, widget_ScheduleFinish):
             #     self.layout1.removeItem(item)
             #     # self.layout1.removeWidget(item)
             #     # item.widget().deleteLater()
-            #     print("==========", i)
             #     sip.delete(item)
             #     self.layout1.itemAt(i).widget().setParent(None)
-            # bbb = self.layout1.count()
-            # print("bbb=",bbb)
-
             # print("Schedule::: self.UnitDict = ", self.UnitDict, "self.equipID = ", self.equipID)
             for key,item in self.UnitDict.items():
                 flag = selectIfUnitScheduleFinish(self.UnitDict[key][0], self.equipID, self.year)
@@ -133,16 +139,13 @@ class ScheduleFinish(QWidget, widget_ScheduleFinish):
             #         pb1.setText(item[1])
             #     self.layout1.addWidget(pb1)
             # self.w2_hbox.setLayout(self.layout1)
-
-            # ccc = self.layout1.count()
-            # print("ccc=",ccc)
         except Exception as e:
-            print("errrrrror", e)
+            print(e)
 
 
     def ifUnitScheduleFinish(self):
         aaa= self.layout1.count()
-        print("self.layout1.count()=", aaa)
+        # print("self.layout1.count()=", aaa)
         for i in range(self.layout1.count()):
             self.key = i
             flag = selectIfUnitScheduleFinish(self.UnitDict[i][0], self.equipID, self.year)
@@ -158,29 +161,77 @@ class ScheduleFinish(QWidget, widget_ScheduleFinish):
             self.initUnitFinish()
 
 
-
+    # 选择文件
     def slot_btn_chooseFile(self):
         fileName_choose, filetype = \
-            QFileDialog.getOpenFileName(self,"选取文件","C:/",  # 起始路径
+            QFileDialog.getOpenFileName(self, "选取文件", "C:/",  # 起始路径
                                         "All Files (*);;PDF Files (*.pdf);;Pictures (*.jpg;*.jpeg;*.bmp)")  # 设置文件扩展名过滤,用双分号间隔
+        # fileName_choose, filetype = \
+        #     QFileDialog.getOpenFileName(self, "选取文件", "C:/",  # 起始路径
+        #                                 "Pictures (*.jpg;*.jpeg;*.bmp;*.png)")  # 设置文件扩展名过滤,用双分号间隔
         if fileName_choose == "":
-            # print("\n取消选择")
             return
-        self.fileName = fileName_choose
+        file = fileName_choose.split("/")
+        self.fileWay = fileName_choose
+        self.fileName = file[len(file)-1]
+        self.file = self.convertToBinaryData(fileName_choose)
         print("\n你选择的文件为:")
-        print(fileName_choose)
-        print("文件筛选器类型: ", filetype)
-
-    def onOpen(self):
         print(self.fileName)
-        if self.fileName == "":
+        print("文件筛选器类型: ", filetype)
+        if self.unitFlag == 1:
+            updateScheduleFinishUper(self.equipID, self.year, self.fileWay, self.file)
+        elif self.unitFlag == 2:
+            updateScheduleFinishBase(self.equipID, self.year, self.fileWay, self.file)
+
+    # 查看文件
+    def onOpen(self):
+        if self.unitFlag == 1:
+            result = selectFileUper(self.equipID, self.year)
+        elif self.unitFlag == 2:
+            result = selectFileBase(self.equipID, self.year)
+        else:
+            return
+        file = result[0][0]
+        fileType = result[0][1]
+        if file == "" or file == '0':
             getMessageBox("提示", "未存放文件", True, False)
             return
-        os.startfile(self.fileName)
+        x = fileType.split("/")
+        name = x[len(x)-1]
+        name1 = name.split(".")
+        type = name1[len(name1)-1]
+        if type == "pdf":
+            reader = PyPDF2.PdfReader(BytesIO(file))
+            print("")
+
+        else:
+            img = Image.open(BytesIO(file))
+            img.show()
+
+        # with Image.open(BytesIO(file)).convert("RGB") as first_image:
+        #     output_buffer = BytesIO()
+        #     first_image.save(output_buffer, "png")
+        #     output_buffer.read()
+            # output_buffer.seek(0)
+
+
+        # with open(name, 'rb') as f:
+        #     json.dump(file, f)
+        # with open(name, "rb") as file:
+        #     file.read()
+
+        # shutil.rmtree("./mics")
+        # os.mkdir('./mics')
+        # self.writeTofile(file, "../mics")
+
+
+    # 下载
+    def download(self):
+        pass
 
 
     def returnFileName(self):
-        return self.fileName
+        return self.fileName, self.file, self.fileWay
 
 
 
@@ -189,11 +240,24 @@ class ScheduleFinish(QWidget, widget_ScheduleFinish):
             flag = False
             if self.layout1.itemAt(idx).widget().isChecked():
                 flag = True
-            updateUnitScheduleFinish(self.UnitDict[idx][0], self.equipID, self.year,flag)
+            updateUnitScheduleFinish(self.UnitDict[idx][0], self.equipID, self.year, flag)
             # self.initUnitFinish()
         self.signal.emit('1')
         return
 
+
+    def convertToBinaryData(self, filename):
+        # Convert digital data to binary format
+        with open(filename, 'rb') as file:
+            blobData = file.read()
+        return blobData
+
+
+    def writeTofile(self, data, filename):
+        # Convert binary data to proper format and write it on Hard Disk
+        with open(filename, 'wb') as file:
+            file.write(data)
+        print("Stored blob data into: ", filename, "\n")
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

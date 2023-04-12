@@ -445,7 +445,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                     flag4 = selectIfScheduleFinishUper(self.currentEquipdict[i][0], self.currentYear)
                     item = QPushButton("设置进度")
                     item.clicked.connect(self.setScheduleFinish)
-                    if flag4[0][0] != '0':
+                    if flag4[0][0] != 'FALSE':
                         item = QPushButton("已完成")
                         item.setStyleSheet("background-color : rgba(154,200,226,255)")
                         item.clicked.connect(self.setButtonBack)
@@ -487,7 +487,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                     flag4 = selectIfScheduleFinishBase(self.currentEquipdict[i][0], self.currentYear)
                     item = QPushButton("设置进度")
                     item.clicked.connect(self.setScheduleFinish)
-                    if flag4[0][0] != '0':
+                    if flag4[0][0] != 'FALSE':
                         item = QPushButton("已完成")
                         item.setStyleSheet("background-color : rgba(154,200,226,255)")
                         item.clicked.connect(self.setButtonBack)
@@ -690,7 +690,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                     updateRocketScheduleUper(self.currentEquipdict[currentRow][0], self.currentYear, '0')
                     delRocketTransferByIDAndYear(self.currentEquipdict[currentRow][0], self.currentYear)
                 if currentColumn == 8 + self.lenCurrentUnitChilddict:
-                    updateScheduleFinishUper(self.currentEquipdict[currentRow][0], self.currentYear, '0')
+                    updateScheduleFinishUper(self.currentEquipdict[currentRow][0], self.currentYear, '0', "")
                     for v in self.currentUnitChilddict.values():
                         updateUnitScheduleFinish(v[0], self.currentEquipdict[currentRow][0], self.currentYear,False)
                 item = QPushButton("设置进度")
@@ -701,7 +701,9 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                 if currentColumn == 6 + self.lenCurrentUnitChilddict:
                     updateAllotConditionBase(self.currentEquipdict[currentRow][0], self.currentYear, '0')
                 if currentColumn == 7 + self.lenCurrentUnitChilddict:
-                    updateScheduleFinishBase(self.currentEquipdict[currentRow][0], self.currentYear, '0')
+                    updateScheduleFinishBase(self.currentEquipdict[currentRow][0], self.currentYear, '0', "")
+                    for v in self.currentUnitChilddict.values():
+                        updateUnitScheduleFinish(v[0], self.currentEquipdict[currentRow][0], self.currentYear,False)
                 item = QPushButton("设置进度")
                 self.disturbResult.setCellWidget(currentRow, currentColumn, item)
             self.preSelectSchedule()
@@ -848,7 +850,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         # self.scheduleFinish.setWindowFlags(Qt.Dialog|Qt.WindowCloseButtonHint)
         self.scheduleFinish.fileName = ""
         self.scheduleFinish.initDict(self.currentUnitChilddict,
-                                     self.currentEquipdict[currentRow][0], self.currentYear)
+                                     self.currentEquipdict[currentRow][0], self.currentYear, self.unitFlag)
         self.scheduleFinish.init1()
         self.scheduleFinish.show()
         self.scheduleFinish.signal.connect(self.updateFinish)
@@ -856,8 +858,8 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
     # 更新进度4 是否完成
     def updateFinish(self):
         currentRow = self.disturbResult.currentRow()
-        fileName = self.scheduleFinish.returnFileName()
-        print("fileName", fileName)
+        fileName, file, fileWay = self.scheduleFinish.returnFileName()
+        print("fileName", fileName, "file", file, "fileWay", fileWay)
         flag1 = True
         for x in range(0, self.lenCurrentUnitChilddict):
             flag = selectIfUnitScheduleFinish(self.currentUnitChilddict[x][0],
@@ -867,15 +869,15 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                 flag1 = False
                 break
 
-        if (fileName != "") & flag1:
+        if (fileName != "") and flag1:
             item = QPushButton("已完成")
             item.setStyleSheet("background-color : rgba(154,200,226,255)")
             if self.unitFlag == 1:
                 self.disturbResult.setCellWidget(currentRow, 8 + self.lenCurrentUnitChilddict, item)
-                updateScheduleFinishUper(self.currentEquipdict[currentRow][0], self.currentYear, fileName)
+                updateIfScheduleFinishUper(self.currentEquipdict[currentRow][0], self.currentYear)
             elif self.unitFlag == 2:
                 self.disturbResult.setCellWidget(currentRow, 7 + self.lenCurrentUnitChilddict, item)
-                updateScheduleFinishBase(self.currentEquipdict[currentRow][0], self.currentYear, fileName)
+                updateIfScheduleFinishBase(self.currentEquipdict[currentRow][0], self.currentYear)
         self.selectSchedule()
         self.scheduleFinish.signal.disconnect()
 
@@ -910,7 +912,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                         flag3 = False
                     else:
                         flag3 = True
-                    if '全部完成' in index and selectIfScheduleFinishUper(equipID, self.currentYear)[0][0] == '0':
+                    if '全部完成' in index and selectIfScheduleFinishUper(equipID, self.currentYear)[0][0] != 'FALSE':
                         flag4 = False
                     else:
                         flag4 = True
@@ -1037,7 +1039,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                         flag3 = False
                     else:
                         flag3 = True
-                    if '全部完成' in index and selectIfScheduleFinishBase(equipID, self.currentYear)[0][0] == '0':
+                    if '全部完成' in index and selectIfScheduleFinishBase(equipID, self.currentYear)[0][0] != 'FALSE':
                         flag4 = False
                     else:
                         flag4 = True
@@ -1141,4 +1143,6 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
 
         # 通过选中行的装备与选中的年份信息
         pass
+
+
 

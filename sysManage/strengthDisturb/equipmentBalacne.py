@@ -172,9 +172,6 @@ class equipmentBalance(QWidget, Widget_Retirement):
         #     if equipItem.checkState(0) == Qt.Checked or equipItem.checkState(0) == Qt.PartiallyChecked:
         self.currentCheckedEquipList = self.get_checked(self.tw_second.topLevelItem(0))
         self.tw_second.expandAll()
-        # print('-----------------------------')
-        # print(self.currentCheckedEquipList)
-
         if self.currentCheckedEquipList == [] or self.currentCheckedUnitList == []:
             self.tw_result.setRowCount(2)
             self.tw_result.horizontalHeader().setVisible(False)

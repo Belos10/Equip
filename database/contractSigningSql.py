@@ -27,7 +27,7 @@ def getBureauNamesFromAgentRoom():
 
 def getAgentNamesAndIds(bureauName):
     sql = "select id,agent_name from agent_room where bureau_name = '%s'"%bureauName
-    print(sql)
+
     result = list(executeSql(sql))
     ids = []
     names = []
@@ -65,7 +65,7 @@ def updataOneDataIntoContractSign(rowData):
              rowData[9], rowData[10], rowData[11], rowData[12], rowData[13], rowData[14],
              rowData[15], rowData[16], rowData[17], rowData[18], rowData[19], rowData[20], rowData[21],
              rowData[22], rowData[23],rowData[24],rowData[0])
-    print(sql)
+
     return executeCommit(sql)
 
 def deleteDataByContractSignId(id):

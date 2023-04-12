@@ -71,7 +71,6 @@ class mainManage(QObject):
             self.mainwnd._widget.login.tb_ManageWidget.removeTab(5)
             self.mainwnd._widget.login.tb_ManageWidget.removeTab(0)
         set_value("totleUserInfo", self.mainwnd._widget.login.userInfo)
-        # print("''''''''''''''''''''''''''''''''", get_value("totleUserInfo"))
         # self.strengthDisturb.initUserInfo(self.userInfo)
         # self.alocatMange.initUserInfo(self.userInfo)
         # self.PosEngin.slotInstallation()
@@ -95,7 +94,6 @@ if __name__ == "__main__":
     basepath=os.path.split(os.path.abspath(__file__))[0]
     path = basepath + "\\icons\\ElegantDark.qss"
     # path=os.path.join(basepath,"./icons/ElegantDark.qss")
-    # print(path)
     with open(path, 'r') as f:
         qssStyle = f.read()
     app.setStyleSheet(qssStyle)

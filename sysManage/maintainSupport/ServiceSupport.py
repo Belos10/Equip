@@ -411,7 +411,6 @@ class ServiceSupport(QWidget, ServiceSupportNewUI):
             新增一行的数据
     '''
     def slotAlterAndSava(self, index):
-        print('修改保存')
         selectRow = self.tw_result.selectedItems()
         if len(selectRow) != 0:
             currentRow = selectRow[0].row()

@@ -133,7 +133,6 @@ class MaintenanceContractSigning(QWidget, MaintenanceContractSigningUI):
                 self.tw_result.setItem(3 + i, 3, item)
 
                 #合同号
-                print('dataList-i',dataList[i])
                 item = QTableWidgetItem(dataList[i][4])
                 item.setFlags(Qt.ItemIsEnabled)
                 item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)

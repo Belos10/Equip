@@ -355,7 +355,7 @@ class MultiyearComparison(QWidget, Widget_MultiyearComparison):
                     item4 = QTableWidgetItem("")
                     # 是否完成接装
                     flag4 = selectIfScheduleFinishUper(self.currentEquipdict[0][0], self.yearChooseList[i])
-                    if flag4[0][0] != '0' and flag4[0][0] is not None and flag4[0][0] != "":
+                    if flag4[0][0] != 'FALSE' and flag4[0][0] is not None and flag4[0][0] != "":
                         item4.setText("已完成")
                     else:
                         item4.setText("未完成")
@@ -386,7 +386,7 @@ class MultiyearComparison(QWidget, Widget_MultiyearComparison):
                     item4 = QTableWidgetItem("")
                     # 是否完成接装
                     flag4 = selectIfScheduleFinishBase(self.currentEquipdict[0][0], self.yearChooseList[i])
-                    if flag4[0][0] != '0' and flag4[0][0] is not None and flag4[0][0] != '':
+                    if flag4[0][0] != 'FALSE' and flag4[0][0] is not None and flag4[0][0] != '':
                         item4.setText("已完成")
                     else:
                         item4.setText("未完成")

@@ -40,7 +40,6 @@ def selectAllDataAboutLogin():
 
 def updateRootLogin():
     loginList = selectAllDataAboutLogin()
-    print("loginList", loginList)
     if len(loginList) == 0:
         insertIntoLogin('root', '默认机关', '123456', '机关', '1')
     else:
@@ -68,6 +67,6 @@ def delFromLogin(accont):
 def updateUserInfo(accont, name, password, role, unitID):
     sql = "update login set name = '" +  name + "', password = '" + password + "', role = '" + role\
           + "', unitID = '" + unitID + "' where accont = '" + accont + "'"
-    print(sql)
+
     cur.execute(sql)
     conn.commit()

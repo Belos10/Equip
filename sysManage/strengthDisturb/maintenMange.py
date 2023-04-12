@@ -171,7 +171,6 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
             Unit_ID = resultInfo[0]
             Equip_ID = resultInfo[1]
             orginNum = resultInfo[5]
-            print('resultInfo', resultInfo)
             year = resultInfo[-1]
             unitHaveChild = selectUnitIsHaveChild(Unit_ID)
             equipHaveChild = selectEquipIsHaveChild(Equip_ID)

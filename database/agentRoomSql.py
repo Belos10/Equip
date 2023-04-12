@@ -34,7 +34,6 @@ def deleteDataById(id):
     return excuteupdata(sqls)
 
 def insertOneDataAgentRoom(rowDate):
-    print(rowDate)
     sql = "insert into agent_room(bureau_name,agent_name,manufactor_name,contact,phone_number,region) values ('%s', '%s','%s','%s','%s','%s')"\
           %(rowDate[0],rowDate[1],rowDate[2],rowDate[3],rowDate[4], rowDate[5])
     return executeCommit(sql)

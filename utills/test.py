@@ -373,7 +373,6 @@ class FramelessWindow(QWidget):
                 return
         self.setGeometry(x, y, w, h)
     def center(self):
-        print("center")
         #获获取屏幕的尺寸信息，也可以理解为屏幕的分辨率信息。获取到的屏幕信息有两个属性，一个是width对应屏幕的长度，一个是height对应屏幕的宽度。
         screen = QDesktopWidget().screenGeometry()
         #获取控件的尺寸信息

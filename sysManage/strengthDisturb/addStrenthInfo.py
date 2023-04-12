@@ -70,7 +70,6 @@ class AddStrenthInfo(QWidget, Add_Strenth_Info):
             self.factoryYear = "---"
             self.startFactoryYear = self.chooseFactoryYear.startFactoryYear
             self.endFactoryYear = self.chooseFactoryYear.endFactoryYear
-            #print("===============0", self.startFactoryYear, self.endFactoryYear)
             if int(self.startFactoryYear) > int(self.endFactoryYear):
                 getMessageBox("查询", "请重新选择，开始年份必须小于等于结束年份", True, False)
                 return
