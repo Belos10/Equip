@@ -235,8 +235,8 @@ def insertIntoOrderPlanYear(year):
         sql = "insert into orderallotplannote(Equip_id,Equip_Name,Year,Note) values " +\
                   "('" + EquipInfo[0] + "','" + EquipInfo[1] + "','" + str(year) +"', '' )"
         cur.execute(sql)
-        sql = "insert into orderallotschedule (Equip_Id,Equip_Name,contract,allotconditionUper,rocketUper,finishUper,year) values " \
-              + "('" + EquipInfo[0] + "','" + EquipInfo[1] + "', '','0','0','0','" + str(year) + "' )"
+        sql = "insert into orderallotschedule (Equip_Id,Equip_Name,contract,allotconditionUper,rocketUper,year) values " \
+              + "('" + EquipInfo[0] + "','" + EquipInfo[1] + "', '','0','0','" + str(year) + "' )"
         cur.execute(sql)
         for UnitInfo in UnitList:
             sql = "insert into orderallotplan(Equip_id,Equip_Name,Unit_Id,Unit_Name,Year,OrderNum) values " +\
@@ -435,7 +435,7 @@ def selectRocketScheduleUper(Equip_Id, Year):
 # 查询是否完成(基地)
 def selectIfScheduleFinishBase(Equip_Id, Year):
     # conn, cur = connectMySql()
-    sql = "select finishBase from orderallotschedule where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
+    sql = "select finishBaseFlag from orderallotschedule where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
     cur.execute(sql)
     result = cur.fetchall()
     conn.commit()
@@ -446,12 +446,27 @@ def selectIfScheduleFinishBase(Equip_Id, Year):
 # 查询是否完成(机关)
 def selectIfScheduleFinishUper(Equip_Id, Year):
     # conn, cur = connectMySql()
-    sql = "select finishUper from orderallotschedule where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
+    sql = "select finishUperFlag from orderallotschedule where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
     cur.execute(sql)
     result = cur.fetchall()
     conn.commit()
     # disconnectMySql(conn, cur)
     return result
+
+# 更新是否完成(机关)
+def updateIfScheduleFinishUper(Equip_Id, Year):
+    sql = "update orderallotschedule set finishUperFlag = TRUE where Equip_Id = '%s' and year = '%s'" % (Equip_Id, Year)
+    cur.execute(sql)
+    conn.commit()
+
+
+# 更新是否完成(基地)
+def updateIfScheduleFinishBase(Equip_Id, Year):
+    sql = "update orderallotschedule set finishBaseFlag = TRUE where Equip_Id = '%s' and year = '%s'" % (Equip_Id, Year)
+    cur.execute(sql)
+    conn.commit()
+
+
 
 # 更新陆军调拨单进度
 def updateContractSchedule(Equip_Id, Year, txt):
@@ -497,22 +512,40 @@ def updateRocketScheduleUper(Equip_Id, Year):
     # disconnectMySql(conn, cur)
 
 # 更新是否完成进度(基地)
-def updateScheduleFinishBase(Equip_Id, Year, fileName):
+def updateScheduleFinishBase(Equip_Id, Year, fileWay, file):
     # conn, cur = connectMySql()
-    sql = "update orderallotschedule set finishBase = '" + fileName + "' where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
+    sql = "update orderallotschedule set finishBaseWay = '" + fileWay + "' where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
+    cur.execute(sql)
+    conn.commit()
+    sql = "update orderallotschedule set finishBaseFile = '" + file + "' where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
     cur.execute(sql)
     conn.commit()
     #disconnectMySql(conn, cur)
 
 # 更新是否完成进度(机关)
-def updateScheduleFinishUper(Equip_Id, Year, fileName):
+def updateScheduleFinishUper(Equip_Id, Year, fileWay, file):
     # conn, cur = connectMySql()
-    sql = "update orderallotschedule set finishUper = '" + fileName + "' where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
+    sql = "update orderallotschedule set finishUperWay = '" + fileWay + "' where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
     cur.execute(sql)
+    conn.commit()
+    sql = "update orderallotschedule set finishUperFile = ? where Equip_Id = '" + Equip_Id + "'and year = '" + Year + "'"
+    cur.execute(sql, (file,))
     conn.commit()
     #disconnectMySql(conn, cur)
 
+def selectFileUper(Equip_Id, Year):
+    sql = "select finishUperFile, finishUperWay from orderallotschedule where Equip_Id = '%s' and year = '%s'" %(Equip_Id, Year)
+    cur.execute(sql)
+    result = cur.fetchall()
+    conn.commit()
+    return result
 
+def selectFileBase(Equip_Id, Year):
+    sql = "select finishBaseFile, finishBaseWay from orderallotschedule where Equip_Id = '%s' and year = '%s'" %(Equip_Id, Year)
+    cur.execute(sql)
+    result = cur.fetchall()
+    conn.commit()
+    return result
 
 # # 按装备ID列表从unit表复制数据至Orderplanunit表
 # def insertIntoDisturbPlanUnitFromList(UnitList):

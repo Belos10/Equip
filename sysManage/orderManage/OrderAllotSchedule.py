@@ -407,7 +407,7 @@ class OrderAllotSchedule(QWidget, widget_OrderAllotSchedule):
                     print("flag4",flag4)
                     item = QPushButton("设置进度")
                     item.clicked.connect(self.setScheduleFinish)
-                    if flag4[0][0] != '0':
+                    if flag4[0][0] != 'FALSE':
                         item = QPushButton("已完成")
                     self.disturbResult.setCellWidget(i, 8 + self.lenCurrentUnitChilddict, item)
         # 选择基地
@@ -446,7 +446,7 @@ class OrderAllotSchedule(QWidget, widget_OrderAllotSchedule):
                     print("flag4", flag4)
                     item = QPushButton("设置进度")
                     item.clicked.connect(self.setScheduleFinish)
-                    if flag4[0][0] != '0':
+                    if flag4[0][0] != 'FALSE':
                         item = QPushButton("已完成")
                     self.disturbResult.setCellWidget(i, 7 + self.lenCurrentUnitChilddict, item)
 
@@ -776,22 +776,26 @@ class OrderAllotSchedule(QWidget, widget_OrderAllotSchedule):
             getMessageBox("设置接装条件", "上一级未完成", True, False)
             return
         self.scheduleFinish.setWindowFlags(Qt.Dialog|Qt.WindowCloseButtonHint)
+        self.scheduleFinish.fileName = ""
+        self.scheduleFinish.initDict(self.currentUnitChilddict,
+                                     self.currentEquipdict[currentRow][0], self.currentYear, self.unitFlag)
+        self.scheduleFinish.init1()
         self.scheduleFinish.show()
         self.scheduleFinish.signal.connect(self.updateFinish)
 
     # 更新进度4 是否完成
     def updateFinish(self):
         currentRow = self.disturbResult.currentRow()
-        fileName = self.scheduleFinish.returnFileName()
+        fileName, file, fileWay = self.scheduleFinish.returnFileName()
         print("fileName", fileName)
         if fileName != "":
             item = QPushButton("已完成")
             if self.unitFlag == 1:
                 self.disturbResult.setCellWidget(currentRow, 8 + self.lenCurrentUnitChilddict, item)
-                updateScheduleFinishUper(self.currentEquipdict[currentRow][0], self.currentYear, fileName)
+                updateIfScheduleFinishUper(self.currentEquipdict[currentRow][0], self.currentYear)
             elif self.unitFlag == 2:
                 self.disturbResult.setCellWidget(currentRow, 7 + self.lenCurrentUnitChilddict, item)
-                updateScheduleFinishBase(self.currentEquipdict[currentRow][0], self.currentYear, fileName)
+                updateIfScheduleFinishBase(self.currentEquipdict[currentRow][0], self.currentYear)
 
 
     # 筛选调拨进度
@@ -875,7 +879,7 @@ class OrderAllotSchedule(QWidget, widget_OrderAllotSchedule):
                 j = 0
                 for equipID, equipItem in self.second_treeWidget_dict.items():
                     flag4 = selectIfScheduleFinishUper(equipID, self.currentYear)
-                    if flag4[0][0] != '0':
+                    if flag4[0][0] != 'FALSE':
                         if equipItem.checkState(0) == Qt.Checked:
                             equipInfo = findEquipInfo(equipID)
                             equipDict[j] = equipInfo[0]
@@ -945,7 +949,7 @@ class OrderAllotSchedule(QWidget, widget_OrderAllotSchedule):
                 j = 0
                 for equipID, equipItem in self.second_treeWidget_dict.items():
                     flag4 = selectIfScheduleFinishBase(equipID, self.currentYear)
-                    if flag4[0][0] != '0':
+                    if flag4[0][0] != 'FALSE':
                         if equipItem.checkState(0) == Qt.Checked:
                             equipInfo = findEquipInfo(equipID)
                             equipDict[j] = equipInfo[0]

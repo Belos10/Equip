@@ -30,14 +30,6 @@ class ScheduleFinish(QWidget, widget_ScheduleFinish):
         self.equipID = ''
         self.year = -1
         self.unitFlag = -1
-
-        # self.btn_chooseFile = QPushButton(self)
-        # self.btn_chooseFile.setObjectName("btn_chooseFile")
-        # self.btn_chooseFile.setText("选取文件")
-        #
-        # self.btn_openFile = QPushButton(self)
-        # self.btn_openFile.setObjectName("btn_openFile")
-        # self.btn_openFile.setText("查看文件")
         self.layout1 = QHBoxLayout()
         self.signalConnect()
         # self.initUnitFinish()
@@ -61,7 +53,6 @@ class ScheduleFinish(QWidget, widget_ScheduleFinish):
         self.file = ""
         self.fileWay = ""
         # self.ifUnitScheduleFinish()
-
 
     def deleteItemsOfLayout(self,layout):
         if layout is not None:
@@ -142,10 +133,8 @@ class ScheduleFinish(QWidget, widget_ScheduleFinish):
         except Exception as e:
             print(e)
 
-
     def ifUnitScheduleFinish(self):
-        aaa= self.layout1.count()
-        # print("self.layout1.count()=", aaa)
+        aaa = self.layout1.count()
         for i in range(self.layout1.count()):
             self.key = i
             flag = selectIfUnitScheduleFinish(self.UnitDict[i][0], self.equipID, self.year)
@@ -211,7 +200,7 @@ class ScheduleFinish(QWidget, widget_ScheduleFinish):
 
 
 
-    def closeEvent(self,event):
+    def closeEvent(self, event):
         for idx in range(self.layout1.count()):
             flag = False
             if self.layout1.itemAt(idx).widget().isChecked():

@@ -83,7 +83,10 @@ def insertIntoArmyTransfer(ID, Trans_ID, Trans_Date, Trans_Reason, Trans, Trans_
                            Send_Tel, Recive_Name, Recive_Connect, Recive_Tel, Equip_ID,
                            Equip_Name, Equip_Unit, Equip_Quity, Equip_Num, Equip_Other, year):
     # conn, cur = connectMySql()
-    sql = 'Port_Way", Effic_Date, Send_UnitID, Send_UnitName, Send_Connect, Send_Tel, Recive_Name,' + ID + "', '"  + Trans_ID + "', '"  + Trans_Date + "', '"  + Trans_Reason + \
+    sql = "INSERT INTO armytransfer(ID, Trans_ID, Trans_Date, Trans_Reason, Trans, Trans_Way," \
+          "Port_Way, Effic_Date, Send_UnitID, Send_UnitName, Send_Connect, Send_Tel, Recive_Name," \
+          "Recive_Connect, Recive_Tel, Equip_ID, Equip_Name, Equip_Unit, Equip_Quity, Equip_Num," \
+          "Equip_Other, year) VALUES ('" + ID + "', '"  + Trans_ID + "', '"  + Trans_Date + "', '"  + Trans_Reason + \
           "', '"  + Trans + "', '" + Trans_Way + "', '" + Port_Way + "', '" + Effic_Date + "', '" \
           + Send_UnitID + "', '" + Send_UnitName + "', '" + Send_Connect + "', '" + Send_Tel\
           + "', '" + Recive_Name + "', '" + Recive_Connect + "', '" + Recive_Tel + "', '" + Equip_ID + \
@@ -101,7 +104,10 @@ def insertIntoRocketTransfer(ID, Trans_ID, Trans_Date, Trans_Reason, Trans, Tran
                            Send_Tel, Recive_Name, Recive_Connect, Recive_Tel, Equip_ID,
                            Equip_Name, Equip_Unit, Equip_Quity, Equip_Num, Equip_Other, year):
     #conn, cur = connectMySql()
-    sql = 'Port_Way", Effic_Date, Send_UnitID, Send_UnitName, Send_Connect, Send_Tel, Recive_Name,' + ID + "', '"  + Trans_ID + "', '"  + Trans_Date + "', '"  + Trans_Reason + \
+    sql = "INSERT INTO rockettransfer(ID, Trans_ID, Trans_Date, Trans_Reason, Trans, Trans_Way," \
+          "Port_Way, Effic_Date, Send_UnitID, Send_UnitName, Send_Connect, Send_Tel, Recive_Name," \
+          "Recive_Connect, Recive_Tel, Equip_ID, Equip_Name, Equip_Unit, Equip_Quity, Equip_Num," \
+          "Equip_Other, year) VALUES ('" + ID + "', '"  + Trans_ID + "', '"  + Trans_Date + "', '"  + Trans_Reason + \
           "', '"  + Trans + "', '" + Trans_Way + "', '" + Port_Way + "', '" + Effic_Date + "', '" \
           + Send_UnitID + "', '" + Send_UnitName + "', '" + Send_Connect + "', '" + Send_Tel\
           + "', '" + Recive_Name + "', '" + Recive_Connect + "', '" + Recive_Tel + "', '" + Equip_ID + \
