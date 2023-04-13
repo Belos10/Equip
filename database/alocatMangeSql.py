@@ -402,7 +402,13 @@ def selectDisturbPlanOther(EquipList, YearList):
         result = cur.fetchall()
         #print("other result",result)
         if result:
-            resultList.append(result)
+            if len(result) == 1:
+                resultList.append(result)
+            elif len(result) > 1:
+                num = 0
+                for x in result:
+                    num += int(x[1])
+                resultList.append([(result[0][0], num)])
         else:
             resultList.append([])
     # print("陆军调拨单resultList", resultList)
@@ -417,7 +423,13 @@ def selectDisturbPlanOther_single(EquipId, YearList):
     result = cur.fetchall()
     #print("other result",result)
     if result:
-        resultList.append(result)
+        if len(result) == 1:
+            resultList.append(result)
+        elif len(result) > 1:
+            num = 0
+            for x in result:
+                num += int(x[1])
+            resultList.append([(result[0][0], num)])
     else:
         resultList.append([])
     # print("陆军调拨单resultList", resultList)

@@ -637,6 +637,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                     for i in range(0, len(self.currentEquipdict)):
                         item = self.disturbResult.item(i, 2)
                         if unitDisturbPlanOtherList[i]:
+                            a = unitDisturbPlanOtherList[i]
                             item.setText(str(unitDisturbPlanOtherList[i][0][1]))
                         else:
                             item.setText("")

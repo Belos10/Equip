@@ -760,6 +760,7 @@ def selectEquipUnitInfo(Equip_ID):
         return ''
     else:
         return result[0][0]
+
 # 先装备信息表中修改一条数据
 def updateDataIntoEquipUnitInfo(Equip_ID, Equip_Unit_Info):
     if len(selectEquipUnitInfo(Equip_ID)) > 0:
@@ -767,6 +768,7 @@ def updateDataIntoEquipUnitInfo(Equip_ID, Equip_Unit_Info):
     else:
         sql = "Insert into equip_unit_info values ('%s', '%s')"%(Equip_ID, Equip_Unit_Info)
     return executeCommit(sql)
+
 # 单位表equip中修改一条数据
 def updateDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type, unit):
     # 插入的sql语句
