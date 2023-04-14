@@ -375,7 +375,7 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
         # print(self.currentCheckedUnitList)
         # print(self.currentCheckedEquipList)
         # if self.currentCheckedUnitList == [] or self.currentCheckedEquipList == []:
-        #     headerlist = ['单位名称', '装备名称', '实力数', '编制数', '现有数']
+        #     headerlist = ['单位名称', '装备名称', '计划数', '编制数', '现有数']
         #     self.tw_result.setHorizontalHeaderLabels(headerlist)
         #     self.currentInquiryResult.clear()
         #     self.tw_result.setColumnCount(len(headerlist))
@@ -384,7 +384,7 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
         if len(self.currentCheckedUnitList) > 0 and len(self.currentCheckedUnitList) > 0:
             self._initTableWidgetByUnitListAndEquipList(self.currentCheckedUnitList, self.currentCheckedEquipList, self.currentYear)
         else:
-            headerlist = ['单位名称', '装备名称', '实力数', '编制数', '现有数']
+            headerlist = ['单位名称', '装备名称', '计划数', '编制数', '现有数']
             self.tw_result.setHorizontalHeaderLabels(headerlist)
             self.tw_result.setColumnCount(len(headerlist))
             self.tw_result.setRowCount(0)
@@ -422,7 +422,7 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
             self.rb_equipShow.setDisabled(False)
             self.rb_unitShow.setDisabled(False)
 
-        headerlist = ['单位名称', '装备名称', '实力数', '编制数', '现有数']
+        headerlist = ['单位名称', '装备名称', '计划数', '编制数', '现有数']
         self.tw_result.setHorizontalHeaderLabels(headerlist)
         self.currentInquiryResult.clear()
         self.tw_result.setColumnCount(len(headerlist))

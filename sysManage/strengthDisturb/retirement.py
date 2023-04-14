@@ -395,7 +395,7 @@ class retirement(QWidget, Widget_Retirement):
         item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
         self.tw_result.setItem(1, 2, item)
 
-        item = QTableWidgetItem('实力数')
+        item = QTableWidgetItem('计划数')
         item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
         self.tw_result.setItem(1, 3, item)
@@ -492,7 +492,7 @@ class retirement(QWidget, Widget_Retirement):
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.tw_result.setItem(i + 2, 2, item)
 
-            # 实力数
+            # 计划数
             item = QTableWidgetItem(str(LineInfo[5]))
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.tw_result.setItem(i + 2, 3, item)
@@ -744,7 +744,7 @@ class retirement(QWidget, Widget_Retirement):
             workSheet.write(1,0,"序号",titileStyle)
             workSheet.write(1, 1, "装备名称",titileStyle)
             workSheet.write(1, 2, "单位",titileStyle)
-            workSheet.write(1, 3, "实力数",titileStyle)
+            workSheet.write(1, 3, "计划数",titileStyle)
             workSheet.write(1, 4, "编制数",titileStyle)
             workSheet.write(1, 5, "拟退役数",titileStyle)
             workSheet.write(1, 6, "现有数",titileStyle)
@@ -776,7 +776,7 @@ class retirement(QWidget, Widget_Retirement):
                 # 单位
                 workSheet.write(i + 2, 2, LineInfo[4],contentStyle)
 
-                # 实力数
+                # 计划数
                 workSheet.write(i + 2, 3,str(LineInfo[5]), contentStyle)
                 # 现有数
                 workSheet.write(i + 2, 6, LineInfo[8], contentStyle)
@@ -870,7 +870,7 @@ class retirement(QWidget, Widget_Retirement):
             print(e)
             getMessageBox("加载文件失败！", "请检查文件格式及内容格式！", True, False)
             return
-        headerlist = ['装备名称', '实力数', '编制数', '拟退役数', '现有数', '超缺编数', '申请需求', '提前退役', '备注', '未到位数', '拟批准退役', '拟申请']
+        headerlist = ['装备名称', '计划数', '编制数', '拟退役数', '现有数', '超缺编数', '申请需求', '提前退役', '备注', '未到位数', '拟批准退役', '拟申请']
         self.showInputResult.setWindowTitle("导入数据")
         self.showInputResult.show()
         # QTableWidget设置整行选中

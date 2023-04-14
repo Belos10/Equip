@@ -46,7 +46,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         self.signalConnect()
         self.startFactoryYear = None
         self.endFactoryYear = None
-        headerlist = ['单位名称', '装备名称', '实力数', '编制数', '现有数', '偏差(实力-现有)', '准备退役数', '未到位数', '提前退役', '待核查无实物', '待核查无实力', '单独建账',
+        headerlist = ['单位名称', '装备名称', '计划数', '编制数', '现有数', '偏差(实力-现有)', '准备退役数', '未到位数', '提前退役', '待核查无实物', '待核查无实力', '单独建账',
                       '正常到位']
         self.tw_inquiryResult.setHorizontalHeaderLabels(headerlist)
         self.tw_inquiryResult.setColumnCount(len(headerlist))
@@ -75,7 +75,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         #删除当前装备
         self.pb_clearCheck.clicked.connect(self.slotClearCurrentRow)
 
-        #清除当前页面全部装备实力数
+        #清除当前页面全部装备计划数
         self.pb_clearAll.clicked.connect(self.slotClearCurrentPage)
 
         #选择展示的出厂年份
@@ -84,7 +84,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         #筛选表头
         self.pb_filterTitle.clicked.connect(self.slotShowFilterTitle)
 
-        #修改实力数
+        #修改计划数
         self.tw_inquiryResult.itemChanged.connect(self.slotItemChange)
 
         self.chooseFactoryYear.tb_cancel.clicked.connect(self.slotCancelChooseFactoryYear)
@@ -214,7 +214,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         self.filterTitle.hide()
 
     '''
-        清除当前结果页面所有的实力数
+        清除当前结果页面所有的计划数
     '''
     def slotClearCurrentPage(self):
         if self.currentFactoryYear != "":
@@ -223,7 +223,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         if self.year == '全部':
             getMessageBox('清除', '只能某一年，清除失败', True, False)
             return
-        reply = getMessageBox('清除', '是否清除当前页面所有行的实力数？', True, True)
+        reply = getMessageBox('清除', '是否清除当前页面所有行的计划数？', True, True)
         if reply == QMessageBox.Cancel:
             return
 
@@ -235,7 +235,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
             unitHaveChild = selectUnitIsHaveChild(Unit_ID)
             equipHaveChild = selectEquipIsHaveChild(Equip_ID)
             if unitHaveChild or equipHaveChild:
-                getMessageBox('清除', '第' + str(i) + "行清除失败，只能清除末级单位和装备实力数", True, False)
+                getMessageBox('清除', '第' + str(i) + "行清除失败，只能清除末级单位和装备计划数", True, False)
                 continue
             else:
                 updateStrengthAboutStrengrh(Unit_ID, Equip_ID, year, "0", orginNum)
@@ -260,7 +260,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
 
 
     '''
-        清除当前行的实力数
+        清除当前行的计划数
     '''
     def slotClearCurrentRow(self):
         currentRow = self.tw_inquiryResult.currentRow()
@@ -276,13 +276,13 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                     unitHaveChild = selectUnitIsHaveChild(Unit_ID)
                     equipHaveChild = selectEquipIsHaveChild(Equip_ID)
                     if unitHaveChild or equipHaveChild:
-                        getMessageBox('清除', '只能清除末级单位和装备的实力数', True, False)
+                        getMessageBox('清除', '只能清除末级单位和装备的计划数', True, False)
                         return
                     elif self.year == '全部':
                         getMessageBox('清除', '只能某一年，清除失败', True, False)
                         return
                     else:
-                        getMessageBox('清除', '是否清除当前行的实力数？', True, True)
+                        getMessageBox('清除', '是否清除当前行的计划数？', True, True)
                         updateStrengthAboutStrengrh(Unit_ID, Equip_ID, year, "0", orginNum)
                         self._initTableWidgetByUnitListAndEquipList(self.unitList, self.equipList, self.year)
 
@@ -312,7 +312,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                         #     self.tw_inquiryResult.item(currentRow, currentColumn).setText(str(resultInfo[4]))
                         #     return
                         # if unitHaveChild or equipHaveChild:
-                        #     reply = QMessageBox.question(self, '修改', '只能修改末级实力数，修改失败', QMessageBox.Yes)
+                        #     reply = QMessageBox.question(self, '修改', '只能修改末级计划数，修改失败', QMessageBox.Yes)
                         #     self.tw_inquiryResult.item(currentRow, currentColumn).setText(str(resultInfo[4]))
                         #     return
                         elif self.year == '全部':
@@ -358,7 +358,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         if self.titleList:
             headerlist = self.titleList
         else:
-            headerlist = ['单位名称', '装备名称', '实力数', '编制数', '现有数', '偏差(实力-现有)', '准备退役数', '未到位数', '提前退役', '待核查无实物', '待核查无实力', '单独建账',
+            headerlist = ['单位名称', '装备名称', '计划数', '编制数', '现有数', '偏差(实力-现有)', '准备退役数', '未到位数', '提前退役', '待核查无实物', '待核查无实力', '单独建账',
                       '正常到位']
         print("headerlist=",headerlist)
         self.tw_inquiryResult.setHorizontalHeaderLabels(headerlist)
@@ -422,7 +422,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                     # item.setBackground(QBrush(QColor(154, 200, 226)))
                     # self.tw_inquiryResult.setItem(i, 2, item)
                     try:
-                        index1 = headerlist.index('实力数')
+                        index1 = headerlist.index('计划数')
                         self.tw_inquiryResult.setItem(i, index1, item)
                     except ValueError:
                         pass
@@ -524,7 +524,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                 # item.setBackground(QBrush(QColor(154, 200, 226)))
                 # self.tw_inquiryResult.setItem(i, 2, item)
                 try:
-                    index1 = headerlist.index('实力数')
+                    index1 = headerlist.index('计划数')
                     self.tw_inquiryResult.setItem(i, index1, item)
                 except ValueError:
                     pass
@@ -683,7 +683,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
             contentStyle.borders = borders
 
             #画表头
-            headerlist = [ '单位编号','单位名称', '装备编号', '装备名称', '实力数', '编制数', '现有数', '偏差(实力-现有)', '准备退役数', '未到位数', '提前退役', '待核查无实物', '待核查无实力',
+            headerlist = [ '单位编号','单位名称', '装备编号', '装备名称', '计划数', '编制数', '现有数', '偏差(实力-现有)', '准备退役数', '未到位数', '提前退役', '待核查无实物', '待核查无实力',
                           '单独建账',
                           '正常到位']
             for i in range(len(headerlist)):
@@ -768,7 +768,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
             print(e)
             getMessageBox("加载文件失败！", "请检查文件格式及内容格式！", True, False)
             return
-        headerlist = ['单位名称', '装备名称', '实力数', '编制数', '现有数', '偏差(实力-现有)', '准备退役数', '未到位数', '提前退役', '待核查无实物', '待核查无实力', '单独建账',
+        headerlist = ['单位名称', '装备名称', '计划数', '编制数', '现有数', '偏差(实力-现有)', '准备退役数', '未到位数', '提前退役', '待核查无实物', '待核查无实力', '单独建账',
                       '正常到位']
         self.showInputResult.setWindowTitle("导入数据")
         self.showInputResult.show()
@@ -824,7 +824,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         pass
 
     '''
-        从Excel导入实力数
+        从Excel导入计划数
     '''
     def slotInputDataFromExcel(self):
         self.inputList = []
@@ -849,7 +849,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                 self.setDisabled(False)
                 return
             print("year: " + year)
-            title = ['单位编号', '单位名称', '装备编号', '装备名称', '实力数']
+            title = ['单位编号', '单位名称', '装备编号', '装备名称', '计划数']
             for r in range(1, self.workSheet.nrows):
                 unitId = (self.workSheet.cell(r, 0).value)
                 unitName = self.workSheet.cell(r, 1).value
@@ -871,7 +871,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                 inputInfo.append(strength)
                 inputInfo.append(year)
                 self.inputList.append(inputInfo)
-            self.showInputResult.setWindowTitle("从Excel导入%s年实力数"%year)
+            self.showInputResult.setWindowTitle("从Excel导入%s年计划数"%year)
             self.showInputResult.tw_result.setColumnCount(len(title))
             self.showInputResult.tw_result.setHorizontalHeaderLabels(title)
             self.showInputResult.tw_result.setEditTriggers(QAbstractItemView.NoEditTriggers)
@@ -907,7 +907,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         if self.inputList[0] != '实力查询数据':
             for i, lineInfo in enumerate(self.inputList):
                 try:
-                    # ['单位编号', '单位名称', '装备编号', '装备名称', '实力数'， ’年份‘]
+                    # ['单位编号', '单位名称', '装备编号', '装备名称', '计划数'， ’年份‘]
                     # ['8', '六十一阵地', '5', 'A车', '1', '2001']
                     # updateStrengthAboutStrengrh(Unit_ID, Equip_ID, year, strengthNum, orginStrengthNum)
                     orginStrengthNum = selectStrength(lineInfo[0], lineInfo[2],lineInfo[-1])
