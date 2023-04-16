@@ -367,8 +367,7 @@ class select_setEquip(QWidget,widget_Select_SetEquip):
                                                   self.inputEquipInfoList[i][2], self.inputEquipInfoList[i][3],
                                                   self.inputEquipInfoList[i][4], self.inputEquipInfoList[i][5])
                     addEquipInfoSuccess = addDataIntoEquipUnitInfo(self.inputEquipInfoList[i][0], self.inputEquipInfoList[i][6])
-                    print('addEquipInfoSuccess', addEquipInfoSuccess)
-                    print('addSuccess', addSuccess)
+                    # print('addEquipInfoSuccess', addEquipInfoSuccess)
                 else:
                     if isHaveEquipment(self.inputEquipInfoList[i][2]):
                         updateDataIntoEquip(self.inputEquipInfoList[i][0], self.inputEquipInfoList[i][1],
