@@ -46,6 +46,14 @@ class Strength_Disturb_Widget(object):
         self.tb_strengthSelect.setObjectName("tb_strengthSelect")
         self.tb_strengthSelect.setToolButtonStyle(Qt.Qt.ToolButtonTextUnderIcon)
 
+        self.tb_strengthMaintance = QtWidgets.QToolButton(MainWindow)
+        icon5 = QtGui.QIcon()
+        icon5.addPixmap(QtGui.QPixmap(":/pic/table.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.tb_strengthMaintance.setIcon(icon5)
+        self.tb_strengthMaintance.setIconSize(QSize(10, 10))
+        self.tb_strengthMaintance.setObjectName("tb_strengthMaintance")
+        self.tb_strengthMaintance.setToolButtonStyle(Qt.Qt.ToolButtonTextUnderIcon)
+
         self.tb_maintenMange = QtWidgets.QToolButton(MainWindow)
         icon1 = QtGui.QIcon()
         icon1.addPixmap(QtGui.QPixmap(":/pic/wave.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -76,6 +84,7 @@ class Strength_Disturb_Widget(object):
         self.tb_strengthDisturbSet.setToolButtonStyle(Qt.Qt.ToolButtonTextUnderIcon)
 
         self.toolBar.addWidget(self.tb_strengthSelect)
+        self.toolBar.addWidget(self.tb_strengthMaintance)
         self.toolBar.addWidget(self.tb_maintenMange)
         self.toolBar.addWidget(self.tb_equipBalance)
         self.toolBar.addWidget(self.tb_applyRetire)
@@ -89,6 +98,7 @@ class Strength_Disturb_Widget(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.toolBar.setWindowTitle(_translate("MainWindow", "toolBar"))
         self.tb_strengthSelect.setText(_translate("MainWindow", "实力查询"))
+        self.tb_strengthMaintance.setText(_translate("MainWindow", "实力维护"))
         self.tb_maintenMange.setText(_translate("MainWindow", "编制数维护"))
         self.tb_equipBalance.setText(_translate("MainWindow", "装备平衡表"))
         self.tb_applyRetire.setText(_translate("MainWindow", "申请退役"))

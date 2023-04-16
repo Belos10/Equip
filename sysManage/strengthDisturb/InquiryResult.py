@@ -28,6 +28,9 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
         super(Inquiry_Result, self).__init__(parent)
         self.setupUi(self)
 
+        self.pb_input.setVisible(False)
+        self.pb_inputFromExcel.setVisible(False)
+        self.pb_output.setVisible(False)
         #存储当前查询结果，结构为：{'行号':该行数据'}
         self.currentInquiryResult = {}
         self.unitList = []
@@ -323,7 +326,7 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                             if self.tw_inquiryResult.item(currentRow, currentColumn).text() != resultInfo[4]:
                                 num = self.tw_inquiryResult.item(currentRow,currentColumn).text()
                                 updateSuccess = updateStrengthAboutStrengrh\
-                                    (Unit_ID, Equip_ID, self.year,num,str(resultInfo[4]))
+                                    (Unit_ID, Equip_ID, self.year, num,str(resultInfo[4]))
                                 if not updateSuccess:
                                     getMessageBox("修改", str(updateSuccess) + "修改失败", True, False)
                                     # QMessageBox.information(self, "修改", "修改成功！", QMessageBox.Yes)
@@ -617,9 +620,9 @@ class Inquiry_Result(QWidget, Widget_Inquiry_Result):
                 if selectEquipIsHaveChild(j):
                     row1+=1
                 else:
-                    item = self.tw_inquiryResult.item(row1, index)
-                    item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable)
-                    item.setBackground(QBrush(QColor(154, 200, 226)))
+                    # item = self.tw_inquiryResult.item(row1, index)
+                    # item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable)
+                    # item.setBackground(QBrush(QColor(154, 200, 226)))
                     row1+=1
 
 

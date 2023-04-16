@@ -151,6 +151,8 @@ class AdjustOrder(QWidget, widget_adjustOrder):
         while stack:
             EquipInfo = stack.pop(0)
             item = QTreeWidgetItem(root.pop(0))
+            item.setFlags(
+                Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable | Qt.ItemIsAutoTristate)
             item.setText(0, EquipInfo[1])
             item.setCheckState(0, Qt.Unchecked)
             self.equip_treeWidget_dict[EquipInfo[0]] = item

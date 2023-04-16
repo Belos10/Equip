@@ -320,6 +320,8 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
         while stack:
             EquipInfo = stack.pop(0)
             item = QTreeWidgetItem(root.pop(0))
+            item.setFlags(
+                Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable | Qt.ItemIsAutoTristate)
             item.setText(0, EquipInfo[1])
             item.setData(0, Qt.UserRole, QVariant(EquipInfo[0]))
             item.setCheckState(0, Qt.Unchecked)
@@ -339,6 +341,8 @@ class maintenManage(QWidget, Widget_Mainten_Manage):
         while stack:
             UnitInfo = stack.pop(0)
             item = QTreeWidgetItem(root.pop(0))
+            item.setFlags(
+                Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable | Qt.ItemIsAutoTristate)
             item.setText(0, UnitInfo[1])
             item.setData(0, Qt.UserRole, QVariant(UnitInfo[0]))
             item.setCheckState(0, Qt.Unchecked)

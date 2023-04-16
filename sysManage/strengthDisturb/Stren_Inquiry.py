@@ -172,6 +172,8 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         while stack:
             EquipInfo = stack.pop(0)
             item = QTreeWidgetItem(root.pop(0))
+            item.setFlags(
+                Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable | Qt.ItemIsAutoTristate)
             item.setText(0, EquipInfo[1])
             item.setCheckState(0, Qt.Unchecked)
             self.second_treeWidget_dict[EquipInfo[0]] = item
@@ -190,6 +192,8 @@ class Stren_Inquiry(QWidget, Widget_Stren_Inquiry):
         while stack:
             UnitInfo = stack.pop(0)
             item = QTreeWidgetItem(root.pop(0))
+            item.setFlags(
+                Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable | Qt.ItemIsAutoTristate)
             item.setText(0, UnitInfo[1])
             item.setCheckState(0, Qt.Unchecked)
             self.first_treeWidget_dict[UnitInfo[0]] = item

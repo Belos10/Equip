@@ -3,7 +3,7 @@ import sys
 import os
 import shutil
 import json
-import PyPDF2
+#import PyPDF2
 from io import BytesIO
 from PIL import Image
 from PyQt5.QtWidgets import *

@@ -24,5 +24,6 @@
     <file>orderManagement.png</file>
     <file>orderApply.png</file>
     <file>orderAllotPlan.png</file>
+    <file>table.png</file>
   </qresource>
 </RCC>

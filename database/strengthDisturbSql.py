@@ -454,6 +454,15 @@ def addDataIntoUnit(Unit_ID, Unit_Name, Unit_Uper, Unit_Alias, Is_Group):
                 conn.rollback()
                 return e
 
+            sql = "INSERT INTO strength_maintance (Unit_ID, Equip_ID, Unit_Name, Equip_Name, Plan_Unhanded, year) VALUES" \
+                  + "('" + Unit_ID + "','" + equipInfo[0] + "','" + Unit_Name + "','" + equipInfo[
+                      1] + "', 0, '" + strengthYearInfo[1] + "')"
+            try:
+                cur.execute(sql)
+            except Exception as e:
+                conn.rollback()
+                return e
+
         for disturbplanYearInfo in disturbplanYearInfoTuple:
             sql = "insert into disturbplan (Equip_Id,Equip_Name,Unit_Id,Unit_Name,Year,DisturbNum) values " \
                   + "('" + equipInfo[0] + "','" + equipInfo[1] + "','" + Unit_ID + \
@@ -564,6 +573,17 @@ def addDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type, E
                 conn.rollback()
                 return e
 
+            sql = "INSERT INTO strength_maintance (Unit_ID, Equip_ID, Unit_Name, Equip_Name, Plan_Unhanded, year) VALUES" \
+                  + "('" + unitInfo[0] + "','" + Equip_ID + "','" + unitInfo[
+                      1] + "','" + Equip_Name + "', 0,  '" + \
+                  strengthYearInfo[1] + "')"
+            try:
+                cur.execute(sql)
+            except Exception as e:
+                conn.rollback()
+                return e
+
+
         for disturbplanYearInfo in disturbplanYearInfoTuple:
             sql = "insert into disturbplan (Equip_Id,Equip_Name,Unit_Id,Unit_Name,Year,DisturbNum) values " \
                   + "('" + Equip_ID + "','" + Equip_Name + "','" + unitInfo[0] +\
@@ -613,8 +633,8 @@ def addDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type, E
             conn.rollback()
             return e
 
-        sql = "insert into allotschedule (Equip_Id,Equip_Name,army,allotconditionUper,rocketUper,finishUper,year) values " \
-              + "('" + Equip_ID + "','" + Equip_Name + "', '','0','0','0','" + disturbplanYearInfo + "' )"
+        sql = "insert into allotschedule (Equip_Id,Equip_Name,army,allotconditionUper,rocketUper,year) values " \
+              + "('" + Equip_ID + "','" + Equip_Name + "', '','0','0','" + disturbplanYearInfo + "' )"
         try:
             cur.execute(sql)
         except Exception as e:
@@ -648,8 +668,8 @@ def addDataIntoEquip(Equip_ID, Equip_Name, Equip_Uper, Input_Type, Equip_Type, E
             conn.rollback()
             return e
 
-        sql = "insert into orderallotschedule (Equip_Id,Equip_Name,contract,allotconditionUper,rocketUper,finishUper,year) values " \
-              + "('" + Equip_ID + "','" + Equip_Name + "', '','0','0','0','" + orderallotplanYearInfo + "' )"
+        sql = "insert into orderallotschedule (Equip_Id,Equip_Name,contract,allotconditionUper,rocketUper,year) values " \
+              + "('" + Equip_ID + "','" + Equip_Name + "', '','0','0','" + orderallotplanYearInfo + "' )"
         try:
             cur.execute(sql)
         except Exception as e:
@@ -1480,6 +1500,74 @@ def isEquipUper(Equip_ID, Equip_Uper):
         return True
     else:
         return False
+#按装备展开查询实力数和计划未移交量
+def selectAboutStrengthMaintanceByEquipShow(UnitList, EquipList, year):
+    resultList = []
+    for Unit_ID in UnitList:
+        for Equip_ID in EquipList:
+            # 查询当前装备ID的孩子序列
+            EquipIDChildList = []
+            findChildEquip(Equip_ID, EquipIDChildList, "")
+            for i, childEquipID in enumerate(EquipIDChildList):
+                unitName = selectUnitNameByUnitID(Unit_ID)
+                equipName = selectEquipNameByEquipID(childEquipID[0])
+                strength = getStrengthNum(Unit_ID, Equip_ID, year)
+                planUnhanded = selectPlanUnhandedNum(Unit_ID, Equip_ID, year)
+                resultList.append([Unit_ID, unitName, Equip_ID, childEquipID[1], strength, planUnhanded])
+    return resultList
+#查询实力数和计划未移交量
+def selectAboutStrengthMaintanceByUnitListAndEquipList(UnitList, EquipList, year):
+    resultList = []
+    for Unit_ID in UnitList:
+        for Equip_ID in EquipList:
+            unitName = selectUnitNameByUnitID(Unit_ID)
+            equipName = selectEquipNameByEquipID(Equip_ID)
+            strength = getStrengthNum(Unit_ID, Equip_ID, year)
+            planUnhanded = selectPlanUnhandedNum(Unit_ID, Equip_ID, year)
+            resultList.append([Unit_ID, unitName, Equip_ID, equipName, strength, planUnhanded, year])
+    return resultList
+#展开到末级查询实力数和计划未移交量
+def selectAboutStrengthMaintanceByLast(UnitList, EquipList, year):
+    resultList = []
+    if UnitList:
+        UnitID = UnitList[0]
+    else:
+        return
+    if EquipList:
+        EquipID = EquipList[0]
+    else:
+        return
+    childEquip = []
+    childUnit = []
+    findSuccess = findChildEquip(EquipID, childEquip, "")
+    if findSuccess != True:
+        return []
+    findSuccess = findChildUnit(UnitID, childUnit, "")
+    if findSuccess != True:
+        return []
+    unitSpace = ""
+    for UnitID in childUnit:
+        for EquipID in childEquip:
+            strengthNum = getStrengthNum(UnitID[0], EquipID[0], year)
+            planUnhandedNum = selectPlanUnhandedNum(UnitID[0], EquipID[0], year)
+            resultList.append([UnitID[0], UnitID[1], EquipID[0], EquipID[1], strengthNum, planUnhandedNum, year])
+    return resultList
+#按单位展开查询实力数和计划未移交量
+def selectAboutStrengthMaintanceByUnitShow(UnitList, EquipList, year):
+    resultList = []
+    for Equip_ID in EquipList:
+        for Unit_ID in UnitList:
+                #查询当前单位ID的孩子序列
+            UnitIDChildList = []
+            findChildUnit(Unit_ID, UnitIDChildList, "")
+            space = ""
+            for childUnitID in UnitIDChildList:
+                unitName = selectUnitNameByUnitID(childUnitID[0])
+                equipName = selectEquipNameByEquipID(Equip_ID)
+                strength = getStrengthNum(Unit_ID, Equip_ID, year)
+                planUnhanded = selectPlanUnhandedNum(Unit_ID, Equip_ID, year)
+                resultList.append([Unit_ID, childUnitID[1], Equip_ID, equipName, strength, planUnhanded, year])
+    return resultList
 
 # 按装备展开时根据单位列表、装备列表以及年份查询实力表
 def selectAboutStrengthByEquipShow(UnitList, EquipList, yearList,equipYear,startYear, endYear,flagValue0 = False):
@@ -2633,6 +2721,44 @@ def findBigOtherYear(year):
     for info in result:
         yearList.append(info[0])
     return yearList
+# 根据单位号，装备号更新末年计划未移交量
+def updatePlanUnhanded(Unit_ID, Equip_ID, year, newPlanUnhanded, orginPlanUnhanded):
+    EquipIDList = []
+    UnitIDList = []
+    findUnitUperIDList(Unit_ID, UnitIDList)
+    findEquipUperIDList(Equip_ID, EquipIDList)
+    orginYearPlanUnhanded = 0
+    for UnitID in UnitIDList:
+        for EquipID in EquipIDList:
+            equipName = selectEquipNameByEquipID(EquipID)
+            unitName = selectUnitNameByUnitID(UnitID)
+            planUnhandedNum = selectPlanUnhandedNum(UnitID, EquipID, year)
+            if planUnhandedNum:
+                orginYearPlanUnhanded = planUnhandedNum
+            else:
+                orginYearPlanUnhanded = 0
+                sql = "INSERT INTO strength_maintance (Unit_ID, Equip_ID,Unit_Name, Equip_Name, Plan_Unhanded, year) VALUES" \
+                      + "('" + UnitID + "','" + EquipID + "','" + unitName + "','" + equipName + "', 0,"  + "'" + year + "')"
+                try:
+                    cur.execute(sql)
+                except Exception as e:
+                    conn.rollback()
+                    return e
+            changeplanUnhandedNum = orginYearPlanUnhanded - int(orginYearPlanUnhanded) + int(newPlanUnhanded)
+            sql = "Update strength_maintance set Plan_Unhanded = " + str(changeplanUnhandedNum) + " where Equip_ID = '" + \
+                  EquipID + "' and Unit_ID = '" + UnitID + "' and year = '" + year + "'"
+            try:
+                cur.execute(sql)
+            except Exception as e:
+                conn.rollback()
+                return e
+    try:
+        conn.commit()
+        return True
+    except Exception as e:
+        conn.rollback()
+        return e
+
 
 # 根据单位号，装备号修改某年的实力数
 def updateStrengthAboutStrengrh(Unit_ID, Equip_ID, year, strengthNum, orginStrengthNum):
@@ -3048,12 +3174,15 @@ def selectInfoFromRetire(unitID, equipID, year):
         return ''
 
 
-def selectStrengthNum(unitID, EquipID, year):
+def getStrengthNum(unitID, EquipID, year):
     sql = "select Strength from strength where Equip_ID = '" + \
           EquipID + "' and Unit_ID = '" + unitID + "' and year = '" + year + "'"
     cur.execute(sql)
     result = cur.fetchall()
-    return result
+    num = 0
+    if result != None and len(result) > 0:
+        num = result[0][0]
+    return num
 
 
 # 查询实力信息
@@ -3065,6 +3194,22 @@ def selectStrengthInfo(unitID, EquipID, year):
     result = cur.fetchall()
     return result
 
+def selectStrengthNum(unitID, EquipID, year):
+    sql = "select Strength from strength where Equip_ID = '" + \
+          EquipID + "' and Unit_ID = '" + unitID + "' and year = '" + year + "'"
+    cur.execute(sql)
+    result = cur.fetchall()
+    return result
+
+def selectPlanUnhandedNum(unitID, EquipID, year):
+    sql = "select Plan_Unhanded from strength_maintance where Equip_ID = '" + \
+          EquipID + "' and Unit_ID = '" + unitID + "' and year = '" + year + "'"
+    cur.execute(sql)
+    result = cur.fetchall()
+    num = 0
+    if result != None and len(result) > 0:
+        num = result[0][0]
+    return num
 
 # 单位ID对应单位名
 def findUnitNameFromID(UnitID):
