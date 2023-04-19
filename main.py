@@ -92,9 +92,10 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     widget = mainManage()
     basepath=os.path.split(os.path.abspath(__file__))[0]
-    path = basepath + "\\icons\\ElegantDark.qss"
-    # path=os.path.join(basepath,"./icons/ElegantDark.qss")
-    with open(path, 'r') as f:
+    # path = basepath + "\\icons\\ElegantDark.qss"
+    # path = basepath + "\\icons\\rcc\\qss\\static\\baseStyle.qss"
+    path=os.path.join(basepath,"./icons/ElegantDark.qss")
+    with open(path, 'r', encoding="utf-8") as f:
         qssStyle = f.read()
     app.setStyleSheet(qssStyle)
     # exit_code = appctxt.app.exec_()

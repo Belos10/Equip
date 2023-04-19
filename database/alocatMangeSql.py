@@ -577,14 +577,14 @@ def selectIfScheduleFinishUper(Equip_Id, Year):
 
 # 更新是否完成(机关)
 def updateIfScheduleFinishUper(Equip_Id, Year):
-    sql = "update allotschedule set finishUperFlag = TRUE where Equip_Id = '%s' and year = '%s'" % (Equip_Id, Year)
+    sql = "update allotschedule set finishUperFlag = '{}' where Equip_Id = '%s' and year = '%s'".format('TRUE') % (Equip_Id, Year)
     cur.execute(sql)
     conn.commit()
 
 
 # 更新是否完成(基地)
 def updateIfScheduleFinishBase(Equip_Id, Year):
-    sql = "update allotschedule set finishBaseFlag = TRUE where Equip_Id = '%s' and year = '%s'" % (Equip_Id, Year)
+    sql = "update allotschedule set finishBaseFlag = '{}' where Equip_Id = '%s' and year = '%s'".format('TRUE') % (Equip_Id, Year)
     cur.execute(sql)
     conn.commit()
 

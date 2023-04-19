@@ -708,6 +708,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                 item = QPushButton("设置进度")
                 self.disturbResult.setCellWidget(currentRow, currentColumn, item)
             self.preSelectSchedule()
+            # self.initDisturbPlanByUnitListAndEquipList(self.equipDict, self.equipDictTab)
 
     # 进度1 陆军调拨
     def setArmySchedule(self):
@@ -727,6 +728,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         item.setStyleSheet("background-color : rgba(154,200,226,255)")
         self.disturbResult.setCellWidget(currentRow, 5 + self.lenCurrentUnitChilddict, item)
         updateArmySchedule(self.currentEquipdict[currentRow][0], self.currentYear,txt)
+        self.selectSchedule()
 
     # 进度2 接装条件
     def setCondition(self):
@@ -748,6 +750,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                 updateAllotConditionUper(self.currentEquipdict[currentRow][0], self.currentYear, '1')
             elif self.unitFlag == 2:
                 updateAllotConditionBase(self.currentEquipdict[currentRow][0], self.currentYear, '1')
+        self.selectSchedule()
 
     # 进度3 火箭军调拨
     def setRocketSchedule(self):
@@ -775,12 +778,16 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                 info1.append(result1[0][1])
                 # 单位Info 当前选中装备Info 当前年份 [质量 此次分配合计数 各单位分配数 依据 陆军单号]
                 self.rocketSchedule.getUnitIDList(currentUnit,self.currentEquipdict[self.disturbResult.currentRow()],self.currentYear,info1)
+                self.rocketSchedule.setWindowFlags(Qt.Dialog | Qt.WindowCloseButtonHint)
+                self.rocketSchedule.show()
+                self.rocketSchedule.signal.connect(self.updateRocket)
             else:
-                self.rocketSchedule.getUnitIDList("", "",
-                                                  "", "")
-            self.rocketSchedule.setWindowFlags(Qt.Dialog|Qt.WindowCloseButtonHint)
-            self.rocketSchedule.show()
-            self.rocketSchedule.signal.connect(self.updateRocket)
+                getMessageBox("错误", "未找到相关调拨单信息", True, False)
+                # self.rocketSchedule.getUnitIDList("", "",
+                #                                   "", "")
+            # self.rocketSchedule.setWindowFlags(Qt.Dialog|Qt.WindowCloseButtonHint)
+            # self.rocketSchedule.show()
+            # self.rocketSchedule.signal.connect(self.updateRocket)
 
     # 更新进度3 火箭军调拨
     def updateRocket(self):
@@ -795,6 +802,7 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
             self.disturbResult.setCellWidget(currentRow, 5 + self.lenCurrentUnitChilddict, item)
             updateRocketScheduleBase(self.currentEquipdict[currentRow][0], self.currentYear, '1')
             item.clicked.connect(self.showRocket)
+        self.selectSchedule()
 
     # 展示火箭军调拨单
     def showRocket(self):
@@ -886,14 +894,16 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
         index = self.cb_schedule.currentText()
         if self.cbScheduleIndex != index:
             self.cbScheduleIndex = index
-            self.selectSchedule()
+        self.selectSchedule()
+
 
     # 筛选调拨进度
     def selectSchedule(self):
         index = self.cbScheduleIndex
+        print("index==", index)
         if self.unitFlag == 1:
             # 全选
-            if len(index) == 4:
+            if len(index) == 4 or len(index) == 0:
                 self.initDisturbPlanByUnitListAndEquipList(self.originalEquipDict, self.originalEquipDictTab)
             # 完成进度一
             else:
@@ -913,7 +923,8 @@ class AllotSchedule(QWidget,widget_AllotSchedule):
                         flag3 = False
                     else:
                         flag3 = True
-                    if '全部完成' in index and selectIfScheduleFinishUper(equipID, self.currentYear)[0][0] != 'FALSE':
+                    if '全部完成' in index and (selectIfScheduleFinishUper(equipID, self.currentYear)[0][0] == 'FALSE' or
+                    selectIfScheduleFinishUper(equipID, self.currentYear)[0][0] == '0'):
                         flag4 = False
                     else:
                         flag4 = True
